@@ -79,6 +79,44 @@
   --amber:#0E9C8E;--amber-ink:#0A776C;--amber-soft:#D6F0EC;--on-amber:#FFFFFF;
   --ok:#158A55;--ok-soft:#D9F0E4;--alert:#CF3F31;--alert-soft:#FAE2DF;--ring:rgba(14,156,142,.4);
 }
+/* Crema arancia — arancione da ufficio, non da insegna, su fondo crema */
+:root[data-tema="crema"]{
+  --bg:#191411;--surface:#231C16;--surface-2:#2D241C;--surface-3:#3A2F25;--line:#3E3227;--line-soft:#2A221B;
+  --text:#F1E7D9;--dim:#B6A692;--mute:#877867;--navy:#4A3B2D;
+  --amber:#E07B3C;--amber-ink:#F0A068;--amber-soft:#3A2410;--on-amber:#1B1004;
+  --ok:#4CAE84;--ok-soft:#14291F;--alert:#D9594C;--alert-soft:#33191A;--ring:rgba(224,123,60,.4);
+}
+@media (prefers-color-scheme:light){:root[data-tema="crema"]:not([data-theme="dark"]){
+  --bg:#F1E7D8;--surface:#FFFBF4;--surface-2:#F8F1E5;--surface-3:#EDE1CE;--line:#DFD0B8;--line-soft:#EDE3D3;
+  --text:#2B2118;--dim:#6C5B48;--mute:#9A8A75;--navy:#B6A48C;
+  --amber:#C2622A;--amber-ink:#A04D1C;--amber-soft:#F8E4D2;--on-amber:#FFFFFF;
+  --ok:#1E8A5F;--ok-soft:#DCF0E6;--alert:#BE4136;--alert-soft:#F9E2DF;--ring:rgba(194,98,42,.4);
+}}
+:root[data-tema="crema"][data-theme="light"]{
+  --bg:#F1E7D8;--surface:#FFFBF4;--surface-2:#F8F1E5;--surface-3:#EDE1CE;--line:#DFD0B8;--line-soft:#EDE3D3;
+  --text:#2B2118;--dim:#6C5B48;--mute:#9A8A75;--navy:#B6A48C;
+  --amber:#C2622A;--amber-ink:#A04D1C;--amber-soft:#F8E4D2;--on-amber:#FFFFFF;
+  --ok:#1E8A5F;--ok-soft:#DCF0E6;--alert:#BE4136;--alert-soft:#F9E2DF;--ring:rgba(194,98,42,.4);
+}
+/* Bordeaux — i colori presi dall'immagine: vinaccia profondo e rosa acceso */
+:root[data-tema="bordeaux"]{
+  --bg:#170410;--surface:#230913;--surface-2:#2E0F1A;--surface-3:#3D1624;--line:#44192A;--line-soft:#2B101B;
+  --text:#F8E5EB;--dim:#C89BAB;--mute:#95687A;--navy:#4B2131;
+  --amber:#DD5170;--amber-ink:#F0839A;--amber-soft:#3B1020;--on-amber:#1E0510;
+  --ok:#3FC096;--ok-soft:#0E2A23;--alert:#F0913F;--alert-soft:#33220F;--ring:rgba(221,81,112,.42);
+}
+@media (prefers-color-scheme:light){:root[data-tema="bordeaux"]:not([data-theme="dark"]){
+  --bg:#F4E7EB;--surface:#FFFBFC;--surface-2:#FAF0F3;--surface-3:#EFDDE3;--line:#E2CBD3;--line-soft:#F0E1E6;
+  --text:#2B1019;--dim:#6E4854;--mute:#9C7986;--navy:#B08E9A;
+  --amber:#B22D50;--amber-ink:#95203F;--amber-soft:#FADDE4;--on-amber:#FFFFFF;
+  --ok:#17845F;--ok-soft:#D9F0E6;--alert:#B5651B;--alert-soft:#FAEBD9;--ring:rgba(178,45,80,.4);
+}}
+:root[data-tema="bordeaux"][data-theme="light"]{
+  --bg:#F4E7EB;--surface:#FFFBFC;--surface-2:#FAF0F3;--surface-3:#EFDDE3;--line:#E2CBD3;--line-soft:#F0E1E6;
+  --text:#2B1019;--dim:#6E4854;--mute:#9C7986;--navy:#B08E9A;
+  --amber:#B22D50;--amber-ink:#95203F;--amber-soft:#FADDE4;--on-amber:#FFFFFF;
+  --ok:#17845F;--ok-soft:#D9F0E6;--alert:#B5651B;--alert-soft:#FAEBD9;--ring:rgba(178,45,80,.4);
+}
 /* Nebbia — chiaro attenuato: niente bianco pieno, si regge anche di sera */
 :root[data-tema="nebbia"]{
   --bg:#D9E0E6;--surface:#E9EEF2;--surface-2:#E2E8ED;--surface-3:#D2DBE3;--line:#C2CCD6;--line-soft:#D8E0E7;
@@ -1334,6 +1372,15 @@ input,textarea,select{font:inherit;color:inherit}
   font:inherit;font-size:15px;text-align:left}
 /* ---------- LA BARRA DELLE SEZIONI (telefono) ---------- */
 .tabbar{display:none}
+/* la scheda che sto tenendo in mano */
+.preso{transition:transform .12s ease-out,box-shadow .12s ease-out;
+  box-shadow:0 14px 40px rgba(0,0,0,.35);z-index:50;position:relative}
+.preso:not(.buco){transform:scale(1.03)}
+body.sto-spostando{cursor:grabbing}
+body.sto-spostando .tile:not(.preso),
+body.sto-spostando .spazio:not(.preso){transition:transform .16s cubic-bezier(.4,0,.2,1)}
+body.sto-spostando *{user-select:none!important}
+.tile,.spazio{touch-action:pan-y}
 .prossima .chiudi-saluti.fuori{background:transparent;border-color:transparent;color:var(--amber-ink)}
 .prossima .chiudi-saluti.fuori:hover{background:var(--surface);border-color:var(--line)}
 .prossima .az{padding-right:26px}
@@ -1514,10 +1561,17 @@ input,textarea,select{font:inherit;color:inherit}
   .topbar #lockBtn,
   .topbar #themeBtn,
   .topbar #meBtn{display:none!important}
-  .topbar #piuBtn{order:1}
+  .topbar #piuBtn,.topbar #indietroBtn{order:1}
   .topbar .crumb{order:2;flex:1;min-width:0;justify-content:center;text-align:center}
-  .topbar #shareBtn{order:3}
+  .topbar #shareBtn{display:none!important}
   .topbar #bellBtn{order:4}
+  /* dentro a un lavoro il nome sta in alto: qui sotto non serve ripeterlo,
+     ne' dire il tipo, il cliente, la priorita' o riaprire i commenti,
+     che stanno gia' nella barra in basso */
+  .proj-head{display:none!important}
+  .work-head{gap:8px;flex-direction:row;align-items:center;padding:10px 14px}
+  .work-head h2{font-size:15.5px}
+  .work-head .chip.editabile{padding:4px 7px;gap:4px}
   .crumb .tel-titolo{font-family:Sora;font-weight:700;font-size:15.5px;letter-spacing:-.01em;
     display:inline-flex;align-items:center;gap:5px;color:var(--text);
     background:none;border:none;font:inherit;cursor:pointer;max-width:100%}
@@ -1611,8 +1665,14 @@ input,textarea,select{font:inherit;color:inherit}
   .work-head{position:sticky;top:0;z-index:3;background:var(--bg)}
   .subs{flex:none;min-height:0;overflow:visible}
   .rail-r .feed{-webkit-overflow-scrolling:touch}
-  .work-head{padding:12px 14px 10px;flex-direction:column;align-items:flex-start;gap:8px}
+  /* prima riga: nome della fase, chi ne risponde, condividi.
+     Il tasto COMPLETATO, quando c'e', si prende una riga tutta sua. */
+  .work-head{padding:9px 14px;flex-direction:row;align-items:center;gap:8px;flex-wrap:wrap}
   .work-head h2{font-size:16px}
+  .work-head > div:first-child{flex:1 1 auto;min-width:0}
+  .work-head > div:nth-child(2){flex:none;flex-wrap:nowrap}
+  .work-head .chip.editabile{padding:3px 6px;gap:4px;border-radius:999px}
+  .work-head .rail-compatta{flex:1 0 100%;width:100%;margin-left:0;order:9}
   .rail-compatta{margin-left:0;width:100%}
   .rail-compatta .btn-completa{flex:1;justify-content:center}
   .proj > .rail:not(.rail-r){width:min(292px,88vw)}
@@ -1676,6 +1736,9 @@ input,textarea,select{font:inherit;color:inherit}
     </div>
     <button class="iconbtn solo-tel" data-action="nuovo-da-tel" id="piuBtn" title="Nuovo progetto">
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M12 5v14M5 12h14"/></svg>
+    </button>
+    <button class="iconbtn solo-tel" data-action="home" id="indietroBtn" title="Torna ai progetti" hidden>
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4"><path d="m15 5-7 7 7 7"/></svg>
     </button>
     <div class="crumb" id="crumb"></div>
     <div class="viewswitch" id="viewswitch" hidden></div>
@@ -1900,7 +1963,9 @@ const TEMI = [
   {id:'brand',   nome:'Brand',   ds:'Navy e ambra — il tuo',                     c:['#0D1926','#1A3149','#FFAD01']},
   {id:'bosco',   nome:'Bosco',   ds:'Verdi bassi, molto calmo',                  c:['#0F1714','#1C2924','#7FB069']},
   {id:'grafite', nome:'Grafite', ds:'Monocromo, arancio secco',                  c:['#141312','#232120','#E2723B']},
-  {id:'notte',   nome:'Notte',   ds:'Indaco e lilla, riposante',                 c:['#101223','#1E2239','#7C6CF0']}
+  {id:'notte',   nome:'Notte',   ds:'Indaco e lilla, riposante',                 c:['#101223','#1E2239','#7C6CF0']},
+  {id:'crema',   nome:'Crema arancia', ds:'Arancione da ufficio su fondo crema',  c:['#F1E7D8','#F8F1E5','#C2622A']},
+  {id:'bordeaux',nome:'Bordeaux',ds:'Vinaccia profondo e rosa acceso',            c:['#170410','#2E0F1A','#DD5170']}
 ];
 const PESO = {alta:0, media:1, bassa:2};
 
@@ -1908,6 +1973,7 @@ function P(o){
   const p = Object.assign({
     fase:0, avanz:0, revisione:false, tab:'commenti', draft:'',
     tipo:'video', prio:'media', indirizzo:'', nota:'', allegati:[], tags:[], icona:null, coord:null,
+    ord:-1,   /* con l'ordine a mano, un progetto nuovo si mette davanti */
     spazio:'sp1',
     commenti:{}, chat:[], log:[], visti:{commenti:0, chat:0, attivita:0}, faseAss:{},
     lock:{on:false, pw:''}, completato:false
@@ -2216,6 +2282,8 @@ function listaProgetti(){
   const o = state.ordina;
   return l.sort((a,b)=>{
     if(!!a.completato !== !!b.completato) return a.completato? 1 : -1;
+    /* ordine deciso a mano: chi l'ha spostato vince su tutto il resto */
+    if(o==='manuale') return (a.ord??9999)-(b.ord??9999);
     if(o==='scadenza') return (giorniA(a.consegna)??999)-(giorniA(b.consegna)??999);
     if(o==='cliente') return a.cliente.localeCompare(b.cliente);
     if(o==='fase') return b.avanz-a.avanz;
@@ -2317,10 +2385,14 @@ function renderTop(){
   el('meBtn').title = nomeVisibile()+' — profilo';
   const c = el('crumb');
   if(suTelefono()){
-    /* Al centro c'e' scritto dove sei, e sullo spazio si tocca per cambiarlo. */
+    /* Al centro c'e' scritto dove sei. Dentro a un lavoro basta il suo nome:
+       tutto il resto sta piu' in basso, dove si lavora davvero. */
     const sp = SPZ();
     const titoli = {spazi:'I tuoi spazi', mie:'Cosa tocca a te', cerca:'Cerca', profilo:'Profilo'};
-    if((state.schermo==='home' || state.schermo==='progetto') && sp){
+    if(state.schermo==='progetto'){
+      const pr = PROJ();
+      c.innerHTML = '<span class="tel-titolo"><b>'+esc(pr? pr.nome : 'Progetto')+'</b></span>';
+    } else if(state.schermo==='home' && sp){
       c.innerHTML = '<button class="tel-titolo" data-action="menu-spazi" title="Cambia spazio di lavoro">'+
         '<b>'+esc(sp.nome)+'</b><span class="giu">'+svg('chev',2.6)+'</span></button>';
     } else {
@@ -2336,6 +2408,8 @@ function renderTop(){
   } else c.innerHTML = '';
   const pb = el('piuBtn');
   if(pb) pb.hidden = !(state.schermo==='home' || state.schermo==='spazi');
+  const ib = el('indietroBtn');
+  if(ib) ib.hidden = state.schermo!=='progetto';
   el('searchWrap').hidden = state.schermo!=='home';
   const gate = state.schermo==='gate';
   ['undoBtn','bellBtn','meBtn','themeBtn'].forEach(id=>{ const n = el(id); if(n) n.hidden = gate; });
@@ -2678,10 +2752,15 @@ function renderProgetto(){
   h += '<section class="work"><div class="work-head"><div style="flex:1;min-width:0">'+
     '<h2><span style="color:var(--amber-ink)">'+svg(F.icon).replace('<svg','<svg style="width:17px;height:17px;vertical-align:-3px"')+'</span>'+esc(F.nome)+
     (p.revisione? ' <span class="chip ok">in modifica</span>':'')+'</h2>'+
-    '<p>'+esc(F.desc)+'</p></div>'+
+    '<p class="no-tel">'+esc(F.desc)+'</p></div>'+
     '<div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap">'+
-      '<span class="chip editabile" style="gap:6px">Responsabile '+av(U(p.faseAss[f]||p.team[0]),'sm')+
-        esc(U(p.faseAss[f]||p.team[0]).nome.split(' ')[0])+pen('fase','',null,f,1)+'</span>'+
+      '<span class="chip editabile" style="gap:6px">'+
+        '<span class="no-tel">Responsabile</span> '+av(U(p.faseAss[f]||p.team[0]),'sm')+
+        '<span class="no-tel">'+esc(U(p.faseAss[f]||p.team[0]).nome.split(' ')[0])+'</span>'+pen('fase','',null,f,1)+'</span>'+
+      (state.ospite?'' : '<button class="iconbtn solo-tel" data-action="condividi" data-pid="'+p.id+'" '+
+        'title="Condividi questo lavoro">'+svg('share',2)+'</button>')+
+      ((p.lock&&p.lock.on)? '<button class="lockchip solo-tel" data-action="lock" data-pid="'+p.id+'" '+
+        'title="Sblocca con password">'+svg('lock')+'</button>':'')+
       '</div>'+
     '<div class="rail-compatta'+((!p.completato && pct<100)?' e-anello':'')+'">'+
       avanzamentoHTML(p,pct,F,20,2*Math.PI*20,true)+'</div></div>';
@@ -2892,7 +2971,7 @@ function renderPhasebar(){
       '</div>'+
       '<div class="ordina"><span class="lbl" style="margin:0">Ordina</span>'+
         '<select id="ordinaSel" data-action="noop">'+
-          [['prio','Priorità'],['scadenza','Scadenza'],['cliente','Cliente'],['fase','Fase']]
+          [['prio','Priorità'],['scadenza','Scadenza'],['cliente','Cliente'],['fase','Fase'],['manuale','Il mio ordine']]
             .map(o=>'<option value="'+o[0]+'"'+(state.ordina===o[0]?' selected':'')+'>'+o[1]+'</option>').join('')+
         '</select></div>'+
       (snoozeOn? '<span class="snoozed">'+svg('clock').replace('<svg','<svg style="width:12px;height:12px"')+'silenziate</span>':'');
@@ -3846,6 +3925,138 @@ function riga(t,d,k,on){
     '<button class="sw'+(on?' on':'')+'" data-action="cfg" data-k="'+k+'" aria-pressed="'+(!!on)+'" aria-label="'+t+'"></button></div>';
 }
 
+/* ---------- TENERE PREMUTO ----------
+   Col mouse c'e' il tasto destro. Col dito no, quindi tenere premuto
+   fa la stessa cosa: si alza la scheda e, se si lascia, esce il menu;
+   se invece si muove il dito, la scheda si trascina. Come le icone
+   del telefono. */
+const ZONE_MENU = '.tile,.spazio,.postit,.bacheca,.ev,.day,.chk,.sub,.rg,.luogo,.mie-r,.mie-h,.step,.proj-head,.rail-sec';
+const ZONE_SPOSTA = '.tile,.spazio';
+const ATTESA_PRESA = 480;
+
+let presa = null;        // {el, x, y, lista, indice, spostabile, armato, trascina}
+let timerPresa = null;
+
+function vibra(ms){ try{ if(navigator.vibrate) navigator.vibrate(ms||12); }catch(e){} }
+
+function fermaPresa(){
+  clearTimeout(timerPresa); timerPresa = null;
+  if(presa && presa.el) presa.el.classList.remove('preso');
+  document.querySelectorAll('.preso,.buco').forEach(n=>n.classList.remove('preso','buco'));
+  document.body.classList.remove('sto-spostando');
+  presa = null;
+}
+
+document.addEventListener('pointerdown', function(e){
+  if(e.button && e.button!==0) return;
+  if(e.target.closest('input,textarea,select,[contenteditable="true"],.ctx,.modale,.wz')) return;
+  const spost = e.target.closest(ZONE_SPOSTA);
+  const menu  = e.target.closest(ZONE_MENU);
+  const z = spost || menu;
+  if(!z) return;
+  /* col mouse tengo il tasto destro per il menu: la pressione serve solo
+     per spostare le schede */
+  if(e.pointerType === 'mouse' && !spost) return;
+  presa = {el:z, x:e.clientX, y:e.clientY, spostabile:!!spost, armato:false, trascina:false};
+  clearTimeout(timerPresa);
+  timerPresa = setTimeout(()=>{
+    if(!presa) return;
+    presa.armato = true;
+    presa.el.classList.add('preso');
+    clearTimeout(tenuta); tenuta = null;      // niente rinomina: qui comanda la presa
+    vibra();
+  }, ATTESA_PRESA);
+}, true);
+
+document.addEventListener('pointermove', function(e){
+  if(!presa) return;
+  const dx = e.clientX - presa.x, dy = e.clientY - presa.y;
+  const mosso = Math.abs(dx) > 8 || Math.abs(dy) > 8;
+  if(!presa.armato){ if(mosso) fermaPresa(); return; }
+  if(!presa.spostabile) return;
+  if(!presa.trascina && mosso){
+    presa.trascina = true;
+    document.body.classList.add('sto-spostando');
+  }
+  if(presa.trascina){
+    e.preventDefault();
+    presa.el.style.transform = 'translate('+dx+'px,'+dy+'px) scale(1.03)';
+    const sotto = vicinoA(e.clientX, e.clientY, presa.el);
+    if(sotto) scambia(presa.el, sotto);
+  }
+}, {passive:false});
+
+/* la scheda piu' vicina al dito, tra quelle sorelle */
+function vicinoA(x, y, el){
+  const fratelli = [...el.parentElement.children].filter(n=>n!==el && n.matches(ZONE_SPOSTA));
+  let migliore = null, dist = 1e9;
+  fratelli.forEach(n=>{
+    const r = n.getBoundingClientRect();
+    if(x < r.left-8 || x > r.right+8 || y < r.top-8 || y > r.bottom+8) return;
+    const d = Math.hypot(x-(r.left+r.width/2), y-(r.top+r.height/2));
+    if(d < dist){ dist = d; migliore = n; }
+  });
+  return migliore;
+}
+function scambia(el, sotto){
+  const genitore = el.parentElement;
+  const figli = [...genitore.children];
+  const i = figli.indexOf(el), j = figli.indexOf(sotto);
+  if(i < j) genitore.insertBefore(el, sotto.nextSibling);
+  else genitore.insertBefore(el, sotto);
+  el.style.transform = '';
+  presa.x = presa.x + 0; // il riferimento resta, il transform riparte da qui
+  const r = el.getBoundingClientRect();
+  presa.x = r.left + r.width/2; presa.y = r.top + r.height/2;
+}
+
+document.addEventListener('pointerup', function(e){
+  if(!presa) return;
+  const p = presa;
+  if(p.armato && p.trascina){
+    p.el.style.transform = '';
+    salvaOrdine(p.el);
+    fermaPresa();
+    e.preventDefault();
+    appenaTenuto = true; setTimeout(()=>{ appenaTenuto = false; }, 500);
+    return;
+  }
+  if(p.armato && !p.trascina){
+    /* tenuto fermo: esce il menu, come il tasto destro */
+    const x = e.clientX, y = e.clientY;
+    fermaPresa();
+    appenaTenuto = true; setTimeout(()=>{ appenaTenuto = false; }, 500);
+    p.el.dispatchEvent(new MouseEvent('contextmenu', {bubbles:true, cancelable:true, clientX:x, clientY:y}));
+    e.preventDefault();
+    return;
+  }
+  fermaPresa();
+});
+document.addEventListener('pointercancel', fermaPresa);
+window.addEventListener('scroll', fermaPresa, true);
+
+/* l'ordine nuovo lo scrivo nei dati, sennò al prossimo disegno torna com'era */
+function salvaOrdine(el){
+  const genitore = el.parentElement;
+  const ids = [...genitore.children].filter(n=>n.matches(ZONE_SPOSTA)).map(n=>n.dataset.id);
+  if(el.matches('.spazio')){
+    snap('Ordine degli spazi');
+    const mappa = {}; state.spazi.forEach(sp=>mappa[sp.id]=sp);
+    const nuovi = ids.map(id=>mappa[id]).filter(Boolean);
+    state.spazi.forEach(sp=>{ if(nuovi.indexOf(sp)<0) nuovi.push(sp); });
+    state.spazi = nuovi;
+    azione('Spazi rimessi in ordine');
+    toast('Spostato. L\'ordine resta questo.','ok','Ordine cambiato');
+  } else {
+    snap('Ordine dei progetti');
+    ids.forEach((id,i)=>{ const pr = state.progetti.find(z=>z.id===id); if(pr) pr.ord = i; });
+    state.ordina = 'manuale';
+    azione('Progetti rimessi in ordine');
+    toast('Spostato. L\'ordine ora \u00e8 il tuo.','ok','Ordine cambiato');
+  }
+  render();
+}
+
 function renderInvito(){
   const scelto = state.invitoScelto;
   el('stage').innerHTML =
@@ -4065,8 +4276,29 @@ window.addEventListener('resize', ()=>{
     if(prima!==state.vista) render(); else { renderTop(); misuraNav(); } }, 150);
 });
 
+/* ---------- NON PERDERE IL SEGNO ----------
+   render() ridisegna la pagina da capo, e senza questo ogni spunta
+   riportava in cima: si perdeva il punto in cui si stava leggendo. */
+const SCORRIBILI = '.scroller,.work,.subs,.feed,.mappa-lista,.reg,.nlist';
+function segnaScorrimento(){
+  const o = {};
+  document.querySelectorAll(SCORRIBILI).forEach((n,i)=>{
+    if(n.scrollTop > 0) o[i+'|'+n.className] = n.scrollTop;
+  });
+  return o;
+}
+function rimettiScorrimento(o){
+  if(!o) return;
+  document.querySelectorAll(SCORRIBILI).forEach((n,i)=>{
+    const v = o[i+'|'+n.className];
+    if(v) n.scrollTop = v;
+  });
+}
+
 function render(){
   const a = document.activeElement, aid = a && a.id, sel = a && a.selectionStart;
+  const dove = state.schermo+'/'+state.progettoId+'/'+state.vista;
+  const scorrimento = (dove === ultimoPosto) ? segnaScorrimento() : null;
   if(ctxEl && schermoCtx !== state.schermo+'/'+state.progettoId) chiudiCtx();
   schermoCtx = state.schermo+'/'+state.progettoId;
   vistaValida();
@@ -4082,9 +4314,12 @@ function render(){
   misuraNav();
   el('drawer').classList.toggle('on', state.drawer);
   el('scrim').classList.toggle('on', state.drawer);
+  rimettiScorrimento(scorrimento);
+  ultimoPosto = dove;
   if(aid){ const n = el(aid); if(n){ n.focus(); if(sel!=null && n.setSelectionRange) try{n.setSelectionRange(sel,sel);}catch(e){} } }
   save();
 }
+let ultimoPosto = '';
 
 /* ============ GATE / UTENTI ============ */
 function renderGate(){
