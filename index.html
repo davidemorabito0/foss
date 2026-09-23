@@ -2,7 +2,7 @@
 <html lang="it">
 <head>
 <meta charset="utf-8">
-<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover">
 <meta name="description" content="FOSS — gestionale di produzione: dal brief alla consegna.">
 <meta name="theme-color" content="#0D1926">
 <title>FOSS</title>
@@ -192,7 +192,9 @@
 }
 
 *{box-sizing:border-box}
-html,body{height:100%;overflow:hidden;margin:0}
+/* il telefono non deve gonfiare i testi per conto suo: la pagina e' gia' disegnata per lo schermo piccolo */
+html{-webkit-text-size-adjust:100%;text-size-adjust:100%}
+html,body{height:100%;overflow:hidden;margin:0;max-width:100%}
 img{max-width:100%}
 [hidden]{display:none!important}
 body{
@@ -503,7 +505,7 @@ input,textarea,select{font:inherit;color:inherit}
 .proj-head .cli{font-size:10.5px;letter-spacing:.14em;text-transform:uppercase;color:var(--mute);font-family:Sora;font-weight:600}
 .proj-head h1{font-size:24px;letter-spacing:-.025em;line-height:1.15;margin-top:1px}
 .proj-head .side{display:flex;align-items:center;gap:8px;margin-left:auto;flex-wrap:wrap}
-.proj{display:grid;grid-template-columns:232px minmax(0,1fr);flex:1;min-height:0;position:relative}
+.proj{display:grid;grid-template-columns:232px minmax(0,1fr);flex:1;min-height:0;position:relative;overflow:hidden}
 /* Commenti, chat e attivita' stanno in un cassetto: si aprono quando servono
    e per il resto del tempo lasciano respirare il lavoro. */
 .proj > .rail-r{position:absolute;z-index:40;top:0;bottom:0;right:0;width:min(340px,92vw);
@@ -929,7 +931,15 @@ input,textarea,select{font:inherit;color:inherit}
 .chk-ass.vuoto svg{width:11px;height:11px}
 .chk:hover .chk-ass.vuoto,.chk-ass.vuoto:focus-visible{opacity:.7}
 .chk-ass.vuoto:hover{opacity:1;color:var(--amber-ink);border-color:var(--amber)}
-@media (hover:none){.chk-ass.vuoto{opacity:.45}}
+@media (hover:none),(pointer:coarse){
+  /* la casella e' il bersaglio: deve essere grande e da sola */
+  .chk{padding:10px 0}
+  .chk .box{width:26px;height:26px;border-radius:9px}
+  .chk .tx{padding-left:2px}
+  /* il cerchietto "assegna" vuoto va a destra, lontano dal testo:
+     accanto restava solo l'avatar di chi ci lavora davvero */
+  .chk-ass.vuoto{margin-left:auto;opacity:.32}
+}
 .chk .pen{margin-left:auto}
 .bloccato .chk-ass.vuoto{display:none}
 .bloccato .pen{display:none}
@@ -1295,6 +1305,43 @@ input,textarea,select{font:inherit;color:inherit}
 .riga-indietro{display:contents}
 .rail-compatta{display:none}
 .rail-scrim{display:none}
+/* ---------- LE MIE TASK E LA RICERCA ---------- */
+.mie-g{margin-bottom:12px}
+.mie-h{display:flex;align-items:center;gap:11px;width:100%;text-align:left;padding:12px 14px;
+  border-radius:14px 14px 0 0;border:1px solid var(--line);border-left:3px solid var(--acc,var(--amber));
+  background:var(--surface);color:var(--text);font:inherit;cursor:pointer}
+.mie-h + .mie-r{border-radius:0}
+.mie-g .mie-r:last-child{border-radius:0 0 14px 14px}
+.mie-h .tx,.mie-r .tx{flex:1;min-width:0;display:flex;flex-direction:column;gap:1px}
+.mie-h .tx b{font-family:Sora;font-size:14px;font-weight:600}
+.mie-h .tx span,.mie-r .tx span{font-size:11.5px;color:var(--mute);
+  overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.mie-r{display:flex;align-items:center;gap:11px;width:100%;text-align:left;padding:11px 14px;
+  border:1px solid var(--line);border-top:none;background:var(--surface);color:var(--text);
+  font:inherit;cursor:pointer;border-radius:14px;margin-bottom:7px}
+.mie-r .tx b{font-size:13.5px;font-weight:600}
+.mie-r .box{width:20px;height:20px;flex:none;border-radius:7px;border:1.5px solid var(--line);
+  display:grid;place-items:center;color:transparent}
+.mie-r .box.fatto{background:var(--ok);border-color:var(--ok);color:#04140F}
+.mie-r:active,.mie-h:active{background:var(--surface-2)}
+.cerca-box{display:flex;align-items:center;gap:10px;padding:12px 14px;border-radius:14px;
+  border:1px solid var(--line);background:var(--surface-2)}
+.cerca-box .ic{color:var(--mute);display:grid;place-items:center}
+.cerca-box .ic svg{width:17px;height:17px}
+.cerca-box input{flex:1;min-width:0;background:none;border:none;outline:none;color:var(--text);
+  font:inherit;font-size:15px;text-align:left}
+/* ---------- LA BARRA DELLE SEZIONI (telefono) ---------- */
+.tabbar{display:none}
+@media (max-width:620px){
+  .seg{font-size:11.5px}
+  .seg button{padding:7px 11px}
+}
+.viste-tel{display:flex;gap:2px;padding:3px;border-radius:11px;border:1px solid var(--line);background:var(--surface-2)}
+.viste-tel .vt{background:none;border:none;padding:7px 11px;border-radius:8px;color:var(--mute);
+  cursor:pointer;display:grid;place-items:center}
+.viste-tel .vt svg{width:17px;height:17px}
+.viste-tel .vt.on{background:var(--surface);color:var(--text);box-shadow:0 1px 3px rgba(0,0,0,.14)}
+.tabbar[hidden]{display:none!important}
 #statoProfilo{transition:color .2s,border-color .2s}
 #statoProfilo.ok-flash{color:var(--ok);border-color:var(--ok)}
 .chiudi-feed{flex:none;width:34px;padding:0;display:grid;place-items:center;color:var(--mute)}
@@ -1403,23 +1450,60 @@ input,textarea,select{font:inherit;color:inherit}
   .brand b{display:none}
   .crumb{flex:1;min-width:0}
   .sp-chip{max-width:none;flex:1}
-  .viewswitch{
-    position:fixed;left:0;right:0;bottom:0;top:auto;transform:none;border-radius:0;
-    border:none;border-top:1px solid var(--line);background:var(--surface);
-    padding:6px 6px calc(6px + env(safe-area-inset-bottom,0px));z-index:35;
-    justify-content:space-around;
-  }
-  .viewswitch .vs{flex:1;flex-direction:column;gap:3px;padding:7px 2px;font-size:10px;border-radius:10px}
-  .viewswitch .vs span{display:block;font-size:10px}
-  .viewswitch .vs svg{width:19px;height:19px}
-  /* Telefono: barra in alto ridotta all'osso.
-     Spazio, commenti, annulla e tema stanno nel menu ⋯ (vedi menuTelefono). */
+  /* la scelta della vista non sta piu' in fondo: e' dentro la pagina dei lavori */
+  .viewswitch{position:static;transform:none;border-radius:12px;padding:3px;gap:2px;
+    border:1px solid var(--line);background:var(--surface-2)}
+  .viewswitch .vs{padding:7px 10px;font-size:11.5px;border-radius:9px}
+  .viewswitch .vs span{display:none}
+  .viewswitch .vs svg{width:17px;height:17px}
+  /* ---------- LA BARRA DELLE SEZIONI ----------
+     Cinque posti sempre uguali, come nelle app che si usano tutti i giorni. */
+  .tabbar{display:flex;position:fixed;left:0;right:0;bottom:0;z-index:36;
+    background:var(--surface);border-top:1px solid var(--line);
+    padding:5px 4px calc(5px + env(safe-area-inset-bottom,0px));justify-content:space-around}
+  .tabbar .tb{flex:1;display:flex;flex-direction:column;align-items:center;gap:2px;
+    background:none;border:none;padding:6px 2px;border-radius:11px;color:var(--mute);
+    font:inherit;cursor:pointer;-webkit-tap-highlight-color:transparent}
+  .tabbar .tb .ic{position:relative;display:grid;place-items:center}
+  .tabbar .tb svg{width:22px;height:22px}
+  .tabbar .tb .lb{font-size:10px;font-family:Sora;font-weight:600;letter-spacing:.01em}
+  .tabbar .tb.on{color:var(--text)}
+  .tabbar .tb.on .ic{color:var(--amber-ink)}
+  .tabbar .tb .n{position:absolute;top:-5px;right:-8px;min-width:15px;height:15px;padding:0 4px;
+    border-radius:8px;background:var(--alert);color:#fff;font-size:9.5px;font-weight:700;
+    font-family:Sora;display:grid;place-items:center;border:2px solid var(--surface)}
+  .tabbar .tb:active{background:var(--surface-2)}
+  /* ---------- LA BARRA IN ALTO DEL TELEFONO ----------
+     Tre cose e basta, nei posti dove la gente le cerca gia':
+     a sinistra il piu', al centro dove sei, a destra la campanella. */
   .no-tel{display:none!important}
   .solo-tel{display:inline-flex!important}
   .crumb .sp-chip{display:none}
+  .topbar{gap:4px}
+  .topbar .brand,
+  .topbar .spacer,
+  .topbar #viewswitch,
   .topbar [data-action="toggle-feed"],
+  .topbar [data-action="menu-telefono"],
   .topbar #undoBtn,
-  .topbar #themeBtn{display:none!important}
+  .topbar #lockBtn,
+  .topbar #themeBtn,
+  .topbar #meBtn{display:none!important}
+  .topbar #piuBtn{order:1}
+  .topbar .crumb{order:2;flex:1;min-width:0;justify-content:center;text-align:center}
+  .topbar #shareBtn{order:3}
+  .topbar #bellBtn{order:4}
+  .crumb .tel-titolo{font-family:Sora;font-weight:700;font-size:15.5px;letter-spacing:-.01em;
+    display:inline-flex;align-items:center;gap:5px;color:var(--text);
+    background:none;border:none;font:inherit;cursor:pointer;max-width:100%}
+  .crumb .tel-titolo b{overflow:hidden;text-overflow:ellipsis;white-space:nowrap;
+    font-family:Sora;font-weight:700;font-size:15.5px}
+  .crumb .tel-titolo svg{width:14px;height:14px;flex:none;color:var(--mute)}
+  .crumb .tel-titolo .giu{display:grid;place-items:center;transform:rotate(90deg)}
+  .topbar #piuBtn svg{width:24px;height:24px}
+  /* il nome dello spazio sta gia' in alto: nella pagina non lo ripeto */
+  .sp-head h1{display:none}
+  .sp-head .desc{display:none}
   .rail-compatta.e-anello{display:none}
   .work-head .editabile .pen{display:none}
   .sub-h .chip{display:none}
@@ -1561,6 +1645,9 @@ input,textarea,select{font:inherit;color:inherit}
       <div class="mark"></div>
       <div><b>FOSS</b></div>
     </div>
+    <button class="iconbtn solo-tel" data-action="nuovo-da-tel" id="piuBtn" title="Nuovo progetto">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M12 5v14M5 12h14"/></svg>
+    </button>
     <div class="crumb" id="crumb"></div>
     <div class="viewswitch" id="viewswitch" hidden></div>
     <div class="spacer"></div>
@@ -1587,6 +1674,7 @@ input,textarea,select{font:inherit;color:inherit}
   <main class="stage" id="stage"></main>
   <div id="bannerSlot"></div>
   <nav class="phasebar" id="phasebar"></nav>
+  <nav class="tabbar" id="tabbar" hidden aria-label="Sezioni"></nav>
 </div>
 
 <div class="scrim" id="scrim" data-action="close-all"></div>
@@ -1621,6 +1709,7 @@ const I = {
   bell:'<path d="M18 8a6 6 0 1 0-12 0c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.7 21a2 2 0 0 1-3.4 0"/>',
   rewind:'<circle cx="13.5" cy="13.5" r="7.5"/><path d="M13.5 9.5v4l2.5 1.5"/><path d="M11 2.5h5"/><path d="M6 13.5H2.5m0 0L5 11m-2.5 2.5L5 16"/>',
   chev:'<path d="m9 18 6-6-6-6"/>',
+  cerca:'<circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/>',
   check:'<path d="m4 12 5 5L20 6"/>',
   plus:'<path d="M12 5v14M5 12h14"/>',
   grid:'<rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/>',
@@ -2198,7 +2287,17 @@ function renderTop(){
   el('meBtn').innerHTML = av(me);
   el('meBtn').title = nomeVisibile()+' — profilo';
   const c = el('crumb');
-  if(state.schermo==='home' || state.schermo==='progetto'){
+  if(suTelefono()){
+    /* Al centro c'e' scritto dove sei, e sullo spazio si tocca per cambiarlo. */
+    const sp = SPZ();
+    const titoli = {spazi:'I tuoi spazi', mie:'Cosa tocca a te', cerca:'Cerca', profilo:'Profilo'};
+    if((state.schermo==='home' || state.schermo==='progetto') && sp){
+      c.innerHTML = '<button class="tel-titolo" data-action="menu-spazi" title="Cambia spazio di lavoro">'+
+        '<b>'+esc(sp.nome)+'</b><span class="giu">'+svg('chev',2.6)+'</span></button>';
+    } else {
+      c.innerHTML = '<span class="tel-titolo"><b>'+esc(titoli[state.schermo]||'FOSS')+'</b></span>';
+    }
+  } else if(state.schermo==='home' || state.schermo==='progetto'){
     const sp = SPZ();
     c.innerHTML = sp? '<button class="sp-chip" style="--acc:'+sp.col+'" data-action="menu-spazi" title="Cambia spazio di lavoro">'+
       '<span class="ic">'+svg(sp.icona)+'</span><span class="nm">'+esc(sp.nome)+'</span>'+
@@ -2206,6 +2305,8 @@ function renderTop(){
   } else if(state.schermo==='profilo'){
     c.innerHTML = '<b>Profilo</b>';
   } else c.innerHTML = '';
+  const pb = el('piuBtn');
+  if(pb) pb.hidden = !(state.schermo==='home' || state.schermo==='spazi');
   el('searchWrap').hidden = state.schermo!=='home';
   const gate = state.schermo==='gate';
   ['undoBtn','bellBtn','meBtn','themeBtn'].forEach(id=>{ const n = el(id); if(n) n.hidden = gate; });
@@ -2265,7 +2366,11 @@ function intestazioneSpazio(lista){
     '</div>'+
     (state.ospite? '' : '<div class="azioni">'+
       '<button class="btn sm ghost" data-action="modifica-spazio" data-id="'+sp.id+'">'+svg('pen')+'Modifica spazio</button>'+
-      '<button class="btn primary" data-action="nuovo">'+svg('plus')+'Nuovo progetto</button>'+
+      '<button class="btn primary no-tel" data-action="nuovo">'+svg('plus')+'Nuovo progetto</button>'+
+      (suTelefono()? '<div class="viste-tel">'+
+        ['tessere','lista'].map(k=>'<button class="vt'+(state.vista===k?' on':'')+'" data-action="vista" data-v="'+k+'" '+
+          'title="'+(k==='tessere'?'Tessere':'Lista')+'">'+svg(k==='tessere'?'grid':'list')+'</button>').join('')+
+        '</div>' : '')+
     '</div>')+'</div>';
 }
 
@@ -2576,8 +2681,10 @@ function renderProgetto(){
       '<div class="sub-b"><div><div class="sub-in">'+
         s.items.map((i,ix)=>{
           const ua = i.ass? U(i.ass) : null;
-          return '<div class="chk'+(i.done?' done':'')+'" role="button" tabindex="0" data-action="check" data-id="'+s.id+'" data-i="'+ix+'">'+
-          '<span class="box">'+svg('check',3.2)+'</span><span class="tx">'+esc(i.t)+'</span>'+
+          return '<div class="chk'+(i.done?' done':'')+'" role="button" tabindex="0" data-action="check-riga" data-id="'+s.id+'" data-i="'+ix+'">'+
+          '<span class="box" role="button" tabindex="-1" data-action="check" data-id="'+s.id+'" data-i="'+ix+'" '+
+            'aria-label="'+(i.done?'Togli la spunta':'Segna come fatto')+'">'+svg('check',3.2)+'</span>'+
+          '<span class="tx">'+esc(i.t)+'</span>'+
           (ua? '<span class="chk-ass" data-action="assegna-sub" data-id="'+s.id+'" data-i="'+ix+'" role="button" tabindex="0" '+
                'title="'+esc(ua.nome)+' — '+esc(ua.ruolo)+'. Tocca per cambiare.">'+av(ua,'sm')+'</span>'
              : (state.ospite?'' : '<span class="chk-ass vuoto" data-action="assegna-sub" data-id="'+s.id+'" data-i="'+ix+'" role="button" tabindex="0" '+
@@ -2756,9 +2863,9 @@ function renderPhasebar(){
     return;
   }
   const p = PROJ();
-  let h = '<button class="rewind'+(p.revisione?' armed':'')+'" data-action="indietro" title="'+
-    (p.revisione? 'Torna avanti su '+esc(FZ(p)[Math.min(p.avanz,FZ(p).length-1)].nome) : 'Riapri la fase precedente per modificarla')+'"'+
-    (p.fase===0 && !p.revisione ?' disabled':'')+'>'+svg('rewind',1.9)+'</button><div class="steps">';
+  let h = '<button class="rewind'+(p.revisione?' armed':'')+'" data-action="indietro" '+
+    'title="Torna indietro su una fase gi\u00e0 chiusa"'+
+    (p.avanz===0 ?' disabled':'')+'>'+svg('rewind',1.9)+'</button><div class="steps">';
   FZ(p).forEach((f,i)=>{
     let cls='', st='';
     if(i < p.fase){ cls='off'; st='Chiusa'; }
@@ -2879,6 +2986,125 @@ function taggatoSu(){
     });
   });
   return out;
+}
+
+/* ---------- LE MIE TASK ----------
+   Tutto quello che aspetta me, in un posto solo: le voci che mi sono
+   state assegnate e quelle dove mi hanno taggato, progetto per progetto. */
+function mieCose(){
+  const out = [];
+  state.progetti.forEach(p=>{
+    if(p.completato || !vedeProgetto(p)) return;
+    const voci = [];
+    (p.subs||[]).forEach(s=>{
+      const taggato = (s.taggati||[]).some(x=>x && x.u===state.utente);
+      (s.items||[]).forEach((i,ix)=>{
+        if(i.done) return;
+        const mia = i.ass===state.utente || (!i.ass && s.assegnato===state.utente);
+        if(mia || taggato) voci.push({s, i, ix, taggato: taggato && !mia});
+      });
+    });
+    if(voci.length) out.push({p, voci});
+  });
+  const g = x => { const q = giorniA(x.p.consegna); return q==null? 9999 : q; };
+  return out.sort((a,b)=> g(a)-g(b));
+}
+function contaMie(){ return mieCose().reduce((n,x)=>n+x.voci.length, 0); }
+
+function renderMie(){
+  const gruppi = mieCose();
+  const tot = gruppi.reduce((n,x)=>n+x.voci.length,0);
+  let h = '<div class="pane"><div class="scroller" style="padding:16px 14px 14px">';
+  h += '<div style="padding:0 2px 14px">'+
+       '<p style="margin:0;font-size:13px;color:var(--mute)">'+
+       (tot? '<b style="color:var(--text)">'+tot+'</b>'+(tot===1?' cosa aperta':' cose aperte')+' in '+gruppi.length+(gruppi.length===1?' lavoro':' lavori')
+           : 'Niente in sospeso: non c\'\u00e8 nessuna voce assegnata a te.')+'</p></div>';
+  if(!tot){
+    h += '<div class="empty" style="padding:26px">Quando qualcuno ti assegna una voce o ti tagga, la trovi qui.</div>';
+  }
+  gruppi.forEach(x=>{
+    const sc = scadenza(x.p);
+    h += '<div class="mie-g"><button class="mie-h" data-action="apri" data-id="'+x.p.id+'" style="--acc:'+x.p.col+'">'+
+      '<span class="tx"><b>'+esc(x.p.nome)+'</b><span>'+esc(x.p.cliente)+'</span></span>'+
+      '<span class="chip '+sc.c+'">'+sc.t+'</span></button>';
+    x.voci.forEach(v=>{
+      h += '<div class="mie-r" role="button" tabindex="0" data-action="vai-primo" data-pid="'+x.p.id+'" data-sid="'+v.s.id+'">'+
+        '<span class="box" role="button" tabindex="0" data-action="check-mia" data-pid="'+x.p.id+'" '+
+          'data-sid="'+v.s.id+'" data-i="'+v.ix+'" aria-label="Segna come fatto">'+svg('check',3.2)+'</span>'+
+        '<span class="tx"><b>'+esc(v.i.t)+'</b><span>'+esc(v.s.titolo)+'</span></span>'+
+        (v.taggato? '<span class="chip">taggato</span>':'')+'</div>';
+    });
+    h += '</div>';
+  });
+  h += '</div></div>';
+  el('stage').innerHTML = h;
+}
+
+/* ---------- CERCA ----------
+   Sul telefono la lente ha una pagina sua: si scrive e si vede subito. */
+function renderCerca(){
+  const q = (state.filtro||'').trim().toLowerCase();
+  const tutti = state.spazi.flatMap(sp=>progettiDi(sp.id));
+  const prog = q? tutti.filter(p=> (p.nome+' '+p.cliente).toLowerCase().indexOf(q)>=0) : [];
+  const voci = [];
+  if(q) tutti.forEach(p=> (p.subs||[]).forEach(s=>{
+    (s.items||[]).forEach(i=>{ if(i.t.toLowerCase().indexOf(q)>=0 && voci.length<40) voci.push({p,s,i}); });
+  }));
+  let h = '<div class="pane"><div class="scroller" style="padding:16px 14px 14px">'+
+    '<div class="cerca-box"><span class="ic">'+svg('cerca',2)+'</span>'+
+    '<input id="qTel" type="search" placeholder="Cerca un lavoro, un cliente, una task\u2026" '+
+    'value="'+esc(state.filtro||'')+'" autocomplete="off"></div>';
+  if(!q){
+    h += '<div class="empty" style="padding:26px">Scrivi qualcosa: cerco tra i nomi dei lavori, i clienti e le task.</div>';
+  } else {
+    if(prog.length){
+      h += '<div class="lbl" style="margin:16px 0 8px">Lavori \u00b7 '+prog.length+'</div>';
+      prog.forEach(p=>{ const sc = scadenza(p);
+        h += '<button class="mie-h" style="--acc:'+p.col+';margin-bottom:7px" data-action="apri" data-id="'+p.id+'">'+
+          '<span class="tx"><b>'+esc(p.nome)+'</b><span>'+esc(p.cliente)+'</span></span>'+
+          '<span class="chip '+sc.c+'">'+sc.t+'</span></button>'; });
+    }
+    if(voci.length){
+      h += '<div class="lbl" style="margin:16px 0 8px">Task \u00b7 '+voci.length+'</div>';
+      voci.forEach(v=>{
+        h += '<button class="mie-r" data-action="vai-primo" data-pid="'+v.p.id+'" data-sid="'+v.s.id+'">'+
+          '<span class="box'+(v.i.done?' fatto':'')+'">'+svg('check',3.2)+'</span>'+
+          '<span class="tx"><b>'+esc(v.i.t)+'</b><span>'+esc(v.s.titolo)+' \u00b7 '+esc(v.p.nome)+'</span></span></button>';
+      });
+    }
+    if(!prog.length && !voci.length) h += '<div class="empty" style="padding:26px">Nessun risultato per \u00ab'+esc(q)+'\u00bb.</div>';
+  }
+  h += '</div></div>';
+  el('stage').innerHTML = h;
+  const n = el('qTel'); if(n && state.mettiFuoco){ state.mettiFuoco = false; n.focus(); }
+}
+
+/* ---------- LA BARRA DELLE SEZIONI ----------
+   Sul telefono si naviga da qui, come nelle app che la gente usa gi\u00e0:
+   cinque posti, sempre gli stessi, sempre nello stesso ordine. */
+function renderTabbar(){
+  const n = el('tabbar'); if(!n) return;
+  const dentro = state.schermo==='progetto' || state.schermo==='gate';
+  n.hidden = !suTelefono() || dentro;
+  if(n.hidden){ n.innerHTML = ''; return; }
+  const mie = contaMie();
+  const T = [
+    {k:'progetti', l:'Lavori',  ic:'grid'},
+    {k:'mie',      l:'Per te',  ic:'check', n:mie},
+    {k:'note',     l:'Note',    ic:'pen'},
+    {k:'cerca',    l:'Cerca',   ic:'cerca'},
+    {k:'profilo',  l:'Profilo', ic:'user'}
+  ];
+  const attivo =
+    state.schermo==='profilo' ? 'profilo' :
+    state.schermo==='mie'     ? 'mie' :
+    state.schermo==='cerca'   ? 'cerca' :
+    (state.schermo==='home' && state.vista==='note') ? 'note' :
+    (state.schermo==='home' || state.schermo==='spazi') ? 'progetti' : '';
+  n.innerHTML = T.map(t=>
+    '<button class="tb'+(attivo===t.k?' on':'')+'" data-action="tab-tel" data-k="'+t.k+'">'+
+      '<span class="ic">'+svg(t.ic)+(t.n? '<span class="n">'+(t.n>9?'9+':t.n)+'</span>':'')+'</span>'+
+      '<span class="lb">'+t.l+'</span></button>').join('');
 }
 
 /* ---------- LA HOME DEL TELEFONO ----------
@@ -3775,9 +4001,10 @@ function vistaValida(){
 /* La barra viste è fissa in basso sul telefono: misuro quanto è alta
    e alzo di altrettanto il resto dell'app, così la barra sotto non gonfia. */
 function misuraNav(){
-  const vs = el('viewswitch');
-  const h = (suTelefono() && vs && !vs.hidden) ? vs.offsetHeight : 0;
-  document.documentElement.style.setProperty('--nav-h', h+'px');
+  if(!suTelefono()){ document.documentElement.style.setProperty('--nav-h','0px'); return; }
+  const tb = el('tabbar'), vs = el('viewswitch');
+  const n = (tb && !tb.hidden) ? tb : ((vs && !vs.hidden) ? vs : null);
+  document.documentElement.style.setProperty('--nav-h', (n? n.offsetHeight : 0)+'px');
 }
 let timerNav = null;
 window.addEventListener('resize', ()=>{
@@ -3795,9 +4022,11 @@ function render(){
   else if(state.schermo==='spazi'){ renderSpazi(); }
   else if(state.schermo==='home'){ renderHome(); }
   else if(state.schermo==='profilo'){ renderProfilo(); }
+  else if(state.schermo==='mie'){ renderMie(); }
+  else if(state.schermo==='cerca'){ renderCerca(); }
   else { renderProgetto(); }
-  renderTop(); renderPhasebar(); renderDrawer();
-  el('app').classList.toggle('con-nav', state.schermo==='home');
+  renderTop(); renderPhasebar(); renderTabbar(); renderDrawer();
+  el('app').classList.toggle('con-nav', state.schermo==='home' || !el('tabbar').hidden);
   misuraNav();
   el('drawer').classList.toggle('on', state.drawer);
   el('scrim').classList.toggle('on', state.drawer);
@@ -4618,23 +4847,35 @@ document.addEventListener('click', function(e){
       break; }
 
     case 'indietro':{
-      /* Il cronometro è un interruttore: una pressione riapre la fase
-         precedente, la successiva riporta avanti dov'eri. Per tornare
-         indietro di più fasi si tocca direttamente la fase nella barra. */
-      if(p.revisione){
-        p.fase = p.avanz; p.revisione = false;
-        logga(p,'Modifiche chiuse, ripresa la fase <b>'+FZ(p)[p.fase].nome+'</b>',true);
-        render(); flash('#step'+p.fase); break;
+      /* Il cronometro apre l'elenco di tutte le fasi gia' chiuse: da qui
+         si torna su qualunque punto del lavoro, non solo su quello prima. */
+      const r = t.getBoundingClientRect();
+      const voci = [];
+      for(let i = p.avanz - 1; i >= 0; i--){
+        voci.push({a:'torna-a-fase', d:'data-i="'+i+'"', ic:FZ(p)[i].icon,
+                   l:'Riapri <b>'+esc(FZ(p)[i].nome)+'</b>', k:'0'+(i+1)});
       }
-      if(p.fase===0) break;
-      snap('Riapertura della fase '+FZ(p)[p.fase-1].nome);
-      p.fase -= 1; p.revisione = true;
-      azione('Riaperta la fase <b>'+FZ(p)[p.fase].nome+'</b> — '+esc(p.nome));
-      logga(p,'Riaperta la fase <b>'+FZ(p)[p.fase].nome+'</b> per modifiche');
-      toast('Modifiche su '+FZ(p)[p.fase].nome+'. Le fasi successive sono in pausa.','info','Fase riaperta');
-      render(); flash('#step'+p.fase); break; }
+      if(!voci.length){ toast('Sei ancora sulla prima fase: non c\'è niente dietro.','info','Nessuna fase chiusa'); break; }
+      if(p.revisione){
+        voci.unshift({sep:1});
+        voci.unshift({a:'riprendi', ic:'right', l:'Torna avanti su <b>'+esc(FZ(p)[Math.min(p.avanz,FZ(p).length-1)].nome)+'</b>'});
+      }
+      apriCtx(r.left, r.bottom + 6, 'Torna indietro', voci, t);
+      break; }
+
+    case 'torna-a-fase':{
+      const i = Number(t.dataset.i);
+      chiudiCtx();
+      if(i === p.fase && p.revisione) break;
+      snap('Riapertura della fase '+FZ(p)[i].nome);
+      p.fase = i; p.revisione = true;
+      azione('Riaperta la fase <b>'+FZ(p)[i].nome+'</b> — '+esc(p.nome));
+      logga(p,'Riaperta la fase <b>'+FZ(p)[i].nome+'</b> per modifiche');
+      toast('Modifiche su '+FZ(p)[i].nome+'. Le fasi successive sono in pausa.','info','Fase riaperta');
+      render(); flash('#step'+i); break; }
 
     case 'riprendi':
+      chiudiCtx();
       p.fase = p.avanz; p.revisione = false;
       logga(p,'Modifiche chiuse, ripresa la fase <b>'+FZ(p)[p.fase].nome+'</b>',true);
       toast('Sei di nuovo su '+FZ(p)[p.fase].nome+'.','ok','Modifiche salvate');
@@ -4644,6 +4885,11 @@ document.addEventListener('click', function(e){
       const s = p.subs.find(x=>x.id===t.dataset.id);
       s.aperto = !s.aperto; render(); break; }
 
+    /* Col dito la riga intera non spunta piu' niente: si tocca la casella.
+       Sul telefono bastava sfiorare il testo per chiudere una cosa non fatta. */
+    case 'check-riga':
+      if(matchMedia('(hover:none),(pointer:coarse)').matches) break;
+      /* col mouse la riga intera resta cliccabile: scende al caso qui sotto */
     case 'check':{
       const s = p.subs.find(x=>x.id===t.dataset.id);
       const it = s.items[Number(t.dataset.i)];
@@ -4660,10 +4906,38 @@ document.addEventListener('click', function(e){
       flash('#sub_'+s.id);
       break; }
 
+    /* dalla lista "cosa tocca a te" si spunta senza entrare nel lavoro */
+    case 'check-mia':{
+      const pr = state.progetti.find(x=>x.id===t.dataset.pid); if(!pr) break;
+      const sb = (pr.subs||[]).find(x=>x.id===t.dataset.sid); if(!sb) break;
+      const it = sb.items[Number(t.dataset.i)]; if(!it) break;
+      snap((it.done?'Riapertura':'Spunta')+' di \u00ab'+it.t+'\u00bb');
+      it.done = !it.done;
+      azione((it.done?'Completato':'Riaperto')+' <b>'+esc(it.t)+'</b> \u2014 '+esc(pr.nome));
+      logga(pr, (it.done?'\u2713 ':'\u21ba ')+esc(it.t)+' \u2014 '+esc(sb.titolo));
+      render();
+      toast(it.t, it.done?'ok':'info', it.done?'Fatto':'Riaperto');
+      break; }
+
     case 'tab':
       p.tab = t.dataset.t; render(); break;
 
     case 'vai-luogo': vaiAlSegno(Number(t.dataset.i)); break;
+
+    case 'tab-tel':{
+      const k = t.dataset.k;
+      chiudiCtx(); state.drawer = false;
+      if(k==='progetti'){ state.schermo = state.spazioId? 'home':'spazi'; if(state.vista==='note') state.vista='tessere'; }
+      else if(k==='note'){ state.schermo='home'; state.vista='note'; }
+      else if(k==='mie'){ state.schermo='mie'; }
+      else if(k==='cerca'){ state.schermo='cerca'; state.mettiFuoco = true; }
+      else if(k==='profilo'){ state.schermo='profilo'; }
+      render(); break; }
+
+    case 'nuovo-da-tel':
+      if(state.schermo==='spazi' || !state.spazioId) apriWizard(false);
+      else modaleNuovoProgetto();
+      break;
 
     case 'toggle-feed':
     case 'feed':{
@@ -5418,6 +5692,11 @@ document.addEventListener('change', function(e){
 });
 
 document.addEventListener('input', function(e){
+  if(e.target.id==='qTel'){
+    state.filtro = e.target.value; renderCerca();
+    const n = el('qTel'); if(n){ n.focus(); try{ n.setSelectionRange(n.value.length,n.value.length); }catch(err){} }
+    return;
+  }
   if(e.target.id==='q'){
     state.filtro = e.target.value; renderHome();
     const q = el('q'); if(q){ q.focus(); try{ q.setSelectionRange(q.value.length,q.value.length); }catch(err){} }
@@ -5906,6 +6185,15 @@ function start(dati){
     });
   }).catch(()=>{});
 }
+/* Niente zoom con le dita: la pagina e' gia' disegnata per lo schermo
+   che ha, e uno zoom accidentale la manda fuori squadra. */
+['gesturestart','gesturechange','gestureend'].forEach(ev=>{
+  document.addEventListener(ev, e=>e.preventDefault(), {passive:false});
+});
+document.addEventListener('dblclick', e=>{
+  if(e.target.closest('input,textarea,[contenteditable]')) return;
+  e.preventDefault();
+}, {passive:false});
 window.addEventListener('hashchange', ()=>{ applicaIndirizzo(); });
 /* installabile: si aggiunge alla schermata Home e si apre a tutto schermo */
 if('serviceWorker' in navigator){
