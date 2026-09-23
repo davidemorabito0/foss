@@ -1332,6 +1332,23 @@ input,textarea,select{font:inherit;color:inherit}
   font:inherit;font-size:15px;text-align:left}
 /* ---------- LA BARRA DELLE SEZIONI (telefono) ---------- */
 .tabbar{display:none}
+/* nelle note il conteggio dei progetti non c'entra niente */
+.vista-note .sp-head .riga2{display:none}
+@media (max-width:620px){
+  /* il piu' per una nota nuova sta in un angolo, non sopra le note */
+  .piu-nota{left:auto;right:12px;top:12px;transform:none;width:48px;height:48px;border-radius:16px}
+  .piu-nota:hover{transform:none}
+}
+.riga-saluto{display:flex;align-items:flex-start;gap:10px}
+.riga-saluto .tel-saluto{flex:1;min-width:0}
+.chiudi-saluti{flex:none;width:32px;height:32px;border-radius:50%;display:grid;place-items:center;
+  border:1px solid var(--line);background:var(--surface);color:var(--mute);cursor:pointer;
+  transition:color .14s,border-color .14s}
+.chiudi-saluti svg{width:14px;height:14px}
+.chiudi-saluti:hover{color:var(--text);border-color:var(--mute)}
+.chiudi-saluti.fuori{position:absolute;top:12px;right:12px;z-index:2}
+.benvenuto{position:relative}
+.benv{position:relative}
 @media (max-width:620px){
   .seg{font-size:11.5px}
   .seg button{padding:7px 11px}
@@ -2356,7 +2373,8 @@ function intestazioneSpazio(lista){
       '<h1>'+esc(sp.nome)+'</h1>'+
       (sp.desc? '<div class="desc">'+esc(sp.desc)+'</div>':'')+
       '<div class="riga2">'+
-        '<span class="dato"><b>'+(lista.length-fatti)+'</b> '+(state.filtroAttivo?'filtrati':'progetti attivi')+'</span>'+
+        '<span class="dato"><b>'+(lista.length-fatti)+'</b> '+(state.filtroAttivo? (lista.length-fatti===1?'filtrato':'filtrati')
+          : (lista.length-fatti===1?'progetto attivo':'progetti attivi'))+'</span>'+
         (fatti? '<span class="dato"><b>'+fatti+'</b> completati</span>':'')+
         '<span class="dato"><b>'+task+'</b> task</span>'+
         (urg? '<span class="dato urg"><b>'+urg+'</b> in scadenza</span>':'')+
@@ -2367,7 +2385,7 @@ function intestazioneSpazio(lista){
     (state.ospite? '' : '<div class="azioni">'+
       '<button class="btn sm ghost" data-action="modifica-spazio" data-id="'+sp.id+'">'+svg('pen')+'Modifica spazio</button>'+
       '<button class="btn primary no-tel" data-action="nuovo">'+svg('plus')+'Nuovo progetto</button>'+
-      (suTelefono()? '<div class="viste-tel">'+
+      (suTelefono() && state.vista!=='note' ? '<div class="viste-tel">'+
         ['tessere','lista'].map(k=>'<button class="vt'+(state.vista===k?' on':'')+'" data-action="vista" data-v="'+k+'" '+
           'title="'+(k==='tessere'?'Tessere':'Lista')+'">'+svg(k==='tessere'?'grid':'list')+'</button>').join('')+
         '</div>' : '')+
@@ -2482,10 +2500,12 @@ function tessera(p){
 
 function renderHome(){
   const lista = listaProgetti(), sp = SPZ();
-  let h = '<div class="pane'+(sp && sp.sfondo?' con-sfondo':'')+'"'+
+  let h = '<div class="pane'+(sp && sp.sfondo?' con-sfondo':'')+(state.vista==='note'?' vista-note':'')+'"'+
           (sp && sp.sfondo? ' style="--bg-img:url(\''+sp.sfondo+'\')"':'')+'>';
   h += barraOspite();
-  if(suTelefono()) h += testataTelefono();
+  /* Il saluto ha senso solo davanti all'elenco dei lavori: nelle note,
+     nel calendario e nella mappa ruba spazio e basta. */
+  if(suTelefono() && (state.vista==='tessere' || state.vista==='lista')) h += testataTelefono();
   h += intestazioneSpazio(lista);
 
   if(state.vista==='note'){
@@ -3112,11 +3132,14 @@ function renderTabbar(){
    Il resto viene dopo: sullo schermo piccolo la prima schermata deve
    rispondere, non riempirsi. */
 function testataTelefono(){
+  if(!salutiAperti) return '';
   const tg = taggatoSu();
   const nuove = state.notifiche.filter(n=>n.nuova).length;
   const pc = primaCosa();
   let h = '<div class="tel-home">';
-  h += '<h2 class="tel-saluto">'+saluto()+', '+esc(nomeVisibile().split(' ')[0])+'</h2>';
+  h += '<div class="riga-saluto"><h2 class="tel-saluto">'+saluto()+', '+esc(nomeVisibile().split(' ')[0])+'</h2>'+
+       '<button class="chiudi-saluti" data-action="chiudi-saluti" title="Nascondi fino al prossimo accesso" '+
+       'aria-label="Nascondi">'+svg('x',2.6)+'</button></div>';
 
   if(tg.length){
     const primo = tg[0];
@@ -3149,7 +3172,13 @@ function testataTelefono(){
   return h;
 }
 
+/* I riquadri di benvenuto servono appena entri, non mentre lavori:
+   la X li chiude per questa visita e tornano al prossimo accesso.
+   Sta fuori da state apposta: non finisce nell'archivio. */
+let salutiAperti = true;
+
 function benvenuto(){
+  if(!salutiAperti) return '';
   const nuove = state.notifiche.filter(n=>n.nuova).length;
   const urg = state.progetti.filter(p=>{ const g = giorniA(p.consegna); return !p.completato && g!=null && g<=7; }).length;
   const attivi = state.progetti.filter(p=>!p.completato).length;
@@ -3158,6 +3187,8 @@ function benvenuto(){
     p.subs.forEach(t=>{ if(t.assegnato===state.utente) t.items.forEach(i=>{ if(!i.done) mie++; }); }); });
   const pc = primaCosa();
   return '<div class="benvenuto"><div class="benv">'+
+    '<button class="chiudi-saluti fuori" data-action="chiudi-saluti" '+
+      'title="Nascondi fino al prossimo accesso" aria-label="Nascondi">'+svg('x',2.6)+'</button>'+
     '<span class="campana'+(nuove?'':' zero')+'">'+svg(nuove?'bell':'check')+
       (nuove? '<span class="n">'+(nuove>99?'99+':nuove)+'</span>':'')+'</span>'+
     '<div class="benv-tx">'+
@@ -4923,6 +4954,9 @@ document.addEventListener('click', function(e){
       p.tab = t.dataset.t; render(); break;
 
     case 'vai-luogo': vaiAlSegno(Number(t.dataset.i)); break;
+
+    case 'chiudi-saluti':
+      salutiAperti = false; render(); break;
 
     case 'tab-tel':{
       const k = t.dataset.k;
