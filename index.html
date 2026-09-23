@@ -14,6 +14,8 @@
 <meta name="apple-mobile-web-app-title" content="FOSS">
 <meta name="mobile-web-app-capable" content="yes">
 <meta name="color-scheme" content="dark light">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.css">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.js" defer></script>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.4/dist/umd/supabase.js"></script>
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Sora:wght@400;500;600;700&family=DM+Sans:opsz,wght@9..40,400;9..40,500;9..40,700&family=JetBrains+Mono:wght@400;600&display=swap">
@@ -494,7 +496,22 @@ input,textarea,select{font:inherit;color:inherit}
 .proj-head .cli{font-size:10.5px;letter-spacing:.14em;text-transform:uppercase;color:var(--mute);font-family:Sora;font-weight:600}
 .proj-head h1{font-size:24px;letter-spacing:-.025em;line-height:1.15;margin-top:1px}
 .proj-head .side{display:flex;align-items:center;gap:8px;margin-left:auto;flex-wrap:wrap}
-.proj{display:grid;grid-template-columns:232px minmax(0,1fr) 304px;flex:1;min-height:0}
+.proj{display:grid;grid-template-columns:232px minmax(0,1fr);flex:1;min-height:0;position:relative}
+/* Commenti, chat e attivita' stanno in un cassetto: si aprono quando servono
+   e per il resto del tempo lasciano respirare il lavoro. */
+.proj > .rail-r{position:absolute;z-index:40;top:0;bottom:0;right:0;width:min(340px,92vw);
+  display:flex;transform:translateX(103%);transition:transform .22s cubic-bezier(.4,0,.2,1);
+  box-shadow:-14px 0 46px rgba(0,0,0,.3)}
+.proj.show-feed > .rail-r{transform:none}
+.proj.show-feed > .feed-scrim{display:block;position:absolute;inset:0;z-index:35;
+  background:rgba(8,12,20,.42);animation:fadein .18s ease-out}
+.feed-scrim{display:none}
+/* il tasto che lo apre: si deve vedere, e deve dire se c'e' roba da leggere */
+.feed-btn{position:relative}
+.feed-btn .n{position:absolute;top:-6px;right:-6px;min-width:17px;height:17px;padding:0 4px;
+  border-radius:9px;background:var(--alert);color:#fff;font-size:10px;font-weight:700;
+  font-family:Sora;display:grid;place-items:center;border:2px solid var(--bg)}
+.feed-btn.ha-nuovi{border-color:var(--alert)}
 .rail{background:var(--surface);border-right:1px solid var(--line);display:flex;flex-direction:column;min-height:0;overflow-y:auto}
 .rail-r{overflow:hidden}
 .rail-r{border-right:none;border-left:1px solid var(--line)}
@@ -538,7 +555,7 @@ input,textarea,select{font:inherit;color:inherit}
 .work-head{padding:14px 18px 10px;border-bottom:1px solid var(--line-soft);display:flex;align-items:flex-start;gap:14px;flex-wrap:wrap}
 .work-head h2{font-size:17px;display:flex;align-items:center;gap:9px}
 .work-head p{margin:3px 0 0;color:var(--dim);font-size:12px}
-.specs{display:grid;grid-template-columns:repeat(auto-fit,minmax(118px,1fr));gap:1px;background:var(--line-soft);
+.specs{display:none;grid-template-columns:repeat(auto-fit,minmax(118px,1fr));gap:1px;background:var(--line-soft);
   border-top:1px solid var(--line-soft);border-bottom:1px solid var(--line-soft)}
 .spec{background:var(--bg);padding:9px 18px}
 .spec .k{font-size:9.5px;letter-spacing:.12em;text-transform:uppercase;color:var(--mute);font-family:Sora;font-weight:600}
@@ -896,14 +913,14 @@ input,textarea,select{font:inherit;color:inherit}
 .chk{position:relative}
 /* chi fa questa singola subtask */
 .chk-ass{width:22px;height:22px;border-radius:50%;display:grid;place-items:center;flex:none;
-  margin-left:auto;transition:opacity .14s,color .14s}
+  margin-left:4px;transition:opacity .14s,color .14s}
 .chk-ass .av{width:20px;height:20px;font-size:8.5px}
 .chk-ass.vuoto{color:var(--mute);opacity:0;border:1px dashed var(--line);border-radius:50%}
 .chk-ass.vuoto svg{width:11px;height:11px}
 .chk:hover .chk-ass.vuoto,.chk-ass.vuoto:focus-visible{opacity:.7}
 .chk-ass.vuoto:hover{opacity:1;color:var(--amber-ink);border-color:var(--amber)}
 @media (hover:none){.chk-ass.vuoto{opacity:.45}}
-.chk .pen{margin-left:0}
+.chk .pen{margin-left:auto}
 .bloccato .chk-ass.vuoto{display:none}
 .bloccato .pen{display:none}
 #undoBtn.nulla{animation:shake .32s ease-out}
@@ -1154,7 +1171,15 @@ input,textarea,select{font:inherit;color:inherit}
 .luogo .tx b{display:block;font-family:Sora;font-size:12.5px;font-weight:600}
 .luogo .tx span{display:block;font-size:11px;color:var(--mute);line-height:1.3}
 .luogo .tx .tag{display:inline-flex;width:auto}
-.mappa-vuota{position:absolute;inset:0;display:grid;place-items:center;color:var(--mute);font-size:13px}
+.mappa-vuota{position:absolute;inset:0;display:grid;place-items:center;color:var(--mute);font-size:13px;
+  text-align:center;padding:0 24px;line-height:1.5}
+.mappa .leaflet-container{width:100%;height:100%;background:var(--surface-2);font-family:inherit}
+.mappa.mappa-scura .leaflet-tile-pane{filter:invert(1) hue-rotate(180deg) brightness(.92) contrast(.9)}
+.segno span{display:grid;place-items:center;width:26px;height:26px;border-radius:50%;
+  background:var(--acc,#FFAD01);color:#0D1926;font-family:Sora;font-weight:700;font-size:12px;
+  border:2px solid #fff;box-shadow:0 2px 8px rgba(0,0,0,.35);cursor:pointer}
+.leaflet-popup-content{font-family:inherit;font-size:12.5px;line-height:1.45}
+.leaflet-popup-content a{color:var(--amber-ink);font-weight:600}
 @media (max-width:820px){ .mappa-lista{display:none} .mappa-wrap{padding:0 12px 12px} }
 
 /* ---------- CONDIVISIONE ---------- */
@@ -1260,8 +1285,18 @@ input,textarea,select{font:inherit;color:inherit}
 .riga-indietro{display:contents}
 .rail-compatta{display:none}
 .rail-scrim{display:none}
+#statoProfilo{transition:color .2s,border-color .2s}
+#statoProfilo.ok-flash{color:var(--ok);border-color:var(--ok)}
+.chiudi-feed{flex:none;width:34px;padding:0;display:grid;place-items:center;color:var(--mute)}
+.chiudi-feed svg{width:14px;height:14px}
+.chiudi-feed:hover{color:var(--text)}
+.chat-step{position:relative;flex:none!important;width:46px;justify-content:center;padding:7px!important}
+.chat-step .n{position:absolute;top:2px;right:2px;min-width:15px;height:15px;padding:0 3px;border-radius:8px;
+  background:var(--alert);color:#fff;font-size:9.5px;font-weight:700;font-family:Sora;display:grid;place-items:center}
+.chat-step.ha-nuovi{border-color:var(--alert)}
 @media (max-width:1100px){
-  .proj{grid-template-columns:minmax(0,1fr) 280px;position:relative}
+  .specs{display:grid}
+  .proj{grid-template-columns:minmax(0,1fr);position:relative}
   .solo-stretto{display:inline-flex!important}
   .rail-compatta{display:flex;align-items:center;gap:10px;flex:none;margin-left:auto}
   .rail-compatta .ring-wrap{gap:10px}
@@ -1285,7 +1320,6 @@ input,textarea,select{font:inherit;color:inherit}
   .vs{padding:7px 12px;font-size:13px}
 }
 @media (max-width:820px){
-  .proj{grid-template-columns:minmax(0,1fr)}
   .cal-title{font-size:20px;min-width:0}
   .cal-head{padding:6px 12px 8px}
   .cal-wrap{padding:0 12px 12px}
@@ -1296,10 +1330,6 @@ input,textarea,select{font:inherit;color:inherit}
   .griglia{grid-template-columns:1fr}
   .proj-head{padding:10px 14px}
   .proj-head h1{font-size:18px}
-  .rail-r{display:none}
-  .proj.show-feed{grid-template-columns:minmax(0,1fr)}
-  .proj.show-feed .work{display:none}
-  .proj.show-feed .rail-r{display:flex;border-left:none}
   .step .tx{display:none}
   .step{justify-content:center;padding:7px}
   .step .idx{display:none}
@@ -1406,11 +1436,52 @@ input,textarea,select{font:inherit;color:inherit}
   .filtri .fchip{white-space:nowrap;flex:none}
   .ordina{display:none}
   .snoozed{flex:none}
-  .sp-head{padding:12px 14px 8px;gap:12px}
-  .sp-head .ic{width:42px;height:42px;border-radius:13px}
-  .sp-head h1{font-size:23px}
-  .sp-head .azioni{margin-left:0;width:100%}
-  .sp-head .azioni .btn{flex:1;justify-content:center}
+  /* ---------- LA HOME DEL TELEFONO ----------
+     In alto rispondo a tre domande e basta: chi sei, ti hanno cercato,
+     cosa fai adesso. Lo spazio di lavoro scende sotto, in una riga sola. */
+  .tel-home{padding:14px 14px 4px}
+  .tel-saluto{font-family:Sora;font-size:22px;font-weight:700;margin:0 0 11px;letter-spacing:-.01em}
+  .tel-avviso{display:flex;align-items:center;gap:11px;width:100%;text-align:left;
+    padding:13px 13px;border-radius:15px;border:1px solid var(--line);background:var(--surface);
+    color:var(--text);font:inherit;cursor:pointer}
+  .tel-avviso .ic{width:34px;height:34px;flex:none;border-radius:11px;display:grid;place-items:center;
+    background:var(--surface-2);color:var(--mute)}
+  .tel-avviso .ic svg{width:17px;height:17px}
+  .tel-avviso .tx{flex:1;min-width:0;display:flex;flex-direction:column;gap:2px}
+  .tel-avviso .tx b{font-family:Sora;font-size:14.5px;font-weight:600;line-height:1.25}
+  .tel-avviso .tx span{font-size:12px;color:var(--mute);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+  .tel-avviso .fr{flex:none;color:var(--mute);display:grid;place-items:center}
+  .tel-avviso .fr svg{width:16px;height:16px}
+  .tel-avviso.tag{border-color:var(--amber);background:var(--amber-soft)}
+  .tel-avviso.tag .ic{background:var(--amber);color:#0D1926}
+  .tel-avviso.tag .tx span{color:var(--amber-ink)}
+  .tel-avviso.calmo{background:transparent;border-style:dashed;cursor:default}
+  .tel-prima{margin-top:10px;padding:14px;border-radius:15px;border:1px solid var(--line);
+    background:var(--surface);display:flex;flex-direction:column;gap:3px}
+  .tel-prima .lb{font-family:Sora;font-size:9.5px;font-weight:700;letter-spacing:.13em;
+    text-transform:uppercase;color:var(--mute)}
+  .tel-prima > b{font-family:Sora;font-size:17px;font-weight:700;line-height:1.25;letter-spacing:-.01em}
+  .tel-prima .tel-prima-sub{font-size:12px;color:var(--mute);line-height:1.4}
+  .tel-prima .btn{margin-top:10px;width:100%;justify-content:center;padding:12px}
+  .tel-prima.urg{border-color:var(--alert);background:var(--alert-soft)}
+  .tel-prima.urg .lb{color:var(--alert)}
+  /* lo spazio di lavoro: una riga, non mezza schermata */
+  .sp-head{padding:8px 14px 8px;gap:10px;align-items:center}
+  .sp-head > .riga-indietro{flex:none;margin:0}
+  .sp-head > .riga-indietro .indietro{padding:8px 11px;font-size:12.5px}
+  .sp-head > .ic{display:none}
+  .sp-head .ic{width:34px;height:34px;border-radius:11px}
+  .sp-head .ic svg{width:17px;height:17px}
+  .sp-head h1{font-size:17px}
+  .sp-head .desc{display:none}
+  .sp-head .riga2 .dato{font-size:11px}
+  .sp-head .riga2 .dato:not(.urg):nth-child(n+2){display:none}
+  .sp-head .azioni{margin-left:auto;width:auto}
+  .sp-head .azioni [data-action="modifica-spazio"]{display:none}
+  .sp-head .azioni .btn{padding:9px 12px}
+  .sp-head .azioni .btn span,.sp-head .azioni .btn{font-size:0}
+  .sp-head .azioni .btn svg{width:18px;height:18px}
+  .segmenti{margin-top:2px}
   .scroller{padding:4px 14px 14px}
   .tiles{grid-template-columns:1fr}
   .proj-head{padding:10px 12px;gap:10px}
@@ -1961,14 +2032,30 @@ function giorniA(dmy){
   const m = /^(\d{2})\/(\d{2})\/(\d{4})$/.exec(dmy||''); if(!m) return null;
   return Math.round((new Date(+m[3],+m[2]-1,+m[1]) - OGGI)/86400000);
 }
+const GIORNI_SETT = ['domenica','luned\u00ec','marted\u00ec','mercoled\u00ec','gioved\u00ec','venerd\u00ec','sabato'];
+const MESI_BREVI = ['gen','feb','mar','apr','mag','giu','lug','ago','set','ott','nov','dic'];
+function dataDi(dmy){
+  const m = /^(\d{2})\/(\d{2})\/(\d{4})$/.exec(dmy||''); if(!m) return null;
+  return new Date(+m[3],+m[2]-1,+m[1]);
+}
+/* La scadenza detta come la direbbe una persona: "domani", "gioved\u00ec",
+   e solo da lontano la data. Il rosso lo uso solo quando serve davvero. */
 function scadenza(p){
-  const g = giorniA(p.consegna);
-  if(g===null) return {t:'—', c:''};
-  if(g<0) return {t:'Scaduto da '+(-g)+'g', c:'alert'};
-  if(g===0) return {t:'Consegna oggi', c:'alert'};
-  if(g<=3) return {t:'Tra '+g+' giorni', c:'alert'};
-  if(g<=10) return {t:'Tra '+g+' giorni', c:'now'};
-  return {t:'Tra '+g+' giorni', c:''};
+  const g = giorniA(p.consegna), d = dataDi(p.consegna);
+  if(g===null) return {t:'\u2014', c:''};
+  /* un lavoro chiuso non \u00e8 in ritardo: \u00e8 consegnato */
+  if(p.completato) return {t: d? 'Consegnato il '+d.getDate()+' '+MESI_BREVI[d.getMonth()] : 'Consegnato', c:'fatto'};
+  if(g<0){
+    const n = -g;
+    return {t: n===1? 'Scaduto ieri' : n<7? 'Scaduto '+n+' giorni fa'
+              : n<14? 'Scaduto una settimana fa' : 'Scaduto il '+d.getDate()+' '+MESI_BREVI[d.getMonth()], c:'alert'};
+  }
+  if(g===0) return {t:'Oggi', c:'alert'};
+  if(g===1) return {t:'Domani', c:'alert'};
+  if(g===2) return {t:'Dopodomani', c:'alert'};
+  if(g<=6) return {t:GIORNI_SETT[d.getDay()][0].toUpperCase()+GIORNI_SETT[d.getDay()].slice(1), c:'now'};
+  if(g<=13) return {t:'Tra una settimana', c:'now'};
+  return {t: d.getDate()+' '+MESI_BREVI[d.getMonth()] + (d.getFullYear()!==OGGI.getFullYear()? ' '+d.getFullYear():''), c:''};
 }
 function fmtSize(b){ return b>=1048576 ? (b/1048576).toFixed(1)+' MB' : Math.max(1,Math.round(b/1024))+' KB'; }
 function passaFiltro(p, f){
@@ -2259,22 +2346,20 @@ function tessera(p){
         '<div class="tile-meta" style="margin-bottom:8px">'+
           '<span class="picona" style="width:22px;height:22px;border-radius:7px">'+
             svg(p.icona||T.ic).replace('<svg','<svg style="width:12px;height:12px"')+'</span>'+
-          '<span class="tipo" style="--tc:'+T.c+'"><i></i>'+T.n+'</span><span class="sep"></span>'+
+          '<span class="sep"></span>'+
           (isLock(p)? '<span class="lockchip">'+svg('lock')+'</span>':'')+
           (nuoveN? '<span class="unread">'+svg('bell')+nuoveN+'</span>':'')+
           '<span class="prio '+p.prio+'">'+PRIO[p.prio]+'</span></div>'+
         '<div class="tile-top"><div style="flex:1;min-width:0"><div class="cli">'+esc(p.cliente)+'</div><h3>'+esc(p.nome)+'</h3></div></div>'+
-        ((p.tags&&p.tags.length)? '<div class="tags-row" style="margin:7px 0 2px">'+
-          p.tags.slice(0,4).map(t=>'<span class="tag">'+esc(t)+'</span>').join('')+'</div>':'')+
         '<div class="pips">'+FZ(p).map((f,i)=>'<i class="pip '+(i<p.avanz?'done':i===p.avanz?'now':'')+'"></i>').join('')+'</div>'+
         '<div class="tile-meta">'+(p.completato
           ? '<span class="chip fatto">'+svg('check')+'Completato</span>'
           : '<span class="chip '+(p.avanz===FZ(p).length-1?'ok':'now')+'">'+FZ(p)[p.avanz].nome+'</span>')+
-        '<span class="mono" style="font-size:11px">'+prog(p)+'%</span><span class="sep"></span>'+
+        '<span class="sep"></span>'+
         '<span class="av-stack">'+p.team.slice(0,4).map(id=>av(U(id),'sm')).join('')+'</span></div>'+
         '<div class="tile-meta" style="margin-top:9px">'+
           '<span class="chip '+s.c+'">'+svg('clock')+s.t+'</span>'+
-          '<span class="sep"></span><span style="font-size:11px;color:var(--mute)" class="mono">'+p.consegna+'</span>'+
+          '<span class="sep"></span>'+
           (p.allegati && p.allegati.length? '<span style="font-size:11px;color:var(--mute);display:inline-flex;align-items:center;gap:3px">'+
             svg('clip').replace('<svg','<svg style="width:11px;height:11px"')+p.allegati.length+'</span>':'')+
         '</div></button>';
@@ -2285,6 +2370,7 @@ function renderHome(){
   let h = '<div class="pane'+(sp && sp.sfondo?' con-sfondo':'')+'"'+
           (sp && sp.sfondo? ' style="--bg-img:url(\''+sp.sfondo+'\')"':'')+'>';
   h += barraOspite();
+  if(suTelefono()) h += testataTelefono();
   h += intestazioneSpazio(lista);
 
   if(state.vista==='note'){
@@ -2311,6 +2397,8 @@ function renderHome(){
   h += '</div>';
   el('stage').innerHTML = h;
   const qi = el('q'); if(qi && qi.value!==state.filtro) qi.value = state.filtro;
+  if(state.vista==='mappa') montaMappa();
+  else if(mappaLeaflet){ try{ mappaLeaflet.remove(); }catch(e){} mappaLeaflet = null; }
 }
 
 function renderCal(lista){
@@ -2399,16 +2487,17 @@ function renderProgetto(){
       '<h1 style="display:flex;align-items:center;gap:8px">'+esc(p.nome)+pen('proj','nome',null,null,1)+'</h1></div>'+
     '<div class="side">'+
       '<button class="btn sm ghost solo-stretto no-tel" data-action="toggle-rail" title="Scheda progetto, team e blocco">'+svg('file')+'Scheda</button>'+
+      tastoFeed(p)+
       '<button class="btn sm no-tel" data-action="condividi" data-pid="'+p.id+'">'+svg('share')+'Condividi</button>'+
       ((p.lock&&p.lock.on)? '<button class="lockchip" data-action="lock" data-pid="'+p.id+'" title="Sblocca con password">'+svg('lock')+'Bloccato</button>':'')+
-      '<span class="tipo no-tel" style="--tc:'+TT.c+'"><i></i>'+TT.n+'</span>'+
       '<span class="prio '+p.prio+'">'+PRIO[p.prio]+'</span>'+
       '<span class="chip no-tel '+SC.c+'">'+svg('clock')+SC.t+'</span>'+
       '<span class="av-stack no-tel">'+p.team.slice(0,5).map(id=>av(U(id),'sm')).join('')+'</span>'+
     '</div></div>';
 
   h += '<div class="proj'+(state.showFeed?' show-feed':'')+(state.railOn?' rail-on':'')+'">'+
-       '<div class="rail-scrim" data-action="toggle-rail"></div>';
+       '<div class="rail-scrim" data-action="toggle-rail"></div>'+
+       '<div class="feed-scrim" data-action="feed"></div>';
 
   /* rail sinistra */
   h += '<aside class="rail"><div class="rail-sec">'+avanzamentoHTML(p,pct,F,R,C,false)+'</div>';
@@ -2446,7 +2535,7 @@ function renderProgetto(){
     '<div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap">'+
       '<span class="chip editabile" style="gap:6px">Responsabile '+av(U(p.faseAss[f]||p.team[0]),'sm')+
         esc(U(p.faseAss[f]||p.team[0]).nome.split(' ')[0])+pen('fase','',null,f,1)+'</span>'+
-      '<span class="chip no-tel">Fase '+(f+1)+' di '+FZ(p).length+'</span></div>'+
+      '</div>'+
     '<div class="rail-compatta'+((!p.completato && pct<100)?' e-anello':'')+'">'+
       avanzamentoHTML(p,pct,F,20,2*Math.PI*20,true)+'</div></div>';
   h += barraProssima(p);
@@ -2498,8 +2587,10 @@ function renderProgetto(){
   h += '</div></section>';
 
   /* rail destra: feedback */
-  const tab = p.tab, nl = nonLetti(p);
+  const tab = ['commenti','chat','attivita'].indexOf(p.tab)>=0 ? p.tab : 'commenti';
+  const nl = nonLetti(p);
   h += '<aside class="rail rail-r"><div class="tabs">'+
+    '<button class="tab chiudi-feed" data-action="feed" title="Chiudi il pannello">'+svg('x',2.6)+'</button>'+
     ['commenti','chat','attivita'].map(t=>'<button class="tab'+(tab===t?' on':'')+'" data-action="tab" data-t="'+t+'">'+
       (t==='commenti'?'Commenti':t==='chat'?'Chat':'Attività')+
       (nl[t] && tab!==t ? '<span class="n">'+(nl[t]>9?'9+':nl[t])+'</span>' : '')+
@@ -2575,13 +2666,27 @@ function msg(u,c){
     '<div class="tx">'+c.tx+'</div></div></div>';
 }
 function kv(k,v,campo){
-  return '<div class="kv"><span>'+k+'</span><b>'+esc(v)+'</b>'+(campo? pen('proj',campo):'')+'</div>';
+  const val = (v==null || v==='') ? '\u2014' : v;
+  return '<div class="kv"><span>'+k+'</span><b>'+esc(val)+'</b>'+(campo? pen('proj',campo):'')+'</div>';
 }
 const MONO = {call:1,girato:1,schede:1,versione:1,note:1,tc:1,lufs:1,consegna:1};
 function specs(p,f){
   const fase = FZ(p)[f] || {};
   const campi = fase.campi || [['Consegna','consegna'],['Budget','budget'],['Referente','referente'],['Note aperte','note']];
   return campi.map(c => [c[0], (p[c[1]]==null||p[c[1]]==='')?'—':p[c[1]], MONO[c[1]]?1:0, c[1]]);
+}
+
+/* Il tasto del cassetto: dice a colpo d'occhio se c'e' qualcosa da leggere,
+   cosi' si capisce se vale la pena aprirlo. */
+function totaleNonLetti(p){
+  const nl = nonLetti(p);
+  return (nl.commenti||0) + (nl.chat||0) + (nl.attivita||0);
+}
+function tastoFeed(p){
+  const n = totaleNonLetti(p);
+  return '<button class="btn sm feed-btn'+(n?' ha-nuovi':' ghost')+'" data-action="feed" '+
+    'title="'+(n? n+' da leggere tra commenti, chat e attivit\u00e0' : 'Commenti, chat e attivit\u00e0')+'">'+
+    svg('chat')+'Commenti'+(n? '<span class="n">'+(n>9?'9+':n)+'</span>' : '')+'</button>';
 }
 
 /* ============ BARRA FASI ============ */
@@ -2603,7 +2708,7 @@ function renderPhasebar(){
     bar.innerHTML = '<button class="btn ghost" data-action="home">'+svg('left')+'Torna ai progetti</button>'+
       '<div class="spacer" style="flex:1"></div>'+
       '<button class="btn ghost" data-action="esci">'+svg('out')+'Esci</button>'+
-      '<button class="btn primary" data-action="salva-profilo">'+svg('check')+'Salva profilo</button>';
+      '<span class="chip" id="statoProfilo">Si salva da solo</span>';
     return;
   }
   if(state.schermo==='home' && state.vista==='note'){
@@ -2656,6 +2761,14 @@ function renderPhasebar(){
       '<span class="idx mono">0'+(i+1)+'</span></button>';
   });
   h += '</div>';
+  /* Sul telefono la barra in basso e' l'unico posto sempre a portata di pollice:
+     ci metto anche la chat, sennò dal telefono non si raggiunge. */
+  if(suTelefono()){
+    const n = totaleNonLetti(p);
+    h += '<button class="step chat-step'+(n?' ha-nuovi':'')+'" data-action="feed" title="Commenti e chat">'+
+      '<span class="ic">'+svg('chat')+'</span>'+
+      (n? '<span class="n">'+(n>9?'9+':n)+'</span>':'')+'</button>';
+  }
   bar.innerHTML = h;
 
   if(p.revisione){
@@ -2741,6 +2854,63 @@ function primaCosa(){
     }
   }
   return null;
+}
+
+/* ---------- DOVE MI HANNO TAGGATO ----------
+   La prima domanda di chi apre l'app dal telefono \u00e8 sempre la stessa:
+   qualcuno mi ha cercato? Rispondo prima di tutto il resto. */
+function taggatoSu(){
+  const out = [];
+  state.progetti.forEach(p=>{
+    if(p.completato || !vedeProgetto(p)) return;
+    (p.subs||[]).forEach(s=>{
+      if((s.taggati||[]).some(x=>x && x.u===state.utente)) out.push({p, s, tipo:'tag'});
+      (s.items||[]).forEach(i=>{ if(i && i.ass===state.utente && !i.done) out.push({p, s, i, tipo:'sub'}); });
+    });
+  });
+  return out;
+}
+
+/* ---------- LA HOME DEL TELEFONO ----------
+   Tre cose, in quest'ordine: chi sei, se ti hanno cercato, cosa fare adesso.
+   Il resto viene dopo: sullo schermo piccolo la prima schermata deve
+   rispondere, non riempirsi. */
+function testataTelefono(){
+  const tg = taggatoSu();
+  const nuove = state.notifiche.filter(n=>n.nuova).length;
+  const pc = primaCosa();
+  let h = '<div class="tel-home">';
+  h += '<h2 class="tel-saluto">'+saluto()+', '+esc(nomeVisibile().split(' ')[0])+'</h2>';
+
+  if(tg.length){
+    const primo = tg[0];
+    const dove = primo.tipo==='sub' ? esc(primo.i.t)+' \u00b7 '+esc(primo.s.titolo) : esc(primo.s.titolo);
+    h += '<button class="tel-avviso tag" data-action="vai-primo" data-pid="'+primo.p.id+'" data-sid="'+primo.s.id+'">'+
+      '<span class="ic">'+svg('user',2.2)+'</span>'+
+      '<span class="tx"><b>'+(tg.length===1? 'Ti hanno taggato in un punto' : 'Ti hanno taggato in '+tg.length+' punti')+'</b>'+
+      '<span>'+dove+' \u00b7 '+esc(primo.p.nome)+'</span></span>'+
+      '<span class="fr">'+svg('right',2.2)+'</span></button>';
+  } else if(nuove){
+    h += '<button class="tel-avviso" data-action="notifiche">'+
+      '<span class="ic">'+svg('bell',2.2)+'</span>'+
+      '<span class="tx"><b>'+nuove+(nuove===1?' notifica da leggere':' notifiche da leggere')+'</b>'+
+      '<span>Nessuno ti ha taggato direttamente</span></span>'+
+      '<span class="fr">'+svg('right',2.2)+'</span></button>';
+  } else {
+    h += '<div class="tel-avviso calmo">'+
+      '<span class="ic">'+svg('check',2.2)+'</span>'+
+      '<span class="tx"><b>Nessuno ti ha taggato</b><span>Puoi lavorare tranquillo</span></span></div>';
+  }
+
+  if(pc){
+    h += '<div class="tel-prima'+(pc.urg?' urg':'')+'">'+
+      '<span class="lb">'+esc(pc.lb)+'</span>'+
+      '<b>'+pc.tx+'</b>'+
+      '<span class="tel-prima-sub">'+esc(pc.sub.split(' \u00b7 ').slice(0,2).join(' \u00b7 '))+'</span>'+
+      pc.az+'</div>';
+  }
+  h += '</div>';
+  return h;
 }
 
 function benvenuto(){
@@ -3169,45 +3339,21 @@ function luoghi(){
   return out;
 }
 function renderMappa(){
-  const L = luoghi(), W = 1000, H = 640;
+  const L = luoghi();
+  const da = daGeocodificare();
   let h = '<div class="cal-head" style="padding-top:0">'+
-    '<span class="count">'+L.length+' luoghi sui progetti in elenco</span>'+
+    '<span class="count">'+L.length+' luogh'+(L.length===1?'io':'i')+' sui progetti in elenco'+
+      (da.length? ' · cerco l\'indirizzo di '+da.length+' altr'+(da.length===1?'o':'i'):'')+'</span>'+
     '<div class="cal-nav"><h2 class="cal-title" style="text-transform:none">Milano <span>e hinterland</span></h2></div>'+
     '<div></div></div>';
 
-  h += '<div class="mappa-wrap"><div class="mappa"><svg viewBox="0 0 '+W+' '+H+'" preserveAspectRatio="xMidYMid slice">'+
-    '<rect width="'+W+'" height="'+H+'" fill="var(--surface-2)"/>'+
-    /* parco nord, parco sud, idrografia: forme larghe solo per orientarsi */
-    '<path d="M300 40 L470 30 L500 120 L330 140 Z" fill="var(--surface-3)" opacity=".5"/>'+
-    '<path d="M120 470 L520 440 L620 600 L160 620 Z" fill="var(--surface-3)" opacity=".5"/>'+
-    '<path d="M60 260 Q 300 230 520 300 T 960 330" stroke="var(--navy)" stroke-width="3" fill="none" opacity=".45"/>'+
-    /* tangenziali: anello esterno e cerchia interna */
-    '<ellipse cx="500" cy="330" rx="330" ry="250" fill="none" stroke="var(--line)" stroke-width="2" stroke-dasharray="7 6"/>'+
-    '<ellipse cx="500" cy="330" rx="150" ry="115" fill="none" stroke="var(--line)" stroke-width="2"/>'+
-    '<circle cx="500" cy="330" r="52" fill="none" stroke="var(--amber)" stroke-width="1.5" opacity=".5"/>'+
-    /* assi principali */
-    '<path d="M500 80 L500 580 M170 330 L830 330 M270 120 L730 540 M730 120 L270 540" stroke="var(--line)" stroke-width="1.5" opacity=".6"/>'+
-    '<text x="500" y="334" text-anchor="middle" font-family="Sora" font-size="13" font-weight="700" fill="var(--mute)">DUOMO</text>'+
-    '<text x="500" y="72" text-anchor="middle" font-family="Sora" font-size="10" fill="var(--mute)" letter-spacing="2">NORD</text>'+
-    '<text x="855" y="335" font-family="Sora" font-size="10" fill="var(--mute)" letter-spacing="2">EST</text>'+
-    '<text x="105" y="335" font-family="Sora" font-size="10" fill="var(--mute)" letter-spacing="2">OVEST</text>'+
-    '<text x="500" y="600" text-anchor="middle" font-family="Sora" font-size="10" fill="var(--mute)" letter-spacing="2">SUD</text>';
-
-  L.forEach((l,i)=>{
-    const q = px(l.coord, W, H);
-    const x = Math.max(24, Math.min(W-24, q.x)), y = Math.max(24, Math.min(H-24, q.y));
-    h += '<g class="pin" style="--acc:'+l.p.col+'" data-action="'+(l.s?'vai-task':'apri')+'" data-id="'+l.p.id+'"'+
-         (l.s?' data-sid="'+l.s.id+'"':'')+'>'+
-      '<title>'+esc(l.nome+' — '+(l.sotto||''))+'</title>'+
-      '<circle class="alone" cx="'+x+'" cy="'+y+'" r="26"/>'+
-      '<path class="corpo" d="M'+x+' '+(y+16)+' c-9-11-14-17-14-24 a14 14 0 1 1 28 0 c0 7-5 13-14 24 z"/>'+
-      '<text x="'+x+'" y="'+(y-3)+'" text-anchor="middle">'+(i+1)+'</text></g>';
-  });
-  h += '</svg>'+(L.length? '' : '<div class="mappa-vuota">Nessun indirizzo con coordinate nei progetti filtrati.</div>')+'</div>';
+  h += '<div class="mappa-wrap"><div class="mappa" id="mappaBox">'+
+       (L.length? '' : '<div class="mappa-vuota">Nessun progetto con un indirizzo. '+
+         'Scrivilo nella scheda del progetto e comparirà qui.</div>')+'</div>';
 
   h += '<div class="mappa-lista">'+ (L.length? L.map((l,i)=>
-      '<button class="luogo" style="--acc:'+l.p.col+'" data-action="'+(l.s?'vai-task':'apri')+'" data-id="'+l.p.id+'"'+
-        (l.s?' data-sid="'+l.s.id+'"':'')+'>'+
+      '<button class="luogo" style="--acc:'+l.p.col+'" data-action="vai-luogo" data-i="'+i+'" '+
+        'data-id="'+l.p.id+'"'+(l.s?' data-sid="'+l.s.id+'"':'')+'>'+
         '<span class="n">'+(i+1)+'</span><span class="tx"><b>'+esc(l.nome)+'</b>'+
         '<span>'+esc(l.sotto||'')+'</span>'+
         '<span style="margin-top:3px"><span class="tag">'+(l.s?'Task':'Progetto')+'</span> '+esc(l.p.cliente)+'</span></span></button>'
@@ -3217,7 +3363,119 @@ function renderMappa(){
   return h;
 }
 
+/* ---------- LA MAPPA VERA ----------
+   Se la libreria della mappa è arrivata disegno Milano com'è, con le strade.
+   Se non è arrivata (offline, o rete lenta) resta lo schema: meglio qualcosa
+   che una scatola vuota. */
+let mappaLeaflet = null, mappaSegni = [];
+function montaMappa(){
+  const box = el('mappaBox'); if(!box) return;
+  const L = luoghi();
+  avviaGeocodifica();
+  if(!window.L){ box.innerHTML = mappaSchema(L); return; }
+
+  if(mappaLeaflet){ try{ mappaLeaflet.remove(); }catch(e){} mappaLeaflet = null; }
+  box.innerHTML = '';
+  const scuro = tema()==='dark';
+  mappaLeaflet = window.L.map(box, {zoomControl:true, attributionControl:true, scrollWheelZoom:true})
+    .setView([45.4642, 9.1900], 11);
+  window.L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+    maxZoom:19, attribution:'© OpenStreetMap'
+  }).addTo(mappaLeaflet);
+  box.classList.toggle('mappa-scura', scuro);
+
+  mappaSegni = [];
+  L.forEach((l,i)=>{
+    const ic = window.L.divIcon({className:'segno', html:'<span style="--acc:'+l.p.col+'">'+(i+1)+'</span>',
+                                 iconSize:[26,26], iconAnchor:[13,13]});
+    const m = window.L.marker(l.coord, {icon:ic}).addTo(mappaLeaflet);
+    m.bindPopup('<b>'+esc(l.nome)+'</b><br>'+esc(l.sotto||'')+
+      '<br><a href="#" data-action="'+(l.s?'vai-task':'apri')+'" data-id="'+l.p.id+'"'+
+      (l.s?' data-sid="'+l.s.id+'"':'')+'>Apri il progetto</a>');
+    mappaSegni.push(m);
+  });
+  if(L.length === 1) mappaLeaflet.setView(L[0].coord, 14);
+  else if(L.length) mappaLeaflet.fitBounds(L.map(l=>l.coord), {padding:[40,40], maxZoom:14});
+  setTimeout(()=>{ if(mappaLeaflet) mappaLeaflet.invalidateSize(); }, 80);
+}
+function vaiAlSegno(i){
+  const L = luoghi(); if(!L[i]) return;
+  if(mappaLeaflet){ mappaLeaflet.setView(L[i].coord, 15); if(mappaSegni[i]) mappaSegni[i].openPopup(); }
+}
+
+/* ---------- DALL'INDIRIZZO AL PUNTO SULLA MAPPA ----------
+   Chiedo le coordinate una volta sola e me le tengo nel progetto: dalla
+   seconda volta la mappa si disegna senza chiedere niente a nessuno. */
+function daGeocodificare(){
+  return state.progetti.filter(p => p.indirizzo && p.indirizzo.trim() && !p.coord && !p.senzaCoord);
+}
+let geoInCorso = false;
+function avviaGeocodifica(){
+  if(geoInCorso || !window.fetch) return;
+  const da = daGeocodificare(); if(!da.length) return;
+  geoInCorso = true;
+  const passo = (k)=>{
+    if(k >= da.length){ geoInCorso = false; save(); if(state.vista==='mappa') render(); return; }
+    const p = da[k];
+    const q = /milan|\(mi\)|italia/i.test(p.indirizzo) ? p.indirizzo : p.indirizzo+', Milano, Italia';
+    fetch('https://nominatim.openstreetmap.org/search?format=json&limit=1&q='+encodeURIComponent(q))
+      .then(r=>r.json())
+      .then(d=>{
+        if(d && d[0]) p.coord = [parseFloat(d[0].lat), parseFloat(d[0].lon)];
+        else p.senzaCoord = true;
+      })
+      .catch(()=>{ p.senzaCoord = true; })
+      .then(()=>{ setTimeout(()=>passo(k+1), 1100); });   // una richiesta al secondo: sono le loro regole
+  };
+  passo(0);
+}
+
+/* lo schema di riserva, quando la mappa vera non è disponibile */
+function mappaSchema(L){
+  const W = 1000, H = 640;
+  const px = (c)=>({ x:(c[1]-9.19)*1000/0.30*1 + W/2, y:H/2 - (c[0]-45.4642)*640/0.16 });
+  let h = '<svg viewBox="0 0 '+W+' '+H+'" preserveAspectRatio="xMidYMid slice">'+
+    '<rect width="'+W+'" height="'+H+'" fill="var(--surface-2)"/>'+
+    '<ellipse cx="500" cy="330" rx="330" ry="250" fill="none" stroke="var(--line)" stroke-width="2" stroke-dasharray="7 6"/>'+
+    '<ellipse cx="500" cy="330" rx="150" ry="115" fill="none" stroke="var(--line)" stroke-width="2"/>'+
+    '<text x="500" y="334" text-anchor="middle" font-family="Sora" font-size="13" font-weight="700" fill="var(--mute)">DUOMO</text>';
+  L.forEach((l,i)=>{
+    const q = px(l.coord);
+    const x = Math.max(24, Math.min(W-24, q.x)), y = Math.max(24, Math.min(H-24, q.y));
+    h += '<g class="pin" style="--acc:'+l.p.col+'" data-action="'+(l.s?'vai-task':'apri')+'" data-id="'+l.p.id+'"'+
+         (l.s?' data-sid="'+l.s.id+'"':'')+'>'+
+      '<title>'+esc(l.nome+' — '+(l.sotto||''))+'</title>'+
+      '<circle class="alone" cx="'+x+'" cy="'+y+'" r="26"/>'+
+      '<path class="corpo" d="M'+x+' '+(y+16)+' c-9-11-14-17-14-24 a14 14 0 1 1 28 0 c0 7-5 13-14 24 z"/>'+
+      '<text x="'+x+'" y="'+(y-3)+'" text-anchor="middle">'+(i+1)+'</text></g>';
+  });
+  return h+'</svg>';
+}
+
 /* ============ PROFILO ============ */
+/* Se tocco un campo del profilo e' ovvio che voglio tenerlo: non serve
+   un tasto Salva. Scrivo e basta, e la riga in basso conferma. */
+let tSalvaProfilo = null;
+function applicaProfilo(){
+  const u = U(state.utente);
+  if(u){ u.nome = nomeVisibile(); u.ini = iniziali(); u.ruolo = state.me.ruolo || u.ruolo; u.foto = state.me.foto; }
+  save();
+  if(typeof salvaProfiloCloud === 'function') salvaProfiloCloud();
+  statoProfilo('Salvato');
+}
+function statoProfilo(testo){
+  const n = el('statoProfilo'); if(!n) return;
+  n.textContent = testo;
+  n.classList.add('ok-flash');
+  clearTimeout(window.__tStato);
+  window.__tStato = setTimeout(()=>{ if(el('statoProfilo')){ el('statoProfilo').textContent = 'Si salva da solo';
+    el('statoProfilo').classList.remove('ok-flash'); } }, 1800);
+}
+function profiloTocco(){
+  statoProfilo('Salvo\u2026');
+  clearTimeout(tSalvaProfilo);
+  tSalvaProfilo = setTimeout(applicaProfilo, 600);
+}
 function renderProfilo(){
   const m = state.me, c = state.cfg;
   const foto = m.foto? 'style="background-image:url('+m.foto+')"' : '';
@@ -4395,8 +4653,17 @@ document.addEventListener('click', function(e){
     case 'tab':
       p.tab = t.dataset.t; render(); break;
 
+    case 'vai-luogo': vaiAlSegno(Number(t.dataset.i)); break;
+
     case 'toggle-feed':
-      state.showFeed = !state.showFeed; render(); break;
+    case 'feed':{
+      state.showFeed = !state.showFeed;
+      if(state.showFeed && p){
+        const nl = nonLetti(p);
+        const dove = ['commenti','chat','attivita'].find(k=>nl[k]);
+        if(dove) p.tab = dove;
+      }
+      render(); break; }
     case 'toggle-rail':
       state.railOn = !state.railOn; render(); break;
     case 'menu-telefono': menuTelefono(t); break;
@@ -4648,6 +4915,7 @@ document.addEventListener('click', function(e){
       const et = k==='boxFull'?'Box a schermo intero':k==='toast'?'Avvisi in alto a destra':'Notifiche solo dei tuoi progetti';
       if(k==='toast' && !nuovo) toast(et+' disattivati.','info');   // ultimo avviso prima di spegnerli
       state.cfg[k] = nuovo; render();
+      if(typeof salvaProfiloCloud === 'function') salvaProfiloCloud();
       if(nuovo || k!=='toast') toast(et+(nuovo?' attivi.':' disattivati.'),'info');
       break; }
 
@@ -4659,7 +4927,7 @@ document.addEventListener('click', function(e){
       toast('«'+T.nome+'» applicato a tutta l\'app.','ok','Tema cambiato'); break; }
 
     case 'togli-foto':
-      state.me.foto = null; U(state.utente).foto = null; render();
+      state.me.foto = null; U(state.utente).foto = null; render(); applicaProfilo();
       toast('Foto rimossa.','info'); break;
 
     case 'salva-profilo':{
@@ -5120,7 +5388,7 @@ document.addEventListener('change', function(e){
     }).catch(()=>toast('Immagine non leggibile.','warn','Errore'));
     e.target.value=''; return;
   }
-  if(e.target.id==='pf_snooze'){ state.cfg.snoozeMin = Number(e.target.value); toast('Silenzio impostato a '+e.target.value+' minuti.','info'); return; }
+  if(e.target.id==='pf_snooze'){ state.cfg.snoozeMin = Number(e.target.value); applicaProfilo(); return; }
   if(e.target.id==='ordinaSel'){
     const v = e.target.value;
     animaTessere(()=>{ state.ordina = v; renderHome(); });
@@ -5162,6 +5430,7 @@ document.addEventListener('input', function(e){
     const pr = el('prevRuolo'); if(pr) pr.textContent = state.me.ruolo||'—';
     const fo = document.querySelector('.foto');
     if(fo && !state.me.foto) fo.textContent = iniziali();
+    profiloTocco();
   }
 });
 document.addEventListener('keydown', function(e){
