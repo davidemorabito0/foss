@@ -902,6 +902,7 @@ input,textarea,select{font:inherit;color:inherit}
 .chk{position:relative}
 .bloccato .pen{display:none}
 #undoBtn.nulla{animation:shake .32s ease-out}
+#lockBtn.appena{animation:halo .9s ease-out;color:var(--alert)}
 .btn.confermato{background:var(--ok-soft);color:var(--ok);border-color:var(--ok)}
 .btn.confermato svg{color:var(--ok)}
 .lockchip{display:inline-flex;align-items:center;gap:5px;padding:3px 9px;border-radius:20px;
@@ -979,6 +980,24 @@ input,textarea,select{font:inherit;color:inherit}
 .benvenuto .mini div{font-size:12px;color:var(--mute)}
 .benvenuto .mini b{font-family:Sora;font-size:15px;color:var(--text);margin-right:4px}
 .benvenuto .mini .urg b{color:var(--alert)}
+
+/* la prima cosa da fare, in home */
+.daffare{
+  display:flex;align-items:center;gap:14px;margin-top:10px;padding:14px 18px;border-radius:16px;
+  background:var(--ok-soft);border:1px solid var(--ok);
+}
+.daffare.urg{background:var(--alert-soft);border-color:var(--alert)}
+.daffare .ic{width:40px;height:40px;border-radius:13px;display:grid;place-items:center;flex:none;
+  background:var(--ok);color:#04140F}
+.daffare.urg .ic{background:var(--alert);color:#fff}
+.daffare .ic svg{width:20px;height:20px}
+.daffare .tx{display:flex;flex-direction:column;gap:1px;min-width:0;flex:1 1 220px}
+.daffare .lb{font-size:10px;letter-spacing:.14em;text-transform:uppercase;font-family:Sora;font-weight:700;color:var(--ok)}
+.daffare.urg .lb{color:var(--alert)}
+.daffare b{font-family:Sora;font-size:15.5px;letter-spacing:-.01em;color:var(--text);
+  overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.daffare .tx > span:last-child{font-size:12px;color:var(--dim)}
+.daffare .az{margin-left:auto;flex:none}
 
 /* ---------- SPAZI DI LAVORO ---------- */
 .spazi-head{padding:26px 20px 14px;max-width:1100px;margin:0 auto;width:100%}
@@ -1416,11 +1435,18 @@ input,textarea,select{font:inherit;color:inherit}
   .benvenuto{padding:0 14px}
   .benvenuto .benv{padding:15px 16px;gap:12px}
   .benvenuto h2{font-size:18px}
-  .benvenuto .benv-tx{flex:1 1 140px}
-  .benvenuto .campana{width:44px;height:44px;border-radius:13px}
-  .benvenuto .mini{gap:12px;margin-top:9px}
+  /* la campana è già nella barra in alto: qui ruba solo spazio */
+  .benvenuto .campana{display:none}
+  .benvenuto .benv-tx{flex:1 1 100%}
+  .benvenuto .mini{gap:6px 14px;margin-top:8px;font-size:12px}
+  .benvenuto h2{font-size:17px}
+  .benvenuto p{font-size:12.5px}
   .benvenuto .az{width:100%;margin-left:0;flex:1 1 100%}
   .benvenuto .az .btn{flex:1;justify-content:center}
+  .daffare{flex-wrap:wrap;gap:10px;padding:13px 15px}
+  .daffare .ic{width:34px;height:34px;border-radius:11px}
+  .daffare .az{width:100%;margin-left:0}
+  .daffare .az .btn{width:100%;justify-content:center}
   .solo-largo{display:none!important}
   .spazi{grid-template-columns:1fr;padding:0 14px 20px}
   .spazi-head{padding:18px 14px 12px}
@@ -1949,10 +1975,23 @@ function passaFiltro(p, f){
   if(f.cliente && !p.cliente.toLowerCase().includes(f.cliente.toLowerCase())) return false;
   return true;
 }
+/* Una lista vuota deve dire PERCHÉ è vuota e come rimediare:
+   una ricerca dimenticata nasconde tutto e sembra che i dati siano spariti. */
+function vuotoPerche(){
+  const tot = progettiDi(state.spazioId).length;
+  if(!tot) return '<div class="empty">Ancora nessun progetto in questo spazio. '+
+    '<button class="btn sm" style="margin-top:10px" data-action="nuovo">'+svg('plus')+'Crea il primo</button></div>';
+  if(state.filtro) return '<div class="empty">Nessuno dei <b>'+tot+'</b> progetti corrisponde a «'+esc(state.filtro)+'». '+
+    '<button class="btn sm" style="margin-top:10px" data-action="pulisci-ricerca">'+svg('x')+'Cancella la ricerca</button></div>';
+  if(state.filtroAttivo) return '<div class="empty">Nessuno dei <b>'+tot+'</b> progetti passa questo filtro. '+
+    '<button class="btn sm" style="margin-top:10px" data-action="filtro" data-id="">'+svg('undo')+'Mostra tutti</button></div>';
+  return '<div class="empty">Qui non c\'è niente da mostrare.</div>';
+}
+
 function listaProgetti(){
   const q = state.filtro.toLowerCase();
   const f = filtriDiSpazio().find(x=>x.id===state.filtroAttivo);
-  const l = state.progetti.filter(p=> p.spazio===state.spazioId &&
+  const l = state.progetti.filter(p=> p.spazio===state.spazioId && vedeProgetto(p) &&
         (!q || (p.nome+' '+p.cliente).toLowerCase().includes(q)) && passaFiltro(p,f));
   const o = state.ordina;
   return l.sort((a,b)=>{
@@ -2186,7 +2225,7 @@ function segmenti(){
 
 function renderLista(lista){
   let h = '<div class="lista-wrap">'+segmenti();
-  if(!lista.length) return h + '<div class="empty">Nessun progetto con questi filtri.</div></div>';
+  if(!lista.length) return h + vuotoPerche() + '</div>';
   const gruppi = gruppiDi(lista);
   gruppi.forEach(g=>{
     if(!g.ps.length) return;
@@ -2239,7 +2278,7 @@ function renderHome(){
   } else if(state.vista==='tessere'){
     h += '<div class="scroller">';
     h += segmenti();
-    if(!lista.length) h += '<div class="empty">Nessun progetto con questi filtri.</div>';
+    if(!lista.length) h += vuotoPerche();
     gruppiDi(lista).forEach(g=>{
       if(!g.ps.length) return;
       h += '<div class="gruppo-tiles" style="--gc:'+g.c+'"><div class="gruppo-h">'+
@@ -2605,7 +2644,14 @@ function renderPhasebar(){
 
 /* ============ SPAZI DI LAVORO ============ */
 const SPZ = () => state.spazi.find(x=>x.id===state.spazioId) || state.spazi[0];
-function progettiDi(sid){ return state.progetti.filter(p=>p.spazio===sid); }
+/* Chi non è il titolare dell'archivio vede solo i progetti in cui è nel team
+   o è taggato su una task: gli altri lavori non lo riguardano. */
+function vedeProgetto(p){
+  if(state.utente === 'u1') return true;                    // il titolare vede tutto
+  if((p.team||[]).indexOf(state.utente) >= 0) return true;
+  return (p.subs||[]).some(s => (s.taggati||[]).some(x => x.u === state.utente));
+}
+function progettiDi(sid){ return state.progetti.filter(p=>p.spazio===sid && vedeProgetto(p)); }
 
 function saluto(){
   const o = new Date().getHours();
@@ -2614,6 +2660,52 @@ function saluto(){
   if(o<18) return 'Buon pomeriggio';
   return 'Buonasera';
 }
+/* ---------- LA PRIMA COSA DA FARE ----------
+   In home non basta dire quante notifiche ci sono: deve dire da dove partire,
+   e portarci con un tocco. L'ordine è quello che userebbe una persona:
+   prima quello che è già scaduto, poi quello che si chiude con un clic,
+   poi quello che tocca a te, e solo alla fine il resto. */
+function primaCosa(){
+  const attivi = state.progetti.filter(p=>!p.completato && vedeProgetto(p));
+  if(!attivi.length) return null;
+  const g = p => { const q = giorniA(p.consegna); return q==null? 9999 : q; };
+  const ord = attivi.slice().sort((a,b)=> g(a)-g(b) || (PESO[a.prio]-PESO[b.prio]));
+  const dove = p => (state.spazi.find(x=>x.id===p.spazio)||{}).nome || '';
+  const quando = p => { const q = g(p); if(q===9999) return 'senza data';
+    if(q<0) return 'scaduto da '+(-q)+(q===-1?' giorno':' giorni');
+    if(q===0) return 'consegna oggi'; if(q===1) return 'consegna domani';
+    return 'tra '+q+' giorni'; };
+
+  /* 1 — una fase è al 100%: è a un clic dalla chiusura */
+  for(const p of ord){
+    if(prog(p, p.fase) === 100){
+      const ultima = p.fase >= FZ(p).length-1;
+      return {urg: g(p)<=1, lb: ultima? 'Pronto da consegnare' : 'Pronto ad avanzare',
+        tx: esc(p.nome), sub: FZ(p)[p.fase].nome+' è al 100% — '+(ultima?'premi COMPLETATO e il lavoro è chiuso':'la fase successiva è '+FZ(p)[p.fase+1].nome)+' · '+dove(p)+' · '+quando(p),
+        az:'<button class="btn primary" data-action="vai-primo" data-pid="'+p.id+'">'+svg('right')+'Aprilo</button>'};
+    }
+  }
+  /* 2 — qualcosa assegnato a me, nel progetto più urgente */
+  for(const p of ord){
+    const {voce, mie} = prossimaCosa(p);
+    if(voce && voce.mia){
+      return {urg: g(p)<=1, lb:'Tocca a te',
+        tx: esc(voce.it.t), sub:'in '+esc(voce.t.titolo)+' · '+esc(p.nome)+' · '+dove(p)+' · '+quando(p)+(mie>1? ' · altre '+(mie-1)+' assegnate a te':''),
+        az:'<button class="btn primary" data-action="vai-primo" data-pid="'+p.id+'" data-sid="'+voce.t.id+'">'+svg('right')+'Portami lì</button>'};
+    }
+  }
+  /* 3 — il lavoro più vicino alla consegna, chiunque lo stia facendo */
+  for(const p of ord){
+    const {voce, tutte} = prossimaCosa(p);
+    if(voce){
+      return {urg: g(p)<=1, lb: g(p)<0? 'In ritardo' : 'Il più urgente',
+        tx: esc(p.nome), sub:'prossima: '+esc(voce.it.t)+' · '+esc(U(voce.t.assegnato||p.team[0]).nome.split(' ')[0])+' · '+dove(p)+' · '+quando(p)+' · '+tutte+' cose aperte',
+        az:'<button class="btn primary" data-action="vai-primo" data-pid="'+p.id+'" data-sid="'+voce.t.id+'">'+svg('right')+'Portami lì</button>'};
+    }
+  }
+  return null;
+}
+
 function benvenuto(){
   const nuove = state.notifiche.filter(n=>n.nuova).length;
   const urg = state.progetti.filter(p=>{ const g = giorniA(p.consegna); return !p.completato && g!=null && g<=7; }).length;
@@ -2621,6 +2713,7 @@ function benvenuto(){
   let mie = 0;
   state.progetti.forEach(p=>{ if(p.completato) return;
     p.subs.forEach(t=>{ if(t.assegnato===state.utente) t.items.forEach(i=>{ if(!i.done) mie++; }); }); });
+  const pc = primaCosa();
   return '<div class="benvenuto"><div class="benv">'+
     '<span class="campana'+(nuove?'':' zero')+'">'+svg(nuove?'bell':'check')+
       (nuove? '<span class="n">'+(nuove>99?'99+':nuove)+'</span>':'')+'</span>'+
@@ -2636,9 +2729,14 @@ function benvenuto(){
       '</div>'+
     '</div>'+
     '<div class="az">'+
-      (nuove? '<button class="btn primary" data-action="notifiche">'+svg('bell')+'Apri le notifiche</button>':'')+
+      (nuove? '<button class="btn'+(pc?' ghost':' primary')+'" data-action="notifiche">'+svg('bell')+'Apri le notifiche</button>':'')+
       '<button class="btn ghost" data-action="me">'+svg('user')+'Profilo</button>'+
-    '</div></div></div>';
+    '</div></div>'+
+    (pc? '<div class="daffare'+(pc.urg?' urg':'')+'">'+
+        '<span class="ic">'+svg(pc.urg?'clock':'spark',2.4)+'</span>'+
+        '<span class="tx"><span class="lb">'+esc(pc.lb)+'</span><b>'+pc.tx+'</b><span>'+esc(pc.sub)+'</span></span>'+
+        '<span class="az">'+pc.az+'</span></div>' : '')+
+  '</div>';
 }
 
 function renderSpazi(){
@@ -3078,7 +3176,8 @@ function renderProfilo(){
       campo('Nome','pf_nome',m.nome)+campo('Cognome','pf_cognome',m.cognome)+
       campo('Nickname (facoltativo)','pf_nick',m.nick,'Es. Dave')+
       campo('Email','pf_email',m.email,'nome@studio.it')+
-    '</div><div style="margin-top:12px">'+campo('Ruolo di lavoro','pf_ruolo',m.ruolo,'Es. Regia · Montaggio')+'</div></div>';
+    '</div><div style="margin-top:12px">'+campo('Ruolo di lavoro','pf_ruolo',m.ruolo,'Es. Regia · Montaggio')+'</div>'+
+    '<div style="margin-top:12px">'+campo('Link (sito, LinkedIn, Instagram…)','pf_link',m.link||'','https://')+'</div></div>';
 
   h += '<div class="card"><h3>Notifiche</h3><div class="hint">Decidi quanto il software può interromperti mentre lavori.</div>'+
     riga('Box a schermo intero','Menzioni e assegnazioni oscurano lo schermo finché non premi VISUALIZZATO','boxFull',c.boxFull)+
@@ -4011,8 +4110,15 @@ document.addEventListener('click', function(e){
       pr.lock = {on:true, pw};
       azione('<b>'+esc(pr.nome)+'</b> bloccato con password');
       logga(pr,'Progetto bloccato', true);
-      chiudiModale(); render();
-      toast(pr.nome+' non è più modificabile senza password.','ok','Bloccato'); break; }
+      chiudiModale();
+      /* resto dentro al progetto e lo faccio vedere: il lucchetto si accende,
+         la scheda si tinge, e il nome dice che è bloccato */
+      if(state.progettoId !== pr.id){ state.progettoId = pr.id; state.spazioId = pr.spazio; }
+      state.schermo = 'progetto';
+      render();
+      const lb2 = el('lockBtn'); if(lb2){ lb2.classList.remove('appena'); void lb2.offsetWidth; lb2.classList.add('appena'); }
+      flash('.proj-head');
+      break; }
 
     case 'sblocca':{
       const pr = state.progetti.find(x=>x.id===lockPid); if(!pr) break;
@@ -4023,8 +4129,13 @@ document.addEventListener('click', function(e){
       pr.lock = {on:false, pw:''};
       azione('<b>'+esc(pr.nome)+'</b> sbloccato');
       logga(pr,'Progetto sbloccato', true);
-      chiudiModale(); render();
-      toast(pr.nome+' è di nuovo modificabile.','ok','Sbloccato'); break; }
+      chiudiModale();
+      if(state.progettoId !== pr.id){ state.progettoId = pr.id; state.spazioId = pr.spazio; }
+      state.schermo = 'progetto';
+      render();
+      const lb3 = el('lockBtn'); if(lb3){ lb3.classList.remove('appena'); void lb3.offsetWidth; lb3.classList.add('appena'); }
+      flash('.proj-head');
+      break; }
 
     case 'annulla': annulla(); break;
 
@@ -4222,6 +4333,18 @@ document.addEventListener('click', function(e){
     case 'toggle-rail':
       state.railOn = !state.railOn; render(); break;
     case 'menu-telefono': menuTelefono(t); break;
+
+    case 'vai-primo':{
+      const pr = state.progetti.find(x=>x.id===t.dataset.pid); if(!pr) break;
+      const sid = t.dataset.sid;
+      if(sid){ const s2 = pr.subs.find(x=>x.id===sid); if(s2){ pr.fase = Math.min(s2.fase, pr.avanz); s2.aperto = true; } }
+      apriProgetto(pr.id, false);
+      if(sid) setTimeout(()=>flash('#sub_'+sid), 160);
+      break; }
+
+    case 'pulisci-ricerca':{
+      state.filtro = ''; const q = el('q'); if(q) q.value = '';
+      render(); break; }
 
     case 'tagga':{
       const s2 = p.subs.find(x=>x.id===t.dataset.id); if(!s2) break;
@@ -4438,7 +4561,7 @@ document.addEventListener('click', function(e){
       toast('Foto rimossa.','info'); break;
 
     case 'salva-profilo':{
-      ['nome','cognome','nick','email','ruolo'].forEach(k=>{
+      ['nome','cognome','nick','email','ruolo','link'].forEach(k=>{
         const n = el('pf_'+(k==='nick'?'nick':k)); if(n) state.me[k] = n.value.trim();
       });
       const s = el('pf_snooze'); if(s) state.cfg.snoozeMin = Number(s.value);
@@ -4646,6 +4769,7 @@ document.addEventListener('contextmenu', function(e){
     apriCtx(x,y, esc(sp.nome), [
       {a:'apri-spazio', l:'Apri lo spazio', ic:'right', d:dd},
       {a:'rinomina-spazio', l:'Rinomina', ic:'pen', d:dd},
+      {a:'modifica-spazio', l:'Collaboratori dello spazio…', ic:'users', d:dd},
       {a:'nuovo-spazio', l:'Nuovo spazio di lavoro', ic:'plus'},
       {sep:1},
       {a:'elimina-spazio', l:'Elimina lo spazio', ic:'x', d:dd, danger:1},
