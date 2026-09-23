@@ -7,8 +7,9 @@
 <meta name="theme-color" content="#0D1926">
 <title>FOSS</title>
 <link rel="manifest" href="manifest.json">
-<link rel="icon" href="icone/favicon-32.png" sizes="32x32">
-<link rel="apple-touch-icon" href="icone/apple-touch-icon.png">
+<link rel="icon" href="icone/favicon-32-v2.png" sizes="32x32">
+<link rel="apple-touch-icon" href="icone/apple-touch-icon-v2.png">
+<link rel="apple-touch-icon" sizes="180x180" href="icone/apple-touch-icon-v2.png">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <meta name="apple-mobile-web-app-title" content="FOSS">
@@ -977,6 +978,7 @@ input,textarea,select{font:inherit;color:inherit}
 
 /* ---------- PROSSIMA COSA DA FARE ---------- */
 .prossima{
+  position:relative;
   display:flex;align-items:center;gap:12px;margin:12px 18px 0;padding:11px 14px;
   border-radius:var(--r-m);background:var(--amber-soft);border:1px solid transparent;
   box-shadow:0 0 0 1px var(--amber) inset;
@@ -1332,6 +1334,9 @@ input,textarea,select{font:inherit;color:inherit}
   font:inherit;font-size:15px;text-align:left}
 /* ---------- LA BARRA DELLE SEZIONI (telefono) ---------- */
 .tabbar{display:none}
+.prossima .chiudi-saluti.fuori{background:transparent;border-color:transparent;color:var(--amber-ink)}
+.prossima .chiudi-saluti.fuori:hover{background:var(--surface);border-color:var(--line)}
+.prossima .az{padding-right:26px}
 /* nelle note il conteggio dei progetti non c'entra niente */
 .vista-note .sp-head .riga2{display:none}
 @media (max-width:620px){
@@ -1346,9 +1351,12 @@ input,textarea,select{font:inherit;color:inherit}
   transition:color .14s,border-color .14s}
 .chiudi-saluti svg{width:14px;height:14px}
 .chiudi-saluti:hover{color:var(--text);border-color:var(--mute)}
-.chiudi-saluti.fuori{position:absolute;top:12px;right:12px;z-index:2}
-.benvenuto{position:relative}
-.benv{position:relative}
+.chiudi-saluti.fuori{position:absolute;top:10px;right:10px;z-index:2;
+  width:30px;height:30px;background:var(--surface)}
+.benv,.daffare,.tel-prima{position:relative}
+.daffare .chiudi-saluti.fuori,.tel-prima .chiudi-saluti.fuori{background:transparent;border-color:transparent}
+.daffare .chiudi-saluti.fuori:hover,.tel-prima .chiudi-saluti.fuori:hover{background:var(--surface);border-color:var(--line)}
+.daffare .az,.tel-prima .lb{padding-right:26px}
 @media (max-width:620px){
   .seg{font-size:11.5px}
   .seg button{padding:7px 11px}
@@ -1599,6 +1607,10 @@ input,textarea,select{font:inherit;color:inherit}
   .proj-head h1{font-size:19px}
   .proj-head .side{width:100%;margin-left:0}
   .proj-head .picona.big{width:34px;height:34px;border-radius:11px}
+  .work{overflow-y:auto;overflow-x:hidden;-webkit-overflow-scrolling:touch;overscroll-behavior:contain}
+  .work-head{position:sticky;top:0;z-index:3;background:var(--bg)}
+  .subs{flex:none;min-height:0;overflow:visible}
+  .rail-r .feed{-webkit-overflow-scrolling:touch}
   .work-head{padding:12px 14px 10px;flex-direction:column;align-items:flex-start;gap:8px}
   .work-head h2{font-size:16px}
   .rail-compatta{margin-left:0;width:100%}
@@ -2775,17 +2787,21 @@ function prossimaCosa(p){
   return {voce: mie[0] || altre[0] || null, mie: mie.length, tutte: mie.length+altre.length};
 }
 
+function xProssima(){
+  return '<button class="chiudi-saluti fuori" data-action="chiudi-saluti" data-b="prossima" '+
+    'title="Nascondi: leggo la lista" aria-label="Nascondi">'+svg('x',2.6)+'</button>';
+}
 function barraProssima(p){
-  if(p.completato) return '';
+  if(p.completato || !boxProssima) return '';
   const {voce, mie, tutte} = prossimaCosa(p);
   if(!voce){
-    return '<div class="prossima calma"><span class="ic">'+svg('check',3)+'</span>'+
+    return '<div class="prossima calma">'+xProssima()+'<span class="ic">'+svg('check',3)+'</span>'+
       '<span class="tx"><span class="lb">Tutto spuntato</span>'+
       '<b>Non resta niente da fare in questo progetto</b>'+
       '<span>Puoi avanzare di fase o chiuderlo.</span></span></div>';
   }
   const dove = FZ(p)[voce.fase] ? FZ(p)[voce.fase].nome : '';
-  return '<div class="prossima"><span class="ic">'+svg('spark',2.4)+'</span>'+
+  return '<div class="prossima">'+xProssima()+'<span class="ic">'+svg('spark',2.4)+'</span>'+
     '<span class="tx"><span class="lb">'+(voce.mia? 'Tocca a te' : 'Prossima cosa da fare')+'</span>'+
     '<b>'+esc(voce.it.t)+'</b>'+
     '<span>in <b style="display:inline;font-size:11.5px">'+esc(voce.t.titolo)+'</b> · fase '+esc(dove)+
@@ -2908,11 +2924,9 @@ function renderPhasebar(){
   }
   bar.innerHTML = h;
 
-  if(p.revisione){
-    slot.innerHTML = '<div class="banner">'+svg('clock').replace('<svg','<svg style="width:14px;height:14px;flex:none"')+
-      '<span>Stai modificando <b>'+FZ(p)[p.fase].nome+'</b> — le fasi successive restano in pausa.</span><span class="spacer"></span>'+
-      '<button class="btn sm" data-action="riprendi">Riprendi '+FZ(p)[Math.min(p.avanz,FZ(p).length-1)].nome+' '+svg('right')+'</button></div>';
-  }
+  /* Niente striscia in basso: che stai modificando una fase vecchia lo dice
+     gia' il pallino «in modifica» accanto al nome, e per tornare avanti c'e'
+     il cronometro. Una riga in meno su uno schermo piccolo. */
 }
 
 /* ============ SPAZI DI LAVORO ============ */
@@ -3132,14 +3146,15 @@ function renderTabbar(){
    Il resto viene dopo: sullo schermo piccolo la prima schermata deve
    rispondere, non riempirsi. */
 function testataTelefono(){
-  if(!salutiAperti) return '';
+  if(!boxSaluto && !boxDaFare) return '';
   const tg = taggatoSu();
   const nuove = state.notifiche.filter(n=>n.nuova).length;
   const pc = primaCosa();
   let h = '<div class="tel-home">';
+  if(boxSaluto){
   h += '<div class="riga-saluto"><h2 class="tel-saluto">'+saluto()+', '+esc(nomeVisibile().split(' ')[0])+'</h2>'+
-       '<button class="chiudi-saluti" data-action="chiudi-saluti" title="Nascondi fino al prossimo accesso" '+
-       'aria-label="Nascondi">'+svg('x',2.6)+'</button></div>';
+       '<button class="chiudi-saluti" data-action="chiudi-saluti" data-b="saluto" '+
+       'title="Nascondi fino al prossimo accesso" aria-label="Nascondi">'+svg('x',2.6)+'</button></div>';
 
   if(tg.length){
     const primo = tg[0];
@@ -3160,9 +3175,12 @@ function testataTelefono(){
       '<span class="ic">'+svg('check',2.2)+'</span>'+
       '<span class="tx"><b>Nessuno ti ha taggato</b><span>Puoi lavorare tranquillo</span></span></div>';
   }
+  }
 
-  if(pc){
+  if(pc && boxDaFare){
     h += '<div class="tel-prima'+(pc.urg?' urg':'')+'">'+
+      '<button class="chiudi-saluti fuori" data-action="chiudi-saluti" data-b="fare" '+
+        'title="Nascondi fino al prossimo accesso" aria-label="Nascondi">'+svg('x',2.6)+'</button>'+
       '<span class="lb">'+esc(pc.lb)+'</span>'+
       '<b>'+pc.tx+'</b>'+
       '<span class="tel-prima-sub">'+esc(pc.sub.split(' \u00b7 ').slice(0,2).join(' \u00b7 '))+'</span>'+
@@ -3175,10 +3193,10 @@ function testataTelefono(){
 /* I riquadri di benvenuto servono appena entri, non mentre lavori:
    la X li chiude per questa visita e tornano al prossimo accesso.
    Sta fuori da state apposta: non finisce nell'archivio. */
-let salutiAperti = true;
+let boxSaluto = true, boxDaFare = true, boxProssima = true;
 
 function benvenuto(){
-  if(!salutiAperti) return '';
+  if(!boxSaluto && !boxDaFare) return '';
   const nuove = state.notifiche.filter(n=>n.nuova).length;
   const urg = state.progetti.filter(p=>{ const g = giorniA(p.consegna); return !p.completato && g!=null && g<=7; }).length;
   const attivi = state.progetti.filter(p=>!p.completato).length;
@@ -3186,8 +3204,9 @@ function benvenuto(){
   state.progetti.forEach(p=>{ if(p.completato) return;
     p.subs.forEach(t=>{ if(t.assegnato===state.utente) t.items.forEach(i=>{ if(!i.done) mie++; }); }); });
   const pc = primaCosa();
-  return '<div class="benvenuto"><div class="benv">'+
-    '<button class="chiudi-saluti fuori" data-action="chiudi-saluti" '+
+  return '<div class="benvenuto">'+
+    (boxSaluto? '<div class="benv">'+
+    '<button class="chiudi-saluti fuori" data-action="chiudi-saluti" data-b="saluto" '+
       'title="Nascondi fino al prossimo accesso" aria-label="Nascondi">'+svg('x',2.6)+'</button>'+
     '<span class="campana'+(nuove?'':' zero')+'">'+svg(nuove?'bell':'check')+
       (nuove? '<span class="n">'+(nuove>99?'99+':nuove)+'</span>':'')+'</span>'+
@@ -3205,8 +3224,10 @@ function benvenuto(){
     '<div class="az">'+
       (nuove? '<button class="btn'+(pc?' ghost':' primary')+'" data-action="notifiche">'+svg('bell')+'Apri le notifiche</button>':'')+
       '<button class="btn ghost" data-action="me">'+svg('user')+'Profilo</button>'+
-    '</div></div>'+
-    (pc? '<div class="daffare'+(pc.urg?' urg':'')+'">'+
+    '</div></div>' : '')+
+    ((pc && boxDaFare)? '<div class="daffare'+(pc.urg?' urg':'')+'">'+
+        '<button class="chiudi-saluti fuori" data-action="chiudi-saluti" data-b="fare" '+
+          'title="Nascondi fino al prossimo accesso" aria-label="Nascondi">'+svg('x',2.6)+'</button>'+
         '<span class="ic">'+svg(pc.urg?'clock':'spark',2.4)+'</span>'+
         '<span class="tx"><span class="lb">'+esc(pc.lb)+'</span><b>'+pc.tx+'</b><span>'+esc(pc.sub)+'</span></span>'+
         '<span class="az">'+pc.az+'</span></div>' : '')+
@@ -4900,6 +4921,9 @@ document.addEventListener('click', function(e){
       if(i === p.fase && p.revisione) break;
       snap('Riapertura della fase '+FZ(p)[i].nome);
       p.fase = i; p.revisione = true;
+      /* le apro tutte: se torno indietro e' per rimettere mano a qualcosa,
+         comprese le voci gia' spuntate */
+      (p.subs||[]).forEach(x=>{ if(x.fase===i) x.aperto = true; });
       azione('Riaperta la fase <b>'+FZ(p)[i].nome+'</b> — '+esc(p.nome));
       logga(p,'Riaperta la fase <b>'+FZ(p)[i].nome+'</b> per modifiche');
       toast('Modifiche su '+FZ(p)[i].nome+'. Le fasi successive sono in pausa.','info','Fase riaperta');
@@ -4956,7 +4980,10 @@ document.addEventListener('click', function(e){
     case 'vai-luogo': vaiAlSegno(Number(t.dataset.i)); break;
 
     case 'chiudi-saluti':
-      salutiAperti = false; render(); break;
+      if(t.dataset.b==='fare') boxDaFare = false;
+      else if(t.dataset.b==='prossima') boxProssima = false;
+      else boxSaluto = false;
+      render(); break;
 
     case 'tab-tel':{
       const k = t.dataset.k;
