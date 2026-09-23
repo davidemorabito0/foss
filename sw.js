@@ -1,9 +1,9 @@
-/* Service worker di Feedback.
+/* Service worker di FOSS.
    Strategia: rete per prima sulla pagina, così un aggiornamento arriva subito;
    la copia in cache serve solo quando sei offline. I DATI non stanno qui:
    vivono nel database e nella memoria del browser, quindi un aggiornamento
    dell'app non può cancellarli. */
-const CACHE = 'foss-guscio-v2';
+const CACHE = 'foss-guscio-v3';
 const GUSCIO = ['./', './index.html', './manifest.json',
                 './icone/icona-192.png', './icone/icona-512.png'];
 

@@ -14,14 +14,7 @@
 <meta name="apple-mobile-web-app-title" content="FOSS">
 <meta name="mobile-web-app-capable" content="yes">
 <meta name="color-scheme" content="dark light">
-<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.4/dist/umd/supabase.js">
-/* installabile: si aggiunge alla schermata Home e si apre a tutto schermo */
-if('serviceWorker' in navigator){
-  window.addEventListener('load', ()=>{
-    navigator.serviceWorker.register('sw.js').catch(()=>{});
-  });
-}
-</script>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.4/dist/umd/supabase.js"></script>
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Sora:wght@400;500;600;700&family=DM+Sans:opsz,wght@9..40,400;9..40,500;9..40,700&family=JetBrains+Mono:wght@400;600&display=swap">
 <style>
@@ -603,7 +596,8 @@ input,textarea,select{font:inherit;color:inherit}
 }
 .tag-p:hover{border-color:var(--amber)}
 .tag-p .nm{font-family:Sora;font-weight:600;color:var(--text)}
-.tag-p .rl{color:var(--mute);font-size:10.5px;padding-right:2px}
+.tag-p .rl{display:none}          /* il ruolo si legge passandoci sopra */
+.tag-p .nm{padding-right:3px}
 .tag-p .x{width:15px;height:15px;border-radius:50%;display:grid;place-items:center;color:var(--mute);opacity:0;transition:opacity .14s,color .14s}
 .tag-p .x svg{width:9px;height:9px}
 .tag-p:hover .x{opacity:.75}
@@ -900,6 +894,17 @@ input,textarea,select{font:inherit;color:inherit}
 .spec{position:relative}
 .spec .pen{position:absolute;top:6px;right:8px}
 .chk{position:relative}
+/* chi fa questa singola subtask */
+.chk-ass{width:22px;height:22px;border-radius:50%;display:grid;place-items:center;flex:none;
+  margin-left:auto;transition:opacity .14s,color .14s}
+.chk-ass .av{width:20px;height:20px;font-size:8.5px}
+.chk-ass.vuoto{color:var(--mute);opacity:0;border:1px dashed var(--line);border-radius:50%}
+.chk-ass.vuoto svg{width:11px;height:11px}
+.chk:hover .chk-ass.vuoto,.chk-ass.vuoto:focus-visible{opacity:.7}
+.chk-ass.vuoto:hover{opacity:1;color:var(--amber-ink);border-color:var(--amber)}
+@media (hover:none){.chk-ass.vuoto{opacity:.45}}
+.chk .pen{margin-left:0}
+.bloccato .chk-ass.vuoto{display:none}
 .bloccato .pen{display:none}
 #undoBtn.nulla{animation:shake .32s ease-out}
 #lockBtn.appena{animation:halo .9s ease-out;color:var(--alert)}
@@ -1714,7 +1719,7 @@ function P(o){
   p.avanz = p.fase;
   p.subs = (o.preset===false) ? [] : mkSubs(p.fase, p.fasi.length, p.tipo);
   /* ogni fase e ogni task hanno un responsabile */
-  const t = p.team || ['u1'];
+  const t = p.team || [state.utente];
   FZ(p).forEach((f,i)=>{ if(p.faseAss[i]==null) p.faseAss[i] = t[i % t.length]; });
   p.subs.forEach((s,i)=>{ if(!s.assegnato) s.assegnato = t[(i+1) % t.length]; });
   /* Un progetto già avviato non può avere il registro vuoto: le fasi che ha
@@ -1907,7 +1912,7 @@ function taggatiHTML(s){
     t.map((x,i)=>{
       const u = U(x.u);
       return '<span class="tag-p" data-action="edit" data-t="tag" data-id="'+s.id+'" data-i="'+i+'" role="button" tabindex="0" '+
-        'title="Tocca per cambiare il ruolo">'+av(u,'sm')+
+        'title="'+esc(u.nome)+' — '+esc(x.ruolo)+'. Tocca per cambiare il ruolo.">'+av(u,'sm')+
         '<span class="nm">'+esc(u.nome.split(' ')[0])+'</span>'+
         '<span class="rl">'+esc(x.ruolo)+'</span>'+
         (state.ospite?'':'<span class="x" data-action="stagga" data-id="'+s.id+'" data-i="'+i+'" title="Togli il tag">'+svg('x',2.6)+'</span>')+
@@ -2470,9 +2475,16 @@ function renderProgetto(){
         '<span class="mono" style="font-size:11px;color:var(--mute);min-width:34px;text-align:right">'+fatti+'/'+tot+'</span>'+
       '</div>'+
       '<div class="sub-b"><div><div class="sub-in">'+
-        s.items.map((i,ix)=>'<div class="chk'+(i.done?' done':'')+'" role="button" tabindex="0" data-action="check" data-id="'+s.id+'" data-i="'+ix+'">'+
+        s.items.map((i,ix)=>{
+          const ua = i.ass? U(i.ass) : null;
+          return '<div class="chk'+(i.done?' done':'')+'" role="button" tabindex="0" data-action="check" data-id="'+s.id+'" data-i="'+ix+'">'+
           '<span class="box">'+svg('check',3.2)+'</span><span class="tx">'+esc(i.t)+'</span>'+
-          pen('item','',s.id,ix)+'</div>').join('')+
+          (ua? '<span class="chk-ass" data-action="assegna-sub" data-id="'+s.id+'" data-i="'+ix+'" role="button" tabindex="0" '+
+               'title="'+esc(ua.nome)+' — '+esc(ua.ruolo)+'. Tocca per cambiare.">'+av(ua,'sm')+'</span>'
+             : (state.ospite?'' : '<span class="chk-ass vuoto" data-action="assegna-sub" data-id="'+s.id+'" data-i="'+ix+'" role="button" tabindex="0" '+
+               'title="Assegna questa subtask a qualcuno">'+svg('user',2.2)+'</span>'))+
+          pen('item','',s.id,ix)+'</div>';
+        }).join('')+
         '<div class="task-nota editabile'+(s.nota?'':' vuota')+'" data-action="edit" data-t="sub" data-k="nota" data-id="'+s.id+'" role="button" tabindex="0">'+
           '<span class="ic">'+svg('pen',2.2)+'</span>'+
           '<span class="tx">'+(s.nota? menzioni(linkifica(s.nota)) : 'Aggiungi una nota: commenti, link, riferimenti per questa task')+'</span>'+
@@ -2655,14 +2667,28 @@ function renderPhasebar(){
 
 /* ============ SPAZI DI LAVORO ============ */
 const SPZ = () => state.spazi.find(x=>x.id===state.spazioId) || state.spazi[0];
+/* In locale l'archivio e' mio e vedo tutto. In cloud lo strato Supabase
+   mette a false questa variabile quando entro come collaboratore di un altro. */
+let sonoTitolare = true;
+/* Nel cloud e' il database a decidere cosa mi arriva: qui resta solo la
+   domanda "questo spazio e' mio?", per non mostrare scatole vuote altrui. */
+let spazioMio = () => true;
+/* un progetto di un altro non lo riorganizzo: lo lascio dov'e' */
+let mioProgetto = () => true;
+const IO = () => state.utente;
 /* Chi non è il titolare dell'archivio vede solo i progetti in cui è nel team
    o è taggato su una task: gli altri lavori non lo riguardano. */
 function vedeProgetto(p){
-  if(state.utente === 'u1') return true;                    // il titolare vede tutto
+  if(sonoTitolare) return true;                             // il titolare vede tutto
   if((p.team||[]).indexOf(state.utente) >= 0) return true;
   return (p.subs||[]).some(s => (s.taggati||[]).some(x => x.u === state.utente));
 }
 function progettiDi(sid){ return state.progetti.filter(p=>p.spazio===sid && vedeProgetto(p)); }
+/* Al collaboratore non mostro gli spazi in cui non ha nessun progetto:
+   sarebbero scatole vuote di lavori che non lo riguardano. */
+function spaziVisibili(){
+  return state.spazi.filter(sp => spazioMio(sp) || progettiDi(sp.id).length > 0);
+}
 
 function saluto(){
   const o = new Date().getHours();
@@ -2756,7 +2782,8 @@ function renderSpazi(){
     '<p>Ogni spazio raccoglie i progetti di un ambito: i clienti video, i social, i siti. '+
     'Dentro allo spazio trovi progetti, task e calendario separati dagli altri.</p></div><div class="spazi">';
 
-  state.spazi.forEach(sp=>{
+  const elenco = spaziVisibili();
+  elenco.forEach(sp=>{
     const ps = progettiDi(sp.id);
     const aperti = ps.filter(p=>!p.completato).length;
     const urg = ps.filter(p=>{ const g = giorniA(p.consegna); return g!=null && g<=7; }).length;
@@ -2771,7 +2798,7 @@ function renderSpazi(){
         (urg? '<div><b style="color:var(--alert)">'+urg+'</b><span>In scadenza</span></div>':'')+
       '</div></button>';
   });
-  h += '<button class="spazio nuovo" data-action="nuovo-spazio"><span>'+
+  if(sonoTitolare) h += '<button class="spazio nuovo" data-action="nuovo-spazio"><span>'+
     '<span class="ic">'+svg('plus')+'</span>'+
     '<b style="font-family:Sora;font-size:14px;display:block">Nuovo spazio di lavoro</b>'+
     '<span style="font-size:11.5px;color:var(--mute)">Un ambito nuovo: siti web, eventi, YouTube…</span></span></button>';
@@ -3001,7 +3028,7 @@ function renderBacheca(){
   let h = '<div class="bacheca" id="bacheca">'+
     '<button class="piu-nota" data-action="nuova-nota" title="Aggiungi una nota">'+svg('plus',2.4)+'</button>';
   note.forEach((n,i)=>{
-    const u = U(n.autore||'u1');
+    const u = U(n.autore||state.utente);
     h += '<div class="postit" id="nota_'+n.id+'" data-nota="'+n.id+'" '+
       'style="left:'+n.x+'px;top:'+n.y+'px;width:'+(n.w||186)+'px;height:'+(n.h||150)+'px;'+
         'background:'+n.col+';transform:rotate('+(n.rot||0)+'deg)">'+
@@ -3825,6 +3852,7 @@ function modaleFiltro(){
 const PROTETTE = ['edit','salva-campo','check','fase','indietro','riprendi','add-user','assegna',
                   'elimina-progetto','conferma-elimina','sposta-ev','rinomina-ev','elimina-ev',
                   'add-compito','elimina-compito','elimina-task','tagga','tagga-chi','stagga',
+                  'assegna-sub','assegna-sub-chi',
                   'sub-tutto','sub-azzera','annulla',
                   'nuova-task','sposta-spazio','completa'];
 
@@ -4231,7 +4259,7 @@ document.addEventListener('click', function(e){
     case 'menu-spazi':{
       const r = t.getBoundingClientRect();
       apriCtx(r.left, r.bottom+6, 'Spazi di lavoro',
-        state.spazi.map(sp=>({a:'apri-spazio', l:esc(sp.nome), ic:sp.icona, d:D({id:sp.id}), k:(sp.id===state.spazioId?'qui':'')}))
+        spaziVisibili().map(sp=>({a:'apri-spazio', l:esc(sp.nome), ic:sp.icona, d:D({id:sp.id}), k:(sp.id===state.spazioId?'qui':'')}))
         .concat([{sep:1},
           {a:'spazi', l:'Vedi tutti gli spazi', ic:'grid'},
           {a:'nuovo-spazio', l:'Nuovo spazio di lavoro', ic:'plus'},
@@ -4385,6 +4413,37 @@ document.addEventListener('click', function(e){
 
     case 'pulisci-ricerca':{
       state.filtro = ''; const q = el('q'); if(q) q.value = '';
+      render(); break; }
+
+    case 'assegna-sub':{
+      const s2 = p.subs.find(x=>x.id===t.dataset.id); if(!s2) break;
+      const ix = Number(t.dataset.i); const it2 = s2.items[ix]; if(!it2) break;
+      const r2 = t.getBoundingClientRect();
+      const voci = taggabili().map(u=>({a:'assegna-sub-chi',
+        d:'data-id="'+s2.id+'" data-i="'+ix+'" data-u="'+u.id+'"',
+        l:esc(u.nome)+(it2.ass===u.id? ' ✓':''), ic:'user'}));
+      if(it2.ass) voci.push({sep:1}, {a:'assegna-sub-chi',
+        d:'data-id="'+s2.id+'" data-i="'+ix+'" data-u=""', l:'Nessuno', ic:'x'});
+      const px = r2.width? r2.left : ultimoPunto.x, py = r2.width? r2.bottom+6 : ultimoPunto.y;
+      apriCtx(px, py, 'Chi fa «'+esc(it2.t)+'»', voci, null);
+      break; }
+
+    case 'assegna-sub-chi':{
+      const s2 = p.subs.find(x=>x.id===t.dataset.id); if(!s2) break;
+      const ix = Number(t.dataset.i); const it2 = s2.items[ix]; if(!it2) break;
+      const uid = t.dataset.u || '';
+      snap('Assegnazione di «'+it2.t+'»');
+      it2.ass = uid || null;
+      if(uid){
+        const u = U(uid);
+        if(p.team.indexOf(uid)<0) p.team.push(uid);
+        azione('<b>'+esc(it2.t)+'</b> assegnata a <b>'+esc(u.nome)+'</b> — '+esc(p.nome));
+        logga(p,'<b>'+esc(it2.t)+'</b> assegnata a <b>'+esc(u.nome)+'</b>');
+        notifica('Ti è stata assegnata <b>'+esc(it2.t)+'</b> in '+esc(s2.titolo), p.id, s2.fase, 'user');
+      } else {
+        azione('<b>'+esc(it2.t)+'</b> non è più assegnata a nessuno — '+esc(p.nome));
+        logga(p,'<b>'+esc(it2.t)+'</b> lasciata senza assegnatario');
+      }
       render(); break; }
 
     case 'tagga':{
@@ -4565,8 +4624,8 @@ document.addEventListener('click', function(e){
       if(!sb){ state.schermo='home'; chiudiModale(); render(); break; }
       const b = el('gateBtn'); b.disabled = true; b.textContent = 'Accedo\u2026';
       entraCloud((el('g_mail').value||'').trim(), el('g_pw').value).then(ok=>{
-        if(ok){ state.schermo='home'; chiudiModale(); render();
-                if(!state.spazi.length) apriWizard(true);
+        if(ok){ state.schermo = nuovoArrivato? 'spazi' : 'home'; chiudiModale(); render();
+                if(nuovoArrivato || !state.spazi.length) apriWizard(true);
                 toast('Bentornato, '+nomeVisibile().split(' ')[0]+'.','ok','Accesso effettuato'); }
         else render();
       });
@@ -4577,8 +4636,10 @@ document.addEventListener('click', function(e){
       state.schermo='profilo'; chiudiModale(); render(); break;
 
     case 'esci':
+      chiudiWizard(); chiudiCtx();
       if(sb) sb.auth.signOut().catch(()=>{});
       utenteCloud = null; state.gateModo = 'login';
+      cloudPronto = false; nuovoArrivato = false;
       state.schermo='gate'; chiudiModale(); render();
       toast('Sessione chiusa.','info'); break;
 
@@ -4598,7 +4659,7 @@ document.addEventListener('click', function(e){
       toast('«'+T.nome+'» applicato a tutta l\'app.','ok','Tema cambiato'); break; }
 
     case 'togli-foto':
-      state.me.foto = null; U('u1').foto = null; render();
+      state.me.foto = null; U(state.utente).foto = null; render();
       toast('Foto rimossa.','info'); break;
 
     case 'salva-profilo':{
@@ -4606,7 +4667,7 @@ document.addEventListener('click', function(e){
         const n = el('pf_'+(k==='nick'?'nick':k)); if(n) state.me[k] = n.value.trim();
       });
       const s = el('pf_snooze'); if(s) state.cfg.snoozeMin = Number(s.value);
-      const u = U('u1');
+      const u = U(state.utente);
       u.nome = nomeVisibile(); u.ini = iniziali(); u.ruolo = state.me.ruolo || u.ruolo; u.foto = state.me.foto;
       render(); salvaProfiloCloud();
       toast('Profilo aggiornato — ora sei «'+nomeVisibile()+'».','ok','Salvato'); break; }
@@ -4847,7 +4908,8 @@ document.addEventListener('contextmenu', function(e){
       {a:'check', l:s.items[i].done?'Segna da fare':'Segna come fatto', ic:'check', d:dd, off:isLock(p)},
       {a:'edit', l:'Modifica il testo', ic:'pen', d:dd+' data-t="item"', off:isLock(p)},
       {a:'add-compito', l:'Aggiungi subtask sotto', ic:'plus', d:dd, off:isLock(p)},
-      {a:'tagga', l:'Assegna a qualcuno…', ic:'users', d:dd, off:isLock(p)},
+      {a:'assegna-sub', l:'Assegna questa subtask…', ic:'user', d:dd, off:isLock(p)},
+      {a:'tagga', l:'Aggiungi qualcuno alla task…', ic:'users', d:dd, off:isLock(p)},
       {sep:1},
       {a:'elimina-compito', l:'Elimina subtask', ic:'x', d:dd, danger:1, off:isLock(p)},
       undoV
@@ -5033,12 +5095,12 @@ document.addEventListener('change', function(e){
     if(sb && utenteCloud){
       caricaAvatar(f).then(url=>{
         if(!url) return;
-        state.me.foto = url; U('u1').foto = url; render(); salvaProfiloCloud();
+        state.me.foto = url; U(state.utente).foto = url; render(); salvaProfiloCloud();
       });
       return;
     }
     riduciImmagine(f, 512, 0.82).then(url=>{
-      state.me.foto = url; U('u1').foto = url; render();
+      state.me.foto = url; U(state.utente).foto = url; render();
     }).catch(()=>toast('Immagine non leggibile.','warn','Errore'));
     return;
   }
@@ -5134,21 +5196,21 @@ function normalizza(){
     if(!sp.col) sp.col = (TIPI[sp.tipo]||TIPI.video).c;
     if(!sp.tipo) sp.tipo = 'video';
     if(!Array.isArray(sp.note)) sp.note = [];
-    if(!Array.isArray(sp.membri)) sp.membri = ['u1'];
+    if(!Array.isArray(sp.membri)) sp.membri = [state.utente];
     sp.note.forEach(n=>{ if(!n.col) n.col = PASTELLI[0]; if(n.w==null) n.w = 186; if(n.h==null) n.h = 150; });
   });
   const primo = state.spazi[0].id;
   if(!state.spazi.some(x=>x.id===state.spazioId)) state.spazioId = primo;
 
   (state.progetti||[]).forEach(p=>{
-    if(!p.spazio || !state.spazi.some(x=>x.id===p.spazio)) p.spazio = primo;
+    if((!p.spazio || !state.spazi.some(x=>x.id===p.spazio)) && mioProgetto(p)) p.spazio = primo;
     if(!p.tipo || !TIPI[p.tipo]) p.tipo = 'video';
     if(!Array.isArray(p.fasi) || !p.fasi.length) p.fasi = TIPI[p.tipo].fasi.map(f=>Object.assign({}, f));
     if(!p.icona) p.icona = TIPI[p.tipo].ic;
     if(!Array.isArray(p.tags)) p.tags = [];
     if(!Array.isArray(p.allegati)) p.allegati = [];
     if(!Array.isArray(p.eventi)) p.eventi = [];
-    if(!Array.isArray(p.team) || !p.team.length) p.team = ['u1'];
+    if(!Array.isArray(p.team) || !p.team.length) p.team = [state.utente];
     if(!p.commenti || typeof p.commenti!=='object') p.commenti = {};
     if(!Array.isArray(p.chat)) p.chat = [];
     if(!Array.isArray(p.log)) p.log = [];
@@ -5221,6 +5283,7 @@ function importaDati(testo){
 
 /* ============ PERSISTENZA (per-viewer, best effort) ============ */
 const CHIAVE = 'foss_v1', CHIAVE_BK = 'foss_backup';
+let archivioLocale = false;   // true se in questo browser c'era già un archivio salvato
 function save(){ try{
   const precedente = localStorage.getItem(CHIAVE);
   if(precedente && precedente.length>200) localStorage.setItem(CHIAVE_BK, precedente);
@@ -5265,6 +5328,10 @@ function load(){
         try{ localStorage.removeItem('feedback_v3'); localStorage.removeItem('feedback_backup'); }catch(e){} }
     }
     const r = JSON.parse(grezzo||'null');
+    /* serve a distinguere «questo browser ha del lavoro vero» da «ci sono
+       solo i progetti di esempio»: al primo accesso in cloud non si deve
+       caricare la dimostrazione come se fosse roba dell'utente. */
+    if(r && r.progetti && r.progetti.length) archivioLocale = true;
     if(r && r.progetti && r.progetti.length){
       state.progetti = r.progetti; state.notifiche = r.notifiche||state.notifiche;
       state.utenti = r.utenti||state.utenti; state.vista = r.vista||'tessere';
@@ -5296,7 +5363,7 @@ const SUPA_KEY = 'sb_publishable_f5Kjp6NHT9yTxr1bhWJjhg_4y72V-Kj';
 let sb = null, utenteCloud = null, timerSalva = null;
 /* Finché non ho letto per intero la riga sul database non scrivo niente:
    una lettura andata male non deve sovrascrivere il lavoro già salvato. */
-let cloudPronto = false;
+let cloudPronto = false, nuovoArrivato = false;
 try{ if(window.supabase) sb = window.supabase.createClient(SUPA_URL, SUPA_KEY); }catch(e){}
 
 function COL(i){ return ['#FFAD01','#7FC8F8','#9AE6B4','#F6A8C0','#C3B1F0','#FFD79A','#8FD3C4'][i%7]; }
@@ -5315,59 +5382,188 @@ async function registraCloud(dati){
   if(!data.session){ toast('Ti ho mandato una mail: confermala e poi accedi.','ok','Account creato'); return false; }
   utenteCloud = data.user; await caricaCloud(); return true;
 }
+/* ---------- identita' e mappe ----------
+   Il lavoro non sta piu' in un blocco unico per persona: ogni progetto e ogni
+   spazio hanno una riga sua sul database, con scritto a quale organizzazione
+   appartengono. Chi puo' leggerli lo decide il database, non il browser. */
+let orgMia = null;
+const orgSpazio = {}, orgProg = {};
+let ombraSp = {}, ombraPr = {};
+
+function datiSpazio(sp){ const d = Object.assign({}, sp); delete d.id; return d; }
+function datiProg(p){ const d = Object.assign({}, p); delete d.id; delete d.spazio; return d; }
+const UUID = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
+
+/* chi deve poter aprire questo progetto: il team, i responsabili di fase,
+   chi ha una subtask assegnata e chiunque sia taggato dentro */
+function membriDi(p){
+  const v = [];
+  const add = x => { if(x && UUID.test(x) && v.indexOf(x)<0) v.push(x); };
+  (p.team||[]).forEach(add);
+  Object.keys(p.faseAss||{}).forEach(k=>add(p.faseAss[k]));
+  (p.subs||[]).forEach(s=>{
+    add(s.assegnato);
+    (s.taggati||[]).forEach(t=>add(t && t.u));
+    (s.items||[]).forEach(i=>add(i && i.ass));
+  });
+  return v;
+}
+
 async function caricaCloud(){
   if(!sb || !utenteCloud) return;
   try{
+    state.utente = utenteCloud.id;
     const {data:prof} = await sb.from('profili').select('*').eq('id', utenteCloud.id).maybeSingle();
     if(prof){
       state.me = {nome:prof.nome||'', cognome:prof.cognome||'', nick:prof.nickname||'',
-                  email:prof.email||utenteCloud.email, ruolo:prof.ruolo||'Collaboratore', foto:prof.foto_url||null};
+                  email:prof.email||utenteCloud.email, ruolo:prof.ruolo||'Collaboratore',
+                  foto:prof.foto_url||null, link:(prof.cfg&&prof.cfg.link)||state.me.link||''};
       state.cfg = Object.assign(state.cfg, prof.cfg||{}, {tema:prof.tema||'brand'});
       if(state.cfg.tema && state.cfg.tema!=='brand') document.documentElement.setAttribute('data-tema', state.cfg.tema);
       else document.documentElement.removeAttribute('data-tema');
     }
+
+    /* le organizzazioni di cui faccio parte: la mia e' quella dove sono titolare */
+    const {data:mie, error:errOrg} = await sb.from('membri_org').select('org_id,ruolo').eq('utente_id', utenteCloud.id);
+    if(errOrg) throw errOrg;
+    const titolare = (mie||[]).find(m=>m.ruolo==='titolare');
+    orgMia = titolare ? titolare.org_id : ((mie||[])[0]||{}).org_id || null;
+    spazioMio = sp => (orgSpazio[sp.id] || orgMia) === orgMia;
+    mioProgetto = p => (orgProg[p.id] || orgMia) === orgMia;
+
+    /* le persone: solo quelle che condividono un'organizzazione con me */
     const {data:tutti} = await sb.from('profili').select('*');
-    const io = {id:'u1', nome:nomeVisibile(), ini:iniziali(), ruolo:state.me.ruolo, col:'#FFAD01', foto:state.me.foto};
+    const io = {id:utenteCloud.id, nome:nomeVisibile(), ini:iniziali(),
+                ruolo:state.me.ruolo, col:'#FFAD01', foto:state.me.foto};
     const altri = (tutti||[]).filter(u=>u.id!==utenteCloud.id).map((u,i)=>({
       id:u.id, nome:(u.nickname||((u.nome||'')+' '+(u.cognome||'')).trim()||u.email),
       ini:((u.nome||u.email||'?')[0]+(u.cognome?u.cognome[0]:'')).toUpperCase(),
       ruolo:u.ruolo||'Collaboratore', col:COL(i+1), foto:u.foto_url||null
     }));
     state.utenti = [io].concat(altri);
-    const {data:sp, error:errSp} = await sb.from('spazio_lavoro').select('stato').eq('utente_id', utenteCloud.id).maybeSingle();
-    if(errSp) throw errSp;
-    if(sp && sp.stato && sp.stato.progetti && sp.stato.progetti.length){
-      state.progetti = sp.stato.progetti;
-      state.filtri = sp.stato.filtri || state.filtri;
-      state.notifiche = sp.stato.notifiche || state.notifiche;
-      state.azioni = sp.stato.azioni || state.azioni;
-      state.vista = sp.stato.vista || 'tessere';
-      if(sp.stato.spazi && sp.stato.spazi.length) state.spazi = sp.stato.spazi;
-      if(sp.stato.spazioId) state.spazioId = sp.stato.spazioId;
-      cloudPronto = true;
-      normalizza();
+
+    /* spazi e progetti: arrivano gia' filtrati dal database */
+    const {data:sps, error:e1} = await sb.from('spazi').select('org_id,id,dati,ordine').order('ordine');
+    if(e1) throw e1;
+    const {data:prs, error:e2} = await sb.from('progetti').select('org_id,id,spazio_id,dati');
+    if(e2) throw e2;
+
+    ombraSp = {}; ombraPr = {};
+    state.spazi = (sps||[]).map(r=>{
+      orgSpazio[r.id] = r.org_id;
+      ombraSp[r.id] = JSON.stringify(r.dati)+'|'+r.ordine;
+      return Object.assign({id:r.id}, r.dati);
+    });
+    state.progetti = (prs||[]).map(r=>{
+      orgProg[r.id] = r.org_id;
+      ombraPr[r.id] = JSON.stringify(r.dati)+'|'+r.spazio_id;
+      return Object.assign({id:r.id, spazio:r.spazio_id}, r.dati);
+    });
+
+    /* Nei dati ci sono anche persone senza account (quelle messe in squadra
+       prima che si registrassero): le tengo con nome e ruolo, segnate come
+       "senza account", cosi' non diventano tutte me. */
+    const noti = {}; state.utenti.forEach(u=>noti[u.id]=1);
+    const citati = {};
+    const cita = x => { if(x && !noti[x]) citati[x] = 1; };
+    state.progetti.forEach(p=>{
+      (p.team||[]).forEach(cita);
+      Object.keys(p.faseAss||{}).forEach(k=>cita(p.faseAss[k]));
+      (p.subs||[]).forEach(s=>{ cita(s.assegnato);
+        (s.taggati||[]).forEach(t=>cita(t && t.u));
+        (s.items||[]).forEach(i=>cita(i && i.ass)); });
+    });
+    state.spazi.forEach(sp=>(sp.membri||[]).forEach(cita));
+    Object.keys(citati).forEach((id,i)=>{
+      const d = UTENTI.find(u=>u.id===id);
+      state.utenti.push(d ? Object.assign({}, d, {senzaAccount:true})
+        : {id:id, nome:'Collaboratore', ini:'?', ruolo:'senza account', col:COL(i+3), senzaAccount:true});
+    });
+
+    /* preferenze personali: filtri, notifiche, registro, vista */
+    const {data:mio} = await sb.from('spazio_lavoro').select('stato').eq('utente_id', utenteCloud.id).maybeSingle();
+    const st = (mio && mio.stato) || {};
+    state.filtri = st.filtri || state.filtri;
+    state.notifiche = st.notifiche || [];
+    state.azioni = st.azioni || [];
+    state.vista = st.vista || 'tessere';
+    /* mi apro sullo spazio dove ho davvero qualcosa: a un collaboratore non
+       serve atterrare in uno spazio del titolare dove non ha nessun progetto */
+    const visibili = state.spazi.filter(sp => (orgSpazio[sp.id]||orgMia)===orgMia
+                     || (prs||[]).some(r=>r.spazio_id===sp.id));
+    if(st.spazioId && visibili.some(x=>x.id===st.spazioId)) state.spazioId = st.spazioId;
+    else state.spazioId = visibili.length ? visibili[0].id : (state.spazi[0]||{}).id || null;
+
+    cloudPronto = true;
+    if(!state.progetti.length && !state.spazi.length){
+      nuovoArrivato = true;
+      state.progettoId = null;
     } else {
-      /* nessun archivio sul database: parto da quello locale, se c'è */
-      cloudPronto = true;
       normalizza();
-      await salvaCloud(true);
     }
   }catch(e){
     cloudPronto = false;
     toast('Non sono riuscito a leggere i dati dal cloud: lavoro solo in locale e non sovrascrivo niente. Ricarica la pagina quando torna la connessione.','warn','Sincronizzazione ferma');
   }
 }
+
+/* Scrivo solo quello che e' cambiato davvero, riga per riga: due persone che
+   lavorano su progetti diversi non si cancellano piu' il lavoro a vicenda. */
+let inCorso = false, daRifare = false;
+async function sincronizza(){
+  if(!sb || !utenteCloud || !cloudPronto) return;
+  if(inCorso){ daRifare = true; return; }
+  inCorso = true;
+  const errori = [];
+  try{
+    for(let i=0;i<state.spazi.length;i++){
+      const sp = state.spazi[i];
+      const org = orgSpazio[sp.id] || orgMia;
+      if(org !== orgMia) continue;                       // gli spazi altrui non li scrivo
+      const d = datiSpazio(sp), j = JSON.stringify(d)+'|'+i;
+      if(j === ombraSp[sp.id]) continue;
+      const {error} = await sb.from('spazi').upsert({org_id:org, id:sp.id, dati:d, ordine:i}, {onConflict:'org_id,id'});
+      if(error){ errori.push(error.message); continue; }
+      ombraSp[sp.id] = j; orgSpazio[sp.id] = org;
+    }
+    for(const p of state.progetti){
+      const org = orgProg[p.id] || orgSpazio[p.spazio] || orgMia;
+      if(!org) continue;
+      const d = datiProg(p), j = JSON.stringify(d)+'|'+p.spazio;
+      if(j === ombraPr[p.id]) continue;
+      const {error} = await sb.from('progetti').upsert({org_id:org, id:p.id, spazio_id:p.spazio, dati:d}, {onConflict:'org_id,id'});
+      if(error){ errori.push(error.message); continue; }
+      ombraPr[p.id] = j; orgProg[p.id] = org;
+      const r = await sb.rpc('sincronizza_membri', {p_org:org, p_prog:p.id, p_utenti:membriDi(p)});
+      if(r.error) console.warn(r.error.message);
+    }
+    for(const id in ombraPr){
+      if(state.progetti.some(p=>p.id===id)) continue;
+      await sb.from('progetti').delete().match({org_id:orgProg[id]||orgMia, id:id});
+      delete ombraPr[id]; delete orgProg[id];
+    }
+    for(const id in ombraSp){
+      if(state.spazi.some(x=>x.id===id)) continue;
+      if((orgSpazio[id]||orgMia) !== orgMia) continue;
+      await sb.from('spazi').delete().match({org_id:orgSpazio[id]||orgMia, id:id});
+      delete ombraSp[id]; delete orgSpazio[id];
+    }
+    await sb.from('spazio_lavoro').upsert({
+      utente_id: utenteCloud.id,
+      stato:{filtri:state.filtri, notifiche:state.notifiche,
+             azioni:(state.azioni||[]).slice(0,200), vista:state.vista, spazioId:state.spazioId}
+    });
+  }catch(e){ errori.push(e.message||'errore'); }
+  inCorso = false;
+  if(errori.length) console.warn('sincronizzazione:', errori.join(' / '));
+  if(daRifare){ daRifare = false; sincronizza(); }
+}
 function salvaCloud(subito){
   if(!sb || !utenteCloud || !cloudPronto) return Promise.resolve();
   clearTimeout(timerSalva);
-  const invia = ()=> sb.from('spazio_lavoro').upsert({
-      utente_id: utenteCloud.id,
-      stato:{progetti:state.progetti, filtri:state.filtri, notifiche:state.notifiche,
-             azioni:state.azioni.slice(0,200), vista:state.vista,
-             spazi:state.spazi, spazioId:state.spazioId}
-    }).then(r=>{ if(r.error) console.warn(r.error.message); });
-  if(subito) return invia();
-  timerSalva = setTimeout(invia, 1500);
+  if(subito) return sincronizza();
+  timerSalva = setTimeout(sincronizza, 1500);
+  return Promise.resolve();
 }
 async function salvaProfiloCloud(){
   if(!sb || !utenteCloud) return;
@@ -5375,7 +5571,8 @@ async function salvaProfiloCloud(){
     id: utenteCloud.id, nome:state.me.nome, cognome:state.me.cognome, nickname:state.me.nick,
     email:state.me.email, ruolo:state.me.ruolo, foto_url:state.me.foto,
     tema:state.cfg.tema, cfg:{boxFull:state.cfg.boxFull, toast:state.cfg.toast,
-                              soloMiei:state.cfg.soloMiei, snoozeMin:state.cfg.snoozeMin}
+                              soloMiei:state.cfg.soloMiei, snoozeMin:state.cfg.snoozeMin,
+                              link:state.me.link||''}
   });
   if(error) toast(error.message,'warn','Profilo non salvato');
 }
@@ -5424,14 +5621,19 @@ function start(dati){
     if(!(data && data.session)) return;
     utenteCloud = data.session.user;
     caricaCloud().then(()=>{
-      normalizza();
       state.schermo = 'spazi'; render();
       if(applicaIndirizzo()) return;
-      if(!state.spazi.length) apriWizard(true);
+      if(nuovoArrivato || !state.spazi.length) apriWizard(true);
     });
   }).catch(()=>{});
 }
 window.addEventListener('hashchange', ()=>{ applicaIndirizzo(); });
+/* installabile: si aggiunge alla schermata Home e si apre a tutto schermo */
+if('serviceWorker' in navigator){
+  window.addEventListener('load', ()=>{
+    navigator.serviceWorker.register('sw.js').catch(()=>{});
+  });
+}
 try{
   if(window.claude && window.claude.hot && window.claude.hot.snapshot) window.claude.hot.snapshot(()=>({state}));
   if(window.claude && window.claude.hot && window.claude.hot.ready) window.claude.hot.ready(start);
@@ -5439,3 +5641,5 @@ try{
 }catch(e){ start(null); }
 })();
 </script>
+</body>
+</html>
