@@ -2161,10 +2161,20 @@ function intestazioneSpazio(lista){
           '<span class="av-stack">'+membri.map(id=>av(U(id),'sm')).join('')+'</span>'+membri.length+' nel team</span>':'')+
       '</div>'+
     '</div>'+
-    '<div class="azioni">'+
+    (state.ospite? '' : '<div class="azioni">'+
       '<button class="btn sm ghost" data-action="modifica-spazio" data-id="'+sp.id+'">'+svg('pen')+'Modifica spazio</button>'+
       '<button class="btn primary" data-action="nuovo">'+svg('plus')+'Nuovo progetto</button>'+
-    '</div></div>';
+    '</div>')+'</div>';
+}
+
+/* barra per chi apre un link in sola lettura, sopra la lista dei progetti */
+function barraOspite(){
+  if(!state.ospite) return '';
+  const sp = SPZ();
+  return '<div class="ospite-bar">'+svg('eye')+'<span>Stai guardando <b>'+esc(sp?sp.nome:'questo spazio')+
+    '</b> come visualizzatore esterno: puoi leggere tutto, non puoi modificare nulla.</span>'+
+    '<span class="spacer" style="flex:1"></span>'+
+    '<button class="btn sm" data-action="esci-ospite">'+svg('undo')+'Torna al mio archivio</button></div>';
 }
 
 /* in quale colonna vive un progetto */
@@ -2269,6 +2279,7 @@ function renderHome(){
   const lista = listaProgetti(), sp = SPZ();
   let h = '<div class="pane'+(sp && sp.sfondo?' con-sfondo':'')+'"'+
           (sp && sp.sfondo? ' style="--bg-img:url(\''+sp.sfondo+'\')"':'')+'>';
+  h += barraOspite();
   h += intestazioneSpazio(lista);
 
   if(state.vista==='note'){
@@ -2871,6 +2882,24 @@ function linkDi(pid, sid, ospite){
   const base = location.origin + location.pathname;
   return base + '#/p/' + pid + (sid? '/t/'+sid : '') + (ospite? '?v=1' : '');
 }
+function linkSpazio(spid, ospite){
+  return location.origin + location.pathname + '#/s/' + spid + (ospite? '?v=1' : '');
+}
+function modaleLinkSpazio(spid){
+  const sp = state.spazi.find(x=>x.id===spid); if(!sp) return;
+  const n = progettiDi(sp.id).length;
+  const l1 = linkSpazio(spid, false), l2 = linkSpazio(spid, true);
+  modale('<h3>Condividi lo spazio</h3><div class="sub-t">'+esc(sp.nome)+' · '+n+(n===1?' progetto':' progetti')+'</div><div class="modal-b">'+
+    '<div class="field"><label>Per chi ci lavora — può modificare</label>'+
+      '<div class="link-box">'+esc(l1)+'</div>'+
+      '<button class="btn sm" style="margin-top:7px;justify-content:center" data-action="copia" data-l="'+esc(l1)+'">'+svg('clip')+'Copia link collaboratore</button></div>'+
+    '<div class="field"><label>Per chi guarda da fuori — sola lettura</label>'+
+      '<div class="link-box">'+esc(l2)+'</div>'+
+      '<button class="btn sm" style="margin-top:7px;justify-content:center" data-action="copia" data-l="'+esc(l2)+'">'+svg('clip')+'Copia link visualizzatore</button></div>'+
+    '<div class="nota-box">Il link apre <b>'+esc(sp.nome)+'</b> con dentro i suoi progetti. '+
+      'Chi lo riceve deve avere un accesso a FOSS: se non ce l\'ha, aggiungilo prima dagli invitati.</div>'+
+    '</div><div class="modal-f"><button class="btn" data-action="chiudi-modale">Chiudi</button></div>');
+}
 function modaleLink(pid, sid){
   const p = state.progetti.find(x=>x.id===pid); if(!p) return;
   const s = sid? p.subs.find(x=>x.id===sid) : null;
@@ -2914,12 +2943,22 @@ function copiaVecchioModo(testo, ok){
 }
 function leggiIndirizzo(){
   const h = location.hash || '';
+  const sp = /^#\/s\/([^\/?]+)/.exec(h);
+  if(sp) return {spid:sp[1], ospite:/[?&]v=1/.test(h)};
   const m = /^#\/p\/([^\/?]+)(?:\/t\/([^?]+))?/.exec(h);
   if(!m) return null;
   return {pid:m[1], sid:m[2]||null, ospite:/[?&]v=1/.test(h)};
 }
 function applicaIndirizzo(){
   const a = leggiIndirizzo(); if(!a) return false;
+  if(a.spid){
+    const sp = state.spazi.find(x=>x.id===a.spid);
+    if(!sp){ toast('Il link punta a uno spazio che non è in questo archivio.','warn','Non trovato'); return false; }
+    state.ospite = !!a.ospite;
+    state.spazioId = sp.id; state.schermo = 'home'; state.progettoId = null;
+    state.filtro = ''; state.filtroAttivo = null;
+    render(); return true;
+  }
   const p = state.progetti.find(x=>x.id===a.pid);
   if(!p){ toast('Il link punta a un progetto che non è in questo archivio.','warn','Non trovato'); return false; }
   state.ospite = !!a.ospite;
@@ -4334,6 +4373,8 @@ document.addEventListener('click', function(e){
       state.railOn = !state.railOn; render(); break;
     case 'menu-telefono': menuTelefono(t); break;
 
+    case 'condividi-spazio': modaleLinkSpazio(t.dataset.id || state.spazioId); break;
+
     case 'vai-primo':{
       const pr = state.progetti.find(x=>x.id===t.dataset.pid); if(!pr) break;
       const sid = t.dataset.sid;
@@ -4770,6 +4811,7 @@ document.addEventListener('contextmenu', function(e){
       {a:'apri-spazio', l:'Apri lo spazio', ic:'right', d:dd},
       {a:'rinomina-spazio', l:'Rinomina', ic:'pen', d:dd},
       {a:'modifica-spazio', l:'Collaboratori dello spazio…', ic:'users', d:dd},
+      {a:'condividi-spazio', l:'Condividi con un link', ic:'share', d:dd},
       {a:'nuovo-spazio', l:'Nuovo spazio di lavoro', ic:'plus'},
       {sep:1},
       {a:'elimina-spazio', l:'Elimina lo spazio', ic:'x', d:dd, danger:1},
