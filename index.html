@@ -594,6 +594,42 @@ input,textarea,select{font:inherit;color:inherit}
 .bloccato .task-nota{cursor:default}
 .bloccato .task-nota.vuota{display:none}
 
+/* ---------- PERSONE TAGGATE SU UNA TASK ---------- */
+.taggati{display:flex;align-items:center;gap:6px;flex-wrap:wrap;padding:7px 0 2px;margin-top:2px}
+.tag-p{
+  display:inline-flex;align-items:center;gap:6px;padding:3px 4px 3px 3px;border-radius:999px;
+  background:var(--surface-3);border:1px solid var(--line);font-size:11.5px;cursor:pointer;
+  transition:border-color .14s,background .14s;
+}
+.tag-p:hover{border-color:var(--amber)}
+.tag-p .nm{font-family:Sora;font-weight:600;color:var(--text)}
+.tag-p .rl{color:var(--mute);font-size:10.5px;padding-right:2px}
+.tag-p .x{width:15px;height:15px;border-radius:50%;display:grid;place-items:center;color:var(--mute);opacity:0;transition:opacity .14s,color .14s}
+.tag-p .x svg{width:9px;height:9px}
+.tag-p:hover .x{opacity:.75}
+.tag-p .x:hover{color:var(--alert);opacity:1}
+@media (hover:none){.tag-p .x{opacity:.6}}
+.tag-piu{
+  display:inline-flex;align-items:center;gap:4px;padding:4px 10px;border-radius:999px;
+  border:1px dashed var(--line);color:var(--mute);font-size:11px;font-family:Sora;font-weight:600;
+  transition:color .14s,border-color .14s;
+}
+.tag-piu svg{width:11px;height:11px}
+.tag-piu:hover{color:var(--amber-ink);border-color:var(--amber)}
+.bloccato .tag-piu,.bloccato .tag-p .x{display:none}
+/* @Nome dentro le note */
+.menz{background:var(--amber-soft);color:var(--amber-ink);border-radius:5px;padding:0 4px;font-weight:600}
+/* fila di avatar nell'editor della nota */
+.rte-tag{display:flex;align-items:center;gap:6px;flex-wrap:wrap;margin-top:9px;padding-top:9px;border-top:1px solid var(--line-soft)}
+.rte-tag .lb{font-size:10px;letter-spacing:.12em;text-transform:uppercase;color:var(--mute);font-family:Sora;font-weight:600;width:100%}
+.tag-av{
+  display:inline-flex;align-items:center;gap:5px;padding:3px 9px 3px 3px;border-radius:999px;
+  border:1px solid var(--line);background:var(--surface-2);font-size:11.5px;color:var(--text);
+  transition:border-color .14s,background .14s;
+}
+.tag-av:hover{border-color:var(--amber);background:var(--surface-3)}
+.tag-av.confermato{background:var(--ok-soft);color:var(--ok);border-color:var(--ok)}
+
 /* pannello destro: commenti / chat / attività */
 .tabs{display:flex;gap:2px;padding:9px 10px;border-bottom:1px solid var(--line-soft)}
 .tab{flex:1;padding:6px 4px;border-radius:var(--r-s);font-size:11.5px;font-weight:600;font-family:Sora;
@@ -1821,6 +1857,50 @@ function iniziali(){
 }
 function totCommenti(p){ return Object.keys(p.commenti).reduce((s,k)=>s+p.commenti[k].length,0); }
 /* nelle note gli indirizzi diventano link cliccabili */
+/* ---------- PERSONE TAGGATE SU UNA TASK ----------
+   Taggare non è decorativo: chi viene taggato riceve un ruolo su quella task
+   (l'operatore di una ripresa, chi fa l'editing) e una notifica. */
+/* Chi si può taggare: prima chi è già nel team del progetto, poi tutti gli altri
+   dell'archivio. Nessuno resta fuori: se serve un operatore in più lo tagghi e basta. */
+function taggabili(){
+  const p = state.progettoId ? PROJ() : null;
+  const sp = SPZ();
+  const primi = [].concat(p? p.team : [], (sp && sp.membri) || []);
+  const visti = [];
+  const fuori = [];
+  primi.forEach(id=>{ if(visti.indexOf(id)<0 && state.utenti.some(u=>u.id===id)) visti.push(id); });
+  state.utenti.forEach(u=>{ if(visti.indexOf(u.id)<0) fuori.push(u.id); });
+  return visti.concat(fuori).map(id=>U(id));
+}
+function taggatiOk(s){ if(!Array.isArray(s.taggati)) s.taggati = []; return s.taggati; }
+
+function taggatiHTML(s){
+  const t = taggatiOk(s);
+  if(state.ospite && !t.length) return '';
+  return '<div class="taggati">'+
+    t.map((x,i)=>{
+      const u = U(x.u);
+      return '<span class="tag-p" data-action="edit" data-t="tag" data-id="'+s.id+'" data-i="'+i+'" role="button" tabindex="0" '+
+        'title="Tocca per cambiare il ruolo">'+av(u,'sm')+
+        '<span class="nm">'+esc(u.nome.split(' ')[0])+'</span>'+
+        '<span class="rl">'+esc(x.ruolo)+'</span>'+
+        (state.ospite?'':'<span class="x" data-action="stagga" data-id="'+s.id+'" data-i="'+i+'" title="Togli il tag">'+svg('x',2.6)+'</span>')+
+      '</span>';
+    }).join('')+
+    (state.ospite?'':'<button class="tag-piu" data-action="tagga" data-id="'+s.id+'">'+svg('plus',2.4)+'Tagga</button>')+
+  '</div>';
+}
+
+/* nel testo delle note, @Nome diventa una pastiglia */
+function menzioni(html){
+  return String(html).replace(/@([A-Za-zÀ-ÿ][\wÀ-ÿ'.-]*(?:\s[A-ZÀ-Ý][\wÀ-ÿ'.-]*)?)/g, (m, nome)=>{
+    const u = state.utenti.find(z=> z.nome.toLowerCase().startsWith(nome.toLowerCase().trim()) ||
+                                    nome.toLowerCase().trim().startsWith(z.nome.split(' ')[0].toLowerCase()));
+    if(!u) return m;
+    return '<span class="menz">@'+esc(u.nome.split(' ')[0])+'</span>';
+  });
+}
+
 function linkifica(html){
   return String(html).replace(/(^|[\s>])((?:https?:\/\/|www\.)[^\s<]+)/gi, (m,pre,url)=>{
     const href = /^www\./i.test(url) ? 'https://'+url : url;
@@ -2345,10 +2425,11 @@ function renderProgetto(){
           pen('item','',s.id,ix)+'</div>').join('')+
         '<div class="task-nota editabile'+(s.nota?'':' vuota')+'" data-action="edit" data-t="sub" data-k="nota" data-id="'+s.id+'" role="button" tabindex="0">'+
           '<span class="ic">'+svg('pen',2.2)+'</span>'+
-          '<span class="tx">'+(s.nota? linkifica(s.nota) : 'Aggiungi una nota: commenti, link, riferimenti per questa task')+'</span>'+
+          '<span class="tx">'+(s.nota? menzioni(linkifica(s.nota)) : 'Aggiungi una nota: commenti, link, riferimenti per questa task')+'</span>'+
         '</div>'+
         '<div class="sub-note editabile">'+av(resp,'sm')+' Assegnato a <b style="color:var(--text)">'+esc(resp.nome)+'</b>'+
           pen('sub','assegnato',s.id)+'</div>'+
+        taggatiHTML(s)+
       '</div></div></div></div>';
   });
   if(!subs.length) h += '<div class="empty">Nessuna task in questa fase.</div>';
@@ -3415,11 +3496,11 @@ const CAMPI = {
 const pen = (t,k,id,i,fisso) => '<button class="pen'+(fisso?' fisso':'')+'" data-action="edit" data-t="'+t+'"'+
   ' data-k="'+(k||'')+'" data-id="'+(id||'')+'" data-i="'+(i==null?'':i)+'" title="Modifica">'+svg('pen',2.2)+'</button>';
 
-let editCtx = null;
+let editCtx = null, menzionatiOra = null;
 const Pdi = ctx => (ctx && ctx.pid ? state.progetti.find(x=>x.id===ctx.pid) : PROJ());
 function apriEdit(ctx){
   const p = Pdi(ctx); if(!p) return;
-  editCtx = ctx;
+  editCtx = ctx; menzionatiOra = null;
   let etichetta = ctx.l, valore = '', tipo = ctx.tipo||'testo', opzioni = null;
 
   if(ctx.t==='proj'){
@@ -3432,6 +3513,11 @@ function apriEdit(ctx){
     if(ctx.k==='assegnato'){ etichetta='Responsabile della task'; tipo='utente'; valore=s.assegnato; }
     else if(ctx.k==='nota'){ etichetta='Nota della task'; tipo='rte'; valore=s.nota||''; }
     else { etichetta='Nome della task'; valore = s.titolo; }
+  } else if(ctx.t==='tag'){
+    const s = p.subs.find(x=>x.id===ctx.id);
+    const x = taggatiOk(s)[ctx.i];
+    etichetta = 'Ruolo di '+U(x.u).nome+' su «'+s.titolo+'»';
+    valore = x.ruolo;
   } else if(ctx.t==='item'){
     const s = p.subs.find(x=>x.id===ctx.id);
     etichetta = 'Subtask'; valore = s.items[ctx.i].t;
@@ -3450,9 +3536,16 @@ function apriEdit(ctx){
   } else if(tipo==='data'){
     campoHtml = '<input id="ed_val" type="date" value="'+valore+'">';
   } else if(tipo==='rte'){
+    /* Nella nota di una task si può anche taggare: l'avatar scrive @Nome nel
+       testo e mette la persona fra quelle che lavorano alla task. */
+    const conTag = (ctx.t==='sub' && ctx.k==='nota');
     campoHtml = '<div class="rte-bar"><button class="rte-b b" data-action="rte" data-c="bold">B</button>'+
       '<button class="rte-b u" data-action="rte" data-c="underline">U</button></div>'+
-      '<div class="rte" id="ed_rte" contenteditable="true" data-ph="Scrivi qui…">'+(valore||'')+'</div>';
+      '<div class="rte" id="ed_rte" contenteditable="true" data-ph="Scrivi qui…">'+(valore||'')+'</div>'+
+      (conTag? '<div class="rte-tag"><span class="lb">Tagga chi ci lavora</span>'+
+        taggabili().map(u=>'<button class="tag-av" data-action="menziona" data-u="'+u.id+'" '+
+          'data-sid="'+ctx.id+'" title="'+esc(u.nome)+' — '+esc(u.ruolo)+'">'+av(u,'sm')+
+          '<span>'+esc(u.nome.split(' ')[0])+'</span></button>').join('')+'</div>' : '');
   } else {
     campoHtml = '<input id="ed_val" value="'+esc(valore)+'">';
   }
@@ -3489,6 +3582,15 @@ function applicaEdit(){
     if(ctx.k==='nota'){
       snap('Nota di «'+s.titolo+'»');
       s.nota = v;
+      (menzionatiOra||[]).forEach(id=>{
+        if(taggatiOk(s).some(x=>x.u===id)) return;
+        const u = U(id);
+        s.taggati.push({u:id, ruolo:u.ruolo||'Collaboratore'});
+        if(p.team.indexOf(id)<0) p.team.push(id);
+        logga(p,'<b>'+esc(u.nome)+'</b> taggato nella nota di '+esc(s.titolo), true);
+        notifica('Sei stato taggato nella nota di <b>'+esc(s.titolo)+'</b>', p.id, s.fase, 'user');
+      });
+      menzionatiOra = null;
       azione('Nota aggiornata su <b>'+esc(s.titolo)+'</b> — '+esc(p.nome));
       logga(p,'Nota aggiornata su '+esc(s.titolo));
       toast('Nota salvata.','ok','Modificato');
@@ -3505,6 +3607,13 @@ function applicaEdit(){
       s.titolo = v; logga(p, 'Task rinominata in '+esc(v));
       toast('Task rinominata.','ok','Modificato');
     }
+  } else if(ctx.t==='tag'){
+    const s = p.subs.find(x=>x.id===ctx.id);
+    const x = taggatiOk(s)[ctx.i]; if(!x) return;
+    snap('Ruolo di '+U(x.u).nome+' su «'+s.titolo+'»');
+    x.ruolo = v || 'Collaboratore';
+    azione('<b>'+esc(U(x.u).nome)+'</b> ora è <b>'+esc(x.ruolo)+'</b> su '+esc(s.titolo));
+    logga(p,'<b>'+esc(U(x.u).nome)+'</b> ora è '+esc(x.ruolo)+' su '+esc(s.titolo));
   } else if(ctx.t==='item'){
     const s = p.subs.find(x=>x.id===ctx.id);
     snap('Modifica della subtask «'+s.items[ctx.i].t+'»');
@@ -4102,6 +4211,51 @@ document.addEventListener('click', function(e){
     case 'toggle-rail':
       state.railOn = !state.railOn; render(); break;
     case 'menu-telefono': menuTelefono(t); break;
+
+    case 'tagga':{
+      const s2 = p.subs.find(x=>x.id===t.dataset.id); if(!s2) break;
+      const gia = taggatiOk(s2).map(x=>x.u);
+      const liberi = taggabili().filter(u=>gia.indexOf(u.id)<0);
+      if(!liberi.length){ confermaBottone(t,'Sono già tutti'); break; }
+      const r = t.getBoundingClientRect();
+      apriCtx(r.left, r.bottom+6, 'Chi lavora a «'+esc(s2.titolo)+'»',
+        liberi.map(u=>({a:'tagga-chi', d:'data-id="'+s2.id+'" data-u="'+u.id+'"',
+                        l:esc(u.nome)+' — '+esc(u.ruolo), ic:'user'})), null);
+      break; }
+
+    case 'menziona':{
+      const r = el('ed_rte'); if(!r) break;
+      const u = U(t.dataset.u);
+      r.focus();
+      const testo = '@'+u.nome.split(' ')[0]+' ';
+      try{ document.execCommand('insertText', false, testo); }
+      catch(err){ r.innerHTML += ' '+testo; }
+      /* il tag vero lo metto al salvataggio della nota, così un ripensamento non lascia traccia */
+      if(!menzionatiOra) menzionatiOra = [];
+      if(menzionatiOra.indexOf(u.id)<0) menzionatiOra.push(u.id);
+      confermaBottone(t, u.nome.split(' ')[0]);
+      break; }
+
+    case 'tagga-chi':{
+      const s2 = p.subs.find(x=>x.id===t.dataset.id); if(!s2) break;
+      const u = U(t.dataset.u);
+      snap('Tag di '+u.nome+' su «'+s2.titolo+'»');
+      taggatiOk(s2).push({u:u.id, ruolo:u.ruolo||'Collaboratore'});
+      if(p.team.indexOf(u.id)<0) p.team.push(u.id);
+      azione('<b>'+esc(u.nome)+'</b> taggato su <b>'+esc(s2.titolo)+'</b> come '+esc(u.ruolo||'Collaboratore'));
+      logga(p,'<b>'+esc(u.nome)+'</b> taggato su '+esc(s2.titolo)+' come '+esc(u.ruolo||'Collaboratore'), true);
+      notifica('Sei stato taggato su <b>'+esc(s2.titolo)+'</b> come '+esc(u.ruolo||'Collaboratore'), p.id, s2.fase, 'user');
+      render(); setTimeout(()=>flash('#sub_'+s2.id), 80);
+      break; }
+
+    case 'stagga':{
+      const s2 = p.subs.find(x=>x.id===t.dataset.id); if(!s2) break;
+      const via = taggatiOk(s2)[Number(t.dataset.i)]; if(!via) break;
+      snap('Tag tolto a '+U(via.u).nome);
+      s2.taggati.splice(Number(t.dataset.i), 1);
+      azione('<b>'+esc(U(via.u).nome)+'</b> non è più su <b>'+esc(s2.titolo)+'</b>');
+      logga(p,'<b>'+esc(U(via.u).nome)+'</b> tolto da '+esc(s2.titolo));
+      render(); break; }
 
     case 'invia': inviaMessaggio(); break;
 
