@@ -611,7 +611,10 @@ input,textarea,select{font:inherit;color:inherit}
 .spec .v.mono{font-family:"JetBrains Mono",monospace;font-size:13px;font-weight:600}
 
 .subs{flex:1;min-height:0;overflow-y:auto;padding:12px 18px 18px;display:flex;flex-direction:column;gap:9px}
-.sub{background:var(--surface);border:1px solid var(--line);border-radius:var(--r-m);overflow:hidden;transition:border-color .16s}
+.sub{background:var(--surface);border:1px solid var(--line);border-radius:var(--r-m);overflow:hidden;transition:border-color .16s;
+  /* una task non si schiaccia mai per farci stare le altre: se non
+     ci stanno, la lista si allunga e scorre */
+  flex-shrink:0}
 .sub.open{border-color:var(--surface-3)}
 .sub-h{display:flex;align-items:center;gap:10px;padding:10px 12px;width:100%;text-align:left;transition:background .14s;cursor:pointer}
 .sub-h:hover{background:var(--surface-2)}
@@ -1380,7 +1383,9 @@ body.sto-spostando{cursor:grabbing}
 body.sto-spostando .tile:not(.preso),
 body.sto-spostando .spazio:not(.preso){transition:transform .16s cubic-bezier(.4,0,.2,1)}
 body.sto-spostando *{user-select:none!important}
-.tile,.spazio{touch-action:pan-y}
+/* il contenitore sta fermo mentre tengo una scheda in mano */
+.fermo{overflow:hidden!important;touch-action:none!important;overscroll-behavior:contain}
+.tile,.spazio{touch-action:manipulation}
 .prossima .chiudi-saluti.fuori{background:transparent;border-color:transparent;color:var(--amber-ink)}
 .prossima .chiudi-saluti.fuori:hover{background:var(--surface);border-color:var(--line)}
 .prossima .az{padding-right:26px}
@@ -1423,6 +1428,14 @@ body.sto-spostando *{user-select:none!important}
 .chat-step .n{position:absolute;top:2px;right:2px;min-width:15px;height:15px;padding:0 3px;border-radius:8px;
   background:var(--alert);color:#fff;font-size:9.5px;font-weight:700;font-family:Sora;display:grid;place-items:center}
 .chat-step.ha-nuovi{border-color:var(--alert)}
+/* Col dito, o sotto i 1100px, dentro a un progetto scorre tutta la
+   colonna di lavoro e non solo la lista: sul tablet la lista restava
+   una finestrella di poche righe sotto intestazione e riquadri. */
+@media (hover:none),(pointer:coarse),(max-width:1100px){
+  .work{overflow-y:auto;overflow-x:hidden;-webkit-overflow-scrolling:touch;overscroll-behavior:contain}
+  .work > .work-head{position:sticky;top:0;z-index:3;background:var(--bg)}
+  .work > .subs{flex:none;min-height:0;overflow:visible}
+}
 @media (max-width:1100px){
   .specs{display:grid}
   .proj{grid-template-columns:minmax(0,1fr);position:relative}
@@ -1505,12 +1518,12 @@ body.sto-spostando *{user-select:none!important}
 
 /* iPad in verticale e orizzontale */
 @media (min-width:821px) and (max-width:1180px){
-  .proj{grid-template-columns:200px minmax(0,1fr) 270px}
+  .proj{grid-template-columns:200px minmax(0,1fr)}
   .sp-head h1{font-size:28px}
   .tiles{grid-template-columns:repeat(auto-fill,minmax(240px,1fr))}
 }
 @media (min-width:821px) and (max-width:1024px){
-  .proj{grid-template-columns:minmax(0,1fr) 288px}
+  .proj{grid-template-columns:minmax(0,1fr)}
   .cal-title{font-size:24px}
   .mappa-lista{width:210px}
 }
@@ -3932,59 +3945,187 @@ function riga(t,d,k,on){
    del telefono. */
 const ZONE_MENU = '.tile,.spazio,.postit,.bacheca,.ev,.day,.chk,.sub,.rg,.luogo,.mie-r,.mie-h,.step,.proj-head,.rail-sec';
 const ZONE_SPOSTA = '.tile,.spazio';
-const ATTESA_PRESA = 480;
+const ATTESA_PRESA = 520;
 
-let presa = null;        // {el, x, y, lista, indice, spostabile, armato, trascina}
+let presa = null;        // {el, x, y, spostabile, armato, trascina, sc, top}
 let timerPresa = null;
+let scorrimentoAuto = null;
+
+/* Il contenitore che scorre sotto la scheda: durante lo spostamento lo
+   blocco, sennò la pagina scappa mentre trascino. Torna a scorrere solo
+   quando porto la scheda al bordo. */
+function contenitore(el){
+  let n = el.parentElement;
+  while(n && n !== document.body){
+    const o = getComputedStyle(n).overflowY;
+    if((o === 'auto' || o === 'scroll') && n.scrollHeight > n.clientHeight + 4) return n;
+    n = n.parentElement;
+  }
+  return null;
+}
+function bloccaPagina(){
+  if(!presa) return;
+  const sc = contenitore(presa.el);
+  if(!sc) return;
+  presa.sc = sc; presa.top = sc.scrollTop;
+  sc.classList.add('fermo');
+}
+function sbloccaPagina(){
+  if(presa && presa.sc){
+    const t = presa.sc.scrollTop;
+    presa.sc.classList.remove('fermo');
+    presa.sc.scrollTop = t;
+  }
+  clearInterval(scorrimentoAuto); scorrimentoAuto = null;
+}
+/* al bordo la pagina riprende a scorrere, piano, finché resto lì */
+function bordo(y){
+  if(!presa || !presa.sc) return;
+  const r = presa.sc.getBoundingClientRect(), M = 96;
+  /* piu' il dito entra nella fascia del bordo, piu' la pagina corre */
+  let v = 0;
+  if(y < r.top + M)          v = -Math.min(26, 5 + Math.round((r.top + M - y) / 3));
+  else if(y > r.bottom - M)  v =  Math.min(26, 5 + Math.round((y - (r.bottom - M)) / 3));
+  clearInterval(scorrimentoAuto); scorrimentoAuto = null;
+  if(!v) return;
+  scorrimentoAuto = setInterval(()=>{
+    if(!presa || !presa.sc || !presa.trascina){ clearInterval(scorrimentoAuto); scorrimentoAuto = null; return; }
+    const sc = presa.sc, prima = sc.scrollTop;
+    sc.classList.remove('fermo');
+    sc.scrollTop = prima + v;
+    sc.classList.add('fermo');
+    const d = sc.scrollTop - prima;
+    if(!d){ clearInterval(scorrimentoAuto); scorrimentoAuto = null; return; }   // arrivato in cima o in fondo
+    /* il contenuto e' salito o sceso di d: sposto il riferimento della
+       scheda di altrettanto, cosi' resta ferma sotto il dito */
+    presa.y0 -= d;
+    aggiornaPresa();
+  }, 16);
+}
 
 function vibra(ms){ try{ if(navigator.vibrate) navigator.vibrate(ms||12); }catch(e){} }
 
 function fermaPresa(){
   clearTimeout(timerPresa); timerPresa = null;
-  if(presa && presa.el) presa.el.classList.remove('preso');
+  sbloccaPagina();
+  document.querySelectorAll('.fermo').forEach(n=>n.classList.remove('fermo'));
+  if(presa && presa.el){ presa.el.classList.remove('preso'); presa.el.style.transform = ''; }
   document.querySelectorAll('.preso,.buco').forEach(n=>n.classList.remove('preso','buco'));
   document.body.classList.remove('sto-spostando');
   presa = null;
 }
 
-document.addEventListener('pointerdown', function(e){
-  if(e.button && e.button!==0) return;
-  if(e.target.closest('input,textarea,select,[contenteditable="true"],.ctx,.modale,.wz')) return;
-  const spost = e.target.closest(ZONE_SPOSTA);
-  const menu  = e.target.closest(ZONE_MENU);
+/* Le tre fasi della presa, uguali per il dito e per il mouse. */
+function iniziaPresa(target, x, y, tipo){
+  if(target.closest('input,textarea,select,[contenteditable="true"],.ctx,.modale,.wz')) return;
+  const spost = target.closest(ZONE_SPOSTA);
+  const menu  = target.closest(ZONE_MENU);
   const z = spost || menu;
   if(!z) return;
-  /* col mouse tengo il tasto destro per il menu: la pressione serve solo
-     per spostare le schede */
-  if(e.pointerType === 'mouse' && !spost) return;
-  presa = {el:z, x:e.clientX, y:e.clientY, spostabile:!!spost, armato:false, trascina:false};
+  /* col mouse il menu c'e' gia' col tasto destro: la pressione serve
+     solo per spostare le schede */
+  if(tipo === 'mouse' && !spost) return;
+  presa = {el:z, x0:x, y0:y, x, y, spostabile:!!spost, armato:false, trascina:false, tipo};
   clearTimeout(timerPresa);
   timerPresa = setTimeout(()=>{
     if(!presa) return;
     presa.armato = true;
     presa.el.classList.add('preso');
-    clearTimeout(tenuta); tenuta = null;      // niente rinomina: qui comanda la presa
+    clearTimeout(tenuta && tenuta.t); if(typeof fermaTenuta==='function') fermaTenuta();
     vibra();
   }, ATTESA_PRESA);
-}, true);
+}
 
-document.addEventListener('pointermove', function(e){
-  if(!presa) return;
-  const dx = e.clientX - presa.x, dy = e.clientY - presa.y;
+/* torna true se la presa si e' presa il gesto (e quindi va fermato lo scorrimento) */
+function muoviPresa(x, y){
+  if(!presa) return false;
+  const dx = x - presa.x0, dy = y - presa.y0;
   const mosso = Math.abs(dx) > 8 || Math.abs(dy) > 8;
-  if(!presa.armato){ if(mosso) fermaPresa(); return; }
-  if(!presa.spostabile) return;
+  if(!presa.armato){ if(mosso) fermaPresa(); return false; }
+  if(!presa.spostabile) return true;          // tenuto su una task: niente scorrimento finche' non lascio
   if(!presa.trascina && mosso){
     presa.trascina = true;
     document.body.classList.add('sto-spostando');
+    bloccaPagina();
   }
   if(presa.trascina){
-    e.preventDefault();
-    presa.el.style.transform = 'translate('+dx+'px,'+dy+'px) scale(1.03)';
-    const sotto = vicinoA(e.clientX, e.clientY, presa.el);
-    if(sotto) scambia(presa.el, sotto);
+    presa.x = x; presa.y = y;
+    aggiornaPresa();
+    bordo(y);
   }
+  return true;
+}
+/* la scheda segue il dito, e se passa sopra un'altra si scambiano di posto */
+function aggiornaPresa(){
+  if(!presa || !presa.trascina) return;
+  const x = presa.x, y = presa.y;
+  presa.el.style.transform = 'translate('+(x - presa.x0)+'px,'+(y - presa.y0)+'px) scale(1.03)';
+  const sotto = vicinoA(x, y, presa.el);
+  if(sotto) scambia(presa.el, sotto, x, y);
+}
+
+function rilasciaPresa(x, y){
+  if(!presa) return false;
+  const p = presa;
+  if(p.armato && p.trascina){
+    p.el.style.transform = '';
+    salvaOrdine(p.el);
+    fermaPresa();
+    appenaTenuto = true; setTimeout(()=>{ appenaTenuto = false; }, 500);
+    return true;
+  }
+  if(p.armato && !p.trascina){
+    /* tenuto fermo e lasciato: esce il menu, come col tasto destro */
+    fermaPresa();
+    appenaTenuto = true; setTimeout(()=>{ appenaTenuto = false; }, 500);
+    p.el.dispatchEvent(new MouseEvent('contextmenu', {bubbles:true, cancelable:true, clientX:x, clientY:y}));
+    return true;
+  }
+  fermaPresa();
+  return false;
+}
+
+/* ---------- IL DITO ----------
+   Uso gli eventi del tocco, non i pointer: sono gli unici che lasciano
+   fermare lo scorrimento del telefono. Finche' la scheda non si e'
+   alzata la pagina scorre normale; da quando si alza, il gesto e' mio. */
+document.addEventListener('touchstart', function(e){
+  if(e.touches.length !== 1){ fermaPresa(); return; }
+  const t = e.touches[0];
+  iniziaPresa(e.target, t.clientX, t.clientY, 'touch');
+}, {passive:true, capture:true});
+
+document.addEventListener('touchmove', function(e){
+  if(!presa) return;
+  const t = e.touches[0];
+  const mio = muoviPresa(t.clientX, t.clientY);
+  if(mio && e.cancelable) e.preventDefault();       // qui la pagina smette di scorrere
+}, {passive:false, capture:true});
+
+document.addEventListener('touchend', function(e){
+  if(!presa) return;
+  const t = e.changedTouches[0];
+  if(rilasciaPresa(t.clientX, t.clientY) && e.cancelable) e.preventDefault();
+}, {passive:false, capture:true});
+
+document.addEventListener('touchcancel', function(){ fermaPresa(); }, true);
+
+/* ---------- IL MOUSE ---------- */
+document.addEventListener('pointerdown', function(e){
+  if(e.pointerType !== 'mouse') return;
+  if(e.button && e.button!==0) return;
+  iniziaPresa(e.target, e.clientX, e.clientY, 'mouse');
+}, true);
+document.addEventListener('pointermove', function(e){
+  if(!presa || presa.tipo !== 'mouse') return;
+  if(muoviPresa(e.clientX, e.clientY)) e.preventDefault();
 }, {passive:false});
+document.addEventListener('pointerup', function(e){
+  if(!presa || presa.tipo !== 'mouse') return;
+  if(rilasciaPresa(e.clientX, e.clientY)) e.preventDefault();
+});
+
+window.addEventListener('wheel', function(){ if(presa && !presa.trascina) fermaPresa(); }, {passive:true});
 
 /* la scheda piu' vicina al dito, tra quelle sorelle */
 function vicinoA(x, y, el){
@@ -3998,42 +4139,20 @@ function vicinoA(x, y, el){
   });
   return migliore;
 }
-function scambia(el, sotto){
+/* scambio di posto nel DOM, poi riaggancio la scheda al dito da dove e' finita */
+function scambia(el, sotto, x, y){
   const genitore = el.parentElement;
   const figli = [...genitore.children];
   const i = figli.indexOf(el), j = figli.indexOf(sotto);
+  el.style.transform = '';
   if(i < j) genitore.insertBefore(el, sotto.nextSibling);
   else genitore.insertBefore(el, sotto);
-  el.style.transform = '';
-  presa.x = presa.x + 0; // il riferimento resta, il transform riparte da qui
+  /* la casella nuova diventa il punto di partenza: la scheda resta
+     sotto il dito senza saltare */
   const r = el.getBoundingClientRect();
-  presa.x = r.left + r.width/2; presa.y = r.top + r.height/2;
+  presa.x0 = r.left + r.width/2; presa.y0 = r.top + r.height/2;
+  el.style.transform = 'translate('+(x - presa.x0)+'px,'+(y - presa.y0)+'px) scale(1.03)';
 }
-
-document.addEventListener('pointerup', function(e){
-  if(!presa) return;
-  const p = presa;
-  if(p.armato && p.trascina){
-    p.el.style.transform = '';
-    salvaOrdine(p.el);
-    fermaPresa();
-    e.preventDefault();
-    appenaTenuto = true; setTimeout(()=>{ appenaTenuto = false; }, 500);
-    return;
-  }
-  if(p.armato && !p.trascina){
-    /* tenuto fermo: esce il menu, come il tasto destro */
-    const x = e.clientX, y = e.clientY;
-    fermaPresa();
-    appenaTenuto = true; setTimeout(()=>{ appenaTenuto = false; }, 500);
-    p.el.dispatchEvent(new MouseEvent('contextmenu', {bubbles:true, cancelable:true, clientX:x, clientY:y}));
-    e.preventDefault();
-    return;
-  }
-  fermaPresa();
-});
-document.addEventListener('pointercancel', fermaPresa);
-window.addEventListener('scroll', fermaPresa, true);
 
 /* l'ordine nuovo lo scrivo nei dati, sennò al prossimo disegno torna com'era */
 function salvaOrdine(el){
@@ -5566,7 +5685,7 @@ document.addEventListener('pointerdown', e=>{ ultimoPunto.x = e.clientX; ultimoP
    Vale su tutto: titoli, clienti, campi della scheda, task, subtask, note,
    responsabili. Mouse, dito e Apple Pencil passano dagli stessi eventi.
    Durante l'attesa il campo si riempie, così si capisce che sta succedendo. */
-const TENUTA = 2000;
+const TENUTA = 1500;
 const ZONE_TENUTA = '.spec, .kv, .proj-head .cli, .proj-head h1, .work-head .editabile, '+
                     '.sub-h, .chk, .riga, .task-nota, .sp-head h1, .rail-sec .kv';
 let tenuta = null, appenaTenuto = false;
@@ -5584,18 +5703,29 @@ document.addEventListener('pointerdown', function(e){
   if(e.target.closest('.ctx, .modal, .drawer, .postit')) return;
   const zona = e.target.closest(ZONE_TENUTA);
   if(!zona) return;
+  /* Se qui esce gia' il menu tenendo premuto, la rinomina la fa il menu:
+     la striscia deve misurare quella presa, non un'attesa piu' lunga
+     che tanto non arriva mai. */
+  const conMenu = !!e.target.closest(ZONE_MENU);
+  const durata = conMenu ? ATTESA_PRESA : TENUTA;
   const matita = zona.querySelector('.pen');
   if(!matita || bloccato(state.progettoId?PROJ():null)) return;
   const x0 = e.clientX, y0 = e.clientY;
   zona.classList.add('in-tenuta');
-  zona.style.setProperty('--tenuta', TENUTA+'ms');
+  zona.style.setProperty('--tenuta', durata+'ms');
+  if(conMenu){
+    /* la striscia serve solo a far vedere che sto premendo: la presa
+       apre il menu per conto suo */
+    tenuta = {zona, matita, x0, y0, t:setTimeout(()=>{ fermaTenuta(); }, durata)};
+    return;
+  }
   tenuta = {zona, matita, x0, y0, t:setTimeout(()=>{
     const z = tenuta; fermaTenuta();
     if(navigator.vibrate) try{ navigator.vibrate(18); }catch(err){}
     z.matita.click();                 // prima apro, poi alzo la bandiera:
     appenaTenuto = true;              // così mangio solo il click dell'utente
     setTimeout(()=>{ appenaTenuto = false; }, 600);
-  }, TENUTA)};
+  }, durata)};
 }, true);
 document.addEventListener('pointermove', function(e){
   if(!tenuta) return;
@@ -5655,6 +5785,7 @@ function menuTelefono(bottone){
 
 document.addEventListener('contextmenu', function(e){
   if(staTrascinando){ e.preventDefault(); return; }
+  if(e.isTrusted && presa && presa.tipo === 'touch'){ e.preventDefault(); return; }
   /* nei campi di testo resta il menu del browser, serve per copia-incolla */
   const dentroNota = e.target.closest && e.target.closest('.postit');
   const conSelezione = e.target.selectionStart!=null && e.target.selectionEnd>e.target.selectionStart;
