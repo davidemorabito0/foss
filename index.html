@@ -217,10 +217,17 @@ input,textarea,select{font:inherit;color:inherit}
   background:var(--surface);border-bottom:1px solid var(--line);
   position:relative;z-index:30;
 }
-.brand{display:flex;align-items:center;gap:9px;cursor:pointer;padding-right:6px}
-.mark{width:22px;height:22px;border-radius:50%;background:
-  conic-gradient(from 225deg,var(--amber) 0 50%,var(--navy) 50% 100%);
-  box-shadow:0 0 0 1px var(--line);flex:none}
+.brand{display:flex;align-items:center;gap:7px;cursor:pointer;padding-right:6px}
+.mark{width:27px;height:27px;flex:none;position:relative;margin-left:-2px}
+.mark::before,.mark::after{content:'';position:absolute;inset:0;
+  -webkit-mask-repeat:no-repeat;mask-repeat:no-repeat;
+  -webkit-mask-size:100% 100%;mask-size:100% 100%}
+.mark::before{background:var(--amber);
+  -webkit-mask-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 48 48'%3E%3Crect x='13.4' y='6.8' width='6.8' height='24' rx='3.4'/%3E%3Cpath d='M16.8 28.8c0 5.4 3.4 6 3.4 9.1a3.4 3.4 0 0 1-6.8 0c0-3.1 3.4-3.7 3.4-9.1z'/%3E%3C/svg%3E");
+  mask-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 48 48'%3E%3Crect x='13.4' y='6.8' width='6.8' height='24' rx='3.4'/%3E%3Cpath d='M16.8 28.8c0 5.4 3.4 6 3.4 9.1a3.4 3.4 0 0 1-6.8 0c0-3.1 3.4-3.7 3.4-9.1z'/%3E%3C/svg%3E")}
+.mark::after{background:var(--text);
+  -webkit-mask-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 48 48'%3E%3Crect x='13.4' y='6.8' width='21' height='5.6' rx='2.8'/%3E%3Crect x='13.4' y='19' width='15' height='5.6' rx='2.8'/%3E%3C/svg%3E");
+  mask-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 48 48'%3E%3Crect x='13.4' y='6.8' width='21' height='5.6' rx='2.8'/%3E%3Crect x='13.4' y='19' width='15' height='5.6' rx='2.8'/%3E%3C/svg%3E")}
 .brand b{font-family:Sora;font-size:15px;font-weight:700;letter-spacing:-.02em}
 .brand span{font-size:10px;color:var(--mute);letter-spacing:.14em;text-transform:uppercase}
 
@@ -803,7 +810,7 @@ input,textarea,select{font:inherit;color:inherit}
 .gate{height:100%;display:grid;place-items:center;padding:20px;overflow-y:auto}
 .gate-card{width:min(380px,100%);background:var(--surface);border:1px solid var(--line);
   border-radius:var(--r-l);padding:26px 24px;box-shadow:var(--shadow)}
-.gate-card .mark{width:34px;height:34px}
+.gate-card .mark{width:42px;height:42px}
 .gate-card h1{font-size:23px;margin:14px 0 4px;letter-spacing:-.03em}
 .gate-card p{color:var(--dim);font-size:12.5px;margin:0 0 20px}
 .gate-card .btn{width:100%;justify-content:center;padding:10px}
@@ -817,7 +824,10 @@ input,textarea,select{font:inherit;color:inherit}
 }
 .fade-layer.on{opacity:1;pointer-events:auto}
 .fade-in{text-align:center;max-width:min(420px,88vw)}
-.fade-in .mark{width:42px;height:42px;margin:0 auto 18px;animation:spin 1.6s cubic-bezier(.5,0,.5,1) infinite}
+/* mentre carica, la goccia cade: ha piu' senso di un logo che gira */
+.fade-in .mark{width:46px;height:46px;margin:0 auto 18px}
+.fade-in .mark::before{animation:cade 1.5s ease-in-out infinite}
+@keyframes cade{0%{opacity:.3;transform:translateY(-3px)}45%{opacity:1;transform:none}100%{opacity:.3;transform:translateY(3px)}}
 @keyframes spin{to{transform:rotate(360deg)}}
 .fade-in .cli{font-size:10.5px;letter-spacing:.16em;text-transform:uppercase;color:var(--mute);font-family:Sora;font-weight:600}
 .fade-in h2{font-size:23px;margin:5px 0 16px;letter-spacing:-.025em}
