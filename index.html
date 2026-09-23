@@ -3686,7 +3686,8 @@ function modaleFiltro(){
 /* ============ AZIONI ============ */
 const PROTETTE = ['edit','salva-campo','check','fase','indietro','riprendi','add-user','assegna',
                   'elimina-progetto','conferma-elimina','sposta-ev','rinomina-ev','elimina-ev',
-                  'add-compito','elimina-compito','sub-tutto','sub-azzera','annulla',
+                  'add-compito','elimina-compito','elimina-task','tagga','tagga-chi','stagga',
+                  'sub-tutto','sub-azzera','annulla',
                   'nuova-task','sposta-spazio','completa'];
 
 document.addEventListener('click', function(e){
@@ -3983,6 +3984,16 @@ document.addEventListener('click', function(e){
       s.items.splice(i,1); render();
       toast('Subtask eliminata. Ctrl+Z per annullare.','warn','Eliminata'); break; }
 
+    case 'elimina-task':{
+      const s2 = p.subs.find(x=>x.id===t.dataset.id); if(!s2) break;
+      snap('Eliminazione della task «'+s2.titolo+'»');
+      azione('Eliminata la task <b>'+esc(s2.titolo)+'</b> con le sue '+s2.items.length+' subtask — '+esc(p.nome));
+      logga(p,'Task <b>'+esc(s2.titolo)+'</b> eliminata');
+      p.subs = p.subs.filter(x=>x.id!==s2.id);
+      render();
+      toast('«'+s2.titolo+'» eliminata con le sue subtask. Ctrl+Z per annullare.','warn','Task eliminata');
+      break; }
+
     case 'sub-tutto':
     case 'sub-azzera':{
       const s = p.subs.find(x=>x.id===t.dataset.id), fatto = a==='sub-tutto';
@@ -4217,10 +4228,15 @@ document.addEventListener('click', function(e){
       const gia = taggatiOk(s2).map(x=>x.u);
       const liberi = taggabili().filter(u=>gia.indexOf(u.id)<0);
       if(!liberi.length){ confermaBottone(t,'Sono già tutti'); break; }
+      /* se arrivo dal menu del tasto destro il tasto non c'è più: uso il punto
+         dove ha cliccato, altrimenti il menu finisce nell'angolo */
       const r = t.getBoundingClientRect();
+      if(!r.width) { apriCtx(ultimoPunto.x, ultimoPunto.y, 'Chi lavora a «'+esc(s2.titolo)+'»',
+        liberi.map(u=>({a:'tagga-chi', d:'data-id="'+s2.id+'" data-u="'+u.id+'"',
+                        l:esc(u.nome), ic:'user'})), null); break; }
       apriCtx(r.left, r.bottom+6, 'Chi lavora a «'+esc(s2.titolo)+'»',
         liberi.map(u=>({a:'tagga-chi', d:'data-id="'+s2.id+'" data-u="'+u.id+'"',
-                        l:esc(u.nome)+' — '+esc(u.ruolo), ic:'user'})), null);
+                        l:esc(u.nome), ic:'user'})), null);
       break; }
 
     case 'menziona':{
@@ -4470,6 +4486,8 @@ function confermaBottone(b, testo){
   setTimeout(()=>{ b.innerHTML = prima; b.classList.remove('confermato'); delete b.dataset.confermando; }, 1600);
 }
 let staTrascinando = false;
+const ultimoPunto = {x:120, y:140};
+document.addEventListener('pointerdown', e=>{ ultimoPunto.x = e.clientX; ultimoPunto.y = e.clientY; }, true);
 
 /* ---------- PRESSIONE PROLUNGATA: 2 secondi per modificare ----------
    Vale su tutto: titoli, clienti, campi della scheda, task, subtask, note,
@@ -4663,6 +4681,7 @@ document.addEventListener('contextmenu', function(e){
       {a:'check', l:s.items[i].done?'Segna da fare':'Segna come fatto', ic:'check', d:dd, off:isLock(p)},
       {a:'edit', l:'Modifica il testo', ic:'pen', d:dd+' data-t="item"', off:isLock(p)},
       {a:'add-compito', l:'Aggiungi subtask sotto', ic:'plus', d:dd, off:isLock(p)},
+      {a:'tagga', l:'Assegna a qualcuno…', ic:'users', d:dd, off:isLock(p)},
       {sep:1},
       {a:'elimina-compito', l:'Elimina subtask', ic:'x', d:dd, danger:1, off:isLock(p)},
       undoV
@@ -4674,11 +4693,14 @@ document.addEventListener('contextmenu', function(e){
     const s = p.subs.find(z=>'sub_'+z.id===sub.id), dd = D({id:s.id});
     apriCtx(x,y, esc(s.titolo), [
       {a:'edit', l:'Rinomina task', ic:'pen', d:dd+' data-t="sub" data-k="titolo"', off:isLock(p)},
-      {a:'edit', l:'Assegna a…', ic:'users', d:dd+' data-t="sub" data-k="assegnato"', off:isLock(p)},
+      {a:'tagga', l:'Assegna a qualcuno…', ic:'users', d:dd, off:isLock(p)},
+      {a:'edit', l:'Cambia il responsabile', ic:'user', d:dd+' data-t="sub" data-k="assegnato"', off:isLock(p)},
       {a:'add-compito', l:'Aggiungi subtask', ic:'plus', d:dd+' data-i="-1"', off:isLock(p)},
       {sep:1},
       {a:'sub-tutto', l:'Segna tutto come fatto', ic:'check', d:dd, off:isLock(p)},
       {a:'sub-azzera', l:'Azzera le spunte', ic:'undo', d:dd, off:isLock(p)},
+      {sep:1},
+      {a:'elimina-task', l:'Elimina task', ic:'x', d:dd, danger:1, off:isLock(p)},
       undoV
     ], sub); return;
   }
