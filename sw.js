@@ -3,7 +3,7 @@
    la copia in cache serve solo quando sei offline. I DATI non stanno qui:
    vivono nel database e nella memoria del browser, quindi un aggiornamento
    dell'app non può cancellarli. */
-const CACHE = 'foss-guscio-v18';
+const CACHE = 'foss-guscio-v21';
 const GUSCIO = ['./', './index.html', './manifest.json',
                 './icone/icona-192-v2.png', './icone/icona-512-v2.png'];
 
