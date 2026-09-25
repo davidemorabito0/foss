@@ -7,9 +7,9 @@
 <meta name="theme-color" content="#0D1926">
 <title>FOSS</title>
 <link rel="manifest" href="manifest.json">
-<link rel="icon" href="icone/favicon-32-v2.png" sizes="32x32">
-<link rel="apple-touch-icon" href="icone/apple-touch-icon-v2.png">
-<link rel="apple-touch-icon" sizes="180x180" href="icone/apple-touch-icon-v2.png">
+<link rel="icon" href="foss-icona-32.png" sizes="32x32">
+<link rel="apple-touch-icon" href="foss-icona-180.png">
+<link rel="apple-touch-icon" sizes="180x180" href="foss-icona-180.png">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <meta name="apple-mobile-web-app-title" content="FOSS">
@@ -1828,6 +1828,28 @@ body.sto-spostando *{user-select:none!important}
   .btn-snooze{justify-content:center;padding:11px}
   .toasts{left:10px;right:10px;width:auto}
 }
+/* ---------- IPHONE CON L'APP INSTALLATA ----------
+   A tutto schermo la barra di stato (ora, batteria) sta SOPRA la pagina:
+   la barra in alto parte sotto, altrimenti nome del lavoro e freccia
+   indietro finiscono coperti e non si toccano. */
+.topbar{padding-top:env(safe-area-inset-top,0px);height:calc(52px + env(safe-area-inset-top,0px))}
+.wz,.gate{padding-top:calc(20px + env(safe-area-inset-top,0px))}
+@media (max-width:620px){
+  .topbar{padding-top:env(safe-area-inset-top,0px);height:calc(54px + env(safe-area-inset-top,0px))}
+  .topbar #indietroBtn{width:40px;height:40px;color:var(--text)}
+  .topbar #indietroBtn svg{width:24px;height:24px}
+}
+/* il saluto porta la foto di chi e' entrato: si capisce al volo con che profilo */
+.riga-saluto{align-items:center}
+.riga-saluto .io{flex:none;padding:0;border:none;background:none;cursor:pointer;border-radius:50%}
+.riga-saluto .io .av{width:48px;height:48px;font-size:16px;box-shadow:0 0 0 2px var(--bg),0 0 0 4px var(--amber)}
+.riga-saluto .tel-saluto{margin:0}
+.tel-home .riga-saluto{margin-bottom:12px}
+/* nel «Tocca a te» il lavoro si legge per primo: dove sei, poi cosa fare */
+.prossima .tx .dovep{display:block;font-family:Sora;font-size:12.5px;font-weight:600;color:var(--text);
+  margin:2px 0 1px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.prossima .tx .dovep i{font-style:normal;font-weight:500;color:var(--dim)}
+.nitem .mt .pr{font-family:DM Sans,sans-serif;color:var(--dim);font-weight:700}
 </style>
 
 </head>
@@ -1841,7 +1863,7 @@ body.sto-spostando *{user-select:none!important}
     <button class="iconbtn solo-tel" data-action="nuovo-da-tel" id="piuBtn" title="Nuovo progetto">
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M12 5v14M5 12h14"/></svg>
     </button>
-    <button class="iconbtn solo-tel" data-action="home" id="indietroBtn" title="Torna ai progetti" hidden>
+    <button class="iconbtn solo-tel" data-action="indietro-tel" id="indietroBtn" title="Indietro" aria-label="Indietro" hidden>
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4"><path d="m15 5-7 7 7 7"/></svg>
     </button>
     <div class="crumb" id="crumb"></div>
@@ -2708,7 +2730,8 @@ function renderHome(){
      se il saluto restasse fermo in cima, per i lavori resterebbe mezzo
      schermo e trascinare una scheda farebbe correre subito la pagina. */
   const tutto = suTelefono() && (state.vista==='tessere' || state.vista==='lista');
-  if(tutto) h += '<div class="scroller tel-tutto">' + testataTelefono();
+  /* il saluto e le cose da fare stanno sopra gli spazi, non dentro a uno spazio */
+  if(tutto) h += '<div class="scroller tel-tutto">';
   h += intestazioneSpazio(lista);
 
   if(state.vista==='note'){
@@ -3036,8 +3059,9 @@ function barraProssima(p){
   return '<div class="prossima">'+xProssima()+'<span class="ic">'+svg('spark',2.4)+'</span>'+
     '<span class="tx"><span class="lb">'+(voce.mia? 'Tocca a te' : 'Prossima cosa da fare')+'</span>'+
     '<b>'+esc(voce.it.t)+'</b>'+
+    '<span class="dovep">'+esc(p.nome)+(p.cliente? ' <i>· '+esc(p.cliente)+'</i>' : '')+'</span>'+
     '<span>in <b style="display:inline;font-size:11.5px">'+esc(voce.t.titolo)+'</b> · fase '+esc(dove)+
-      ' · '+esc(U(voce.t.assegnato||p.team[0]).nome.split(' ')[0])+
+      (voce.mia? '' : ' · '+esc(U(voce.t.assegnato||p.team[0]).nome.split(' ')[0]))+
       (mie? ' · '+mie+' assegnate a te' : '')+' · '+tutte+' aperte in tutto</span></span>'+
     '<span class="az">'+
       (voce.fase!==p.fase? '<button class="btn sm" data-action="fase" data-i="'+voce.fase+'">Vai alla fase</button>':'')+
@@ -3420,7 +3444,6 @@ function renderTabbar(){
     {k:'progetti', l:'Lavori',  ic:'grid'},
     {k:'mie',      l:'Per te',  ic:'check', n:mie},
     {k:'note',     l:'Note',    ic:'pen'},
-    {k:'cerca',    l:'Cerca',   ic:'cerca'},
     {k:'profilo',  l:'Profilo', ic:'user'}
   ];
   const attivo =
@@ -3446,7 +3469,11 @@ function testataTelefono(){
   const pc = primaCosa();
   let h = '<div class="tel-home">';
   if(boxSaluto){
-  h += '<div class="riga-saluto"><h2 class="tel-saluto">'+saluto()+', '+esc(nomeVisibile().split(' ')[0])+'</h2>'+
+  const io = Object.assign({}, U(state.utente));
+  if(state.me && state.me.foto) io.foto = state.me.foto;
+  h += '<div class="riga-saluto">'+
+       '<button class="io" data-action="tab-tel" data-k="profilo" title="Il tuo profilo" aria-label="Il tuo profilo">'+av(io)+'</button>'+
+       '<h2 class="tel-saluto">'+saluto()+', '+esc(nomeVisibile().split(' ')[0])+'</h2>'+
        '<button class="chiudi-saluti" data-action="chiudi-saluti" data-b="saluto" '+
        'title="Nascondi fino al prossimo accesso" aria-label="Nascondi">'+svg('x',2.6)+'</button></div>';
 
@@ -3488,6 +3515,9 @@ function testataTelefono(){
    la X li chiude per questa visita e tornano al prossimo accesso.
    Sta fuori da state apposta: non finisce nell'archivio. */
 let boxSaluto = true, boxDaFare = true, boxProssima = true;
+/* navigazione del telefono: se in questa visita ho aperto uno spazio,
+   e da dove sono entrato nel lavoro aperto (per la freccia indietro) */
+let spazioScelto = false, tornaA = null;
 
 function benvenuto(){
   if(!boxSaluto && !boxDaFare) return '';
@@ -3529,8 +3559,9 @@ function benvenuto(){
 }
 
 function renderSpazi(){
-  /* sul telefono il saluto sta solo nella pagina dei lavori */
-  let h = '<div class="pane"><div class="scroller" style="padding:0">'+ (suTelefono()? '' : benvenuto()) +
+  /* Sul telefono si parte da qui: in alto chi sei e cosa tocca a te,
+     sotto gli spazi di lavoro, tutti chiusi. Quale aprire lo decido io. */
+  let h = '<div class="pane"><div class="scroller" style="padding:0">'+ (suTelefono()? testataTelefono() : benvenuto()) +
     '<div class="spazi-head"><h1>I tuoi spazi di lavoro</h1>'+
     '<p>Ogni spazio raccoglie i progetti di un ambito: i clienti video, i social, i siti. '+
     'Dentro allo spazio trovi progetti, task e calendario separati dagli altri.</p></div><div class="spazi">';
@@ -4079,10 +4110,6 @@ function renderProfilo(){
       '</div>'+
     '</div></div></div>';
 
-  h += sonoAdmin ? cartaAmministrazione()
-    : '<div class="card"><h3>Profilo guest</h3><div class="hint" style="margin:0">Vedi solo i lavori che l\u2019amministratore ha aperto per te. '+
-      'Per vedere altro, o per aggiungere persone, chiedi a lui.</div></div>';
-
   h += '<div class="card"><h3>Dati personali</h3><div class="hint">Se compili il nickname, sarà quello mostrato ovunque nel software.</div>'+
     '<div class="griglia">'+
       campo('Nome','pf_nome',m.nome)+campo('Cognome','pf_cognome',m.cognome)+
@@ -4126,6 +4153,11 @@ function renderProfilo(){
                                               : 'In questo browser. Collegando il database restano anche online')+'</span></div>'+
       '<span class="chip mono">v'+SCHEMA+'</span></div>'+
   '</div>';
+
+  /* gestione delle persone: in fondo, prima del tema */
+  h += sonoAdmin ? cartaAmministrazione()
+    : '<div class="card"><h3>Profilo guest</h3><div class="hint" style="margin:0">Vedi solo i lavori che l\u2019amministratore ha aperto per te. '+
+      'Per vedere altro, o per aggiungere persone, chiedi a lui.</div></div>';
 
   h += '<div class="card"><h3>Tema dell\'interfaccia</h3><div class="hint">Colori pensati per stare sullo schermo tutto il giorno: fondi bassi, accento forte solo dove serve guardare.</div>'+
     '<div class="temi">'+TEMI.map(t=>'<button class="tema'+(c.tema===t.id?' on':'')+'" data-action="tema-set" data-t="'+t.id+'">'+
@@ -4521,15 +4553,22 @@ function renderInvito(){
 function renderDrawer(){
   const l = el('nlist');
   if(!state.notifiche.length){ l.innerHTML = '<div class="empty">Nessuna notifica.</div>'; return; }
-  l.innerHTML = state.notifiche.map(n=>
-    '<button class="nitem'+(n.nuova?' new':'')+'" data-action="vai-notifica" data-id="'+n.id+'">'+
+  /* ogni notifica dice in che lavoro: se il testo non lo nomina, lo aggiungo sotto */
+  l.innerHTML = state.notifiche.map(n=>{
+    const pr = n.p ? state.progetti.find(x=>x.id===n.p) : null;
+    const lav = pr && String(n.tx).indexOf(esc(pr.nome))<0
+      ? '<span class="pr">'+esc(pr.nome)+(pr.cliente? ' · '+esc(pr.cliente):'')+'</span> · ' : '';
+    return '<button class="nitem'+(n.nuova?' new':'')+'" data-action="vai-notifica" data-id="'+n.id+'">'+
     '<span class="ic">'+svg(I[n.ic]?n.ic:'spark')+'</span>'+
-    '<span><span class="tx">'+n.tx+'</span><span class="mt">'+n.ts+'</span></span></button>').join('');
+    '<span><span class="tx">'+n.tx+'</span><span class="mt">'+lav+n.ts+'</span></span></button>'; }).join('');
 }
 
 /* ============ APERTURA PROGETTO ============ */
 function apriProgetto(id, conDissolvenza){
   const p = state.progetti.find(x=>x.id===id); if(!p) return;
+  /* mi segno da dove arrivo: la freccia in alto mi ci riporta */
+  if(state.schermo!=='progetto' && state.schermo!=='gate')
+    tornaA = {schermo:state.schermo, vista:state.vista, spazioId:state.spazioId};
   if(p.spazio && p.spazio!==state.spazioId) state.spazioId = p.spazio;   // segue il progetto nel suo spazio
   const vai = ()=>{
     state.progettoId = p.id; state.schermo='progetto'; state.showFeed=false; state.railOn=false; state.drawer=false;
@@ -5015,7 +5054,7 @@ function applicaEdit(){
         s.taggati.push({u:id, ruolo:u.ruolo||'Collaboratore'});
         if(p.team.indexOf(id)<0) p.team.push(id);
         logga(p,'<b>'+esc(u.nome)+'</b> taggato nella nota di '+esc(s.titolo), true);
-        notifica('Sei stato taggato nella nota di <b>'+esc(s.titolo)+'</b>', p.id, s.fase, 'user');
+        notifica('Sei stato taggato nella nota di <b>'+esc(s.titolo)+'</b> in <b>'+esc(p.nome)+'</b>', p.id, s.fase, 'user');
       });
       menzionatiOra = null;
       azione('Nota aggiornata su <b>'+esc(s.titolo)+'</b> — '+esc(p.nome));
@@ -5140,10 +5179,10 @@ document.addEventListener('click', function(e){
 
     /* ---- spazi di lavoro ---- */
     case 'spazi':
-      state.schermo='spazi'; state.progettoId=null; state.showFeed=false; render(); break;
+      state.schermo='spazi'; state.progettoId=null; state.showFeed=false; spazioScelto=false; render(); break;
 
     case 'apri-spazio':
-      state.spazioId = t.dataset.id; state.schermo='home'; state.filtroAttivo=null;
+      state.spazioId = t.dataset.id; state.schermo='home'; state.filtroAttivo=null; spazioScelto=true;
       state.filtro=''; render();
       toast(SPZ().nome+' — '+listaProgetti().length+' progetti.','info','Spazio aperto'); break;
 
@@ -5522,6 +5561,17 @@ document.addEventListener('click', function(e){
     case 'home':
       state.schermo='home'; state.showFeed=false; render(); break;
 
+    /* la freccia in alto a sinistra: torno alla schermata di prima */
+    case 'indietro-tel':{
+      const d = tornaA; tornaA = null;
+      state.showFeed = false; state.railOn = false;
+      if(d && d.schermo){
+        state.schermo = d.schermo;
+        if(d.vista) state.vista = d.vista;
+        if(d.spazioId) state.spazioId = d.spazioId;
+      } else state.schermo = spazioScelto? 'home' : 'spazi';
+      render(); break; }
+
     /* dal profilo si torna dove si era: al progetto aperto, o ai progetti */
     case 'progetto-corrente':
       if(state.progettoId && state.progetti.some(x=>x.id===state.progettoId)) state.schermo='progetto';
@@ -5792,7 +5842,10 @@ document.addEventListener('click', function(e){
     case 'tab-tel':{
       const k = t.dataset.k;
       chiudiCtx(); state.drawer = false;
-      if(k==='progetti'){ state.schermo = state.spazioId? 'home':'spazi'; if(state.vista==='note') state.vista='tessere'; }
+      if(k==='progetti'){
+        const giaQui = state.schermo==='spazi' || (state.schermo==='home' && state.vista!=='note');
+        state.schermo = (!giaQui && spazioScelto)? 'home' : 'spazi';
+        if(state.vista==='note') state.vista='tessere'; }
       else if(k==='note'){ state.schermo='home'; state.vista='note'; }
       else if(k==='mie'){ state.schermo='mie'; mieAppena.clear(); }
       else if(k==='cerca'){ state.schermo='cerca'; state.mettiFuoco = true; }
@@ -5856,7 +5909,7 @@ document.addEventListener('click', function(e){
         if(p.team.indexOf(uid)<0) p.team.push(uid);
         azione('<b>'+esc(it2.t)+'</b> assegnata a <b>'+esc(u.nome)+'</b> — '+esc(p.nome));
         logga(p,'<b>'+esc(it2.t)+'</b> assegnata a <b>'+esc(u.nome)+'</b>');
-        notifica('Ti è stata assegnata <b>'+esc(it2.t)+'</b> in '+esc(s2.titolo), p.id, s2.fase, 'user');
+        notifica('Ti è stata assegnata <b>'+esc(it2.t)+'</b> in '+esc(s2.titolo)+' · <b>'+esc(p.nome)+'</b>', p.id, s2.fase, 'user');
       } else {
         azione('<b>'+esc(it2.t)+'</b> non è più assegnata a nessuno — '+esc(p.nome));
         logga(p,'<b>'+esc(it2.t)+'</b> lasciata senza assegnatario');
@@ -5900,7 +5953,7 @@ document.addEventListener('click', function(e){
       if(p.team.indexOf(u.id)<0) p.team.push(u.id);
       azione('<b>'+esc(u.nome)+'</b> taggato su <b>'+esc(s2.titolo)+'</b> come '+esc(u.ruolo||'Collaboratore'));
       logga(p,'<b>'+esc(u.nome)+'</b> taggato su '+esc(s2.titolo)+' come '+esc(u.ruolo||'Collaboratore'), true);
-      notifica('Sei stato taggato su <b>'+esc(s2.titolo)+'</b> come '+esc(u.ruolo||'Collaboratore'), p.id, s2.fase, 'user');
+      notifica('Sei stato taggato su <b>'+esc(s2.titolo)+'</b> in <b>'+esc(p.nome)+'</b> come '+esc(u.ruolo||'Collaboratore'), p.id, s2.fase, 'user');
       render(); setTimeout(()=>flash('#sub_'+s2.id), 80);
       break; }
 
@@ -6093,7 +6146,7 @@ document.addEventListener('click', function(e){
       if(pw!==pw2){ toast('Le due password non coincidono.','warn','Controlla'); break; }
       const b = el('gateBtn'); b.disabled = true; b.textContent = 'Creo il profilo…';
       primoAccesso(state.invitoScelto, mail, pw).then(ok=>{
-        if(ok){ state.invitoScelto=null; state.schermo='home'; render();
+        if(ok){ state.invitoScelto=null; state.schermo='spazi'; spazioScelto=false; render();
                 toast('Benvenuto, '+nomeVisibile().split(' ')[0]+'. La password resta salvata.','ok','Profilo creato'); }
         else { state.gateModo='login'; state.invitoScelto=null; render(); }
       });
@@ -6107,7 +6160,7 @@ document.addEventListener('click', function(e){
         nick:(el('g_nick').value||'').trim(), ruolo:(el('g_ruolo').value||'').trim()||'Collaboratore',
         email:(el('g_mail').value||'').trim(), pw:el('g_pw').value
       }).then(ok=>{
-        if(ok){ state.schermo='home'; render();
+        if(ok){ state.schermo='spazi'; spazioScelto=false; render();
                 if(!state.spazi.length) apriWizard(true);
                 toast('Benvenuto, '+nomeVisibile().split(' ')[0]+'.','ok','Profilo creato'); }
         else { state.gateModo='login'; render(); }
@@ -6135,7 +6188,7 @@ document.addEventListener('click', function(e){
       if(!sb){ state.schermo='home'; chiudiModale(); render(); break; }
       const b = el('gateBtn'); b.disabled = true; b.textContent = 'Accedo\u2026';
       entraCloud((el('g_mail').value||'').trim(), el('g_pw').value).then(ok=>{
-        if(ok){ state.schermo = nuovoArrivato? 'spazi' : 'home'; chiudiModale(); render();
+        if(ok){ state.schermo = 'spazi'; spazioScelto=false; chiudiModale(); render();
                 if(nuovoArrivato || !state.spazi.length) apriWizard(true);
                 toast('Bentornato, '+nomeVisibile().split(' ')[0]+'.','ok','Accesso effettuato'); }
         else render();
