@@ -2420,6 +2420,59 @@ a.btn.primary{color:var(--on-amber)}
   .kb-col{flex-basis:280px;width:280px}
 }
 
+/* ---------- LE SUBTASK A RIGHE (come il riferimento) ---------- */
+.sub-h .t{flex:0 1 auto;font-family:"Plus Jakarta Sans",Sora,sans-serif;font-weight:700;font-size:14px}
+.sub-barra{flex:0 1 390px;min-width:60px;height:6px;border-radius:3px;background:var(--surface-3);overflow:hidden;margin:0 auto 0 10px}
+.sub-barra i{display:block;height:100%;border-radius:3px;background:var(--t-giallo);transition:width .4s cubic-bezier(.3,1,.4,1)}
+.sub-in{padding:0 14px 12px 22px}
+.chk.v2{gap:14px;padding:0 4px;min-height:50px;border-bottom:1px solid var(--line-soft);font-size:13.5px;font-weight:500;color:var(--text);font-family:"Plus Jakarta Sans",system-ui,sans-serif}
+.chk.v2 *{font-family:inherit}
+.chk.v2:hover{background:color-mix(in srgb,var(--surface-2) 60%,transparent)}
+.chk.v2 .box{width:26px;height:26px;border-radius:7px;border:2px solid color-mix(in srgb,var(--text) 38%,transparent)}
+.chk.v2 .box svg{width:15px;height:15px}
+.chk.v2.done .box{background:var(--t-verde);border-color:var(--t-verde)}
+.chk.v2.done .box svg{color:#fff}
+.chk.v2.done .tx{text-decoration:none;color:var(--text);opacity:.8}
+.chk.v2 .tx{flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.chk.v2 .pen{margin-left:0}
+.v-chi{width:72px;flex:none;display:flex;justify-content:flex-start}
+.chk.v2 .chk-ass{width:30px;height:30px;margin-left:0}
+.chk.v2 .chk-ass .av{width:28px;height:28px;font-size:10px}
+.chk.v2 .chk-ass.vuoto svg{width:13px;height:13px}
+.v-data{position:relative;width:118px;flex:none;display:inline-flex;align-items:center;gap:10px;font-size:14px;font-weight:600;color:var(--text);border-radius:8px;padding:4px 6px;cursor:pointer}
+.v-data svg{width:17px;height:17px;color:var(--hm-2,var(--dim));flex:none}
+.v-data:hover{background:var(--surface-2)}
+.v-data.vuota{color:var(--mute);font-weight:500;font-size:12.5px;opacity:0;transition:opacity .14s}
+.chk.v2:hover .v-data.vuota,.v-data.vuota:focus-visible{opacity:1}
+.v-data.rosso{color:var(--t-rosso)}.v-data.giallo{color:var(--t-giallo)}
+.vd-in{position:absolute;left:0;bottom:0;width:1px;height:1px;opacity:0;pointer-events:none;border:0;padding:0}
+.v-st{width:100px;flex:none;display:inline-flex;justify-content:center;padding:6px 8px;border-radius:9px;font-size:12px;font-weight:600;white-space:nowrap;
+  background:color-mix(in srgb,var(--t-blu) 16%,var(--surface-2));color:color-mix(in srgb,var(--t-blu) 45%,var(--text))}
+.v-st[role="button"]{cursor:pointer}
+.v-st[role="button"]:hover{filter:brightness(1.15)}
+.v-st.corso{background:color-mix(in srgb,var(--t-giallo) 22%,var(--surface-2));color:var(--t-giallo)}
+.v-st.fatta{background:color-mix(in srgb,var(--t-verde) 20%,var(--surface-2));color:var(--t-verde)}
+.v-menu{width:30px;height:30px;border-radius:8px;display:grid;place-items:center;color:var(--hm-2,var(--dim));flex:none}
+.v-menu:hover{background:var(--surface-2);color:var(--text)}
+.v-menu svg{width:18px;height:18px}
+.v-nuova{display:flex;align-items:center;gap:12px;margin:12px 0 8px;padding:12px 16px;border-radius:12px;border:1px solid var(--line-soft);
+  background:color-mix(in srgb,var(--surface-2) 70%,transparent);color:var(--hm-2,var(--dim));cursor:text}
+.v-nuova:focus-within{border-color:var(--amber)}
+.v-nuova svg{width:16px;height:16px;flex:none}
+.v-nuova input{flex:1;min-width:0;background:none;border:none;outline:none;font-size:14px;font-weight:500;color:var(--text);font-family:"Plus Jakarta Sans",system-ui,sans-serif}
+.v-nuova input::placeholder{color:var(--hm-2,var(--mute))}
+@media (max-width:1100px){ .sub-barra{display:none} .v-chi{width:40px} .v-data{width:96px;font-size:13px} .v-st{width:auto;padding:5px 8px} }
+@media (max-width:760px){
+  .sub-in{padding:0 10px 10px 12px}
+  .chk.v2{gap:10px;min-height:48px}
+  .v-chi{width:auto}
+  .v-data{width:auto;gap:5px;font-size:12px;padding:3px 4px}
+  .v-data svg{width:14px;height:14px}
+  .v-data.vuota,.v-menu{display:none}
+  .v-st{font-size:11px;padding:4px 7px}
+  .v-st:not(.corso){display:none}
+}
+
 /* ---------- LE PROFESSIONI CHE FACCIO ---------- */
 .prof-scelte{display:grid;grid-template-columns:repeat(auto-fill,minmax(210px,1fr));gap:8px}
 .prof-b{display:flex;align-items:center;gap:10px;padding:9px 10px;border-radius:var(--r-m);border:1px solid var(--line);background:var(--surface-2);text-align:left;width:100%;transition:border-color .15s,background .15s}
@@ -2808,6 +2861,7 @@ const I = {
   help:'<circle cx="12" cy="12" r="9"/><path d="M9.6 9.3a2.5 2.5 0 1 1 3.4 2.4c-.6.3-1 .8-1 1.5v.6"/><path d="M12 17.2h.01"/>',
   libro:'<path d="M4 19.5V5a2 2 0 0 1 2-2h13v15H6a2 2 0 0 0-2 2 2 2 0 0 0 2 2h13"/><path d="M8 7h7M8 11h5"/>',
   bandiera:'<path d="M5 21V4"/><path d="M5 4h11l-1.8 4L16 12H5"/>',
+  altro:'<circle cx="12" cy="5" r="1.2"/><circle cx="12" cy="12" r="1.2"/><circle cx="12" cy="19" r="1.2"/>',
   out:'<path d="M16 17l5-5-5-5M21 12H9M12 3H6a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h6"/>',
   spark:'<path d="M12 3v4M12 17v4M3 12h4M17 12h4M5.6 5.6 8.5 8.5M15.5 15.5l2.9 2.9M18.4 5.6 15.5 8.5M8.5 15.5l-2.9 2.9"/>',
   x:'<path d="M18 6 6 18M6 6l12 12"/>',
@@ -4578,6 +4632,7 @@ function renderProgetto(){
         '<span class="caret">'+svg('chev',2.6)+'</span>'+
         '<span class="t">'+esc(s.titolo)+'</span>'+
         pen('sub','titolo',s.id)+
+        '<span class="sub-barra" aria-hidden="true"><i style="width:'+pc+'%"></i></span>'+
         tastoCommenti(p, stThr, s)+
         '<button class="pen" data-action="condividi" data-pid="'+p.id+'" data-sid="'+s.id+'" title="Condividi questa task">'+svg('share',2.2)+'</button>'+
         '<span class="chip '+(pc===100?'ok':pc>0?'now':'')+'">'+(pc===100?'Chiusa':pc>0?'In corso':'Da aprire')+'</span>'+
@@ -4588,7 +4643,8 @@ function renderProgetto(){
       '<div class="sub-b"><div><div class="sub-in">'+
         s.items.map((i,ix)=>{
           const ua = i.ass? U(i.ass) : null;
-          return '<div class="chk'+(i.done?' done':'')+'" role="button" tabindex="0" data-action="check-riga" data-id="'+s.id+'" data-i="'+ix+'">'+
+          const q = dataVoce(i), stv = statoVoce(i), fisso = state.ospite || isLock(p) || p.completato;
+          return '<div class="chk v2'+(i.done?' done':'')+'" role="button" tabindex="0" data-action="check-riga" data-id="'+s.id+'" data-i="'+ix+'">'+
           '<span class="box" role="button" tabindex="-1" data-action="check" data-id="'+s.id+'" data-i="'+ix+'" '+
             'aria-label="'+(i.done?'Togli la spunta':'Segna come fatto')+'">'+svg('check',3.2)+'</span>'+
           '<span class="tx">'+esc(i.t)+'</span>'+
@@ -4596,14 +4652,21 @@ function renderProgetto(){
             return '<button class="cl-badge'+(i.lista.length && fl===i.lista.length?' ok':'')+(listeAperte.has(s.id+'|'+ix)?' aperta':'')+'" '+
               'data-action="apri-lista" data-id="'+s.id+'" data-i="'+ix+'" title="Checklist: '+fl+' su '+i.lista.length+'">'+
               svg('list',2.2)+fl+'/'+i.lista.length+'</button>'; })() : '')+
-          (ua? '<span class="chk-ass" data-action="assegna-sub" data-id="'+s.id+'" data-i="'+ix+'" role="button" tabindex="0" '+
+          '<span class="v-chi">'+(ua? '<span class="chk-ass" data-action="assegna-sub" data-id="'+s.id+'" data-i="'+ix+'" role="button" tabindex="0" '+
                'title="'+esc(ua.nome)+' — '+esc(ua.ruolo)+'. Tocca per cambiare.">'+av(ua,'sm')+'</span>'
              : (state.ospite?'' : '<span class="chk-ass vuoto" data-action="assegna-sub" data-id="'+s.id+'" data-i="'+ix+'" role="button" tabindex="0" '+
-               'title="Assegna questa subtask a qualcuno">'+svg('user',2.2)+'</span>'))+
+               'title="Assegna questa subtask a qualcuno">'+svg('user',2.2)+'</span>'))+'</span>'+
+          '<span class="v-data'+(q.t?'':' vuota')+' '+q.c+'"'+(fisso? '' : ' role="button" tabindex="0" data-action="voce-data" data-id="'+s.id+'" data-i="'+ix+'"')+
+            ' title="'+(q.t? 'Scadenza della subtask' : 'Aggiungi una scadenza')+'">'+svg('calendar',2)+'<span>'+(q.t || 'Data')+'</span>'+
+            (fisso? '' : '<input type="date" class="vd-in" tabindex="-1" aria-hidden="true" data-id="'+s.id+'" data-i="'+ix+'" value="'+esc(i.d||'')+'">')+'</span>'+
+          '<span class="v-st '+stv.c+'"'+(fisso? '' : ' role="button" tabindex="0" data-action="voce-stato" data-id="'+s.id+'" data-i="'+ix+'" title="Tocca per cambiare lo stato"')+'>'+stv.t+'</span>'+
           tastoCommenti(p, stThr, s, i)+
+          (fisso? '' : '<button class="v-menu" data-action="menu-voce" title="Altre azioni" aria-label="Altre azioni">'+svg('altro',2)+'</button>')+
           pen('item','',s.id,ix)+'</div>'+
           (i.lista && listeAperte.has(s.id+'|'+ix)? checklistHTML(p, s, i, ix) : '');
         }).join('')+
+        ((state.ospite || isLock(p) || p.completato || !puo('modifica')) ? '' :
+          '<label class="v-nuova">'+svg('plus',2.2)+'<input class="voce-nuova" data-id="'+s.id+'" placeholder="Aggiungi una subtask…" title="Scrivi e premi Invio" maxlength="200" enterkeyhint="done"></label>')+
         '<div class="task-nota editabile'+(s.nota?'':' vuota')+'" data-action="edit" data-t="sub" data-k="nota" data-id="'+s.id+'" role="button" tabindex="0">'+
           '<span class="ic">'+svg('file',2.2)+'</span>'+
           '<span class="tx">'+(s.nota? menzioni(linkifica(sicuro(s.nota))) : 'Aggiungi una descrizione: cosa va fatto, riferimenti. I commenti si scrivono col fumetto')+'</span>'+
@@ -4651,6 +4714,23 @@ function renderProgetto(){
     if(tab==='chat'){ p.visti.chat = p.chat.length; p.visti.commenti = totCommenti(p); }
     else p.visti.attivita = p.log.length;
   }
+}
+/* data e stato di una subtask, come si leggono nella riga */
+function dataVoce(i){
+  if(!i.d) return {t:'', c:''};
+  const d = new Date(i.d+'T12:00:00'); if(isNaN(d)) return {t:'', c:''};
+  const [yy, mm, dd] = i.d.split('-').map(Number);
+  const g = Math.round((new Date(yy, mm-1, dd) - OGGI)/86400000), t = d.getDate()+' '+meseCap(d.getMonth());
+  if(i.done) return {t, c:''};
+  if(g!=null && g<0) return {t, c:'rosso'};
+  if(g===0) return {t:'Oggi', c:'rosso'};
+  if(g===1) return {t:'Domani', c:'giallo'};
+  return {t, c:''};
+}
+function statoVoce(i){
+  if(i.done) return {t:'Completata', c:'fatta'};
+  if(i.st==='corso') return {t:'In corso', c:'corso'};
+  return {t:'Da iniziare', c:''};
 }
 /* ---------- CHECKLIST ----------
    Una subtask puo' avere la sua lista di controllo (batterie, schede,
@@ -4900,7 +4980,7 @@ const PERM_AZIONE = {
   'fase':'modifica','indietro':'modifica','torna-a-fase':'modifica','riprendi':'modifica','completa':'modifica',
   'riapri-progetto':'modifica','menu-sposta':'modifica','lock':'modifica','attiva-lock':'modifica','invia':'modifica',
   'nuova-lista':'modifica','add-lista':'modifica','togli-voce':'modifica',
-  'check':'spunta','check-riga':'spunta','check-mia':'spunta','check-lista':'spunta',
+  'check':'spunta','voce-stato':'spunta','voce-data':'modifica','togli-data-voce':'modifica','check-riga':'spunta','check-mia':'spunta','check-lista':'spunta',
   'elimina-progetto':'elimina','conferma-elimina':'elimina','elimina-task':'elimina','elimina-compito':'elimina',
   'elimina-nota':'elimina','elimina-ev':'elimina','elimina-spazio':'elimina','conferma-elimina-spazio':'elimina',
   'add-user':'visibilita','assegna':'visibilita','togli-team':'visibilita',
@@ -7976,7 +8056,7 @@ function cartaModelli(){
    Come si fa tutto, capitolo per capitolo: dai primi passi alle cose per chi
    organizza un team. Si cerca per parola (anche senza accenti); in fondo c'e'
    il tasto per segnalare quello che manca o non funziona. */
-const VERSIONE = 'v31';
+const VERSIONE = 'v32';
 const LIVELLI_GUIDA = {base:'Per cominciare', medio:'Tutti i giorni', esperto:'Per chi organizza', aiuto:'Se qualcosa non va'};
 const GUIDA = [
 {id:'primi-passi', liv:'base', ic:'spark', t:'Primi passi', s:'Cos’è FOSS e come ci si muove', v:[
@@ -8011,6 +8091,7 @@ const GUIDA = [
   ['Bloccare un progetto', 'Il lucchetto in alto lo blocca con una password di almeno 4 caratteri. Restano liberi lettura, commenti e chat; si bloccano modifiche, spunte, avanzamento delle fasi e spostamento delle date. Si sblocca con la stessa password.']
 ]},
 {id:'task', liv:'base', ic:'check', t:'Task, subtask e checklist', s:'Le cose da fare, spuntate una a una', v:[
+  ['Le righe delle subtask', 'Ogni subtask è una riga: la casella per spuntarla, chi la fa, la scadenza, lo stato e i tre puntini con tutte le azioni. Tocca la <b>data</b> per sceglierla dal calendario (in rosso se è oggi o già passata, in giallo se è domani). Tocca lo <b>stato</b> per farlo avanzare: Da iniziare → In corso → Completata. Per aggiungerne una scrivi nel campo <b>Aggiungi una subtask…</b> in fondo alla task e premi Invio.'],
   ['Task e subtask', 'Le <b>task</b> sono i blocchi di lavoro di una fase (per esempio «Sopralluogo»). Dentro ci sono le <b>subtask</b>, le singole cose da fare: le spunti toccando il quadratino. La barra accanto alla task mostra a che punto sei.'],
   ['Aggiungere una task', 'Nella fase in cui sei premi <b>Nuova task</b>, in alto a destra dell’elenco.'],
   ['Aggiungere una subtask', 'Tasto destro sulla task (sul telefono tienila premuta) → <b>Aggiungi subtask</b>. Su una subtask che c’è già, <b>Aggiungi subtask sotto</b> la mette subito dopo.'],
@@ -9302,7 +9383,7 @@ const PROTETTE = ['check-lista','add-lista','togli-voce','nuova-lista','edit','s
                   'add-compito','elimina-compito','elimina-task','tagga','tagga-chi','stagga',
                   'assegna-sub','assegna-sub-chi',
                   'sub-tutto','sub-azzera','annulla',
-                  'nuova-task','sposta-spazio','completa','data-nuova','data-salva'];
+                  'nuova-task','sposta-spazio','completa','data-nuova','data-salva','voce-stato','voce-data','togli-data-voce'];
 
 document.addEventListener('click', function(e){
   if(appenaTenuto){ appenaTenuto = false; e.preventDefault(); e.stopPropagation(); return; }
@@ -9618,6 +9699,31 @@ document.addEventListener('click', function(e){
       taskInProva = {pid:p.id, id};
       break; }
 
+    case 'voce-stato':{
+      const s = p && p.subs.find(x=>x.id===t.dataset.id); if(!s) break;
+      const it = s.items[Number(t.dataset.i)]; if(!it) break;
+      if(!it.done && it.st!=='corso'){
+        snap('«'+it.t+'» in corso');
+        it.st = 'corso'; logga(p, 'In corso: <b>'+esc(it.t)+'</b> \u2014 '+esc(s.titolo));
+        render(); break;
+      }
+      /* da «in corso» si chiude, da «completata» si torna all'inizio: la spunta vera la fa la casella */
+      const riga = t.closest('.chk'), box = riga && riga.querySelector('.box[data-action="check"]');
+      if(it.done){ if(box) box.click(); const it2 = s.items.find(x=>x===it); if(it2 && !it2.done) delete it2.st; render(); break; }
+      delete it.st; if(box) box.click(); break; }
+    case 'voce-data':{
+      const n = t.querySelector('.vd-in'); if(!n) break;
+      try{ n.showPicker(); }catch(err){ n.focus(); n.click(); }
+      break; }
+    case 'togli-data-voce':{
+      const s = p && p.subs.find(x=>x.id===t.dataset.id); if(!s) break;
+      const it = s.items[Number(t.dataset.i)]; if(!it || !it.d) break;
+      snap('Data tolta da «'+it.t+'»'); delete it.d; render(); break; }
+    case 'menu-voce':{
+      const riga = t.closest('.chk'); if(!riga) break;
+      const r = t.getBoundingClientRect();
+      riga.dispatchEvent(new MouseEvent('contextmenu', {bubbles:true, cancelable:true, clientX:r.left, clientY:r.bottom+4}));
+      break; }
     case 'add-compito':{
       const s = p.subs.find(x=>x.id===t.dataset.id), i = Number(t.dataset.i);
       snap('Nuova subtask in «'+s.titolo+'»');
@@ -10912,6 +11018,7 @@ document.addEventListener('contextmenu', function(e){
       {a:'edit', l:'Rinomina la subtask', ic:'pen', d:dd+' data-t="item"', off:isLock(p)},
       {a:'cm-apri', l:'Commenti, link e file', ic:'chat', d:D({pid:p.id, task:s.id, voce:idVoce(s.items[i])})},
       {a:'add-compito', l:'Aggiungi subtask sotto', ic:'plus', d:dd, off:isLock(p)},
+      (s.items[i].d? {a:'togli-data-voce', l:'Togli la scadenza', ic:'calendar', d:dd, off:isLock(p)} : null),
       {a:'nuova-lista', l:s.items[i].lista? 'Apri la checklist' : 'Aggiungi una checklist', ic:'list', d:dd, off:isLock(p)},
       {a:'assegna-sub', l:'Assegna questa subtask…', ic:'user', d:dd, off:isLock(p)},
       {a:'tagga', l:'Aggiungi qualcuno alla task…', ic:'users', d:dd, off:isLock(p)},
@@ -11024,6 +11131,21 @@ document.addEventListener('keydown', function(e){
 window.addEventListener('blur', chiudiCtx);
 window.addEventListener('resize', chiudiCtx);
 document.addEventListener('scroll', chiudiCtx, true);
+
+/* ---------- AGGIUNGERE UNA SUBTASK DALLA RIGA ---------- */
+document.addEventListener('keydown', function(e){
+  const n = e.target; if(!n.classList || !n.classList.contains('voce-nuova') || e.key!=='Enter' || e.isComposing) return;
+  e.preventDefault();
+  const p = PROJ(); if(!p || bloccato(p) || state.ospite || negato('add-compito')) return;
+  const s = p.subs.find(x=>x.id===n.dataset.id); if(!s) return;
+  const tx = n.value.trim().slice(0, 200); if(!tx) return;
+  snap('Nuova subtask in «'+s.titolo+'»');
+  const v = {t:tx, done:false}; idVoce(v); s.items.push(v); s.aperto = true;
+  azione('Aggiunta la subtask <b>'+esc(tx)+'</b> a <b>'+esc(s.titolo)+'</b> — '+esc(p.nome));
+  logga(p, 'In <b>'+esc(s.titolo)+'</b> aggiunta la subtask «'+esc(tx)+'»');
+  render();
+  const di = document.querySelector('.voce-nuova[data-id="'+s.id+'"]'); if(di) di.focus();
+});
 
 /* ============ ORDINE DEI TASTI VISTA ============ */
 /* tieni premuto un tasto e spostalo: funziona con mouse, dito e pennino */
@@ -11170,6 +11292,15 @@ document.addEventListener('change', function(e){
       sp.sfondo = url; azione('Nuova copertina per lo spazio <b>'+esc(sp.nome)+'</b>'); render();
     }).catch(()=>toast('Immagine non leggibile.','warn','Errore'));
     return;
+  }
+  if(e.target.classList && e.target.classList.contains('vd-in')){
+    const p = PROJ(); if(!p || bloccato(p)) return;
+    const s = p.subs.find(x=>x.id===e.target.dataset.id), it = s && s.items[Number(e.target.dataset.i)]; if(!it) return;
+    const v = e.target.value;
+    snap('Data di «'+it.t+'»');
+    if(/^\d{4}-\d{2}-\d{2}$/.test(v)) it.d = v; else delete it.d;
+    logga(p, 'Scadenza di <b>'+esc(it.t)+'</b>: '+(it.d? esc(dataVoce(it).t) : 'tolta'));
+    render(); return;
   }
   if(e.target.id==='copProgFile'){
     const f = (e.target.files||[])[0]; e.target.value=''; if(!f) return;
@@ -11335,6 +11466,11 @@ function normalizza(){
     p.subs.forEach(t=>{
       if(!Array.isArray(t.items)) t.items = [];
       t.items.forEach(idVoce);                           // ogni subtask ha il suo nome fisso: serve ai commenti
+      t.items.forEach(v=>{                               // data e stato della subtask: solo valori sensati
+        if(v.d != null && !/^\d{4}-\d{2}-\d{2}$/.test(String(v.d))) delete v.d;
+        if(v.st != null && v.st !== 'corso') delete v.st;
+        if(v.done && v.st) delete v.st;
+      });
       if(t.fase == null) t.fase = 0;
       if(!t.assegnato) t.assegnato = p.team[0];
       if(t.nota == null) t.nota = '';
