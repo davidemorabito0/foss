@@ -2433,16 +2433,18 @@ a.btn.primary{color:var(--on-amber)}
 .chk.v2.done .box{background:var(--t-verde);border-color:var(--t-verde)}
 .chk.v2.done .box svg{color:#fff}
 .chk.v2.done .tx{text-decoration:none;color:var(--text);opacity:.8}
-.chk.v2 .tx{flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.v-tx{flex:0 1 360px;min-width:0;display:flex;align-items:center;gap:8px}
+.chk.v2 .tx{flex:0 1 auto;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.chk.v2 .cl-badge{flex:none}
 .chk.v2 .pen{margin-left:0}
-.v-chi{width:72px;flex:none;display:flex;justify-content:flex-start}
+.v-chi{width:56px;flex:none;display:flex;justify-content:flex-start}
 .chk.v2 .chk-ass{width:30px;height:30px;margin-left:0}
 .chk.v2 .chk-ass .av{width:28px;height:28px;font-size:10px}
 .chk.v2 .chk-ass.vuoto svg{width:13px;height:13px}
-.v-data{position:relative;width:118px;flex:none;display:inline-flex;align-items:center;gap:10px;font-size:14px;font-weight:600;color:var(--text);border-radius:8px;padding:4px 6px;cursor:pointer}
+.v-data{position:relative;width:112px;flex:none;display:inline-flex;align-items:center;gap:10px;font-size:14px;font-weight:600;color:var(--text);border-radius:8px;padding:4px 6px;cursor:pointer}
 .v-data svg{width:17px;height:17px;color:var(--hm-2,var(--dim));flex:none}
 .v-data:hover{background:var(--surface-2)}
-.v-data.vuota{color:var(--mute);font-weight:500;font-size:12.5px;opacity:0;transition:opacity .14s}
+.v-data.vuota{color:var(--mute);font-weight:500;font-size:12.5px;opacity:.45;transition:opacity .14s}
 .chk.v2:hover .v-data.vuota,.v-data.vuota:focus-visible{opacity:1}
 .v-data.rosso{color:var(--t-rosso)}.v-data.giallo{color:var(--t-giallo)}
 .vd-in{position:absolute;left:0;bottom:0;width:1px;height:1px;opacity:0;pointer-events:none;border:0;padding:0}
@@ -2466,11 +2468,57 @@ a.btn.primary{color:var(--on-amber)}
   .sub-in{padding:0 10px 10px 12px}
   .chk.v2{gap:10px;min-height:48px}
   .v-chi{width:auto}
+  .v-tx{flex:1}
   .v-data{width:auto;gap:5px;font-size:12px;padding:3px 4px}
   .v-data svg{width:14px;height:14px}
   .v-data.vuota,.v-menu{display:none}
   .v-st{font-size:11px;padding:4px 7px}
   .v-st:not(.corso){display:none}
+}
+
+/* ---------- RITAGLIO DELLE COPERTINE ---------- */
+img.rit{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;display:block;pointer-events:none;user-select:none;-webkit-user-drag:none}
+.hm-spc .cop{overflow:hidden}
+.hm-spc .cop .rit{z-index:0}
+.hm-spc .cop.con-foto::after{z-index:1}
+.hm-spc .cop .cop-b{z-index:2}
+.hm-spc .cop .rit-b{right:auto;left:10px}
+.sp2-cop .cop{overflow:hidden}
+.sp2-cop .cop .rit{z-index:0}
+.sp2-cop .cop::before{z-index:1}
+.sp2-cop .cop > *:not(.rit){z-index:2}
+.sp2-cop .cop-bb{position:absolute;top:10px;right:10px;display:flex;gap:6px;z-index:3}
+.sp2-cop .cop-bb .cop-b{position:static}
+.tk-cop{position:relative;overflow:hidden}
+@media (hover:none){ .hm-spc .cop-b{opacity:1;transform:none} }
+.pane.con-sfondo,.sp2-main.con-sfondo{overflow:hidden}
+.pane.con-sfondo::before,.sp2-main.con-sfondo::before{background-position:var(--bx,50%) var(--by,50%)!important;transform:scale(var(--bz,1));transform-origin:var(--bx,50%) var(--by,50%)}
+
+.rit-layer{position:fixed;inset:0;z-index:120;display:grid;place-items:center;padding:20px;background:rgba(5,9,18,.72);backdrop-filter:blur(4px);-webkit-backdrop-filter:blur(4px)}
+.rit-box{width:min(760px,100%);max-height:100%;overflow-y:auto;background:var(--surface);border:1px solid var(--line);border-radius:18px;padding:18px 20px;box-shadow:0 24px 60px rgba(0,0,0,.45);font-family:"Plus Jakarta Sans",system-ui,sans-serif}
+.rit-box *{font-family:inherit}
+.rit-h{display:flex;align-items:center;justify-content:space-between}
+.rit-h h3{font-size:18px;font-weight:700}
+.rit-sub{margin:4px 0 14px;font-size:13px;color:var(--dim)}
+.rit-tabs{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px;margin-bottom:14px;align-items:start}
+.rit-tabs button{display:flex;flex-direction:column;gap:6px;padding:8px;border-radius:12px;border:1.5px solid var(--line);text-align:left;font-size:12px;font-weight:600;color:var(--dim);background:var(--bg)}
+.rit-tabs button.on{border-color:var(--amber);color:var(--text)}
+.rit-tabs .mini{position:relative;display:block;width:100%;max-height:74px;border-radius:7px;overflow:hidden;background:var(--surface-2)}
+.rit-quadro{position:relative;width:100%;max-height:52vh;margin:0 auto;border-radius:12px;overflow:hidden;background:var(--surface-2);cursor:grab;touch-action:none;box-shadow:0 0 0 2px var(--amber)}
+.rit-quadro.presa{cursor:grabbing}
+.rit-griglia{position:absolute;inset:0;pointer-events:none;
+  background:linear-gradient(90deg,transparent calc(33.33% - .5px),rgba(255,255,255,.35) calc(33.33% - .5px),rgba(255,255,255,.35) calc(33.33% + .5px),transparent calc(33.33% + .5px),transparent calc(66.66% - .5px),rgba(255,255,255,.35) calc(66.66% - .5px),rgba(255,255,255,.35) calc(66.66% + .5px),transparent calc(66.66% + .5px)),
+             linear-gradient(0deg,transparent calc(33.33% - .5px),rgba(255,255,255,.35) calc(33.33% - .5px),rgba(255,255,255,.35) calc(33.33% + .5px),transparent calc(33.33% + .5px),transparent calc(66.66% - .5px),rgba(255,255,255,.35) calc(66.66% - .5px),rgba(255,255,255,.35) calc(66.66% + .5px),transparent calc(66.66% + .5px))}
+.rit-zoom{display:flex;align-items:center;gap:12px;margin:14px 0 4px;color:var(--dim)}
+.rit-zoom svg{width:18px;height:18px;flex:none}
+.rit-zoom input{flex:1;accent-color:var(--amber)}
+.rit-zoom b{width:46px;text-align:right;font-size:13px;color:var(--text);font-variant-numeric:tabular-nums}
+.rit-f{display:flex;align-items:center;gap:8px;margin-top:14px;flex-wrap:wrap}
+@media (max-width:620px){
+  .rit-layer{padding:0;place-items:stretch}
+  .rit-box{border-radius:0;width:100%;padding:16px 14px calc(16px + env(safe-area-inset-bottom))}
+  .rit-tabs{grid-template-columns:repeat(3,minmax(0,1fr));gap:6px}
+  .rit-tabs button{padding:6px;font-size:10.5px}
 }
 
 /* ---------- LE PROFESSIONI CHE FACCIO ---------- */
@@ -4258,8 +4306,9 @@ function schedaSpazio(sp){
   att.sort((a,b)=>b.l.t-a.l.t);
   let h = '<aside class="sp2-info" style="--acc:'+col+'">';
   h += '<section class="sp2-card sp2-cop">'+
-    '<div class="cop'+(bg?' con-foto':'')+'"'+(bg? ' style="background-image:url(\''+bg+'\')"' : '')+'>'+
-      (puoCop ? '<button class="cop-b'+(bg?'':' vuota')+'" data-action="hm-copertina" data-id="'+esc(sp.id)+'">'+svg('foto',2)+'<span>'+(bg?'Cambia':'Aggiungi copertina')+'</span></button>' : '')+
+    '<div class="cop'+(bg?' con-foto':'')+'">'+(bg? imgRit(bg, ritDi(sp,'scheda')) : '')+
+      (puoCop ? '<span class="cop-bb">'+(bg? '<button class="cop-b" data-action="rit-spazio" data-id="'+esc(sp.id)+'">'+svg('grid',2)+'<span>Ritaglia</span></button>' : '')+
+        '<button class="cop-b'+(bg?'':' vuota')+'" data-action="hm-copertina" data-id="'+esc(sp.id)+'">'+svg('foto',2)+'<span>'+(bg?'Cambia':'Aggiungi copertina')+'</span></button></span>' : '')+
       '<b>'+esc(sp.nome)+'</b><span>'+esc(sp.desc || TIPO(sp.tipo).prof || '')+'</span></div>'+
     '<div class="sp2-cop-f">'+pilaAvatar(membri, 5)+'<span class="spacer"></span>'+
       (puoCop ? '<button class="hm-b-nuovo sm" data-action="modifica-spazio" data-id="'+esc(sp.id)+'">'+svg('ingranaggio',2)+'Modifica</button>' : '')+'</div>'+
@@ -4394,7 +4443,7 @@ function tessera(p){
       (p.prio==='alta' && !p.completato? '<span class="tk-prio" title="Priorità alta">'+svg('bandiera',2.2)+'</span>' : '')+'</span>'+
     '<span class="tk-t"><span class="tk-ic">'+(p.completato? svg('check',3) : svg(p.icona||T.ic,2))+'</span>'+
       '<span class="tk-n"><h3>'+esc(p.nome)+'</h3><span>'+(p.completato? 'Completato' : esc(fase ? fase.nome : ''))+'</span></span></span>'+
-    (cop? '<span class="tk-cop" style="background-image:url(\''+cop+'\')"></span>' : '')+
+    (cop? '<span class="tk-cop">'+imgRit(cop, ritDi(p,'bacheca'))+'</span>' : '')+
     '<span class="tk-pb"><span class="b"><i style="width:'+pc+'%"></i></span><span class="pct">'+pc+'%</span></span>'+
     '<span class="tk-f">'+
       (voci? '<span title="Subtask fatte">'+svg('check',2.2)+fatte+'/'+voci+'</span>' : '')+
@@ -4411,7 +4460,7 @@ function renderHome(){
   const bgSp = sp ? sfondoSicuro(sp.sfondo) : '';
   const largo0 = !suTelefono() && !!sp;
   let h = '<div class="pane'+(bgSp && !largo0?' con-sfondo':'')+(state.vista==='note'?' vista-note':'')+'"'+
-          (bgSp && !largo0? ' style="--bg-img:url(\''+bgSp+'\')"':'')+'>';
+          (bgSp && !largo0? ' style="--bg-img:url(\''+bgSp+'\');'+varsRit(ritDi(sp,'sfondo'))+'"':'')+'>';
   h += barraOspite();
   /* Il saluto ha senso solo davanti all'elenco dei lavori: nelle note,
      nel calendario e nella mappa ruba spazio e basta. */
@@ -4421,7 +4470,7 @@ function renderHome(){
   const tutto = suTelefono() && (state.vista==='tessere' || state.vista==='lista');
   const largo = !suTelefono() && !!sp;
   const conScheda = largo && (state.vista==='tessere' || state.vista==='lista');
-  if(largo) h += '<div class="hm sp2-lay'+(conScheda?' con-scheda':'')+'">'+barraSinistra(sp.id)+'<div class="sp2-main'+(bgSp?' con-sfondo':'')+'"'+(bgSp? ' style="--bg-img:url(\''+bgSp+'\')"':'')+'>';
+  if(largo) h += '<div class="hm sp2-lay'+(conScheda?' con-scheda':'')+'">'+barraSinistra(sp.id)+'<div class="sp2-main'+(bgSp?' con-sfondo':'')+'"'+(bgSp? ' style="--bg-img:url(\''+bgSp+'\');'+varsRit(ritDi(sp,'sfondo'))+'"':'')+'>';
   if(tutto) h += '<div class="scroller tel-tutto">' + testataTelefono();
   h += intestazioneSpazio(lista);
   if(largo) h += schedeViste();
@@ -4647,11 +4696,11 @@ function renderProgetto(){
           return '<div class="chk v2'+(i.done?' done':'')+'" role="button" tabindex="0" data-action="check-riga" data-id="'+s.id+'" data-i="'+ix+'">'+
           '<span class="box" role="button" tabindex="-1" data-action="check" data-id="'+s.id+'" data-i="'+ix+'" '+
             'aria-label="'+(i.done?'Togli la spunta':'Segna come fatto')+'">'+svg('check',3.2)+'</span>'+
-          '<span class="tx">'+esc(i.t)+'</span>'+
+          '<span class="v-tx"><span class="tx">'+esc(i.t)+'</span>'+
           (i.lista? (()=>{ const fl = i.lista.filter(v=>v.done).length;
             return '<button class="cl-badge'+(i.lista.length && fl===i.lista.length?' ok':'')+(listeAperte.has(s.id+'|'+ix)?' aperta':'')+'" '+
               'data-action="apri-lista" data-id="'+s.id+'" data-i="'+ix+'" title="Checklist: '+fl+' su '+i.lista.length+'">'+
-              svg('list',2.2)+fl+'/'+i.lista.length+'</button>'; })() : '')+
+              svg('list',2.2)+fl+'/'+i.lista.length+'</button>'; })() : '')+'</span>'+
           '<span class="v-chi">'+(ua? '<span class="chk-ass" data-action="assegna-sub" data-id="'+s.id+'" data-i="'+ix+'" role="button" tabindex="0" '+
                'title="'+esc(ua.nome)+' — '+esc(ua.ruolo)+'. Tocca per cambiare.">'+av(ua,'sm')+'</span>'
              : (state.ospite?'' : '<span class="chk-ass vuoto" data-action="assegna-sub" data-id="'+s.id+'" data-i="'+ix+'" role="button" tabindex="0" '+
@@ -4975,7 +5024,7 @@ const PERM_AZIONE = {
   'pe-nuovo':'crea_lavori','pe-importa':'crea_lavori','pe-salva':'crea_lavori','pe-elimina':'crea_lavori','pe-usa':'crea_lavori',
   'conti':'soldi','conti-prev':'soldi-scrive','conti-add':'soldi-scrive','conti-togli':'soldi-scrive',
   'data-nuova':'modifica','data-salva':'modifica',
-  'edit':'modifica','cop-progetto':'modifica','togli-cop-progetto':'modifica','salva-campo':'modifica','nuova-task':'modifica','add-compito':'modifica',
+  'edit':'modifica','cop-progetto':'modifica','rit-progetto':'modifica','togli-cop-progetto':'modifica','salva-campo':'modifica','nuova-task':'modifica','add-compito':'modifica',
   'tagga':'modifica','tagga-chi':'modifica','stagga':'modifica','assegna-sub':'modifica','assegna-sub-chi':'modifica',
   'fase':'modifica','indietro':'modifica','torna-a-fase':'modifica','riprendi':'modifica','completa':'modifica',
   'riapri-progetto':'modifica','menu-sposta':'modifica','lock':'modifica','attiva-lock':'modifica','invia':'modifica',
@@ -4985,7 +5034,7 @@ const PERM_AZIONE = {
   'elimina-nota':'elimina','elimina-ev':'elimina','elimina-spazio':'elimina','conferma-elimina-spazio':'elimina',
   'add-user':'visibilita','assegna':'visibilita','togli-team':'visibilita',
   'cliente-pagina':'visibilita','cliente-crea':'visibilita','cliente-date':'visibilita','cliente-attiva':'visibilita','cliente-rinnova':'visibilita',
-  'nuovo-spazio':'spazi','hm-copertina':'spazi','rinomina-spazio':'spazi','modifica-spazio':'spazi','salva-spazio':'spazi',
+  'nuovo-spazio':'spazi','hm-copertina':'spazi','rit-spazio':'spazi','rinomina-spazio':'spazi','modifica-spazio':'spazi','salva-spazio':'spazi',
   'sp-col':'spazi','sp-icona':'spazi','sp-membro':'spazi','nuova-nota':'spazi'
 };
 /* torna false se si puo', altrimenti il motivo */
@@ -5545,9 +5594,10 @@ function renderSpazi(){
     const prof = TIPO(sp.tipo).prof;
     const ds = sp.desc ? esc(sp.desc)+(prof && sp.desc.toLowerCase()!==String(prof).toLowerCase() ? ' <i>•</i> '+esc(prof) : '') : esc(prof||'');
     h += '<button class="hm-spc spazio" style="--acc:'+col+'" data-action="apri-spazio" data-id="'+esc(sp.id)+'">'+
-      '<span class="cop'+(bg?' con-foto':'')+'"'+(bg? ' style="background-image:url(\''+bg+'\')"' : '')+'>'+(bg?'':'<span class="cop-ic">'+svg(sp.icona,1.4)+'</span>')+
+      '<span class="cop'+(bg?' con-foto':'')+'">'+(bg? imgRit(bg, ritDi(sp,'home')) : '<span class="cop-ic">'+svg(sp.icona,1.4)+'</span>')+
         (puoCop ? '<span class="cop-b'+(bg?'':' vuota')+'" role="button" tabindex="0" data-action="hm-copertina" data-id="'+esc(sp.id)+'" title="'+(bg?'Cambia la copertina':'Aggiungi una copertina')+'">'+
-          svg('foto',2)+'<span>'+(bg?'Cambia':'Aggiungi copertina')+'</span></span>' : '')+'</span>'+
+          svg('foto',2)+'<span>'+(bg?'Cambia':'Aggiungi copertina')+'</span></span>'+
+          (bg? '<span class="cop-b rit-b" role="button" tabindex="0" data-action="rit-spazio" data-id="'+esc(sp.id)+'" title="Scegli cosa si vede della foto">'+svg('grid',2)+'<span>Ritaglia</span></span>' : '') : '')+'</span>'+
       '<span class="q">'+svg(sp.icona,2)+'</span>'+
       '<span class="cp"><span class="r1"><b>'+esc(sp.nome)+'</b>'+pilaAvatar(team, 3)+'</span>'+
       '<span class="ds">'+ds+'</span>'+
@@ -5680,7 +5730,7 @@ function renderWizard(){
       '<div class="field"><label>Copertina (facoltativa)</label>'+
         '<input type="file" id="wz_cop" accept="image/*" hidden>'+
         (wz.sfondo ? '<div class="wz-cop" style="background-image:url(\''+sfondoSicuro(wz.sfondo)+'\')"><label for="wz_cop" class="btn sm">Cambia</label>'+
-            '<button class="btn sm ghost" data-action="wz-cop-via">Togli</button></div>'
+            '<button class="btn sm ghost" data-action="wz-rit">Ritaglia</button><button class="btn sm ghost" data-action="wz-cop-via">Togli</button></div>'
           : '<label class="drop" for="wz_cop"><b>'+svg('foto').replace('<svg','<svg style="width:14px;height:14px;vertical-align:-2px;margin-right:5px"')+
             'Scegli una foto</b>Compare sulla scheda dello spazio nella Home e, leggera, dietro ai progetti</label>')+
       '</div>';
@@ -5730,7 +5780,7 @@ function wzCrea(){
   const sp = {id:'sp'+Date.now(), creatore:state.utente, nome:wz.nome||'Nuovo spazio', desc:wz.desc,
               icona:wz.icona, col:wz.col, tipo:wz.tipo, tags:wz.tags.slice()};
   if(wz.preset && presetDi(wz.preset)) sp.preset = wz.preset;
-  if(wz.sfondo) sp.sfondo = wz.sfondo;
+  if(wz.sfondo){ sp.sfondo = wz.sfondo; if(wz.copRit) sp.copRit = wz.copRit; }
   state.spazi.push(sp);
   (wz._prop||[]).forEach(f=>{
     if(wz.filtri.indexOf(f.id)<0) return;
@@ -8056,7 +8106,7 @@ function cartaModelli(){
    Come si fa tutto, capitolo per capitolo: dai primi passi alle cose per chi
    organizza un team. Si cerca per parola (anche senza accenti); in fondo c'e'
    il tasto per segnalare quello che manca o non funziona. */
-const VERSIONE = 'v32';
+const VERSIONE = 'v34';
 const LIVELLI_GUIDA = {base:'Per cominciare', medio:'Tutti i giorni', esperto:'Per chi organizza', aiuto:'Se qualcosa non va'};
 const GUIDA = [
 {id:'primi-passi', liv:'base', ic:'spark', t:'Primi passi', s:'Cos’è FOSS e come ci si muove', v:[
@@ -8073,6 +8123,7 @@ const GUIDA = [
   ['A cosa servono', 'Uno spazio raccoglie i progetti di un ambito: un cliente fisso, una città, un tipo di attività. Ha una professione, che decide fasi, task e campi di partenza dei progetti che ci crei, e ha i suoi tag e filtri. Progetti, task e calendario di uno spazio restano separati dagli altri.'],
   ['Creare uno spazio', 'Nella Home premi <b>Nuovo spazio</b> (sul telefono: <b>+</b> in alto → Nuovo spazio di lavoro). Quattro passi: la professione (oppure un tuo preset); nome, icona e colore; i tag; i filtri veloci.'],
   ['La copertina', 'Ogni spazio può avere una foto di copertina. Nella Home passa sopra alla sua scheda e premi <b>Aggiungi copertina</b> (sul telefono e sull’iPad il tasto è sempre visibile), poi scegli la foto. Compare sulla scheda e, leggera, dietro ai progetti dello spazio. Puoi sceglierla anche mentre crei lo spazio; per cambiarla premi <b>Cambia</b> sulla scheda, per toglierla vai in <b>Modifica spazio</b>.'],
+  ['Il ritaglio della copertina', 'Appena carichi una foto si apre il <b>ritaglio</b>: in alto scegli la schermata (la scheda nella Home, la scheda dello spazio, lo sfondo della pagina), poi trascini la foto per decidere cosa si vede e con lo zoom la avvicini. Ogni schermata tiene il suo ritaglio; <b>Usa questo ritaglio ovunque</b> lo copia sulle altre. Per rifarlo più tardi premi <b>Ritaglia</b> sulla scheda o in Modifica spazio; per un progetto, tasto destro sulla sua scheda → <b>Ritaglia la copertina</b>.'],
   ['La copertina di un progetto', 'Anche un progetto può avere la sua foto, che compare sulla sua scheda nella bacheca. Tasto destro sulla scheda (sul telefono tienila premuta) e <b>Aggiungi una copertina</b>, oppure dentro al progetto il tasto <b>Copertina</b> in alto. Dallo stesso menu la cambi o la togli.'],
   ['Le professioni pronte', 'Sono tredici: Video, Fotografia, Grafica, Social, Web e app, Eventi, Legale, Fiscale, Moda, Architettura, Consulenza, Testi e Generico. Ognuna ha le sue fasi e diversi tipi di lavoro (un matrimonio, uno spot, una causa…), ciascuno con le sue task.'],
   ['Passare da uno spazio all’altro', 'Tocca il nome dello spazio in alto: si apre l’elenco, con in fondo <b>Vedi tutti gli spazi</b> e <b>Nuovo spazio di lavoro</b>.'],
@@ -9478,6 +9529,7 @@ document.addEventListener('click', function(e){
             'Scegli una foto</b>Compare sulla scheda dello spazio nella Home e, al 20%, dietro ai progetti</label>'+
           (sp.sfondo? '<div class="file" style="margin-top:8px"><span class="ic">'+svg('file')+'</span>'+
             '<span class="nm">Copertina impostata</span>'+
+            '<button class="btn sm ghost" data-action="rit-spazio" data-id="'+esc(sp.id)+'">Ritaglia</button>'+
             '<button class="btn sm ghost" data-action="togli-sfondo">Rimuovi</button></div>':'')+
         '</div>'+
         '<div class="field"><label>Chi lavora in questo spazio</label>'+
@@ -9511,7 +9563,7 @@ document.addEventListener('click', function(e){
 
     case 'togli-sfondo':{
       const sp = state.spazi.find(x=>x.id===spazioMod); if(!sp) break;
-      leggiCampiSpazio(sp); sp.sfondo = null;
+      leggiCampiSpazio(sp); sp.sfondo = null; delete sp.copRit;
       riapriModificaSpazio(); toast('Copertina rimossa.','info'); break; }
 
     case 'rinomina-spazio':{
@@ -10265,6 +10317,26 @@ document.addEventListener('click', function(e){
       state.spazioId = sp.id; state.schermo = 'home'; state.progettoId = null; state.vista = 'calendario';
       state.filtro = ''; state.filtroAttivo = null; render(); break; }
     case 'hm-giu':{ const n = el(t.dataset.a); if(n) n.scrollIntoView({block:'start', behavior:'smooth'}); break; }
+    case 'rit-tab': if(rit){ rit.cur = t.dataset.k; disegnaRitaglio(); } break;
+    case 'rit-centra': if(rit){ rit.vals[rit.cur] = ritOk({}); aggiornaRitaglio(); } break;
+    case 'rit-tutti': if(rit){ const v = rit.vals[rit.cur]; rit.frames.forEach(f=>{ rit.vals[f.k] = Object.assign({}, v); }); disegnaRitaglio(); toast('Stesso ritaglio per tutte le schermate.','ok'); } break;
+    case 'rit-annulla': chiudiRitaglio(); break;
+    case 'rit-salva':{
+      if(!rit) break;
+      const fn = rit.onSave, vals = JSON.parse(JSON.stringify(rit.vals));
+      chiudiRitaglio(); if(fn) fn(vals); break; }
+    case 'rit-spazio':{
+      const sp = state.spazi.find(x=>x.id===t.dataset.id); if(!sp || !sfondoSicuro(sp.sfondo)) break;
+      apriRitaglio(sfondoSicuro(sp.sfondo), RIT_SP, sp.copRit, vals=>{
+        sp.copRit = vals; azione('Ritaglio della copertina di <b>'+esc(sp.nome)+'</b> cambiato');
+        if(spazioMod===sp.id && el('sp_nome')) riapriModificaSpazio(); else render();
+      }); break; }
+    case 'rit-progetto':{
+      const pr = state.progetti.find(x=>x.id===t.dataset.pid); if(!pr || isLock(pr) || !sfondoSicuro(pr.copertina)) break;
+      apriRitaglio(sfondoSicuro(pr.copertina), RIT_PR, pr.copRit, vals=>{
+        snap('Ritaglio della copertina di «'+pr.nome+'»'); pr.copRit = vals; render();
+      }); break; }
+    case 'wz-rit': if(wz && wz.sfondo){ wzLeggi(); apriRitaglio(wz.sfondo, RIT_SP, wz.copRit, vals=>{ if(!wz) return; wz.copRit = vals; renderWizard(); }); } break;
     case 'cop-progetto':{
       const pr = state.progetti.find(x=>x.id===t.dataset.pid); if(!pr || isLock(pr)) break;
       copProgDi = pr.id;
@@ -10274,12 +10346,12 @@ document.addEventListener('click', function(e){
     case 'togli-cop-progetto':{
       const pr = state.progetti.find(x=>x.id===t.dataset.pid); if(!pr || isLock(pr)) break;
       snap('Copertina tolta da «'+pr.nome+'»');
-      delete pr.copertina; logga(pr, 'Copertina tolta'); render(); break; }
+      delete pr.copertina; delete pr.copRit; logga(pr, 'Copertina tolta'); render(); break; }
     case 'hm-spazi-apri': state.hmSpaziChiusi = !state.hmSpaziChiusi; render(); break;
     case 'hm-copertina':{
       hmCopDi = t.dataset.id; if(!hmCopDi || !state.spazi.some(x=>x.id===hmCopDi)) break;
       const f = el('hmCopFile'); if(f) f.click(); break; }
-    case 'wz-cop-via': if(wz){ wzLeggi(); delete wz.sfondo; renderWizard(); } break;
+    case 'wz-cop-via': if(wz){ wzLeggi(); delete wz.sfondo; delete wz.copRit; renderWizard(); } break;
     case 'hm-vista': state.hmVista = t.dataset.v==='lista' ? 'lista' : 'griglia'; render(); break;
     case 'hm-scorri':{ const n = el('hmSpaziL'); if(n) n.scrollBy({left:n.clientWidth*0.9, behavior:'smooth'}); break; }
 
@@ -11000,6 +11072,7 @@ document.addEventListener('contextmenu', function(e){
       {a:'salva-modello-apri', l:'Salva come preset', ic:'salva', d:dd},
       (cloudAttivo()? {a:'cliente-pagina', l:'Pagina del cliente\u2026', ic:'review', d:dd} : null),
       {a:'cop-progetto', l:pr.copertina? 'Cambia la copertina' : 'Aggiungi una copertina', ic:'foto', d:dd, off:isLock(pr)},
+      (pr.copertina? {a:'rit-progetto', l:'Ritaglia la copertina', ic:'foto', d:dd, off:isLock(pr)} : null),
       (pr.copertina? {a:'togli-cop-progetto', l:'Togli la copertina', ic:'x', d:dd, off:isLock(pr)} : null),
       {a:'menu-sposta', l:'Sposta in un altro spazio…', ic:'right', d:dd, off:isLock(pr)},
       (pr.completato? {a:'riapri-progetto', l:'Riapri il progetto', ic:'undo', d:dd}
@@ -11131,6 +11204,107 @@ document.addEventListener('keydown', function(e){
 window.addEventListener('blur', chiudiCtx);
 window.addEventListener('resize', chiudiCtx);
 document.addEventListener('scroll', chiudiCtx, true);
+
+/* ---------- IL RITAGLIO DELLE COPERTINE ----------
+   La foto resta intera; per ogni punto in cui compare si salva solo come
+   inquadrarla: x e y (0-100, dove guarda) e z (zoom 1-3). */
+const RIT_SP = [{k:'home', n:'Scheda nella Home', r:4.2}, {k:'scheda', n:'Scheda dello spazio', r:2}, {k:'sfondo', n:'Sfondo della pagina', r:16/9}];
+const RIT_PR = [{k:'bacheca', n:'Scheda nella bacheca', r:2.4}];
+function ritOk(v){
+  const n = (x, a, b, d) => { x = Number(x); return isFinite(x) ? Math.min(b, Math.max(a, x)) : d; };
+  v = v && typeof v==='object' ? v : {};
+  return {x:Math.round(n(v.x,0,100,50)*10)/10, y:Math.round(n(v.y,0,100,50)*10)/10, z:Math.round(n(v.z,1,3,1)*100)/100};
+}
+function ritDi(o, k){ return ritOk(o && o.copRit && o.copRit[k]); }
+function stileRit(v){ return 'object-position:'+v.x+'% '+v.y+'%;transform:scale('+v.z+');transform-origin:'+v.x+'% '+v.y+'%'; }
+function imgRit(src, v){ return '<img class="rit" src="'+esc(src)+'" alt="" draggable="false" style="'+stileRit(v)+'">'; }
+function varsRit(v){ return '--bx:'+v.x+'%;--by:'+v.y+'%;--bz:'+v.z+';'; }
+function pulisciRit(o, frames){
+  if(!o || !o.copRit || typeof o.copRit!=='object'){ if(o) delete o.copRit; return; }
+  const out = {}; frames.forEach(f=>{ if(o.copRit[f.k]) out[f.k] = ritOk(o.copRit[f.k]); });
+  o.copRit = out;
+}
+
+let rit = null;         // {src, frames, vals, cur, onSave, iw, ih}
+function apriRitaglio(src, frames, vals, onSave){
+  rit = {src, frames, cur:frames[0].k, onSave, vals:{}};
+  frames.forEach(f=>{ rit.vals[f.k] = ritOk(vals && vals[f.k]); });
+  const im = new Image();
+  im.onload = ()=>{ if(!rit) return; rit.iw = im.naturalWidth; rit.ih = im.naturalHeight; disegnaRitaglio(); };
+  im.src = src;
+  disegnaRitaglio();
+}
+function chiudiRitaglio(){ rit = null; const n = el('ritLayer'); if(n) n.remove(); }
+function disegnaRitaglio(){
+  if(!rit) return;
+  let n = el('ritLayer');
+  if(!n){ n = document.createElement('div'); n.id = 'ritLayer'; n.className = 'rit-layer'; document.body.appendChild(n); }
+  const f = rit.frames.find(x=>x.k===rit.cur), v = rit.vals[rit.cur];
+  n.innerHTML = '<div class="rit-box" role="dialog" aria-label="Ritaglia la copertina">'+
+    '<div class="rit-h"><h3>Ritaglia la copertina</h3><button class="iconbtn" data-action="rit-annulla" title="Chiudi">'+svg('x',2.4)+'</button></div>'+
+    '<p class="rit-sub">Trascina la foto per scegliere cosa si vede, usa lo zoom per avvicinarla. Ogni schermata ha il suo ritaglio.</p>'+
+    (rit.frames.length>1 ? '<div class="rit-tabs">'+rit.frames.map(x=>'<button class="'+(x.k===rit.cur?'on':'')+'" data-action="rit-tab" data-k="'+x.k+'">'+
+      '<span class="mini" style="aspect-ratio:'+x.r+'">'+imgRit(rit.src, rit.vals[x.k])+'</span><span>'+x.n+'</span></button>').join('')+'</div>' : '')+
+    '<div class="rit-quadro" id="ritQuadro" style="aspect-ratio:'+f.r+'">'+imgRit(rit.src, v)+'<span class="rit-griglia"></span></div>'+
+    '<div class="rit-zoom">'+svg('foto',2)+'<input type="range" id="ritZ" min="1" max="3" step="0.01" value="'+v.z+'" aria-label="Zoom">'+
+      '<b id="ritZn">'+Math.round(v.z*100)+'%</b><button class="btn sm ghost" data-action="rit-centra">Centra</button></div>'+
+    '<div class="rit-f">'+(rit.frames.length>1? '<button class="btn sm ghost" data-action="rit-tutti">Usa questo ritaglio ovunque</button>' : '')+
+      '<span class="spacer"></span><button class="btn ghost" data-action="rit-annulla">Annulla</button><button class="btn primary" data-action="rit-salva">Salva</button></div>'+
+  '</div>';
+}
+/* aggiorna solo la foto, senza ridisegnare: cosi' il trascinamento resta fluido */
+function aggiornaRitaglio(){
+  if(!rit) return;
+  const v = rit.vals[rit.cur];
+  const q = el('ritQuadro'), img = q && q.querySelector('img'); if(img) img.setAttribute('style', stileRit(v));
+  const t = document.querySelector('.rit-tabs button.on .mini img'); if(t) t.setAttribute('style', stileRit(v));
+  const z = el('ritZ'); if(z && Number(z.value)!==v.z) z.value = v.z;
+  const zn = el('ritZn'); if(zn) zn.textContent = Math.round(v.z*100)+'%';
+}
+/* lo spostamento: di quanto cambia x (o y) per ogni pixel trascinato,
+   con la foto a riempire il riquadro (cover) e lo zoom attorno al punto scelto */
+function spostaRitaglio(dx, dy){
+  const q = el('ritQuadro'); if(!q || !rit || !rit.iw) return;
+  const fw = q.clientWidth, fh = q.clientHeight, v = rit.vals[rit.cur];
+  const sc = Math.max(fw/rit.iw, fh/rit.ih), rw = rit.iw*sc, rh = rit.ih*sc;
+  const kx = fw - v.z*rw, ky = fh - v.z*rh;
+  const nv = Object.assign({}, v);
+  if(Math.abs(kx) > 1) nv.x = v.x + dx*100/kx;
+  if(Math.abs(ky) > 1) nv.y = v.y + dy*100/ky;
+  rit.vals[rit.cur] = ritOk(nv);
+  aggiornaRitaglio();
+}
+let ritPresa = null;
+document.addEventListener('pointerdown', function(e){
+  const q = e.target.closest && e.target.closest('#ritQuadro'); if(!q) return;
+  e.preventDefault(); ritPresa = {x:e.clientX, y:e.clientY};
+  try{ q.setPointerCapture(e.pointerId); }catch(err){}
+  q.classList.add('presa');
+});
+document.addEventListener('pointermove', function(e){
+  if(!ritPresa) return;
+  e.preventDefault();
+  spostaRitaglio(e.clientX - ritPresa.x, e.clientY - ritPresa.y);
+  ritPresa = {x:e.clientX, y:e.clientY};
+}, {passive:false});
+document.addEventListener('pointerup', function(){ if(!ritPresa) return; ritPresa = null; const q = el('ritQuadro'); if(q) q.classList.remove('presa'); });
+document.addEventListener('pointercancel', function(){ ritPresa = null; });
+document.addEventListener('wheel', function(e){
+  if(!rit || !(e.target.closest && e.target.closest('#ritQuadro'))) return;
+  e.preventDefault();
+  const v = rit.vals[rit.cur];
+  rit.vals[rit.cur] = ritOk(Object.assign({}, v, {z: v.z - e.deltaY*0.0015}));
+  aggiornaRitaglio();
+}, {passive:false});
+document.addEventListener('input', function(e){
+  if(e.target.id!=='ritZ' || !rit) return;
+  rit.vals[rit.cur] = ritOk(Object.assign({}, rit.vals[rit.cur], {z:e.target.value}));
+  aggiornaRitaglio();
+});
+document.addEventListener('keydown', function(e){
+  if(!rit || e.key!=='Escape') return;
+  e.preventDefault(); e.stopImmediatePropagation(); chiudiRitaglio();
+}, true);
 
 /* ---------- AGGIUNGERE UNA SUBTASK DALLA RIGA ---------- */
 document.addEventListener('keydown', function(e){
@@ -11289,7 +11463,9 @@ document.addEventListener('change', function(e){
     const f = (e.target.files||[])[0]; e.target.value=''; if(!f) return;
     const sp = state.spazi.find(x=>x.id===hmCopDi); hmCopDi = null; if(!sp) return;
     riduciImmagine(f, 1400, 0.74).then(url=>{
-      sp.sfondo = url; azione('Nuova copertina per lo spazio <b>'+esc(sp.nome)+'</b>'); render();
+      apriRitaglio(url, RIT_SP, null, vals=>{
+        sp.sfondo = url; sp.copRit = vals; azione('Nuova copertina per lo spazio <b>'+esc(sp.nome)+'</b>'); render();
+      });
     }).catch(()=>toast('Immagine non leggibile.','warn','Errore'));
     return;
   }
@@ -11305,16 +11481,19 @@ document.addEventListener('change', function(e){
   if(e.target.id==='copProgFile'){
     const f = (e.target.files||[])[0]; e.target.value=''; if(!f) return;
     const pr = state.progetti.find(x=>x.id===copProgDi); copProgDi = null; if(!pr || isLock(pr)) return;
-    riduciImmagine(f, 900, 0.72).then(url=>{
-      snap('Copertina di «'+pr.nome+'»');
-      pr.copertina = url; logga(pr, 'Nuova copertina caricata'); render();
+    riduciImmagine(f, 1200, 0.74).then(url=>{
+      apriRitaglio(url, RIT_PR, null, vals=>{
+        snap('Copertina di «'+pr.nome+'»');
+        pr.copertina = url; pr.copRit = vals; logga(pr, 'Nuova copertina caricata'); render();
+      });
     }).catch(()=>toast('Immagine non leggibile.','warn','Errore'));
     return;
   }
   if(e.target.id==='wz_cop'){
     const f = (e.target.files||[])[0]; e.target.value=''; if(!f || !wz) return;
     wzLeggi();
-    riduciImmagine(f, 1400, 0.74).then(url=>{ if(!wz) return; wz.sfondo = url; renderWizard(); })
+    riduciImmagine(f, 1400, 0.74).then(url=>{ if(!wz) return;
+      apriRitaglio(url, RIT_SP, null, vals=>{ if(!wz) return; wz.sfondo = url; wz.copRit = vals; renderWizard(); }); })
       .catch(()=>toast('Immagine non leggibile.','warn','Errore'));
     return;
   }
@@ -11322,9 +11501,11 @@ document.addEventListener('change', function(e){
     const f = (e.target.files||[])[0]; if(!f) return;
     const sp = state.spazi.find(x=>x.id===spazioMod); if(!sp) return;
     leggiCampiSpazio(sp);
-    riduciImmagine(f, 1600, 0.72).then(url=>{
-      sp.sfondo = url; riapriModificaSpazio();
-      toast('Copertina impostata.','ok','Fatto');
+    riduciImmagine(f, 1400, 0.74).then(url=>{
+      apriRitaglio(url, RIT_SP, null, vals=>{
+        sp.sfondo = url; sp.copRit = vals; riapriModificaSpazio();
+        toast('Copertina impostata.','ok','Fatto');
+      });
     }).catch(()=>toast('Immagine non leggibile.','warn','Errore'));
     e.target.value=''; return;
   }
@@ -11422,6 +11603,7 @@ function normalizza(){
     state.spazi = [{id:'sp1', nome:'Il mio lavoro', desc:'', icona:'camera', col:'#FFAD01', tipo:'video'}];
   }
   state.spazi.forEach(sp=>{
+    pulisciRit(sp, RIT_SP);
     if(!sp.id) sp.id = 'sp'+Math.random().toString(36).slice(2,8);
     if(!sp.icona) sp.icona = TIPO(sp.tipo).ic;
     sp.col = coloreOk(sp.col, TIPO(sp.tipo).c);
@@ -11463,6 +11645,7 @@ function normalizza(){
     p.fase = Math.min(p.fase, p.fasi.length-1);
     p.avanz = Math.min(Math.max(p.avanz, p.fase), p.fasi.length-1);
     if(!Array.isArray(p.subs)) p.subs = [];
+    pulisciRit(p, RIT_PR);
     p.subs.forEach(t=>{
       if(!Array.isArray(t.items)) t.items = [];
       t.items.forEach(idVoce);                           // ogni subtask ha il suo nome fisso: serve ai commenti
