@@ -2041,6 +2041,166 @@ a.btn.primary{color:var(--on-amber)}
 .cm-at{font-family:Sora;font-weight:700;font-size:16px;color:var(--amber-ink)}
 .btn-visto.apri{display:inline-flex;align-items:center;gap:6px;justify-content:center}
 .btn-visto.apri svg{width:15px;height:15px}
+/* ---------- LA HOME ---------- */
+.hm{flex:1;min-height:0;display:flex}
+.hm-side{width:236px;flex:none;border-right:1px solid var(--line);background:var(--surface);display:flex;flex-direction:column;gap:2px;padding:14px 12px 14px;overflow-y:auto}
+.hm-navs{display:flex;flex-direction:column;gap:2px}
+.hm-nav{display:flex;align-items:center;gap:11px;padding:9px 11px;border-radius:10px;font-size:13.5px;font-weight:500;color:var(--dim);text-align:left;width:100%;transition:background .14s,color .14s}
+.hm-nav svg{width:17px;height:17px;flex:none}
+.hm-nav span{flex:1;display:flex;align-items:center;gap:8px}
+.hm-nav:hover{background:var(--surface-2);color:var(--text)}
+.hm-nav.on{background:var(--amber-soft);color:var(--amber-ink);font-weight:700}
+.hm-n{margin-left:auto;min-width:20px;height:18px;padding:0 6px;border-radius:9px;background:var(--alert);color:#fff;font-size:10.5px;display:grid;place-items:center}
+.hm-sep{height:1px;background:var(--line-soft);margin:12px 4px}
+.hm-side-t{font-size:10.5px;letter-spacing:.12em;text-transform:uppercase;color:var(--mute);font-family:Sora;font-weight:600;padding:2px 11px 6px}
+.hm-spazi-l{display:flex;flex-direction:column;gap:1px}
+.hm-sp{display:flex;align-items:center;gap:10px;padding:7px 11px;border-radius:9px;font-size:13px;color:var(--text);text-align:left;width:100%}
+.hm-sp:hover{background:var(--surface-2)}
+.hm-sp .q{width:24px;height:24px;border-radius:7px;background:var(--acc);color:#15120a;display:grid;place-items:center;flex:none}
+.hm-sp .q svg{width:13px;height:13px}
+.hm-sp .nm{flex:1;min-width:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.hm-sp.nuovo{color:var(--dim)}
+.hm-sp.nuovo .q{background:transparent;border:1.5px dashed var(--line);color:var(--dim)}
+.hm-spinta{flex:1;min-height:16px}
+.hm-guida{display:flex;flex-direction:column;gap:6px;padding:14px;border-radius:14px;border:1px solid var(--line);
+  background:linear-gradient(160deg,var(--amber-soft),transparent 70%),var(--surface-2)}
+.hm-guida .ic{width:36px;height:36px;border-radius:11px;background:var(--amber);color:var(--on-amber);display:grid;place-items:center;margin-bottom:4px}
+.hm-guida .ic svg{width:18px;height:18px}
+.hm-guida b{font-family:Sora;font-size:14px;line-height:1.3}
+.hm-guida > span{font-size:12px;color:var(--dim);line-height:1.45}
+.hm-guida .btn{align-self:flex-start;margin-top:6px}
+.hm-guida.in-pagina{display:none;margin:18px 0 0}
+.hm-main.scroller{padding:18px 26px 30px}
+.hm-cerca{display:flex;align-items:center;gap:9px;max-width:480px;padding:9px 13px;border-radius:12px;border:1px solid var(--line);background:var(--surface);color:var(--mute);cursor:text}
+.hm-cerca:focus-within{border-color:var(--amber)}
+.hm-cerca svg{width:15px;height:15px;flex:none}
+.hm-cerca input{background:none;border:none;outline:none;width:100%;font-size:13.5px;color:var(--text)}
+
+.hm-hero{position:relative;margin-top:16px;border-radius:20px;overflow:hidden;min-height:196px;display:flex;align-items:center;gap:20px;padding:26px 28px;
+  --pae-1:#16203a;--pae-2:#5a3552;--pae-3:#d8704a;--pae-sole:#ffb35c;--pae-m1:#111a2d;--pae-m2:#0b1120;--pae-neve:#d6dcea;color:#fff}
+:root[data-theme="light"] .hm-hero{--pae-1:#dbe7f7;--pae-2:#f3cdbd;--pae-3:#f5a57c;--pae-sole:#fff0c2;--pae-m1:#8391ad;--pae-m2:#63728f;--pae-neve:#fff;color:#16203a}
+.hm-pae{position:absolute;inset:0;width:100%;height:100%;z-index:0}
+.hm-saluto{position:relative;z-index:1;flex:1;min-width:0}
+.hm-saluto h1{font-size:34px;line-height:1.1;letter-spacing:-.03em;margin:0 0 10px}
+.hm-saluto .mano{display:inline-block;transform-origin:70% 80%;animation:saluta 2.4s ease-in-out 1}
+@keyframes saluta{0%,60%,100%{transform:rotate(0)}10%,30%{transform:rotate(16deg)}20%,40%{transform:rotate(-8deg)}}
+.hm-saluto p{margin:0;font-size:13.5px;opacity:.85;font-style:italic}
+.hm-ora{position:relative;z-index:1;flex:none;display:flex;flex-direction:column;align-items:flex-end;text-align:right;gap:1px;padding:14px 16px;border-radius:16px;
+  background:rgba(8,12,24,.55);backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px);border:1px solid rgba(255,255,255,.12);color:#fff;min-width:200px}
+:root[data-theme="light"] .hm-ora{background:rgba(255,255,255,.72);color:#16203a;border-color:rgba(22,32,58,.1)}
+.hm-ora .g{font-family:Sora;font-weight:600;font-size:14px}
+.hm-ora .d{font-size:11.5px;opacity:.75}
+.hm-ora > b{font-family:Sora;font-size:34px;letter-spacing:-.02em;line-height:1.15;margin:4px 0 6px}
+.hm-ora .st{display:flex;align-items:center;gap:9px;font-size:11.5px;line-height:1.35;text-align:right}
+.hm-ora .st svg{width:22px;height:22px;color:#FFC24D;flex:none}
+
+.hm-stats{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:14px;margin-top:16px}
+.hm-stat{--c:#4C8DFF;display:flex;align-items:center;gap:14px;padding:16px;border-radius:16px;border:1px solid var(--line);text-align:left;
+  background:linear-gradient(135deg,color-mix(in srgb,var(--c) 14%,transparent),transparent 70%),var(--surface);transition:transform .16s,border-color .16s}
+.hm-stat:hover{transform:translateY(-2px);border-color:var(--c)}
+.hm-stat.verde{--c:#2FBF8F}.hm-stat.rosso{--c:#F05A6A}.hm-stat.viola{--c:#9A7CF0}
+.hm-stat .ic{width:46px;height:46px;border-radius:13px;background:var(--c);color:#fff;display:grid;place-items:center;flex:none}
+.hm-stat .ic svg{width:21px;height:21px}
+.hm-stat .tx{flex:1;min-width:0;display:flex;flex-direction:column}
+.hm-stat .tx b{font-family:Sora;font-size:24px;line-height:1.1}
+.hm-stat .tx span{font-size:12px;color:var(--dim);line-height:1.3}
+.hm-barre{display:flex;align-items:flex-end;gap:3px;height:30px;flex:none}
+.hm-barre i{width:4px;border-radius:2px;background:var(--c);opacity:.85}
+
+.hm-sez{display:flex;align-items:center;gap:10px;margin:26px 0 12px}
+.hm-sez h2{font-size:20px;letter-spacing:-.02em}
+.hm-vis{display:inline-flex;border:1px solid var(--line);border-radius:10px;overflow:hidden}
+.hm-vis button{width:34px;height:32px;display:grid;place-items:center;color:var(--mute)}
+.hm-vis button svg{width:15px;height:15px}
+.hm-vis button.on{background:var(--surface-2);color:var(--text)}
+.hm-spazi-w{position:relative}
+.hm-spazi.griglia{display:flex;gap:16px;overflow-x:auto;scroll-snap-type:x mandatory;padding:2px 2px 8px;scrollbar-width:thin}
+.hm-spazi.griglia > .hm-spc{flex:0 0 calc((100% - 32px) / 3)}
+.hm-spazi.lista{display:grid;grid-template-columns:1fr;gap:10px}
+.hm-spc.spazio{padding:0;border-radius:18px;display:flex;flex-direction:column;scroll-snap-align:start;min-width:0}
+.hm-spc.spazio::after{display:none}
+.hm-spc .cop{height:112px;flex:none;display:block;position:relative;background-size:cover;background-position:center;
+  background-color:color-mix(in srgb,var(--acc) 30%,var(--surface-2));
+  background-image:radial-gradient(circle at 80% 20%,color-mix(in srgb,var(--acc) 70%,transparent),transparent 55%),linear-gradient(135deg,color-mix(in srgb,var(--acc) 45%,var(--surface-2)),var(--surface-2))}
+.hm-spc .cop-ic{position:absolute;right:14px;bottom:-18px;color:var(--acc);opacity:.35}
+.hm-spc .cop-ic svg{width:120px;height:120px}
+.hm-spc .q{position:absolute;left:18px;top:84px;width:52px;height:52px;border-radius:15px;background:var(--acc);color:#15120a;display:grid;place-items:center;
+  box-shadow:0 6px 18px rgba(0,0,0,.25);border:3px solid var(--surface)}
+.hm-spc .q svg{width:22px;height:22px}
+.hm-spc .cp{display:flex;flex-direction:column;padding:32px 18px 16px;gap:4px;flex:1}
+.hm-spc .r1{display:flex;align-items:center;gap:10px}
+.hm-spc .r1 b{flex:1;min-width:0;font-family:Sora;font-size:17px;letter-spacing:-.01em;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.hm-spc .av-stack{display:flex;align-items:center}
+.hm-spc .av-stack .av{margin-left:-6px;border:2px solid var(--surface)}
+.hm-spc .piu{margin-left:4px;font-size:11px;color:var(--mute);font-weight:700}
+.hm-spc .ds{font-size:12.5px;color:var(--mute);margin:0;min-height:0}
+.hm-spc .pb{height:5px;border-radius:3px;background:var(--surface-3);margin:10px 0 12px;overflow:hidden;display:block}
+.hm-spc .pb i{display:block;height:100%;background:var(--acc);border-radius:3px}
+.hm-spc .nums{display:flex;gap:18px;margin:0;padding:0;border:none}
+.hm-spc .nums > span{display:flex;flex-direction:column;font-size:11.5px;color:var(--mute);letter-spacing:0;text-transform:none;font-family:inherit;font-weight:500}
+.hm-spc .nums b{font-family:Sora;font-size:18px;color:var(--text)}
+.hm-spc .nums .urg b{color:var(--alert)}
+.hm-spazi.lista .hm-spc{flex-direction:row;align-items:center}
+.hm-spazi.lista .cop{display:none}
+.hm-spazi.lista .q{position:static;margin:14px 0 14px 14px;border:none;box-shadow:none;width:44px;height:44px;flex:none}
+.hm-spazi.lista .cp{padding:12px 16px;flex-direction:row;align-items:center;gap:16px;flex-wrap:wrap}
+.hm-spazi.lista .r1{flex:1 1 220px;min-width:0}
+.hm-spazi.lista .ds,.hm-spazi.lista .pb{display:none}
+.hm-freccia{position:absolute;right:-10px;top:50%;transform:translateY(-50%);width:38px;height:38px;border-radius:50%;background:var(--surface);border:1px solid var(--line);
+  display:grid;place-items:center;box-shadow:var(--shadow);color:var(--text)}
+.hm-freccia svg{width:16px;height:16px}
+
+.hm-tre{display:grid;grid-template-columns:1.2fr 1fr 1fr;gap:16px;margin-top:22px}
+.hm-box{border:1px solid var(--line);background:var(--surface);border-radius:16px;padding:14px 16px;min-width:0}
+.hm-box-h{display:flex;align-items:center;gap:8px;margin-bottom:8px}
+.hm-box-h h3{font-size:15px;flex:1}
+.hm-box-h .lnk{display:inline-flex;align-items:center;gap:4px;font-size:12px;color:var(--amber-ink);font-weight:600}
+.hm-box-h .lnk svg{width:12px;height:12px}
+.hm-t,.hm-a,.hm-e{display:flex;align-items:center;gap:11px;padding:9px 4px;border-top:1px solid var(--line-soft);cursor:pointer;border-radius:6px}
+.hm-t:first-of-type,.hm-a:first-of-type{border-top:none}
+.hm-t:hover,.hm-a:hover,.hm-e:hover{background:var(--surface-2)}
+.hm-t .box{width:20px;height:20px;border-radius:6px}
+.hm-t .box:hover{border-color:var(--ok)}
+.hm-t .tx,.hm-a .tx{flex:1;min-width:0;display:flex;flex-direction:column;gap:1px}
+.hm-t .tx b{font-size:13px;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.hm-t .tx span,.hm-a .tx > span:last-child{font-size:11.5px;color:var(--mute);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.hm-t .q{font-size:12px;font-weight:600;color:var(--dim);flex:none}
+.hm-t .q.rosso{color:var(--alert)}
+.hm-t .q.giallo{color:var(--amber-ink)}
+.hm-a .pt{width:10px;height:10px;border-radius:50%;background:var(--acc);flex:none;opacity:.8}
+.hm-a .pt.acc{box-shadow:0 0 0 3px color-mix(in srgb,var(--acc) 30%,transparent)}
+.hm-a .w{font-size:12.5px;line-height:1.4;overflow:hidden;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical}
+.hm-a .q{font-size:11px;color:var(--mute);flex:none;font-family:"JetBrains Mono",monospace}
+.hm-e{border-top:none;align-items:stretch;padding:5px 0}
+.hm-e .h{width:52px;flex:none;font-size:11.5px;color:var(--mute);font-family:"JetBrains Mono",monospace;padding-top:9px;text-align:right}
+.hm-e .c{flex:1;min-width:0;display:flex;flex-direction:column;gap:1px;padding:8px 11px;border-radius:10px;border-left:3px solid var(--acc);
+  background:color-mix(in srgb,var(--acc) 14%,var(--surface-2))}
+.hm-e .c b{font-size:13px;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.hm-e .c span{font-size:11.5px;color:var(--dim);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.hm-poi{font-size:10.5px;letter-spacing:.12em;text-transform:uppercase;color:var(--mute);font-family:Sora;font-weight:600;margin:12px 0 4px}
+.hm-vuoto{display:flex;align-items:center;gap:10px;padding:12px 4px;font-size:12.5px;color:var(--mute);line-height:1.45}
+.hm-vuoto svg{width:20px;height:20px;flex:none;opacity:.7}
+.hm-main .spazi-head.preset-head{padding-left:0;padding-right:0;max-width:none}
+.hm-main .preset-griglia{padding-left:0;padding-right:0;max-width:none}
+
+@media (max-width:1280px){ .hm-tre{grid-template-columns:1fr 1fr} .hm-tre .hm-box:first-child{grid-column:1 / -1} }
+@media (max-width:1100px){ .hm-stats{grid-template-columns:repeat(2,minmax(0,1fr))} .hm-spazi.griglia > .hm-spc{flex-basis:calc((100% - 16px) / 2)} }
+@media (max-width:999px){ .hm-side{display:none} .hm-guida.in-pagina{display:flex} }
+@media (max-width:760px){
+  .hm-main.scroller{padding:12px 14px 24px}
+  .hm-tre{grid-template-columns:1fr}
+  .hm-hero{flex-direction:column;align-items:stretch;padding:20px;min-height:0}
+  .hm-saluto h1{font-size:26px}
+  .hm-ora{flex-direction:row;flex-wrap:wrap;align-items:center;justify-content:space-between;text-align:left;min-width:0;gap:4px 10px}
+  .hm-ora > b{font-size:24px;margin:0}
+  .hm-spazi.griglia > .hm-spc{flex-basis:86%}
+  .hm-freccia{display:none}
+  .hm-stat{padding:12px;gap:10px}
+  .hm-stat .ic{width:38px;height:38px}
+  .hm-stat .tx b{font-size:20px}
+  .hm-barre{display:none}
+  .hm-cerca{max-width:none}
+}
 /* ---------- LE PROFESSIONI CHE FACCIO ---------- */
 .prof-scelte{display:grid;grid-template-columns:repeat(auto-fill,minmax(210px,1fr));gap:8px}
 .prof-b{display:flex;align-items:center;gap:10px;padding:9px 10px;border-radius:var(--r-m);border:1px solid var(--line);background:var(--surface-2);text-align:left;width:100%;transition:border-color .15s,background .15s}
@@ -3653,7 +3813,7 @@ function renderTop(){
     /* Al centro c'e' scritto dove sei. Dentro a un lavoro basta il suo nome:
        tutto il resto sta piu' in basso, dove si lavora davvero. */
     const sp = SPZ();
-    const titoli = {spazi:'I tuoi spazi', mie:'Cosa tocca a te', cerca:'Cerca', profilo:'Profilo', guida:'Guida'};
+    const titoli = {spazi:'Home', mie:'Cosa tocca a te', cerca:'Cerca', profilo:'Profilo', guida:'Guida'};
     if(state.schermo==='progetto'){
       const pr = PROJ();
       c.innerHTML = '<button class="tel-titolo" data-action="toggle-rail" title="Scheda del lavoro: team, indirizzo, note">'+
@@ -4266,7 +4426,7 @@ function renderPhasebar(){
     bar.classList.toggle('vuota', suTelefono());
     return;
   }
-  if(state.schermo==='spazi' && suTelefono()){ bar.innerHTML = ''; bar.classList.add('vuota'); return; }
+  if(state.schermo==='spazi' || state.schermo==='mie' || state.schermo==='cerca'){ bar.innerHTML = ''; bar.classList.add('vuota'); return; }
   if(state.schermo==='spazi'){
     bar.classList.remove('vuota');
     const tp = state.progetti.length, tt = state.progetti.reduce((n,p)=>n+p.subs.length,0);
@@ -4529,7 +4689,7 @@ function contaMie(){ return mieCose().reduce((n,x)=>n+x.voci.filter(v=>!v.i.done
 function renderMie(){
   const gruppi = mieCose();
   const tot = contaMie();
-  let h = '<div class="pane"><div class="scroller" style="padding:16px 14px 14px">';
+  let h = '<div class="pane"><div class="scroller" style="padding:16px 14px 14px">'+(suTelefono()? '' : tastoIndietro('spazi','Home'));
   h += '<div style="padding:0 2px 14px">'+
        '<p style="margin:0;font-size:13px;color:var(--mute)">'+
        (tot? '<b style="color:var(--text)">'+tot+'</b>'+(tot===1?' cosa aperta':' cose aperte')+' in '+gruppi.length+(gruppi.length===1?' lavoro':' lavori')
@@ -4584,7 +4744,7 @@ function renderCerca(){
       (i.lista||[]).forEach(v=>{ if(v.t.toLowerCase().indexOf(q)>=0 && voci.length<40) voci.push({p,s,i:v, di:i, ix}); });
     });
   }));
-  let h = '<div class="pane"><div class="scroller" style="padding:16px 14px 14px">'+
+  let h = '<div class="pane"><div class="scroller" style="padding:16px 14px 14px">'+(suTelefono()? '' : tastoIndietro('spazi','Home'))+
     '<div class="cerca-box"><span class="ic">'+svg('cerca',2)+'</span>'+
     '<input id="qTel" type="search" placeholder="Cerca un lavoro, un cliente, una task, una checklist\u2026" '+
     'value="'+esc(state.filtro||'')+'" autocomplete="off"></div>';
@@ -4737,35 +4897,237 @@ function benvenuto(){
   '</div>';
 }
 
-function renderSpazi(){
-  /* sul telefono il saluto sta solo nella pagina dei lavori */
-  let h = '<div class="pane"><div class="scroller" style="padding:0">'+ (suTelefono()? '' : benvenuto()) +
-    '<div class="spazi-head"><h1>I tuoi spazi di lavoro</h1>'+
-    '<p>Ogni spazio raccoglie i progetti di un ambito del tuo lavoro, con le fasi della tua professione. '+
-    'Dentro allo spazio trovi progetti, task e calendario separati dagli altri.</p></div><div class="spazi">';
-
-  const elenco = spaziVisibili();
-  elenco.forEach(sp=>{
-    const ps = progettiDi(sp.id);
-    const aperti = ps.filter(p=>!p.completato).length;
-    const urg = ps.filter(p=>{ const g = giorniA(p.consegna); return g!=null && g<=7; }).length;
-    const task = ps.reduce((n,p)=>n+p.subs.length,0);
-    h += '<button class="spazio" style="--acc:'+sp.col+'" data-action="apri-spazio" data-id="'+sp.id+'">'+
-      '<span class="ic">'+svg(sp.icona)+'</span>'+
-      '<h3>'+esc(sp.nome)+'</h3><div class="ds">'+esc(sp.desc||TIPO(sp.tipo).prof)+'</div>'+
-      '<div class="nums">'+
-        '<div><b>'+ps.length+'</b><span>Progetti</span></div>'+
-        '<div><b>'+aperti+'</b><span>Aperti</span></div>'+
-        '<div><b>'+task+'</b><span>Task</span></div>'+
-        (urg? '<div><b style="color:var(--alert)">'+urg+'</b><span>In scadenza</span></div>':'')+
-      '</div></button>';
+/* ============ LA HOME ============
+   A sinistra la navigazione e gli spazi, in fondo l'invito alla guida.
+   Al centro: saluto con l'ora, quattro numeri che contano, gli spazi di
+   lavoro, e sotto le tre cose di oggi: cosa scade, cosa e' successo,
+   cosa c'e' in calendario. Sul telefono la stessa pagina in colonna. */
+const FRASI_HOME = [
+  'Grandi progetti nascono da piccoli passi quotidiani.',
+  'Una cosa alla volta, ma una cosa fatta bene.',
+  'Il lavoro ben organizzato lascia spazio alla creatività.',
+  'Prima si pianifica, poi si gira.',
+  'Chiudere una task è il modo migliore per iniziarne un’altra.',
+  'Le idee migliori arrivano quando il resto è in ordine.',
+  'Ogni consegna rispettata è una promessa mantenuta.',
+  'Oggi è un buon giorno per spuntare qualcosa.',
+  'La qualità sta nei dettagli: segnali tutti.',
+  'Un team che si parla è un team che consegna.'
+];
+const GIORNI_LUNGHI = ['Domenica','Lunedì','Martedì','Mercoledì','Giovedì','Venerdì','Sabato'];
+const MESI_HOME = ['Gennaio','Febbraio','Marzo','Aprile','Maggio','Giugno','Luglio','Agosto','Settembre','Ottobre','Novembre','Dicembre'];
+function fraseDelGiorno(){
+  const d = new Date(), inizio = new Date(d.getFullYear(), 0, 0);
+  return FRASI_HOME[Math.floor((d - inizio) / 86400000) % FRASI_HOME.length];
+}
+function sfondoSicuro(x){
+  const s = String(x || '');
+  if(/^data:image\/(png|jpe?g|webp|gif);base64,[A-Za-z0-9+\/=]+$/.test(s)) return s;
+  return urlSicura(s) || '';
+}
+/* le mie voci aperte, dalla consegna piu' vicina */
+function vociInScadenza(){
+  const out = [], io = state.utente;
+  state.progetti.forEach(p=>{
+    if(p.completato || !vedeProgetto(p)) return;
+    const g = giorniA(p.consegna);
+    (p.subs||[]).forEach(s=>(s.items||[]).forEach((i, ix)=>{
+      if(i.done) return;
+      const mia = i.ass===io || (!i.ass && s.assegnato===io);
+      if(mia) out.push({p, s, i, ix, g: g==null ? 9999 : g});
+    }));
   });
-  if(puo('spazi')) h += '<button class="spazio nuovo" data-action="nuovo-spazio"><span>'+
-    '<span class="ic">'+svg('plus')+'</span>'+
-    '<b style="font-family:Sora;font-size:14px;display:block">Nuovo spazio di lavoro</b>'+
-    '<span style="font-size:11.5px;color:var(--mute)">Un ambito nuovo, anche di un\u2019altra professione</span></span></button>';
-  h += '</div>' + sezionePreset() + '</div></div>';
+  return out.sort((a,b)=>a.g-b.g || (PESO[a.p.prio]-PESO[b.p.prio]));
+}
+function quandoScade(g){
+  if(g===9999) return {t:'senza data', c:''};
+  if(g<0) return {t:'scaduto', c:'rosso'};
+  if(g===0) return {t:'Oggi', c:'rosso'};
+  if(g===1) return {t:'Domani', c:'giallo'};
+  const d = new Date(OGGI); d.setDate(d.getDate()+g);
+  return {t:d.getDate()+' '+MESI_BREVI[d.getMonth()], c:''};
+}
+function impegniDelGiorno(iso){
+  const out = [];
+  state.progetti.forEach(p=>{
+    if(!vedeProgetto(p)) return;
+    (p.eventi||[]).forEach(e=>{ if(e && e.d===iso) out.push({p, t:e.t, ora:e.ora||''}); });
+    const c = dataDi(p.consegna);
+    if(c && isoDi(c)===iso && !p.completato && !(p.eventi||[]).some(e=>e && e.d===iso && /consegna/i.test(e.t||''))) out.push({p, t:'Consegna', ora:'', consegna:true});
+  });
+  return out.sort((a,b)=>String(a.ora||'99').localeCompare(String(b.ora||'99')));
+}
+function prossimiImpegni(n){
+  const oggi = isoDi(OGGI), out = [];
+  state.progetti.forEach(p=>{
+    if(!vedeProgetto(p) || p.completato) return;
+    (p.eventi||[]).forEach(e=>{ if(e && e.d > oggi) out.push({p, t:e.t, ora:e.ora||'', d:e.d}); });
+  });
+  return out.sort((a,b)=>a.d.localeCompare(b.d) || String(a.ora).localeCompare(String(b.ora))).slice(0, n);
+}
+function barre(valori){
+  if(valori.filter(x=>x>0).length < 2) return '';            // con meno di due valori il grafico non dice niente
+  const v = valori.slice(0, 7); while(v.length < 7) v.unshift(0);
+  const max = Math.max(1, ...v);
+  return '<span class="hm-barre" aria-hidden="true">'+v.map(x=>'<i style="height:'+Math.max(12, Math.round(x/max*100))+'%"></i>').join('')+'</span>';
+}
+function oraHome(){
+  const d = new Date();
+  return {g:GIORNI_LUNGHI[d.getDay()], data:d.getDate()+' '+MESI_HOME[d.getMonth()]+' '+d.getFullYear(),
+          ora:('0'+d.getHours()).slice(-2)+':'+('0'+d.getMinutes()).slice(-2), notte: d.getHours()<7 || d.getHours()>=20};
+}
+/* ogni mezzo minuto l'ora della home va avanti da sola */
+setInterval(()=>{
+  const n = el('hmOraT'); if(!n || state.schermo!=='spazi') return;
+  const o = oraHome(); n.textContent = o.ora;
+  const g = el('hmOraG'); if(g) g.textContent = o.g;
+  const d = el('hmOraD'); if(d) d.textContent = o.data;
+}, 30000);
+
+function barraSinistra(){
+  const sp = spaziVisibili(), primo = SPZ() || sp[0];
+  const voce = (a, ic, l, extra, on) => '<button class="hm-nav'+(on?' on':'')+'" data-action="'+a+'"'+(extra||'')+'>'+svg(ic,2)+'<span>'+l+'</span></button>';
+  const mie = contaMie();
+  return '<aside class="hm-side">'+
+    '<nav class="hm-navs">'+
+      voce('spazi', 'casa', 'Home', '', true)+
+      voce('hm-mie', 'check', 'Le mie task'+(mie? '<b class="hm-n">'+mie+'</b>' : ''))+
+      (primo ? voce('hm-cal', 'calendar', 'Calendario', ' data-id="'+esc(primo.id)+'"') : '')+
+      voce('notifiche', 'bell', 'Notifiche')+
+      voce('me', sonoAdmin ? 'users' : 'user', sonoAdmin ? 'Team e profilo' : 'Profilo')+
+    '</nav>'+
+    '<div class="hm-sep"></div>'+
+    '<div class="hm-side-t">Spazi di lavoro</div>'+
+    '<div class="hm-spazi-l">'+sp.map(s=>
+      '<button class="hm-sp" data-action="apri-spazio" data-id="'+esc(s.id)+'" style="--acc:'+coloreOk(s.col,'#FFAD01')+'">'+
+        '<span class="q">'+svg(s.icona,2)+'</span><span class="nm">'+esc(s.nome)+'</span></button>').join('')+
+      (puo('spazi') && !state.ospite ? '<button class="hm-sp nuovo" data-action="nuovo-spazio"><span class="q">'+svg('plus',2)+'</span><span class="nm">Nuovo spazio</span></button>' : '')+
+    '</div>'+
+    '<div class="hm-spinta"></div>'+
+    cartaInvitoGuida()+
+  '</aside>';
+}
+function cartaInvitoGuida(cls){
+  return '<div class="hm-guida'+(cls?' '+cls:'')+'">'+
+    '<span class="ic">'+svg('libro',2)+'</span>'+
+    '<b>Scopri tutto quello che FOSS sa fare</b>'+
+    '<span>La guida spiega ogni funzione, dai primi passi ai trucchi per lavorare più veloce.</span>'+
+    '<button class="btn primary sm" data-action="apri-guida">Leggi la guida '+svg('right',2.4)+'</button></div>';
+}
+
+function renderSpazi(){
+  const o = oraHome(), elenco = spaziVisibili();
+  const attivi = state.progetti.filter(p=>!p.completato && vedeProgetto(p));
+  const taskAperte = attivi.reduce((n,p)=>n+(p.subs||[]).filter(s=>(s.items||[]).some(i=>!i.done)).length, 0);
+  const scad = attivi.filter(p=>{ const g = giorniA(p.consegna); return g!=null && g<=7; });
+  const persone = personeOrg();
+  const mie = vociInScadenza();
+  const oggiN = mie.filter(x=>x.g<=0).length;
+  let h = '<div class="pane"><div class="hm">'+barraSinistra()+'<div class="hm-main scroller">';
+
+  /* cerca */
+  h += '<label class="hm-cerca">'+svg('cerca',2)+'<input id="hmCerca" type="search" placeholder="Cerca progetti, clienti, task…" autocomplete="off" enterkeyhint="search"></label>';
+
+  /* saluto e ora */
+  h += '<section class="hm-hero">'+paesaggioHome()+
+    '<div class="hm-saluto"><h1>'+saluto()+',<br>'+esc(nomeVisibile().split(' ')[0])+' <span class="mano">👋</span></h1>'+
+      '<p>“'+esc(fraseDelGiorno())+'”</p></div>'+
+    '<div class="hm-ora"><span class="g" id="hmOraG">'+o.g+'</span><span class="d" id="hmOraD">'+o.data+'</span>'+
+      '<b id="hmOraT">'+o.ora+'</b>'+
+      '<span class="st">'+svg(o.notte?'moon':'sun',2)+'<span>'+(mie.length ? (oggiN? '<b>'+oggiN+'</b> da chiudere oggi' : 'Giornata produttiva')+'<br>ti aspettano '+mie.length+(mie.length===1?' task':' task') : 'Niente in sospeso<br>per te')+'</span></span>'+
+    '</div></section>';
+
+  /* quattro numeri */
+  const perSpazio = elenco.map(s=>progettiDi(s.id).filter(p=>!p.completato).length);
+  const perLavoro = attivi.map(p=>(p.subs||[]).filter(s=>(s.items||[]).some(i=>!i.done)).length).sort((a,b)=>b-a);
+  const perGiorno = [0,1,2,3,4,5,6].map(g=>attivi.filter(p=>giorniA(p.consegna)===g).length);
+  const perPersona = persone.map(u=>attivi.filter(p=>(p.team||[]).indexOf(u.id)>=0).length);
+  const carta = (cls, ic, n, l, a, extra, bar) => '<button class="hm-stat '+cls+'" data-action="'+a+'"'+(extra||'')+'>'+
+    '<span class="ic">'+svg(ic,2.2)+'</span><span class="tx"><b>'+n+'</b><span>'+l+'</span></span>'+barre(bar)+'</button>';
+  h += '<div class="hm-stats">'+
+    carta('blu', 'grid', attivi.length, attivi.length===1?'Progetto attivo':'Progetti attivi', 'hm-giu', ' data-a="hmSpazi"', perSpazio)+
+    carta('verde', 'check', taskAperte, taskAperte===1?'Task aperta':'Task aperte', 'hm-mie', '', perLavoro)+
+    carta('rosso', 'clock', scad.length, 'In consegna entro 7 giorni', 'hm-giu', ' data-a="hmTre"', perGiorno)+
+    carta('viola', 'users', persone.length, persone.length===1?'Collaboratore':'Collaboratori', 'me', '', perPersona)+
+  '</div>';
+
+  /* spazi di lavoro */
+  const lista = state.hmVista === 'lista';
+  h += '<div class="hm-sez" id="hmSpazi"><h2>I tuoi spazi di lavoro</h2><span class="spacer"></span>'+
+    (puo('spazi') && !state.ospite ? '<button class="btn sm" data-action="nuovo-spazio">'+svg('plus')+'<span class="no-tel">Nuovo spazio di lavoro</span></button>' : '')+
+    '<span class="hm-vis"><button class="'+(lista?'':'on')+'" data-action="hm-vista" data-v="griglia" title="Schede" aria-label="Schede">'+svg('grid',2)+'</button>'+
+      '<button class="'+(lista?'on':'')+'" data-action="hm-vista" data-v="lista" title="Elenco" aria-label="Elenco">'+svg('list',2)+'</button></span></div>';
+  h += '<div class="hm-spazi-w"><div class="hm-spazi '+(lista?'lista':'griglia')+'" id="hmSpaziL">';
+  elenco.forEach(sp=>{
+    const ps = progettiDi(sp.id), aperti = ps.filter(p=>!p.completato);
+    const urg = aperti.filter(p=>{ const g = giorniA(p.consegna); return g!=null && g<=7; }).length;
+    let tot = 0, fatte = 0;
+    ps.forEach(p=>(p.subs||[]).forEach(s=>(s.items||[]).forEach(i=>{ tot++; if(i.done) fatte++; })));
+    const pct = tot ? Math.round(fatte/tot*100) : 0;
+    const col = coloreOk(sp.col, '#FFAD01'), bg = sfondoSicuro(sp.sfondo);
+    const team = [...new Set(ps.flatMap(p=>p.team||[]))].filter(id=>state.utenti.some(u=>u.id===id));
+    h += '<button class="hm-spc spazio" style="--acc:'+col+'" data-action="apri-spazio" data-id="'+esc(sp.id)+'">'+
+      '<span class="cop'+(bg?' foto':'')+'"'+(bg? ' style="background-image:url(\''+bg+'\')"' : '')+'>'+(bg?'':'<span class="cop-ic">'+svg(sp.icona,1.4)+'</span>')+'</span>'+
+      '<span class="q">'+svg(sp.icona,2)+'</span>'+
+      '<span class="cp"><span class="r1"><b>'+esc(sp.nome)+'</b><span class="av-stack">'+team.slice(0,3).map(id=>av(U(id),'sm')).join('')+
+        (team.length>3? '<span class="piu">+'+(team.length-3)+'</span>' : '')+'</span></span>'+
+      '<span class="ds">'+esc(sp.desc || TIPO(sp.tipo).prof)+'</span>'+
+      '<span class="pb"><i style="width:'+pct+'%"></i></span>'+
+      '<span class="nums"><span><b>'+ps.length+'</b>Progetti</span><span><b>'+aperti.length+'</b>Aperti</span>'+
+        '<span><b>'+ps.reduce((n,p)=>n+p.subs.length,0)+'</b>Task</span>'+(urg? '<span class="urg"><b>'+urg+'</b>In scadenza</span>' : '')+'</span></span></button>';
+  });
+  if(!elenco.length) h += '<div class="empty" style="padding:24px">Ancora nessuno spazio: creane uno per iniziare.</div>';
+  h += '</div>'+(!lista && elenco.length>3 ? '<button class="hm-freccia" data-action="hm-scorri" title="Altri spazi" aria-label="Altri spazi">'+svg('right',2.4)+'</button>' : '')+'</div>';
+
+  /* le tre cose di oggi */
+  h += '<div class="hm-tre" id="hmTre">';
+  h += '<section class="hm-box"><div class="hm-box-h"><h3>Le tue task in scadenza</h3>'+(mie.length? '<button class="lnk" data-action="hm-mie">Tutte '+svg('right',2.4)+'</button>' : '')+'</div>';
+  h += mie.length ? mie.slice(0,6).map(x=>{ const q = quandoScade(x.g), chi = U(x.i.ass || x.s.assegnato);
+    return '<div class="hm-t" role="button" tabindex="0" data-action="vai-primo" data-pid="'+esc(x.p.id)+'" data-sid="'+esc(x.s.id)+'">'+
+      '<span class="box" role="button" tabindex="0" data-action="check-mia" data-pid="'+esc(x.p.id)+'" data-sid="'+esc(x.s.id)+'" data-i="'+x.ix+'" aria-label="Segna come fatto">'+svg('check',3.2)+'</span>'+
+      '<span class="tx"><b>'+esc(x.i.t)+'</b><span>'+esc(x.p.nome)+' · '+esc(x.s.titolo)+'</span></span>'+
+      '<span class="q '+q.c+'">'+q.t+'</span>'+av(chi,'sm')+'</div>'; }).join('')
+    : '<div class="hm-vuoto">'+svg('check',2)+'<span>Niente in sospeso per te. Quando ti assegnano qualcosa lo trovi qui.</span></div>';
+  h += '</section>';
+
+  const att = [];
+  state.progetti.forEach(p=>{ if(vedeProgetto(p)) (p.log||[]).forEach(l=>{ if(l && l.t) att.push({p, l}); }); });
+  att.sort((a,b)=>b.l.t-a.l.t);
+  h += '<section class="hm-box"><div class="hm-box-h"><h3>Attività recenti</h3></div>';
+  h += att.length ? att.slice(0,6).map(x=>
+    '<div class="hm-a" role="button" tabindex="0" data-action="apri" data-id="'+esc(x.p.id)+'">'+
+      (x.l.u ? av(autoreCommento(x.l.u),'sm') : '<i class="pt'+(x.l.acc?' acc':'')+'" style="--acc:'+coloreOk(x.p.col,'#FFAD01')+'"></i>')+
+      '<span class="tx"><span class="w">'+sicuro(x.l.tx)+'</span><span>'+esc(x.p.nome)+'</span></span>'+
+      '<span class="q">'+esc(quandoBreve(x.l))+'</span></div>').join('')
+    : '<div class="hm-vuoto">'+svg('list',2)+'<span>Qui compare quello che succede nei tuoi lavori: fasi avanzate, spunte, progetti nuovi.</span></div>';
+  h += '</section>';
+
+  const oggi = impegniDelGiorno(isoDi(OGGI)), poi = oggi.length ? [] : prossimiImpegni(3);
+  const primo = SPZ() || elenco[0];
+  h += '<section class="hm-box"><div class="hm-box-h"><h3>Oggi</h3>'+(primo? '<button class="lnk" data-action="hm-cal" data-id="'+esc(primo.id)+'">Vedi calendario '+svg('right',2.4)+'</button>' : '')+'</div>';
+  const riga = x => '<div class="hm-e" role="button" tabindex="0" data-action="apri" data-id="'+esc(x.p.id)+'" style="--acc:'+coloreOk(x.p.col,'#FFAD01')+'">'+
+    '<span class="h">'+esc(x.d ? (()=>{ const d = new Date(x.d+'T12:00:00'); return d.getDate()+' '+MESI_BREVI[d.getMonth()]; })() : (x.ora || 'oggi'))+'</span>'+
+    '<span class="c"><b>'+esc(x.t||'Impegno')+'</b><span>'+esc(x.p.nome)+(x.d && x.ora ? ' · '+esc(x.ora) : '')+'</span></span></div>';
+  h += oggi.length ? oggi.map(riga).join('')
+    : '<div class="hm-vuoto">'+svg('calendar',2)+'<span>Nessun impegno in calendario oggi.</span></div>'+
+      (poi.length ? '<div class="hm-poi">Prossimi</div>'+poi.map(riga).join('') : '');
+  h += '</section></div>';
+
+  h += cartaInvitoGuida('in-pagina');
+  h += sezionePreset();
+  h += '</div></div></div>';
   el('stage').innerHTML = h;
+}
+/* il paesaggio del saluto: montagne al tramonto, disegnate (niente foto da scaricare) */
+function paesaggioHome(){
+  return '<svg class="hm-pae" viewBox="0 0 1200 300" preserveAspectRatio="xMidYMid slice" aria-hidden="true">'+
+    '<defs><linearGradient id="hmCielo" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="var(--pae-1)"/><stop offset=".55" stop-color="var(--pae-2)"/><stop offset="1" stop-color="var(--pae-3)"/></linearGradient>'+
+    '<radialGradient id="hmSole" cx=".78" cy=".62" r=".35"><stop offset="0" stop-color="var(--pae-sole)" stop-opacity=".9"/><stop offset="1" stop-color="var(--pae-sole)" stop-opacity="0"/></radialGradient></defs>'+
+    '<rect width="1200" height="300" fill="url(#hmCielo)"/><rect width="1200" height="300" fill="url(#hmSole)"/>'+
+    '<path d="M560 300 L700 150 L760 190 L850 90 L930 170 L990 120 L1080 200 L1200 140 L1200 300Z" fill="var(--pae-m1)"/>'+
+    '<path d="M600 300 L720 210 L800 240 L900 160 L980 230 L1060 190 L1200 250 L1200 300Z" fill="var(--pae-m2)"/>'+
+    '<path d="M850 90 L870 112 L858 110 L846 124 L838 104Z M990 120 L1004 136 L992 134 L982 142Z" fill="var(--pae-neve)" opacity=".55"/>'+
+  '</svg>';
 }
 
 /* ============ WIZARD NUOVO SPAZIO ============ */
@@ -7199,21 +7561,22 @@ function cartaModelli(){
    Come si fa tutto, capitolo per capitolo: dai primi passi alle cose per chi
    organizza un team. Si cerca per parola (anche senza accenti); in fondo c'e'
    il tasto per segnalare quello che manca o non funziona. */
-const VERSIONE = 'v28';
+const VERSIONE = 'v29';
 const LIVELLI_GUIDA = {base:'Per cominciare', medio:'Tutti i giorni', esperto:'Per chi organizza', aiuto:'Se qualcosa non va'};
 const GUIDA = [
 {id:'primi-passi', liv:'base', ic:'spark', t:'Primi passi', s:'Cos’è FOSS e come ci si muove', v:[
   ['Che cos’è FOSS', 'È il posto dove tieni i tuoi lavori. Ogni progetto ha le sue fasi, le task da fare, le date, i soldi e le persone che ci lavorano. Funziona dal computer, dall’iPad e dal telefono: quello che cambi su uno compare anche sugli altri.'],
   ['Come è organizzato', 'Quattro livelli, uno dentro l’altro: gli <b>spazi di lavoro</b> (un ambito, per esempio «Video Milano»), i <b>progetti</b> (un lavoro per un cliente), le <b>task</b> divise per fase e, dentro ogni task, le <b>subtask</b> da spuntare. Una subtask può avere anche una sua piccola checklist.'],
   ['Entrare la prima volta', 'Apri FOSS e scegli <b>Registrati</b> con la tua email e una password. Se qualcuno ti ha invitato, registrati con l’email che ha usato lui: entri direttamente nel suo archivio e vedi i lavori che ti ha aperto. Dalla volta dopo il dispositivo si ricorda di te.'],
-  ['Sul computer e sull’iPad', 'FOSS si apre sempre sulla pagina degli spazi. Dentro uno spazio, in alto trovi lo spazio in cui sei (toccalo per cambiarlo), le viste e la ricerca. A destra: Annulla, il lucchetto, il tema chiaro o scuro, il punto di domanda della <b>Guida</b>, la campanella delle notifiche e la tua foto, che apre il profilo.'],
+  ['La Home', 'FOSS si apre sempre sulla <b>Home</b>. A sinistra il menu (Home, Le mie task, Calendario, Notifiche, Profilo) e l’elenco dei tuoi spazi. Al centro il saluto, quattro numeri (progetti attivi, task aperte, consegne entro 7 giorni, collaboratori: toccali per andarci), le schede degli spazi e, in fondo, le task in scadenza da spuntare al volo, le attività recenti e gli impegni di oggi.'],
+  ['Sul computer e sull’iPad', 'Dalla Home entri in uno spazio. Dentro uno spazio, in alto trovi lo spazio in cui sei (toccalo per cambiarlo), le viste e la ricerca. A destra: Annulla, il lucchetto, il tema chiaro o scuro, il punto di domanda della <b>Guida</b>, la campanella delle notifiche e la tua foto, che apre il profilo.'],
   ['Sul telefono', 'In basso ci sono cinque sezioni: <b>Lavori</b>, <b>Per te</b>, <b>Note</b>, <b>Cerca</b> e <b>Profilo</b>. In alto a sinistra il <b>+</b> per creare, al centro il nome di dove sei, a destra la campanella. Dentro a un lavoro la freccia in alto a sinistra ti riporta ai lavori.'],
   ['I lavori che fai', 'Al primo accesso FOSS ti chiede che lavori fai (videomaker, fotografo, social media manager…): quando crei spazi, progetti e preset ti propone solo quelli. Li aggiungi o togli quando vuoi da <b>Profilo → I lavori che fai</b>.'],
   ['Metterlo sulla schermata Home', 'Sull’iPhone apri FOSS con Safari, tocca <b>Condividi</b> e poi <b>Aggiungi alla schermata Home</b>. Su Android, dal menu di Chrome, <b>Installa app</b> o <b>Aggiungi a schermata Home</b>. Si apre a tutto schermo come un’app; sull’iPhone è anche l’unico modo per ricevere gli avvisi.']
 ]},
 {id:'spazi', liv:'base', ic:'grid', t:'Spazi di lavoro', s:'Gli ambiti in cui dividi i lavori', v:[
   ['A cosa servono', 'Uno spazio raccoglie i progetti di un ambito: un cliente fisso, una città, un tipo di attività. Ha una professione, che decide fasi, task e campi di partenza dei progetti che ci crei, e ha i suoi tag e filtri. Progetti, task e calendario di uno spazio restano separati dagli altri.'],
-  ['Creare uno spazio', 'Nella pagina degli spazi premi <b>Nuovo spazio di lavoro</b> (sul telefono: <b>+</b> in alto → Nuovo spazio di lavoro). Quattro passi: la professione (oppure un tuo preset); nome, icona e colore; i tag; i filtri veloci.'],
+  ['Creare uno spazio', 'Nella Home premi <b>Nuovo spazio</b> (sul telefono: <b>+</b> in alto → Nuovo spazio di lavoro). Quattro passi: la professione (oppure un tuo preset); nome, icona e colore; i tag; i filtri veloci.'],
   ['Le professioni pronte', 'Sono tredici: Video, Fotografia, Grafica, Social, Web e app, Eventi, Legale, Fiscale, Moda, Architettura, Consulenza, Testi e Generico. Ognuna ha le sue fasi e diversi tipi di lavoro (un matrimonio, uno spot, una causa…), ciascuno con le sue task.'],
   ['Passare da uno spazio all’altro', 'Tocca il nome dello spazio in alto: si apre l’elenco, con in fondo <b>Vedi tutti gli spazi</b> e <b>Nuovo spazio di lavoro</b>.'],
   ['Nome, colore, sfondo e preset', 'Dentro lo spazio, il tasto <b>Modifica spazio</b> (o tasto destro sulla tessera → <b>Collaboratori dello spazio…</b>) apre «Modifica lo spazio»: nome, descrizione, icona, colore, sfondo della pagina, chi ci lavora e il <b>preset dei nuovi progetti</b>, che verrà già scelto ogni volta che crei un progetto lì dentro.'],
@@ -9372,6 +9735,16 @@ document.addEventListener('click', function(e){
     case 'cliente-rinnova': clienteRinnova(t); break;
     case 'cliente-manda': clienteManda(); break;
 
+    /* ---- home ---- */
+    case 'hm-mie': state.schermo = 'mie'; mieAppena.clear(); render(); break;
+    case 'hm-cal':{
+      const sp = state.spazi.find(x=>x.id===t.dataset.id) || SPZ(); if(!sp) break;
+      state.spazioId = sp.id; state.schermo = 'home'; state.progettoId = null; state.vista = 'calendario';
+      state.filtro = ''; state.filtroAttivo = null; render(); break; }
+    case 'hm-giu':{ const n = el(t.dataset.a); if(n) n.scrollIntoView({block:'start', behavior:'smooth'}); break; }
+    case 'hm-vista': state.hmVista = t.dataset.v==='lista' ? 'lista' : 'griglia'; render(); break;
+    case 'hm-scorri':{ const n = el('hmSpaziL'); if(n) n.scrollBy({left:n.clientWidth*0.9, behavior:'smooth'}); break; }
+
     /* ---- @ per taggare qualcuno ---- */
     case 'menz-apri':{
       const ta = el(t.dataset.per); if(!ta) break;
@@ -10396,6 +10769,12 @@ document.addEventListener('input', function(e){
   }
   if(e.target.id==='cm_tx'){ const t = e.target; t.style.height = 'auto'; t.style.height = Math.min(t.scrollHeight, 160)+'px'; return; }
   if(e.target.id==='gCerca'){ guida.q = e.target.value; filtraGuida(); return; }
+  if(e.target.id==='hmCerca'){
+    /* dalla home la ricerca continua nella sua pagina, con quello che ho scritto */
+    state.filtro = e.target.value; state.schermo = 'cerca'; render();
+    const q = el('qTel'); if(q){ q.focus(); try{ q.setSelectionRange(q.value.length, q.value.length); }catch(err){} }
+    return;
+  }
   if(e.target.id==='sg_testo'){ segnBozza.testo = e.target.value; return; }
   if(e.target.id==='qTel'){
     state.filtro = e.target.value; renderCerca();
