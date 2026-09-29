@@ -254,7 +254,11 @@ input,textarea,select{font:inherit;color:inherit}
 .app{height:100%;display:grid;grid-template-rows:auto minmax(0,1fr) auto;grid-template-columns:minmax(0,1fr)}
 
 .topbar{
-  display:flex;align-items:center;gap:14px;padding:0 16px;height:52px;min-width:0;
+  /* nell'app installata (iPhone) la barra di stato sta sopra alla pagina:
+     la barra in alto parte sotto l'orologio e la tacca, non dietro */
+  display:flex;align-items:center;gap:14px;min-width:0;
+  padding:env(safe-area-inset-top,0px) max(16px,env(safe-area-inset-right,0px)) 0 max(16px,env(safe-area-inset-left,0px));
+  height:calc(52px + env(safe-area-inset-top,0px));
   background:var(--surface);border-bottom:1px solid var(--line);
   position:relative;z-index:30;
 }
@@ -504,7 +508,7 @@ input,textarea,select{font:inherit;color:inherit}
 
 /* ALERT A SCHERMO INTERO */
 .alert-layer{
-  position:fixed;inset:0;z-index:90;display:none;place-items:center;padding:20px;
+  position:fixed;inset:0;z-index:90;display:none;place-items:center;padding:calc(20px + env(safe-area-inset-top,0px)) 20px calc(20px + env(safe-area-inset-bottom,0px));
   background:rgba(6,13,21,.82);backdrop-filter:blur(10px) saturate(.5);
 }
 .alert-layer.on{display:grid;animation:fadein .22s ease-out}
@@ -1637,7 +1641,7 @@ body.sto-spostando *{user-select:none!important}
 /* Telefono */
 @media (max-width:620px){
   body{font-size:14px}
-  .topbar{height:54px;padding:0 10px;gap:8px}
+  .topbar{height:calc(54px + env(safe-area-inset-top,0px));padding:env(safe-area-inset-top,0px) 10px 0;gap:8px}
   .brand b{display:none}
   .crumb{flex:1;min-width:0}
   .sp-chip{max-width:none;flex:1}
@@ -2477,6 +2481,7 @@ a.btn.primary{color:var(--on-amber)}
 }
 
 /* ---------- RITAGLIO DELLE COPERTINE ---------- */
+input.esca{position:absolute;left:-9999px;top:auto;width:1px;height:1px;opacity:0;pointer-events:none}
 img.rit{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;display:block;pointer-events:none;user-select:none;-webkit-user-drag:none}
 .hm-spc .cop{overflow:hidden}
 .hm-spc .cop .rit{z-index:0}
@@ -2516,7 +2521,7 @@ img.rit{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;displa
 .rit-f{display:flex;align-items:center;gap:8px;margin-top:14px;flex-wrap:wrap}
 @media (max-width:620px){
   .rit-layer{padding:0;place-items:stretch}
-  .rit-box{border-radius:0;width:100%;padding:16px 14px calc(16px + env(safe-area-inset-bottom))}
+  .rit-box{border-radius:0;width:100%;padding:calc(16px + env(safe-area-inset-top)) 14px calc(16px + env(safe-area-inset-bottom))}
   .rit-tabs{grid-template-columns:repeat(3,minmax(0,1fr));gap:6px}
   .rit-tabs button{padding:6px;font-size:10.5px}
 }
@@ -2834,7 +2839,7 @@ img.rit{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;displa
     <div class="spacer"></div>
     <div class="search" id="searchWrap" hidden>
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></svg>
-      <input id="q" type="text" placeholder="Cerca progetto o cliente…" autocomplete="off">
+      <input id="q" type="search" placeholder="Cerca progetto o cliente…" autocomplete="off">
     </div>
     <button class="iconbtn solo-tel" data-action="condividi" id="shareBtn" title="Condividi progetto o task">
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/><path d="m8.6 13.5 6.8 4M15.4 6.5l-6.8 4"/></svg>
@@ -8106,7 +8111,7 @@ function cartaModelli(){
    Come si fa tutto, capitolo per capitolo: dai primi passi alle cose per chi
    organizza un team. Si cerca per parola (anche senza accenti); in fondo c'e'
    il tasto per segnalare quello che manca o non funziona. */
-const VERSIONE = 'v34';
+const VERSIONE = 'v36';
 const LIVELLI_GUIDA = {base:'Per cominciare', medio:'Tutti i giorni', esperto:'Per chi organizza', aiuto:'Se qualcosa non va'};
 const GUIDA = [
 {id:'primi-passi', liv:'base', ic:'spark', t:'Primi passi', s:'Cos’è FOSS e come ci si muove', v:[
@@ -9397,14 +9402,14 @@ function modaleLock(pid){
   lockPid = p.id;
   if(!isLock(p)){
     modale('<h3>Blocca questo progetto</h3><div class="sub-t">'+esc(p.nome)+'</div>'+
-      '<div class="modal-b"><div class="field"><label>Password</label><input id="lk_pw" type="password" placeholder="Almeno 4 caratteri"></div>'+
-      '<div class="field"><label>Ripeti password</label><input id="lk_pw2" type="password"></div>'+
+      '<div class="modal-b"><input class="esca" type="text" name="username" autocomplete="username" tabindex="-1" aria-hidden="true"><div class="field"><label>Password</label><input id="lk_pw" type="password" autocomplete="new-password" placeholder="Almeno 4 caratteri"></div>'+
+      '<div class="field"><label>Ripeti password</label><input id="lk_pw2" type="password" autocomplete="new-password"></div>'+
       '<div class="nota-box">Il blocco vale solo per <b>'+esc(p.nome)+'</b>: gli altri progetti restano modificabili. Restano liberi lettura, commenti e chat; si bloccano modifiche, spunte, avanzamento fasi e spostamento eventi.</div>'+
       '</div><div class="modal-f"><button class="btn ghost" data-action="chiudi-modale">Annulla</button>'+
       '<button class="btn primary" data-action="attiva-lock">'+svg('lock')+'Blocca il progetto</button></div>');
   } else {
     modale('<h3>Sblocca il progetto</h3><div class="sub-t">'+esc(p.nome)+'</div>'+
-      '<div class="modal-b"><div class="field"><label>Password</label><input id="lk_pw" type="password" autocomplete="off"></div></div>'+
+      '<div class="modal-b"><input class="esca" type="text" name="username" autocomplete="username" tabindex="-1" aria-hidden="true"><div class="field"><label>Password</label><input id="lk_pw" type="password" autocomplete="new-password"></div></div>'+
       '<div class="modal-f"><button class="btn ghost" data-action="chiudi-modale">Annulla</button>'+
       '<button class="btn primary" data-action="sblocca">'+svg('unlock')+'Sblocca</button></div>');
   }
@@ -11539,6 +11544,11 @@ document.addEventListener('input', function(e){
   }
   if(e.target.id==='cm_tx'){ const t = e.target; t.style.height = 'auto'; t.style.height = Math.min(t.scrollHeight, 160)+'px'; return; }
   if(e.target.id==='gCerca'){ guida.q = e.target.value; filtraGuida(); return; }
+  /* il browser, vedendo una password, a volte scrive la tua email nella prima casella di testo
+     che trova (la ricerca): se non ci sto scrivendo io, quella non e' una ricerca */
+  if((e.target.id==='hmCerca' || e.target.id==='qTel' || e.target.id==='q') && document.activeElement !== e.target){
+    e.target.value = e.target.id==='hmCerca' ? '' : (state.filtro || ''); return;
+  }
   if(e.target.id==='hmCerca'){
     /* dalla home la ricerca continua nella sua pagina, con quello che ho scritto */
     state.filtro = e.target.value; state.schermo = 'cerca'; render();
