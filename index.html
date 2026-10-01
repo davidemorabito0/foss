@@ -3166,6 +3166,31 @@ button.pf-p:hover{background:var(--surface-2);border-radius:10px}
 .pf-tema.on{border-color:var(--amber);box-shadow:inset 0 0 0 1px var(--amber)}
 .pf .esci-rosso{width:100%;justify-content:center}
 .pf .card.pf-adm{padding:18px 20px!important;overflow:visible}
+/* inviti nel profilo */
+.iv-form{display:grid;grid-template-columns:1.3fr 1fr 1fr;gap:12px}
+.iv-form .lungo{grid-column:1 / -1}
+.iv-form .field{margin:0}
+.iv-form textarea{width:100%;resize:vertical;min-height:70px;font:inherit;font-size:13.5px;line-height:1.45;padding:10px 12px;border-radius:10px;border:1px solid var(--line);background:var(--surface-2);color:var(--text);outline:none}
+.iv-form textarea:focus{border-color:var(--amber)}
+.iv-esito{display:flex;align-items:center;gap:10px;margin-top:12px;padding:10px 12px;border-radius:11px;background:var(--amber-soft);color:var(--amber-ink);font-size:13px}
+.iv-esito.ok{background:color-mix(in srgb,#22A565 16%,transparent);color:#2FBF75}
+.iv-esito svg{width:16px;height:16px;flex:none}
+.iv-esito a{color:inherit;font-weight:700;text-decoration:underline}
+.iv-lista{display:flex;flex-direction:column;margin-top:14px;border-top:1px solid var(--line-soft)}
+.iv-r{display:flex;align-items:center;gap:12px;padding:10px 4px;border-bottom:1px solid var(--line-soft)}
+.iv-r:last-child{border-bottom:0}
+.iv-r .av-vuoto{width:36px;height:36px;border-radius:50%;border:1.5px dashed var(--line);display:grid;place-items:center;color:var(--dim);flex:none}
+.iv-r.fatto .av-vuoto{border-style:solid;border-color:#22A565;color:#22A565}
+.iv-r .av-vuoto svg{width:15px;height:15px}
+.iv-r .tx{flex:1;min-width:0;display:flex;flex-direction:column}
+.iv-r .tx b{font-size:14px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.iv-r .tx span{font-size:12px;color:var(--mute);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.iv-r .chip.iv-inv{background:color-mix(in srgb,#5B8DEF 18%,transparent);color:#7FA6F5;border-color:transparent}
+.iv-az{display:flex;align-items:center;gap:4px;flex:none}
+.modal.iv-modale{width:min(700px,96vw);max-width:none}
+.iv-frame{width:100%;height:min(70vh,760px);border:0;border-radius:12px;background:#0A1220}
+@media (max-width:760px){ .iv-form{grid-template-columns:1fr} .iv-r{flex-wrap:wrap} .iv-r .chip{order:3;margin-left:48px} .iv-az{margin-left:auto} }
+
 @media (max-width:1240px){ .pf-grid{grid-template-columns:1fr} .pf-tiles{grid-template-columns:repeat(3,minmax(0,1fr))} }
 @media (max-width:760px){
   .pf.hm-main.scroller{padding:14px 14px 28px}
@@ -5437,7 +5462,7 @@ function puo(k){
   return mieiPermessi[k] !== false;
 }
 /* cose che restano solo dell'amministratore, qualunque permesso abbia il guest */
-const SOLO_ADMIN = ['pf-invita','nuovo-profilo','crea-profilo','togli-profilo','togli-profilo-ok','permessi','perm-toggle',
+const SOLO_ADMIN = ['pf-invita','iv-anteprima','iv-invia','iv-reinvia','nuovo-profilo','crea-profilo','togli-profilo','togli-profilo-ok','permessi','perm-toggle',
   'team-invita','invito-crea','invito-copia','invito-condividi',
   'togli-accesso','togli-accesso-ok','registro','registro-chi','registrati','crea-utente'];
 const PERM_AZIONE = {
@@ -7264,7 +7289,7 @@ function renderProfilo(){
     '</div></section>';
 
   h += cartaProfessioni();
-  h += sonoAdmin && !state.ospite ? pfAmministrazione() : cartaTeam();
+  h += sonoAdmin && !state.ospite ? pfAmministrazione() + pfInviti() : cartaTeam();
   if(!sonoAdmin) h += '<div class="card">'+pfTesta('user','Profilo guest','Vedi solo i lavori che l’amministratore ha aperto per te. Per vedere altro, o per aggiungere persone, chiedi a lui.')+'</div>';
   h += cartaModelli() + cartaSoldi();
 
@@ -7322,6 +7347,69 @@ function renderProfilo(){
   h += '<button class="btn esci-rosso" data-action="esci">'+svg('out')+'Esci da FOSS</button>';
   h += '</div></div></div></div></div>';
   el('stage').innerHTML = h;
+}
+/* ---------- INVITI (nel profilo dell'amministratore) ----------
+   Un'email vera, con la grafica di FOSS, mandata dalla funzione «invia-invito».
+   Finche' l'invio automatico non e' attivo resta la mail dalla propria posta. */
+function pfInviti(){
+  const inv = (state.inviti||[]).slice().sort((a,b)=>String(b.creato_il||'').localeCompare(String(a.creato_il||'')));
+  const aperti = inv.filter(i=>!i.usato), fatti = inv.filter(i=>i.usato).slice(0,4);
+  const es = state.ivEsito, bz = state.ivBozza || {};
+  let h = '<div class="card" id="cartaInviti">'+pfTesta('send','Inviti','Riceve un’email con la grafica di FOSS e un link per registrarsi: entra subito nel tuo team.')+
+    '<div class="iv-form">'+
+      '<div class="field"><label>Email</label><input id="iv_mail" type="email" inputmode="email" autocomplete="off" placeholder="nome@studio.it" maxlength="120" value="'+esc(bz.email||'')+'"></div>'+
+      '<div class="field"><label>Nome (facoltativo)</label><input id="iv_nome" autocomplete="off" placeholder="Es. Laura" maxlength="40" value="'+esc(bz.nome||'')+'"></div>'+
+      '<div class="field"><label>Ruolo (facoltativo)</label><input id="iv_ruolo" list="ivRuoli" autocomplete="off" placeholder="Es. Montatrice" maxlength="60" value="'+esc(bz.ruolo||'')+'">'+datalistRuoli('ivRuoli')+'</div>'+
+      '<div class="field lungo"><label>Due righe tue (facoltativo)</label><textarea id="iv_msg" rows="3" maxlength="600" placeholder="Es. Ciao Laura, per i prossimi lavori ci servi tu al montaggio.">'+esc(bz.messaggio||'')+'</textarea></div>'+
+    '</div>'+
+    '<div class="cal-az" style="margin-top:12px"><button class="btn primary" data-action="iv-invia">'+svg('send')+'Invia l’invito</button>'+
+      '<button class="btn" data-action="iv-anteprima">'+svg('eye')+'Anteprima</button></div>';
+  if(es){
+    const x = inv.find(i=>i.id===es.id);
+    if(es.ok && x) h += '<div class="iv-esito ok">'+svg('check',2.6)+'<span>Email inviata a <b>'+esc(x.email)+'</b>.</span></div>';
+    else if(es.chiave && x) h += '<div class="iv-esito">'+svg('bell',2.2)+'<span>L’invio automatico non è ancora attivo: l’invito è salvato. '+
+      '<a href="'+esc(mailtoInvito(x))+'" target="_blank" rel="noopener">Mandalo dalla tua posta</a>.</span></div>';
+  }
+  if(aperti.length || fatti.length){
+    h += '<div class="iv-lista">';
+    aperti.concat(fatti).forEach(i=>{
+      const nome = (i.nickname || ((i.nome||'')+' '+(i.cognome||'')).trim());
+      const d = i.inviato_il ? new Date(i.inviato_il) : null;
+      const st = i.usato ? '<span class="chip ok">Registrato</span>'
+        : d && !isNaN(d) ? '<span class="chip iv-inv">Inviata il '+d.getDate()+' '+MESI_BREVI[d.getMonth()]+((i.invii||0)>1?' · '+i.invii+' volte':'')+'</span>'
+        : '<span class="chip now">Da inviare</span>';
+      h += '<div class="iv-r'+(i.usato?' fatto':'')+'"><span class="av-vuoto">'+svg(i.usato?'check':'send',2)+'</span>'+
+        '<span class="tx"><b>'+esc(nome || i.email)+'</b><span>'+esc([nome ? i.email : '', i.ruolo||''].filter(Boolean).join(' · ') || 'Ruolo da scegliere')+'</span></span>'+st+
+        (i.usato ? '' : '<span class="iv-az">'+
+          ((i.invii||0) < 3 ? '<button class="btn sm" data-action="iv-reinvia" data-id="'+esc(i.id)+'">'+svg('send')+(i.inviato_il?'Reinvia':'Invia')+'</button>' : '')+
+          '<button class="iconbtn" data-action="iv-anteprima" data-id="'+esc(i.id)+'" title="Anteprima" aria-label="Anteprima">'+svg('eye',2)+'</button>'+
+          '<button class="iconbtn" data-action="togli-profilo" data-id="'+esc(i.id)+'" title="Annulla l’invito" aria-label="Annulla l’invito">'+svg('x',2.4)+'</button></span>')+
+      '</div>';
+    });
+    h += '</div>';
+  }
+  return h + '</div>';
+}
+function esitoInvio(inv, r){
+  if(r && r.ok){
+    inv.inviato_il = r.inviato_il || new Date().toISOString(); inv.invii = r.invii || ((inv.invii||0)+1);
+    state.ivEsito = {id:inv.id, ok:true};
+    azione('Invito mandato a <b>'+esc(inv.email)+'</b>');
+  } else if(!r || r.errore==='chiave' || r.errore==='offline'){
+    state.ivEsito = {id:inv.id, chiave:true};
+  } else {
+    state.ivEsito = null;
+    toast({troppi:'Questo invito è già partito tre volte: aspetta che si registri o annullalo.',
+           registrato:'Questa persona si è già registrata.', email:'L’email non è valida.'}[r.errore] ||
+          'L’email non è partita ('+esc(r.errore)+'). Riprova tra poco.', 'warn', 'Invito non inviato');
+  }
+  render();
+}
+function mostraAnteprimaInvito(html){
+  modale('<h3>Anteprima dell’invito</h3><div class="sub-t">Così la vede chi lo riceve.</div>'+
+    '<div class="modal-b"><iframe class="iv-frame" sandbox="" title="Anteprima dell’invito"></iframe></div>'+
+    '<div class="modal-f"><button class="btn primary" data-action="chiudi-modale">Chiudi</button></div>', 'iv-modale');
+  const f = document.querySelector('.iv-frame'); if(f) f.srcdoc = html;
 }
 /* nel profilo dell'amministratore: le persone in breve, con gli inviti in attesa */
 function pfAmministrazione(){
@@ -9063,7 +9151,7 @@ function cartaModelli(){
    Come si fa tutto, capitolo per capitolo: dai primi passi alle cose per chi
    organizza un team. Si cerca per parola (anche senza accenti); in fondo c'e'
    il tasto per segnalare quello che manca o non funziona. */
-const VERSIONE = 'v38';
+const VERSIONE = 'v39';
 const LIVELLI_GUIDA = {base:'Per cominciare', medio:'Tutti i giorni', esperto:'Per chi organizza', aiuto:'Se qualcosa non va'};
 const GUIDA = [
 {id:'primi-passi', liv:'base', ic:'spark', t:'Primi passi', s:'Cos’è FOSS e come ci si muove', v:[
@@ -9508,6 +9596,8 @@ document.addEventListener('keydown', function(e){
   }
 }, true);
 document.addEventListener('input', function(e){ if(CAMPI_MENZ.indexOf(e.target.id) >= 0) aggiornaMenz(e.target); }, true);
+/* la bozza dell'invito sopravvive ai ridisegni (anteprima, altre azioni) */
+document.addEventListener('input', function(e){ const k = {iv_mail:'email', iv_nome:'nome', iv_ruolo:'ruolo', iv_msg:'messaggio'}[e.target.id]; if(k){ state.ivBozza = state.ivBozza || {}; state.ivBozza[k] = e.target.value; } }, true);
 document.addEventListener('pointerdown', function(e){ if(menz && !e.target.closest('#menzPop, [data-action="menz-apri"]') && e.target !== menz.ta) chiudiMenz(); }, true);
 
 /* ============ COMMENTI DELLE TASK E DELLE SUBTASK ============
@@ -11281,6 +11371,36 @@ document.addEventListener('click', function(e){
 
     /* ---- home ---- */
     case 'hm-mie': state.schermo = 'mie'; mieAppena.clear(); render(); break;
+    case 'iv-anteprima':{
+      const id = t.dataset.id;
+      const corpo = id ? {id, anteprima:true} : {anteprima:true, bozza:{email:(el('iv_mail').value||'').trim().toLowerCase() || 'nome@studio.it',
+        nome:(el('iv_nome').value||'').trim(), ruolo:(el('iv_ruolo').value||'').trim(), messaggio:(el('iv_msg').value||'').trim()}};
+      if(typeof inviaInvitoCloud !== 'function'){ toast('L’anteprima serve la connessione al database.','warn','Anteprima'); break; }
+      t.disabled = true;
+      inviaInvitoCloud(corpo).then(r=>{ t.disabled = false;
+        if(r && r.html) mostraAnteprimaInvito(r.html); else toast('Anteprima non disponibile ('+esc((r&&r.errore)||'')+').','warn','Anteprima'); });
+      break; }
+    case 'iv-invia':{
+      const email = (el('iv_mail').value||'').trim().toLowerCase();
+      const nome = (el('iv_nome').value||'').trim().slice(0,40), ruolo = (el('iv_ruolo').value||'').trim().slice(0,60), messaggio = (el('iv_msg').value||'').trim().slice(0,600);
+      if(!/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(email)){ toast('Scrivi un\u2019email valida: \u00e8 quella con cui si registrer\u00e0.','warn','Email mancante'); el('iv_mail').focus(); break; }
+      if((state.inviti||[]).some(i=>!i.usato && (i.email||'').toLowerCase()===email)){ toast('L\u2019hai gi\u00e0 invitata: premi Reinvia nella lista qui sotto.','warn','Gi\u00e0 invitata'); break; }
+      if(state.utenti.some(u=>(u.email||'').toLowerCase()===email)){ toast('Questa persona \u00e8 gi\u00e0 nel team.','warn','Gi\u00e0 nel team'); break; }
+      const d = {nome, cognome:'', nickname:'', email, ruolo, messaggio};
+      t.disabled = true;
+      const dopo = inv => {
+        if(!inv){ t.disabled = false; return; }
+        state.ivBozza = null; ['iv_mail','iv_nome','iv_ruolo','iv_msg'].forEach(k=>{ const n = el(k); if(n) n.value = ''; });
+        if(typeof inviaInvitoCloud === 'function') inviaInvitoCloud({id:inv.id}).then(r=>esitoInvio(inv, r));
+        else esitoInvio(inv, {errore:'offline'});
+      };
+      if(typeof creaProfiloCloud === 'function') creaProfiloCloud(d).then(dopo);
+      else { state.inviti = state.inviti || []; const inv = Object.assign({id:'i'+Date.now(), usato:false, creato_il:new Date().toISOString()}, d); state.inviti.push(inv); dopo(inv); }
+      break; }
+    case 'iv-reinvia':{
+      const inv = (state.inviti||[]).find(i=>i.id===t.dataset.id); if(!inv) break;
+      if(typeof inviaInvitoCloud !== 'function'){ esitoInvio(inv, {errore:'offline'}); break; }
+      t.disabled = true; inviaInvitoCloud({id:inv.id}).then(r=>esitoInvio(inv, r)); break; }
     case 'mie-filtro': state.mieFiltro = t.dataset.k || 'tutte'; render(); break;
     case 'mie-chiudi':{ const c = state.mieChiusi || (state.mieChiusi = new Set()); const k = t.dataset.id; if(c.has(k)) c.delete(k); else c.add(k); render(); break; }
     case 'mie-stato':{
@@ -11738,6 +11858,7 @@ document.addEventListener('click', function(e){
       state.schermo = 'team'; state.drawer = false; state.progettoId = null; chiudiModale(); render(); break;
     case 'pf-invita':
     case 'team-invita':
+      if(a === 'pf-invita' && el('iv_mail')){ const c = el('cartaInviti'); if(c) c.scrollIntoView({behavior:'smooth', block:'start'}); setTimeout(()=>el('iv_mail').focus({preventScroll:true}), 350); break; }
       if(a === 'pf-invita'){ state.schermo = 'team'; state.progettoId = null; }
       state.teamForm = true; state.teamPronto = null; render();
       setTimeout(()=>{ const i = el('tm_mail'); if(i) i.focus(); }, 40); break;
@@ -13196,7 +13317,7 @@ async function caricaCloud(){
     /* i profili creati dall'amministratore che non si sono ancora registrati */
     state.inviti = [];
     if(sonoAdmin && orgMia){
-      const {data:inv} = await sb.from('inviti').select('id,nome,cognome,nickname,email,ruolo,usato,creato_il').eq('org_id', orgMia);
+      const {data:inv} = await sb.from('inviti').select('id,nome,cognome,nickname,email,ruolo,usato,creato_il,messaggio,inviato_il,invii').eq('org_id', orgMia);
       state.inviti = inv || [];
     }
 
@@ -14072,12 +14193,24 @@ async function primoAccesso(invito, email, pw){
 async function creaProfiloCloud(d){
   if(!sb || !utenteCloud || !orgMia){ toast('Serve la connessione al database.','warn','Non creato'); return false; }
   const {data, error} = await sb.from('inviti').insert({org_id:orgMia, nome:d.nome, cognome:d.cognome,
-    nickname:d.nickname, email:d.email, ruolo:d.ruolo||'', usato:false})
-    .select('id,nome,cognome,nickname,email,ruolo,usato,creato_il').single();
+    nickname:d.nickname, email:d.email, ruolo:d.ruolo||'', messaggio:(d.messaggio||'').slice(0,600), usato:false})
+    .select('id,nome,cognome,nickname,email,ruolo,usato,creato_il,messaggio,inviato_il,invii').single();
   if(error){ toast(error.message,'warn','Invito non creato'); return false; }
   if(data && !data.creato_il) data.creato_il = new Date().toISOString();
   state.inviti = (state.inviti||[]).concat([data]);
   return data;
+}
+/* l'invito con la grafica di FOSS: lo manda la funzione «invia-invito» (Resend).
+   {id} manda, {id, anteprima} o {bozza, anteprima} restituiscono l'HTML. */
+async function inviaInvitoCloud(corpo){
+  if(!sb || !utenteCloud) return {errore:'offline'};
+  try{
+    const {data, error} = await sb.functions.invoke('invia-invito', {body:corpo});
+    if(!error) return data || {};
+    let e = error.message || 'invio';
+    try{ if(error.context && typeof error.context.json === 'function'){ const j = await error.context.json(); if(j && j.errore) e = j.errore; } }catch(x){}
+    return {errore:e};
+  }catch(x){ return {errore:'rete'}; }
 }
 async function salvaPermessiCloud(uid, pm){
   if(!sb || !utenteCloud || !orgMia) return false;
