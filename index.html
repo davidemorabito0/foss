@@ -2980,6 +2980,117 @@ body.sto-spostando .hm-spazi.griglia{scroll-snap-type:none}
   .mov-add{grid-template-columns:1fr 1fr}
   .mov-add input[id$="_n"]{grid-column:1 / 2}
 }
+/* ---------- PROFILO (v38): due colonne, copertina con la scena ---------- */
+.pf.hm-main.scroller{padding:24px 28px 40px}
+.pf-head{margin-bottom:18px}
+.pf-head h1{font-size:30px;font-weight:700;letter-spacing:-.025em;margin:0}
+.pf-head p{margin:4px 0 0;color:var(--hm-2,var(--dim));font-size:13.5px}
+.pf-grid{display:grid;grid-template-columns:minmax(0,1.65fr) minmax(0,1fr);gap:18px;align-items:start}
+.pf-col{display:flex;flex-direction:column;gap:16px;min-width:0}
+.pf .card{border-radius:16px;padding:18px 20px}
+.pf-t{display:flex;align-items:flex-start;gap:12px;margin-bottom:14px}
+.pf-ic{width:26px;height:26px;color:var(--amber);flex:none;display:grid;place-items:center;margin-top:1px}
+.pf-ic svg{width:22px;height:22px}
+.pf-t .tx{flex:1;min-width:0}
+.pf-t h3{font-size:16.5px;font-weight:700;margin:0;letter-spacing:-.01em}
+.pf-t p{margin:3px 0 0;font-size:12.5px;color:var(--dim);line-height:1.45}
+.pf-t > .btn,.pf-t > .chip{flex:none;margin-left:auto}
+.pf-salva{display:inline-flex;align-items:center;gap:6px;padding:6px 11px}
+.pf-salva svg{width:12px;height:12px}
+/* copertina */
+.pf-hero{position:relative;border-radius:18px;overflow:hidden;min-height:260px;border:1px solid var(--line);display:flex;align-items:flex-end;background:#0d1626;isolation:isolate}
+.pf-hero .hm-pae{position:absolute!important;inset:0!important;top:0!important;left:0!important;width:100%!important;height:100%!important;z-index:-2!important}
+.pf-velo{position:absolute;inset:0;z-index:-1;background:linear-gradient(180deg,rgba(8,13,26,0) 10%,rgba(8,13,26,.5) 50%,rgba(8,13,26,.9) 100%)}
+.pf-stato{position:absolute;top:14px;right:14px;display:inline-flex;align-items:center;gap:7px;padding:5px 12px;border-radius:999px;font-size:12px;font-weight:600;color:#fff;
+  background:rgba(10,16,30,.55);border:1px solid rgba(255,255,255,.16);backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px)}
+.pf-stato i{width:8px;height:8px;border-radius:50%;background:#3DDC84;box-shadow:0 0 0 3px rgba(61,220,132,.25)}
+.pf-stato i.off{background:#9AA4B2;box-shadow:none}
+.pf-id{display:flex;align-items:flex-end;gap:20px;padding:24px;width:100%;color:#fff}
+.pf-foto{position:relative;width:120px;height:120px;border-radius:50%;flex:none;display:grid;place-items:center;background:var(--amber) center/cover no-repeat;color:#15120a;
+  font:700 42px Sora,sans-serif;border:3px solid rgba(255,255,255,.92);box-shadow:0 12px 30px rgba(0,0,0,.35)}
+.pf-cam{position:absolute;right:-2px;bottom:4px;width:34px;height:34px;border-radius:50%;display:grid;place-items:center;cursor:pointer;
+  background:#101a2e;color:#fff;border:2px solid #fff;transition:transform .15s}
+.pf-cam:hover{transform:scale(1.08)}
+.pf-cam svg{width:16px;height:16px}
+.pf-id .tx{flex:1;min-width:0}
+.pf-id h2{margin:0;font-size:27px;font-weight:800;letter-spacing:-.02em;color:#fff;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.pf-ruolo{margin:3px 0 0;font-size:13.5px;color:rgba(255,255,255,.85)}
+.pf-ruolo i{font-style:normal;opacity:.55;margin:0 2px}
+.pf-id .chip.ruolo-acc{margin-top:9px}
+.pf-az{display:flex;gap:8px;flex-wrap:wrap;margin-top:12px}
+.pf-az .btn{background:rgba(10,16,30,.55);border-color:rgba(255,255,255,.2);color:#fff;backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px);cursor:pointer}
+.pf-az .btn:hover{background:rgba(10,16,30,.75)}
+.pf-frase{margin:0 0 4px;flex:none;width:230px;padding:16px 18px;border-radius:14px;text-align:center;font-size:13.5px;line-height:1.5;color:#fff;
+  background:rgba(10,16,30,.5);border:1px solid rgba(255,255,255,.16);backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px)}
+/* lavori che fai */
+.pf .prof-scelte{grid-template-columns:repeat(3,minmax(0,1fr));gap:10px}
+.pf .prof-b{padding:12px 14px;border-radius:12px;min-height:60px;gap:12px}
+.pf .prof-b .ic{width:38px;height:38px;border-radius:10px}
+.pf .prof-b .ic svg{width:18px;height:18px}
+.pf .prof-b .nm{font-size:13.5px;font-weight:700}
+.pf .prof-b .sp{width:22px;height:22px}
+.pf .prof-b .sp svg{width:13px;height:13px}
+.pf .prof-b.on{background:color-mix(in srgb,var(--amber) 13%,var(--surface-2))}
+/* amministrazione */
+.pf-pers{display:flex;flex-direction:column}
+.pf-p{display:flex;align-items:center;gap:12px;width:100%;padding:10px 8px;border-top:1px solid var(--line-soft);border-radius:0;text-align:left}
+.pf-p:first-child{border-top:0}
+button.pf-p:hover{background:var(--surface-2);border-radius:10px}
+.pf-p > .av,.pf-p > .av-vuoto{width:38px;height:38px;font-size:12px;flex:none}
+.pf-p .av-vuoto{border-radius:50%;border:1.5px dashed var(--line);display:grid;place-items:center;color:var(--dim)}
+.pf-p .av-vuoto svg{width:15px;height:15px}
+.pf-p .tx{flex:1;min-width:0;display:flex;flex-direction:column;gap:1px}
+.pf-p .tx b{font-size:14px;font-weight:700}
+.pf-p .tx span{font-size:12px;color:var(--mute);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.pf-p > svg{width:16px;height:16px;color:var(--mute);flex:none}
+/* i tuoi dati */
+.pf-tiles{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px}
+.pf-tile{display:flex;align-items:center;gap:12px;padding:14px;border-radius:12px;border:1px solid var(--line);background:var(--surface-2);text-align:left;cursor:pointer;color:var(--text);transition:border-color .15s}
+.pf-tile:hover{border-color:var(--surface-3)}
+.pf-tile.info{cursor:default}
+.pf-tile .q{width:40px;height:40px;border-radius:11px;display:grid;place-items:center;background:var(--surface-3);color:var(--text);flex:none}
+.pf-tile .q svg{width:19px;height:19px}
+.pf-tile.verde .q{background:#22A565;color:#fff}
+.pf-tile .tx{flex:1;min-width:0}
+.pf-tile .tx b{display:block;font-size:13.5px;font-weight:700}
+.pf-tile .tx span{display:block;font-size:11.5px;color:var(--mute);line-height:1.35;margin-top:2px}
+.pf-tile > svg{width:15px;height:15px;color:var(--mute);flex:none}
+/* dati personali */
+.pf-campi{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.pf-campi .lungo{grid-column:1 / -1}
+.pf-campi .field{margin:0}
+/* righe con l'icona */
+.pf .pf-r{gap:12px}
+.pf-ri{width:36px;height:36px;border-radius:10px;background:var(--surface-2);color:var(--dim);display:grid;place-items:center;flex:none}
+.pf-ri svg{width:17px;height:17px}
+.pf-sel{background:var(--surface-2);border:1px solid var(--line);border-radius:10px;padding:8px 10px;font-size:13px;color:var(--text);outline:none}
+/* tema */
+.pf-temi{display:grid;grid-template-columns:repeat(auto-fill,minmax(112px,1fr));gap:8px;margin-bottom:6px}
+.pf-tema{display:flex;flex-direction:column;align-items:flex-start;gap:2px;padding:10px 11px;border-radius:12px;border:1px solid var(--line);background:var(--surface-2);text-align:left;min-width:0}
+.pf-tema:hover{border-color:var(--surface-3)}
+.pf-tema .sw3{display:flex;gap:4px;margin-bottom:7px}
+.pf-tema .sw3 i{width:17px;height:17px;border-radius:5px;border:1px solid rgba(255,255,255,.12)}
+.pf-tema b{font-size:12.5px;font-weight:700}
+.pf-tema span{font-size:10.5px;color:var(--mute);line-height:1.3}
+.pf-tema.on{border-color:var(--amber);box-shadow:inset 0 0 0 1px var(--amber)}
+.pf .esci-rosso{width:100%;justify-content:center}
+.pf .card.pf-adm{padding:18px 20px!important;overflow:visible}
+@media (max-width:1240px){ .pf-grid{grid-template-columns:1fr} .pf-tiles{grid-template-columns:repeat(3,minmax(0,1fr))} }
+@media (max-width:760px){
+  .pf.hm-main.scroller{padding:14px 14px 28px}
+  .pf-head{display:none}
+  .pf-hero{min-height:300px}
+  .pf-id{flex-direction:column;align-items:flex-start;gap:12px;padding:18px}
+  .pf-foto{width:92px;height:92px;font-size:32px}
+  .pf-id h2{font-size:23px}
+  .pf-frase{display:none}
+  .pf .prof-scelte{grid-template-columns:1fr 1fr}
+  .pf-tiles{grid-template-columns:1fr}
+  .pf-campi{grid-template-columns:1fr}
+  .pf .card{padding:16px}
+}
+@media (max-width:420px){ .pf .prof-scelte{gap:8px} .pf .prof-b{padding:10px;gap:9px;min-height:54px} .pf .prof-b .ic{width:32px;height:32px} .pf .prof-b .nm{font-size:12.5px} .pf .prof-b .sp{display:none} }
+
 </style>
 
 </head>
@@ -3761,10 +3872,8 @@ function salvaProfessioni(l){
 }
 function cartaProfessioni(){
   const scelte = haSceltoProfessioni() ? state.cfg.professioni : [];
-  return '<div class="card" id="cartaProf"><h3 style="display:flex;align-items:center;gap:7px">'+
-      svg('briefcase',2.2).replace('<svg','<svg style="width:15px;height:15px;color:var(--amber-ink)"')+'I lavori che fai</h3>'+
-    '<div class="hint">Quando crei uno spazio, un progetto o un preset ti propongo solo queste professioni. '+
-      (scelte.length ? 'Tocca per aggiungerne o toglierne.' : 'Finché non ne scegli nessuna le vedi tutte.')+'</div>'+
+  return '<div class="card" id="cartaProf">'+pfTesta('briefcase','I lavori che fai','Quando crei uno spazio, un progetto o un preset ti propongo solo queste professioni. '+
+      (scelte.length ? 'Tocca per aggiungerne o toglierne.' : 'Finché non ne scegli nessuna le vedi tutte.'))+
     '<div class="prof-scelte">'+ORDINE_TIPI.map(k=>{ const on = scelte.indexOf(k)>=0;
       return '<button class="prof-b'+(on?' on':'')+'" data-action="prof-cambia" data-k="'+k+'" aria-pressed="'+on+'">'+
         '<span class="ic">'+svg(TIPI[k].ic,2)+'</span><span class="nm">'+esc(TIPI[k].prof)+'</span>'+
@@ -3860,15 +3969,15 @@ const PRIO = {alta:'Alta', media:'Media', bassa:'Bassa'};
 /* i tag sostituiscono il vecchio "tipo di lavoro": liberi, creabili al volo */
 const TAG_BASE = ['Evento','Spot','Musicale','Prodotto','Formazione','Food','Corporate','Live','Reel'];
 const TEMI = [
-  {id:'ardesia', nome:'Ardesia', ds:'Blu-grigio, accento teal — il predefinito', c:['#101619','#1D272D','#2FB3A4']},
-  {id:'nebbia',  nome:'Nebbia',  ds:'Chiaro attenuato, non abbaglia di notte',   c:['#DCE2E8','#EDF1F4','#2F7D8C']},
-  {id:'sabbia',  nome:'Sabbia',  ds:'Carta calda, riposa gli occhi la sera',     c:['#E4DDD2','#F1ECE4','#B4632A']},
-  {id:'brand',   nome:'Brand',   ds:'Navy e ambra — il tuo',                     c:['#0D1926','#1A3149','#FFAD01']},
-  {id:'bosco',   nome:'Bosco',   ds:'Verdi bassi, molto calmo',                  c:['#0F1714','#1C2924','#7FB069']},
-  {id:'grafite', nome:'Grafite', ds:'Monocromo, arancio secco',                  c:['#141312','#232120','#E2723B']},
-  {id:'notte',   nome:'Notte',   ds:'Indaco e lilla, riposante',                 c:['#101223','#1E2239','#7C6CF0']},
-  {id:'crema',   nome:'Crema arancia', ds:'Arancione da ufficio su fondo crema',  c:['#F1E7D8','#F8F1E5','#C2622A']},
-  {id:'bordeaux',nome:'Bordeaux',ds:'Vinaccia profondo e rosa acceso',            c:['#170410','#2E0F1A','#DD5170']}
+  {id:'ardesia', nome:'Ardesia', ds:'Blu-grigio, accento teal — il predefinito', c:['#101619','#1D272D','#2FB3A4'], breve:'Il classico di FOSS'},
+  {id:'nebbia',  nome:'Nebbia',  ds:'Chiaro attenuato, non abbaglia di notte',   c:['#DCE2E8','#EDF1F4','#2F7D8C'], breve:'Chiaro e morbido'},
+  {id:'sabbia',  nome:'Sabbia',  ds:'Carta calda, riposa gli occhi la sera',     c:['#E4DDD2','#F1ECE4','#B4632A'], breve:'Caldo e naturale'},
+  {id:'brand',   nome:'Brand',   ds:'Navy e ambra — il tuo',                     c:['#0D1926','#1A3149','#FFAD01'], breve:'I colori di FOSS'},
+  {id:'bosco',   nome:'Bosco',   ds:'Verdi bassi, molto calmo',                  c:['#0F1714','#1C2924','#7FB069'], breve:'Verde e rilassante'},
+  {id:'grafite', nome:'Grafite', ds:'Monocromo, arancio secco',                  c:['#141312','#232120','#E2723B'], breve:'Scuro e deciso'},
+  {id:'notte',   nome:'Notte',   ds:'Indaco e lilla, riposante',                 c:['#101223','#1E2239','#7C6CF0'], breve:'Viola e blu profondo'},
+  {id:'crema',   nome:'Crema arancia', ds:'Arancione da ufficio su fondo crema',  c:['#F1E7D8','#F8F1E5','#C2622A'], breve:'Energico e creativo'},
+  {id:'bordeaux',nome:'Bordeaux',ds:'Vinaccia profondo e rosa acceso',            c:['#170410','#2E0F1A','#DD5170'], breve:'Elegante e profondo'}
 ];
 const PESO = {alta:0, media:1, bassa:2};
 
@@ -5237,7 +5346,7 @@ function puo(k){
   return mieiPermessi[k] !== false;
 }
 /* cose che restano solo dell'amministratore, qualunque permesso abbia il guest */
-const SOLO_ADMIN = ['nuovo-profilo','crea-profilo','togli-profilo','togli-profilo-ok','permessi','perm-toggle',
+const SOLO_ADMIN = ['pf-invita','nuovo-profilo','crea-profilo','togli-profilo','togli-profilo-ok','permessi','perm-toggle',
   'team-invita','invito-crea','invito-copia','invito-condividi',
   'togli-accesso','togli-accesso-ok','registro','registro-chi','registrati','crea-utente'];
 const PERM_AZIONE = {
@@ -6979,91 +7088,124 @@ function profiloTocco(){
   clearTimeout(tSalvaProfilo);
   tSalvaProfilo = setTimeout(applicaProfilo, 600);
 }
+/* intestazione delle carte del profilo: icona, titolo, una riga sotto, e a destra un tasto o uno stato */
+function pfTesta(ic, titolo, sotto, destra){
+  return '<div class="pf-t"><span class="pf-ic">'+svg(ic,2)+'</span><div class="tx"><h3>'+titolo+'</h3>'+(sotto?'<p>'+sotto+'</p>':'')+'</div>'+(destra||'')+'</div>';
+}
+function rigaIc(ic, t, d, k, on){
+  return '<div class="riga pf-r"><span class="pf-ri">'+svg(ic,2)+'</span><div class="tx"><b>'+t+'</b><span>'+d+'</span></div>'+
+    '<button class="sw'+(on?' on':'')+'" data-action="cfg" data-k="'+k+'" aria-pressed="'+(!!on)+'" aria-label="'+t+'"></button></div>';
+}
 function renderProfilo(){
   const m = state.me, c = state.cfg;
   const fotoOk = urlSicura(m.foto);
-  const foto = fotoOk? 'style="background-image:url('+esc(fotoOk)+')"' : '';
-  let h = '<div class="pane"><div class="scroller" style="padding:18px 20px 24px"><div class="prof">'+
-    '<div style="margin:-4px 0 14px" class="no-tel">'+tastoIndietro(state.progettoId?'progetto-corrente':'home','Indietro')+'</div>';
+  const foto = fotoOk? ' style="background-image:url('+esc(fotoOk)+')"' : '';
+  const scena = paesaggioHome();
+  const ruoli = ruoliDi(m.ruolo);
+  let h = '<div class="pane"><div class="hm pf-lay">'+barraSinistra('profilo')+'<div class="hm-main scroller pf">';
+  h += '<div class="pf-head"><h1>Profilo</h1><p>Gestisci il tuo account, le preferenze e le informazioni personali.</p></div>';
+  h += '<div class="pf-grid"><div class="pf-col">';
 
-  h += '<div class="card"><div class="ident">'+
-    '<div class="foto" '+foto+'>'+(fotoOk?'':esc(iniziali()))+'</div>'+
-    '<div style="flex:1;min-width:0">'+
-      '<div class="lbl" style="margin-bottom:3px">Come ti vedono gli altri</div>'+
-      '<h2 style="font-size:21px" id="prevNome">'+esc(nomeVisibile())+'</h2>'+
-      '<div style="font-size:12.5px;color:var(--dim)" id="prevRuolo">'+esc(m.ruolo||'—')+'</div>'+
-      '<span class="chip ruolo-acc'+(sonoAdmin?' admin':'')+'">'+svg(sonoAdmin?'lock':'user',2.2)+(sonoAdmin?'Amministratore':'Guest')+'</span>'+
-      '<div style="display:flex;gap:8px;margin-top:11px;flex-wrap:wrap">'+
-        '<input type="file" id="pf_foto" accept="image/*" hidden>'+
-        '<label class="btn sm" for="pf_foto" style="cursor:pointer">'+svg('user')+'Cambia foto</label>'+
-        (m.foto? '<button class="btn sm ghost" data-action="togli-foto">Rimuovi foto</button>':'')+
-      '</div>'+
-    '</div></div></div>';
+  /* la copertina: la scena del momento, la foto, il nome */
+  h += '<section class="pf-hero tono-'+scena.tono+'">'+scena.svg+'<div class="pf-velo"></div>'+
+    '<span class="pf-stato">'+(cloudAttivo() ? '<i></i>Online' : '<i class="off"></i>Su questo dispositivo')+'</span>'+
+    '<div class="pf-id">'+
+      '<div class="pf-foto"'+foto+'>'+(fotoOk?'':esc(iniziali()))+
+        '<label class="pf-cam" for="pf_foto" title="Cambia foto" aria-label="Cambia foto">'+svg('foto',2)+'</label></div>'+
+      '<div class="tx"><h2 id="prevNome">'+esc(nomeVisibile())+'</h2>'+
+        '<div class="pf-ruolo" id="prevRuolo">'+(ruoli.length ? ruoli.map(esc).join(' <i>•</i> ') : 'Ruolo non indicato')+'</div>'+
+        '<span class="chip ruolo-acc'+(sonoAdmin?' admin':'')+'">'+svg(sonoAdmin?'lock':'user',2.2)+(sonoAdmin?'Amministratore':'Guest')+'</span>'+
+        '<div class="pf-az"><input type="file" id="pf_foto" accept="image/*" hidden>'+
+          '<label class="btn sm" for="pf_foto">'+svg('user')+'Cambia foto</label>'+
+          (m.foto? '<button class="btn sm ghost" data-action="togli-foto">Rimuovi foto</button>':'')+'</div></div>'+
+      '<blockquote class="pf-frase">“'+esc(fraseDelGiorno())+'”</blockquote>'+
+    '</div></section>';
 
-  h += cartaTeam() + cartaModelli();
-  h += cartaGuida();
   h += cartaProfessioni();
-  if(!sonoAdmin) h += '<div class="card"><h3>Profilo guest</h3><div class="hint" style="margin:0">Vedi solo i lavori che l\u2019amministratore ha aperto per te. '+
-      'Per vedere altro, o per aggiungere persone, chiedi a lui.</div></div>';
-  h += cartaSoldi() + cartaCalendario();
+  h += sonoAdmin && !state.ospite ? pfAmministrazione() : cartaTeam();
+  if(!sonoAdmin) h += '<div class="card">'+pfTesta('user','Profilo guest','Vedi solo i lavori che l’amministratore ha aperto per te. Per vedere altro, o per aggiungere persone, chiedi a lui.')+'</div>';
+  h += cartaModelli() + cartaSoldi();
 
-  h += '<div class="card"><h3 style="display:flex;align-items:center;gap:8px">Dati personali<span class="chip" id="statoProfilo" style="margin-left:auto">Si salva da solo</span></h3><div class="hint">Se compili il nickname, sarà quello mostrato ovunque nel software.</div>'+
-    '<div class="griglia">'+
+  /* i tuoi dati */
+  h += '<div class="card">'+pfTesta('salva','I tuoi dati','Esporta progetti, task, note e registro. Tieni sempre una copia del tuo lavoro.')+
+    '<div class="pf-tiles">'+
+      '<button class="pf-tile verde" data-action="esporta"><span class="q">'+svg('deliver',2)+'</span><span class="tx"><b>Scarica un backup</b><span>Spazi, progetti, task, note e registro</span></span>'+svg('right',2.2)+'</button>'+
+      '<input type="file" id="pf_import" accept="application/json,.json" hidden>'+
+      '<label class="pf-tile" for="pf_import"><span class="q">'+svg('undo',2)+'</span><span class="tx"><b>Ripristina da backup</b><span>Sostituisce i dati di adesso. Ctrl+Z annulla</span></span>'+svg('right',2.2)+'</label>'+
+      '<div class="pf-tile info"><span class="q">'+svg('list',2)+'</span><span class="tx"><b>Dove stanno i dati</b><span>'+
+        (typeof sb!=='undefined' && sb ? 'Database del team, con una copia su questo dispositivo' : 'In questo browser')+' · v'+SCHEMA+'</span></span></div>'+
+    '</div></div>';
+  h += '</div><div class="pf-col">';
+
+  /* dati personali */
+  h += '<div class="card">'+pfTesta('user','Dati personali','Queste informazioni le vede il tuo team.','<span class="chip pf-salva" id="statoProfilo">'+svg('check',2.4)+'Si salva da solo</span>')+
+    '<div class="pf-campi">'+
       campo('Nome','pf_nome',m.nome)+campo('Cognome','pf_cognome',m.cognome)+
-      campo('Nickname (facoltativo)','pf_nick',m.nick,'Es. Dave')+
-      campo('Email','pf_email',m.email,'nome@studio.it')+
-    '</div><div style="margin-top:12px">'+campo('Ruolo di lavoro','pf_ruolo',m.ruolo,'Es. Regia · Montaggio')+'</div>'+
-    '<div style="margin-top:12px">'+campo('Link (sito, LinkedIn, Instagram…)','pf_link',m.link||'','https://')+'</div></div>';
+      campo('Nickname (facoltativo)','pf_nick',m.nick,'Es. Dave')+campo('Email','pf_email',m.email,'nome@studio.it')+
+      '<div class="lungo">'+campo('Ruolo di lavoro','pf_ruolo',m.ruolo,'Es. Regia · Montaggio')+'</div>'+
+      '<div class="lungo">'+campo('Link (sito, LinkedIn, Instagram…)','pf_link',m.link||'','https://')+'</div>'+
+    '</div></div>';
 
-  h += '<div class="card"><h3>Notifiche</h3><div class="hint">Decidi quanto il software può interromperti mentre lavori.</div>'+
-    riga('Box a schermo intero','Menzioni e assegnazioni oscurano lo schermo finché non premi VISUALIZZATO','boxFull',c.boxFull)+
-
-    riga('Solo i miei progetti','Niente notifiche dai progetti in cui non sei assegnato','soloMiei',c.soloMiei)+
+  /* notifiche */
+  h += '<div class="card">'+pfTesta('bell','Notifiche','Decidi come e quando il software può interromperti.')+
+    rigaIc('pannello','Box a schermo intero','Menzioni e assegnazioni oscurano lo schermo finché non premi VISUALIZZATO','boxFull',c.boxFull)+
+    rigaIc('filter','Solo i miei progetti','Niente notifiche dai progetti in cui non sei assegnato','soloMiei',c.soloMiei)+
     rigaAvvisi()+
-    '<div class="riga"><div class="tx"><b>Durata del silenzio</b><span>Quanto dura la × sul box a schermo intero</span></div>'+
-      '<select id="pf_snooze" style="background:var(--surface-2);border:1px solid var(--line);border-radius:10px;padding:7px 9px;font-size:12.5px;outline:none">'+
-      [10,30,60].map(v=>'<option value="'+v+'"'+(c.snoozeMin===v?' selected':'')+'>'+v+' minuti</option>').join('')+
-      '</select></div></div>';
+    '<div class="riga pf-r"><span class="pf-ri">'+svg('clock',2)+'</span><div class="tx"><b>Durata del silenzio</b><span>Quanto dura la × sul box a schermo intero</span></div>'+
+      '<select id="pf_snooze" class="pf-sel">'+[10,30,60].map(v=>'<option value="'+v+'"'+(c.snoozeMin===v?' selected':'')+'>'+v+' minuti</option>').join('')+'</select></div>'+
+  '</div>';
 
-  h += '<div class="card"><h3 style="display:flex;align-items:center;gap:7px">'+
-      svg('list').replace('<svg','<svg style="width:14px;height:14px;color:var(--amber-ink)"')+'Registro delle azioni</h3>'+
-    '<div class="hint">Ogni modifica lascia una traccia: utile per capire chi ha spostato cosa quando gli impegni non tornano. Ctrl+Z annulla l\'ultima.</div>'+
-    '<div class="reg">'+ (state.azioni.length? state.azioni.slice(0,60).map(a=>
+  h += cartaCalendario();
+
+  /* tema */
+  h += '<div class="card">'+pfTesta('palette','Tema dell’interfaccia','Scegli i colori che preferisci. Puoi cambiarli quando vuoi.')+
+    '<div class="pf-temi">'+TEMI.map(t=>'<button class="pf-tema'+(c.tema===t.id?' on':'')+'" data-action="tema-set" data-t="'+t.id+'" title="'+esc(t.ds)+'">'+
+      '<span class="sw3">'+t.c.map(x=>'<i style="background:'+x+'"></i>').join('')+'</span>'+
+      '<b>'+t.nome+'</b><span>'+esc(t.breve||t.ds)+'</span></button>').join('')+'</div>'+
+    '<div class="riga pf-r"><span class="pf-ri">'+svg('sun',2)+'</span><div class="tx"><b>Modalità chiara</b><span>Una versione più luminosa, vale su tutti i temi</span></div>'+
+      '<button class="sw'+(tema()==='light'?' on':'')+'" data-action="theme" aria-label="Modalità chiara"></button></div>'+
+  '</div>';
+
+  h += cartaGuida();
+
+  h += '<div class="card">'+pfTesta('list','Registro delle azioni','Ogni modifica lascia una traccia. Ctrl+Z annulla l’ultima.')+
+    '<div class="reg">'+ (state.azioni.length? state.azioni.slice(0,40).map(a=>
       '<div class="r"><span class="t">'+esc(a.ts)+'</span><span class="w">'+sicuro(a.tx)+'</span><span class="chi">'+esc((a.chi||'').split(' ')[0])+'</span></div>'
     ).join('') : '<div class="empty">Nessuna azione registrata.</div>') +'</div>'+
-    '<div style="display:flex;gap:8px;margin-top:12px">'+
+    '<div class="cal-az" style="margin-top:12px">'+
       '<button class="btn sm" data-action="annulla">'+svg('undo')+'Annulla ultima ('+undoStack.length+')</button>'+
       '<button class="btn sm ghost" data-action="pulisci-registro">Svuota registro</button></div>'+
   '</div>';
 
-  h += '<div class="card"><h3>I tuoi dati</h3>'+
-    '<div class="hint">Gli aggiornamenti dell\'app non toccano mai il contenuto: progetti, task, note e registro '+
-    'restano dove sono e i campi nuovi vengono aggiunti a quelli esistenti. Un backup in più non fa male.</div>'+
-    '<div class="riga"><div class="tx"><b>Scarica un backup</b>'+
-      '<span>Un file con spazi, progetti, task, note e registro</span></div>'+
-      '<button class="btn sm" data-action="esporta">'+svg('deliver')+'Scarica</button></div>'+
-    '<div class="riga"><div class="tx"><b>Ripristina da backup</b>'+
-      '<span>Sostituisce i dati di adesso con quelli del file. Ctrl+Z annulla</span></div>'+
-      '<input type="file" id="pf_import" accept="application/json,.json" hidden>'+
-      '<label class="btn sm ghost" for="pf_import" style="cursor:pointer">'+svg('clip')+'Scegli file</label></div>'+
-    '<div class="riga"><div class="tx"><b>Dove stanno i dati</b>'+
-      '<span>'+(typeof sb!=='undefined' && sb ? 'Database del team, con copia locale su questo dispositivo'
-                                              : 'In questo browser. Collegando il database restano anche online')+'</span></div>'+
-      '<span class="chip mono">v'+SCHEMA+'</span></div>'+
-  '</div>';
-
-  h += '<div class="card"><h3>Tema dell\'interfaccia</h3><div class="hint">Colori pensati per stare sullo schermo tutto il giorno: fondi bassi, accento forte solo dove serve guardare.</div>'+
-    '<div class="temi">'+TEMI.map(t=>'<button class="tema'+(c.tema===t.id?' on':'')+'" data-action="tema-set" data-t="'+t.id+'">'+
-      '<span class="sw3">'+t.c.map(x=>'<i style="background:'+x+'"></i>').join('')+'</span>'+
-      '<span class="nm">'+t.nome+'</span><span class="ds">'+t.ds+'</span></button>').join('')+'</div>'+
-    '<div class="riga" style="margin-top:12px"><div class="tx"><b>Modalità chiara</b><span>Vale su tutti i temi</span></div>'+
-      '<button class="sw'+(tema()==='light'?' on':'')+'" data-action="theme" aria-label="Modalità chiara"></button></div>'+
-  '</div>';
-
   h += '<button class="btn esci-rosso" data-action="esci">'+svg('out')+'Esci da FOSS</button>';
-
-  h += '</div></div></div>';
+  h += '</div></div></div></div></div>';
   el('stage').innerHTML = h;
+}
+/* nel profilo dell'amministratore: le persone in breve, con gli inviti in attesa */
+function pfAmministrazione(){
+  const persone = personeOrg();
+  const attesa = (state.inviti||[]).filter(i=>!i.usato);
+  const vede = id => state.progetti.filter(p=>(p.team||[]).includes(id)).length;
+  let h = '<div class="card carta-team pf-adm">'+pfTesta('lock','Amministrazione','Decidi chi vede i tuoi lavori e cosa può fare.',
+      '<button class="btn sm ghost" data-action="team">Apri il Team '+svg('right',2.4)+'</button>')+'<div class="pf-pers">';
+  persone.forEach(u=>{
+    const n = vede(u.id), pm = permessiDi(u.id);
+    const tolti = PERMESSI.filter(x=>pm[x.k]===false).length;
+    const chip = pm.sola_lettura ? '<span class="chip now">Sola lettura</span>' : tolti ? '<span class="chip now">'+tolti+(tolti===1?' permesso tolto':' permessi tolti')+'</span>' : '<span class="chip">Guest</span>';
+    h += '<button class="pf-p" data-action="permessi" data-id="'+esc(u.id)+'">'+av(u)+'<span class="tx"><b>'+esc(u.nome)+'</b><span>'+
+      esc(ruoliDi(u.ruolo).join(' · ') || 'Ruolo non indicato')+' · vede '+n+(n===1?' lavoro':' lavori')+'</span></span>'+chip+svg('right',2.2)+'</button>';
+  });
+  attesa.forEach(i=>{
+    const nome = (i.nickname || ((i.nome||'')+' '+(i.cognome||'')).trim()) || i.email;
+    h += '<div class="pf-p attesa"><span class="av-vuoto">'+svg('send',2)+'</span><span class="tx"><b>'+esc(nome)+'</b><span>'+
+      esc(i.email||'')+' · non si è ancora registrato</span></span><span class="chip now">In attesa</span>'+
+      '<button class="iconbtn" data-action="togli-profilo" data-id="'+esc(i.id)+'" title="Annulla l’invito" aria-label="Annulla l’invito">'+svg('x',2.4)+'</button></div>';
+  });
+  if(!persone.length && !attesa.length) h += '<div class="empty" style="padding:10px 0">Per ora ci sei solo tu.</div>';
+  h += '</div><div class="cal-az" style="margin-top:12px">'+
+    '<button class="btn sm primary" data-action="pf-invita">'+svg('plus')+'Invita una persona</button>'+
+    '<button class="btn sm" data-action="registro">'+svg('list')+'Registro delle attività</button></div></div>';
+  return h;
 }
 /* il team ha la sua pagina: dal profilo ci si arriva da qui (sul telefono e' l'unica strada) */
 function cartaTeam(){
@@ -8277,10 +8419,7 @@ function cartaCalendario(){
     leggiLinkCalendario().then(l=>{ state.cal = {stato: l? 'si' : 'no', link:l}; aggiornaCartaCal(); })
       .catch(()=>{ state.cal = {stato:'no'}; aggiornaCartaCal(); });
   }
-  let h = '<div class="card" id="cartaCal"><h3 style="display:flex;align-items:center;gap:7px">'+
-    svg('calendar',2.2).replace('<svg','<svg style="width:15px;height:15px;color:var(--amber-ink)"')+'Calendario sul telefono</h3>'+
-    '<div class="hint">Riprese, consegne, udienze e scadenze dei tuoi lavori dentro Google Calendar o il Calendario dell’iPhone. '+
-    'Si aggiorna da solo: sposti una data qui, cambia anche lì.</div>';
+  let h = '<div class="card" id="cartaCal">'+pfTesta('calendar','Calendario sul telefono','Riprese, consegne e scadenze dei tuoi lavori in Google Calendar o nel Calendario dell’iPhone. Si aggiorna da solo.');
   const st = (state.cal||{}).stato;
   if(st==='si'){
     const l = state.cal.link, wc = l.replace(/^https?:/,'webcal:');
@@ -8346,7 +8485,7 @@ function rigaAvvisi(){
     case 'lavoro': sotto = 'Un attimo\u2026'; break;
     default: sotto = 'Controllo\u2026';
   }
-  return '<div class="riga riga-push" id="rigaPush"><div class="tx"><b>Avvisi sul telefono</b><span>'+sotto+'</span></div>'+
+  return '<div class="riga riga-push pf-r" id="rigaPush"><span class="pf-ri">'+svg('bell',2)+'</span><div class="tx"><b>Avvisi sul telefono</b><span>'+sotto+'</span></div>'+
     (tasti ? '<div class="tasti">'+tasti+'</div>' : '')+'</div>';
 }
 function aggiornaRigaPush(){
@@ -8377,8 +8516,7 @@ function cartaSoldi(){
     (c.spese||[]).forEach(m=>{ if(String(m.d||'').slice(0,4)===ia) sp += Number(m.importo)||0; });
   });
   daInc.sort((a,b)=>b.v-a.v);
-  let h = '<div class="card"><h3 style="display:flex;align-items:center;gap:7px">'+
-    svg('euro',2.2).replace('<svg','<svg style="width:15px;height:15px;color:var(--amber-ink)"')+'Soldi dei lavori</h3>';
+  let h = '<div class="card">'+pfTesta('euro','Soldi dei lavori','Quanto hai incassato e quanto ti devono, di tutti i lavori.');
   if(!n) return h+'<div class="hint" style="margin:0">Quando aggiungi un preventivo a un lavoro, qui trovi quanto hai incassato e quanto ti devono.</div></div>';
   h += '<div class="conti-top">'+
       '<div><span>Da incassare</span><b class="mono'+(resta>0?' da-inc':'')+'">'+euro(resta)+'</b></div>'+
@@ -8765,9 +8903,7 @@ function sezionePreset(){
 }
 function cartaModelli(){
   const ms = state.modelli||[], posso = puo('crea_lavori');
-  return '<div class="card"><h3 style="display:flex;align-items:center;gap:7px">'+
-    svg('salva',2.2).replace('<svg','<svg style="width:15px;height:15px;color:var(--amber-ink)"')+'I tuoi preset</h3>'+
-    '<div class="hint">Li scegli quando crei un progetto o uno spazio. Li crei da zero, da un lavoro con «Salva come preset» o importando un file.</div>'+
+  return '<div class="card">'+pfTesta('salva','I tuoi preset','Li scegli quando crei un progetto o uno spazio. Li crei da zero, da un lavoro con «Salva come preset» o importando un file.')+
     (ms.length ? '<div class="adm-lista">'+ms.map(m=>{ const X = TIPO(m.tipo);
       return '<div class="adm-r preset-r"><button class="pr-main" data-action="pe-apri" data-id="'+esc(m.id)+'"><span class="picona">'+svg(X.ic)+'</span><div class="tx"><b>'+esc(m.nome)+'</b>'+
         '<span>'+esc(riassuntoPreset(m))+'</span></div></button>'+
@@ -8785,7 +8921,7 @@ function cartaModelli(){
    Come si fa tutto, capitolo per capitolo: dai primi passi alle cose per chi
    organizza un team. Si cerca per parola (anche senza accenti); in fondo c'e'
    il tasto per segnalare quello che manca o non funziona. */
-const VERSIONE = 'v37';
+const VERSIONE = 'v38';
 const LIVELLI_GUIDA = {base:'Per cominciare', medio:'Tutti i giorni', esperto:'Per chi organizza', aiuto:'Se qualcosa non va'};
 const GUIDA = [
 {id:'primi-passi', liv:'base', ic:'spark', t:'Primi passi', s:'Cos’è FOSS e come ci si muove', v:[
@@ -9164,9 +9300,7 @@ function cambiaStatoSegnalazione(t){
 function cartaGuida(){
   const adm = Array.isArray(segnRicevute), aperte = adm ? segnRicevute.filter(s=>s.stato!=='risolta').length : 0;
   if(cloudAttivo() && segnRicevute === null && !segnCarico) setTimeout(caricaSegnalazioni, 0);
-  return '<div class="card" id="cartaGuida"><h3 style="display:flex;align-items:center;gap:7px">'+
-      svg('libro',2.2).replace('<svg','<svg style="width:15px;height:15px;color:var(--amber-ink)"')+'Guida e aiuto</h3>'+
-    '<div class="hint">Come si fa tutto, capitolo per capitolo: dai primi passi alle funzioni avanzate. Se qualcosa manca o non funziona, lo segnali da lì.</div>'+
+  return '<div class="card" id="cartaGuida">'+pfTesta('libro','Guida e aiuto','Come si fa tutto, capitolo per capitolo. Se qualcosa manca o non funziona, lo segnali da lì.')+
     '<div class="cal-az">'+
       '<button class="btn sm primary" data-action="apri-guida">'+svg('help')+'Apri la guida</button>'+
       '<button class="btn sm" data-action="segnala">'+svg('bandiera')+'Segnala un problema</button>'+
@@ -11451,7 +11585,9 @@ document.addEventListener('click', function(e){
     case 'team':
       if(state.schermo==='gate') break;
       state.schermo = 'team'; state.drawer = false; state.progettoId = null; chiudiModale(); render(); break;
+    case 'pf-invita':
     case 'team-invita':
+      if(a === 'pf-invita'){ state.schermo = 'team'; state.progettoId = null; }
       state.teamForm = true; state.teamPronto = null; render();
       setTimeout(()=>{ const i = el('tm_mail'); if(i) i.focus(); }, 40); break;
     case 'team-chiudi': state.teamForm = false; state.teamPronto = null; render(); break;
