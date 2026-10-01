@@ -1943,7 +1943,11 @@ a.btn.primary{color:var(--on-amber)}
 .cm-btn.su-voce:not(.ha){opacity:.45}
 .cm-btn.su-voce:not(.ha):hover{opacity:1}
 .cm-btn.ha{color:var(--dim);border-color:var(--line);background:var(--surface-2)}
-.cm-btn.nuovi{color:var(--alert);border-color:var(--alert)}
+.cm-btn.nuovi{color:#fff;border-color:var(--alert);background:var(--alert);box-shadow:0 0 0 3px color-mix(in srgb,var(--alert) 25%,transparent)}
+.cm-btn.nuovi:hover{background:var(--alert);filter:brightness(1.08);color:#fff}
+.cm-btn.su-voce.nuovi{opacity:1}
+.cm-ics{display:inline-flex;align-items:center;gap:0}
+.cm-ics svg + svg{width:12px;height:12px;margin-left:-1px}
 .cm-n{line-height:1}
 .cm-dot{position:absolute;top:-4px;right:-4px;width:9px;height:9px;border-radius:50%;background:var(--alert);border:2px solid var(--surface)}
 .chk .tx{flex:1;min-width:0}
@@ -1954,7 +1958,8 @@ a.btn.primary{color:var(--on-amber)}
 .cm-lay{position:fixed;inset:0;z-index:70;display:grid;place-items:center;padding:24px}
 .cm-scrim{position:absolute;inset:0;background:rgba(6,12,24,.55);backdrop-filter:blur(3px);-webkit-backdrop-filter:blur(3px)}
 .cm-box{position:relative;width:min(760px,100%);height:min(86vh,900px);background:var(--surface);border:1px solid var(--line);
-  border-radius:var(--r-l);box-shadow:var(--shadow);display:flex;flex-direction:column;overflow:hidden;animation:dropModale .28s cubic-bezier(.2,1.2,.4,1)}
+  border-radius:var(--r-l);box-shadow:var(--shadow);display:flex;flex-direction:column;overflow:hidden;animation:cmEntra .22s cubic-bezier(.2,1,.4,1)}
+@keyframes cmEntra{from{opacity:0;transform:translateY(10px) scale(.98)}to{opacity:1;transform:none}}
 .cm-top{display:flex;align-items:center;gap:12px;padding:14px 14px 10px 16px}
 .cm-ic{width:38px;height:38px;border-radius:11px;background:var(--amber-soft);color:var(--amber-ink);display:grid;place-items:center;flex:none}
 .cm-ic svg{width:18px;height:18px}
@@ -2093,9 +2098,8 @@ a.btn.primary{color:var(--on-amber)}
 .hm-cerca input{background:none;border:none;outline:none;width:100%;font-size:13.5px;font-weight:500;color:var(--text)}
 .hm-cerca input::placeholder{color:var(--hm-2)}
 
-.hm-hero{position:relative;margin-top:16px;border-radius:20px;overflow:hidden;min-height:200px;display:flex;align-items:center;gap:20px;padding:28px 30px;
+.hm-hero{position:relative;margin-top:0;border-radius:20px;overflow:hidden;min-height:200px;display:flex;align-items:center;gap:20px;padding:28px 30px;
   --pae-1:#16203a;--pae-2:#5a3552;--pae-3:#d8704a;--pae-sole:#ffb35c;--pae-m1:#111a2d;--pae-m2:#0b1120;--pae-neve:#d6dcea;color:#fff}
-:root[data-theme="light"] .hm-hero{--pae-1:#dbe7f7;--pae-2:#f3cdbd;--pae-3:#f5a57c;--pae-sole:#fff0c2;--pae-m1:#8391ad;--pae-m2:#63728f;--pae-neve:#fff;color:#16203a}
 .hm-pae{position:absolute;inset:0;width:100%;height:100%;z-index:0}
 .hm-saluto{position:relative;z-index:1;flex:1;min-width:0}
 .hm-saluto h1{font-size:40px;font-weight:700;line-height:1.12;letter-spacing:-.025em;margin:0 0 12px}
@@ -2111,6 +2115,7 @@ a.btn.primary{color:var(--on-amber)}
 .hm-ora .st{display:flex;align-items:center;gap:10px;font-size:11.5px;line-height:1.35;text-align:right;opacity:.92}
 .hm-ora .st b{display:block;font-weight:600;font-size:12px}
 .hm-ora .st svg{width:24px;height:24px;color:#FFC24D;flex:none}
+.hm-ora .st .corto{display:none}
 
 .hm-stats{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:16px;margin-top:18px}
 .hm-stat{--c:var(--t-blu);display:flex;align-items:center;gap:16px;padding:18px 20px;border-radius:16px;text-align:left;
@@ -2143,7 +2148,7 @@ a.btn.primary{color:var(--on-amber)}
 .hm-spazi.lista{display:grid;grid-template-columns:1fr;gap:10px}
 .hm-spc.spazio{padding:0;border-radius:16px;display:flex;flex-direction:column;scroll-snap-align:start;min-width:0;overflow:hidden}
 .hm-spc.spazio::after{display:none}
-.hm-spc .cop{height:104px;flex:none;display:block;position:relative;background-size:cover;background-position:center;
+.hm-spc .cop{height:auto;aspect-ratio:3.6;flex:none;display:block;position:relative;background-size:cover;background-position:center;
   background-color:color-mix(in srgb,var(--acc) 30%,var(--surface-2));
   background-image:radial-gradient(circle at 80% 20%,color-mix(in srgb,var(--acc) 70%,transparent),transparent 55%),linear-gradient(135deg,color-mix(in srgb,var(--acc) 45%,var(--surface-2)),var(--surface-2))}
 .hm-spc .cop.con-foto::after{content:"";position:absolute;inset:0;background:linear-gradient(180deg,transparent 45%,rgba(0,0,0,.28))}
@@ -2157,10 +2162,10 @@ a.btn.primary{color:var(--on-amber)}
 .hm-spc:hover .cop-b,.hm-spc .cop-b:focus-visible,.hm-spc .cop-b.vuota{opacity:1;transform:none}
 .hm-spc .cop-b.vuota{background:rgba(10,16,30,.4)}
 @media (hover:hover){ .hm-spc .cop-b.vuota{opacity:0;transform:translateY(-3px)} .hm-spc:hover .cop-b.vuota{opacity:1;transform:none} }
-.hm-spc .q{position:absolute;left:18px;top:74px;width:54px;height:54px;border-radius:15px;background:var(--acc);color:#15120a;display:grid;place-items:center;
+.hm-spc .q{position:relative;align-self:flex-start;margin:-30px 0 0 18px;width:54px;height:54px;border-radius:15px;background:var(--acc);color:#15120a;display:grid;place-items:center;
   box-shadow:0 8px 20px rgba(0,0,0,.28);border:3px solid var(--surface);z-index:1}
 .hm-spc .q svg{width:23px;height:23px}
-.hm-spc .cp{display:flex;flex-direction:column;padding:34px 18px 16px;gap:3px;flex:1}
+.hm-spc .cp{display:flex;flex-direction:column;padding:8px 18px 16px;gap:3px;flex:1}
 .hm-spc .r1{display:flex;align-items:center;gap:10px}
 .hm-spc .r1 b{flex:1;min-width:0;font-size:17px;font-weight:700;letter-spacing:-.015em;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .hm .av-stack{display:inline-flex;align-items:center;flex:none;padding-left:6px}
@@ -2348,7 +2353,7 @@ a.btn.primary{color:var(--on-amber)}
 .tk-n{min-width:0;display:flex;flex-direction:column;gap:2px}
 .tk-n h3{font-size:14.5px;font-weight:700;letter-spacing:-.01em;line-height:1.25;margin:0;overflow:hidden;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical}
 .tk-n > span{font-size:12px;color:var(--hm-2,var(--dim));white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-.tk-cop{display:block;height:112px;border-radius:10px;background-size:cover;background-position:center;background-color:var(--surface-2)}
+.tk-cop{display:block;height:auto;aspect-ratio:2.4;border-radius:10px;background-size:cover;background-position:center;background-color:var(--surface-2)}
 .tk-pb{display:flex;align-items:center;gap:9px}
 .tk-pb .b{flex:1;height:6px;border-radius:3px;background:var(--surface-3);overflow:hidden}
 .tk-pb .b i{display:block;height:100%;border-radius:3px;background:var(--t-giallo,var(--amber))}
@@ -2373,7 +2378,7 @@ a.btn.primary{color:var(--on-amber)}
 .sp2-card{flex:none;border:1px solid var(--line);border-radius:16px;background:var(--bg);padding:16px}
 .sp2-card h3{font-size:15px;font-weight:700;letter-spacing:-.01em}
 .sp2-cop{padding:0;overflow:hidden}
-.sp2-cop .cop{position:relative;min-height:170px;display:flex;flex-direction:column;justify-content:flex-end;padding:16px;background-size:cover;background-position:center;color:#fff;
+.sp2-cop .cop{position:relative;min-height:0;aspect-ratio:2;display:flex;flex-direction:column;justify-content:flex-end;padding:16px;background-size:cover;background-position:center;color:#fff;
   background-image:radial-gradient(circle at 80% 15%,color-mix(in srgb,var(--acc) 75%,transparent),transparent 60%),linear-gradient(150deg,color-mix(in srgb,var(--acc) 55%,#0d1422),#0d1422)}
 .sp2-cop .cop::before{content:"";position:absolute;inset:0;background:linear-gradient(180deg,transparent 25%,rgba(5,9,18,.82));pointer-events:none}
 .sp2-cop .cop > *{position:relative}
@@ -2508,8 +2513,9 @@ img.rit{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;displa
 .rit-tabs{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px;margin-bottom:14px;align-items:start}
 .rit-tabs button{display:flex;flex-direction:column;gap:6px;padding:8px;border-radius:12px;border:1.5px solid var(--line);text-align:left;font-size:12px;font-weight:600;color:var(--dim);background:var(--bg)}
 .rit-tabs button.on{border-color:var(--amber);color:var(--text)}
-.rit-tabs .mini{position:relative;display:block;width:100%;max-height:74px;border-radius:7px;overflow:hidden;background:var(--surface-2)}
-.rit-quadro{position:relative;width:100%;max-height:52vh;margin:0 auto;border-radius:12px;overflow:hidden;background:var(--surface-2);cursor:grab;touch-action:none;box-shadow:0 0 0 2px var(--amber)}
+.rit-tabs .mini{position:relative;display:block;border-radius:7px;overflow:hidden;background:var(--surface-2);align-self:center}
+.rit-qw{display:flex;justify-content:center}
+.rit-quadro{position:relative;flex:none;margin:0 auto;border-radius:12px;overflow:hidden;background:var(--surface-2);cursor:grab;touch-action:none;box-shadow:0 0 0 2px var(--amber)}
 .rit-quadro.presa{cursor:grabbing}
 .rit-griglia{position:absolute;inset:0;pointer-events:none;
   background:linear-gradient(90deg,transparent calc(33.33% - .5px),rgba(255,255,255,.35) calc(33.33% - .5px),rgba(255,255,255,.35) calc(33.33% + .5px),transparent calc(33.33% + .5px),transparent calc(66.66% - .5px),rgba(255,255,255,.35) calc(66.66% - .5px),rgba(255,255,255,.35) calc(66.66% + .5px),transparent calc(66.66% + .5px)),
@@ -2524,6 +2530,162 @@ img.rit{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;displa
   .rit-box{border-radius:0;width:100%;padding:calc(16px + env(safe-area-inset-top)) 14px calc(16px + env(safe-area-inset-bottom))}
   .rit-tabs{grid-template-columns:repeat(3,minmax(0,1fr));gap:6px}
   .rit-tabs button{padding:6px;font-size:10.5px}
+}
+
+/* ---------- SCENE DEL SALUTO ---------- */
+.hm-hero.tono-scuro{color:#13203a}
+.hm-hero.tono-scuro .hm-saluto h1{text-shadow:0 1px 18px rgba(255,255,255,.45)}
+.hm-hero.tono-scuro .hm-saluto p{opacity:.82}
+.hm-hero.tono-chiaro .hm-saluto h1{text-shadow:0 2px 18px rgba(0,0,0,.25)}
+/* la frase resta leggibile anche se dietro passa una riva o un'onda */
+.hm-hero.tono-scuro .hm-saluto p{text-shadow:0 0 5px rgba(255,255,255,.95),0 0 14px rgba(255,255,255,.7)}
+.hm-hero.tono-chiaro .hm-saluto p{text-shadow:0 0 6px rgba(0,0,0,.55),0 0 14px rgba(0,0,0,.35)}
+.hm-hero.tono-scuro .hm-ora{background:rgba(255,255,255,.55);color:#13203a;border-color:rgba(255,255,255,.75)}
+.hm-hero.tono-scuro .hm-ora .st svg{color:#E59A00}
+.hm-scena{position:absolute;z-index:2;left:14px;bottom:12px;width:30px;height:30px;border-radius:50%;display:grid;place-items:center;
+  background:rgba(10,16,30,.35);color:#fff;backdrop-filter:blur(6px);-webkit-backdrop-filter:blur(6px);opacity:.55;transition:opacity .16s,transform .3s}
+.hm-scena svg{width:15px;height:15px}
+.hm-scena:hover{opacity:1;transform:rotate(45deg)}
+.hm-hero.tono-scuro .hm-scena{background:rgba(255,255,255,.5);color:#13203a}
+.hm-pae .sc-vento{animation:scVento var(--d,70s) ease-in-out infinite alternate}
+@keyframes scVento{from{transform:translateX(-40px)}to{transform:translateX(40px)}}
+.hm-pae .sc-vola{animation:scVola var(--d,46s) linear infinite}
+@keyframes scVola{from{transform:translateX(-700px)}to{transform:translateX(900px)}}
+.hm-pae .sc-ala{transform-box:fill-box;transform-origin:center;animation:scAla .9s ease-in-out infinite alternate}
+@keyframes scAla{from{transform:scaleY(1)}to{transform:scaleY(-.55)}}
+.hm-pae .sc-galleggia{animation:scGalla var(--d,8s) ease-in-out infinite alternate}
+@keyframes scGalla{from{transform:translateY(-6px)}to{transform:translateY(8px)}}
+.hm-pae .sc-pulsa{transform-box:fill-box;transform-origin:center;animation:scPulsa 6s ease-in-out infinite alternate}
+@keyframes scPulsa{from{transform:scale(.94);opacity:.85}to{transform:scale(1.06);opacity:1}}
+.hm-pae .sc-gira{animation:scGira 40s linear infinite}
+@keyframes scGira{to{transform:rotate(360deg)}}
+.hm-pae .sc-brilla{animation:scBrilla var(--d,3s) ease-in-out var(--r,0s) infinite alternate}
+@keyframes scBrilla{from{opacity:.15}to{opacity:1}}
+.hm-pae .sc-luce{animation:scLuce var(--d,5s) steps(1) infinite}
+@keyframes scLuce{0%,64%{opacity:1}65%,100%{opacity:.2}}
+.hm-pae .sc-luccica{animation:scLuccica var(--d,3s) ease-in-out var(--r,0s) infinite alternate}
+@keyframes scLuccica{from{opacity:.2;transform:translateX(-6px)}to{opacity:.95;transform:translateX(6px)}}
+.hm-pae .sc-dondola{transform-box:fill-box;transform-origin:50% 100%;animation:scDondola 4s ease-in-out infinite alternate}
+@keyframes scDondola{from{transform:rotate(-3deg) translateY(1px)}to{transform:rotate(3deg) translateY(-2px)}}
+.hm-pae .sc-aquilone{animation:scAquilone 5s ease-in-out infinite alternate}
+@keyframes scAquilone{from{transform:rotate(-7deg) translateY(4px)}to{transform:rotate(6deg) translateY(-6px)}}
+.hm-pae .sc-onda{animation:scOnda 4s ease-in-out infinite alternate}
+@keyframes scOnda{from{transform:translateY(0);opacity:.85}to{transform:translateY(4px);opacity:.4}}
+.hm-pae .sc-aereo{animation:scAereo 38s linear infinite}
+@keyframes scAereo{from{transform:translate(-120px,178px)}to{transform:translate(1320px,140px)}}
+.hm-pae .sc-cometa{opacity:0;animation:scCometa 9s ease-in infinite}
+@keyframes scCometa{0%,80%{opacity:0;transform:translate(300px,140px) rotate(16deg)}84%{opacity:1}100%{opacity:0;transform:translate(640px,236px) rotate(16deg)}}
+.hm-pae .sc-aurora{animation:scAurora var(--d,14s) ease-in-out infinite alternate;transform-box:fill-box;transform-origin:50% 50%}
+.hm-pae .sc-aurora.b{animation-direction:alternate-reverse}
+@keyframes scAurora{from{transform:translateX(-30px) skewX(-6deg);opacity:.7}to{transform:translateX(40px) skewX(6deg);opacity:1}}
+@media (prefers-reduced-motion:reduce){ .hm-pae *{animation:none!important} }
+
+/* ---------- PROGETTO PERSONALE ---------- */
+.nl-pers{display:flex;align-items:center;gap:12px;padding:12px 14px;margin-bottom:14px;border-radius:12px;border:1px solid var(--line);background:var(--surface-2)}
+.nl-pers.on{border-color:var(--amber);background:var(--amber-soft)}
+.nl-pers .ic{width:34px;height:34px;border-radius:10px;display:grid;place-items:center;background:var(--surface-3);color:var(--dim);flex:none}
+.nl-pers.on .ic{background:var(--amber);color:var(--on-amber,#15120a)}
+.nl-pers .ic svg{width:17px;height:17px}
+.nl-pers .tx{flex:1;min-width:0;display:flex;flex-direction:column;gap:2px}
+.nl-pers .tx b{font-size:14px}
+.nl-pers .tx span{font-size:12px;color:var(--dim);line-height:1.4}
+.griglia2.uno{grid-template-columns:1fr}
+.tk-pill.pers{background:transparent;color:var(--text);box-shadow:inset 0 0 0 1.5px var(--acc)}
+.chip.pers-chip{gap:5px}
+.chip.pers-chip svg{width:12px;height:12px}
+.conti-top.uno{grid-template-columns:1fr}
+
+/* ---------- PAGINA TEAM ---------- */
+.tm-main.scroller{padding:22px 28px 32px}
+.tm-head{display:flex;align-items:flex-end;gap:16px;margin-bottom:16px;flex-wrap:wrap}
+.tm-head .tx{flex:1;min-width:0}
+.tm-head h1{font-size:30px;font-weight:700;letter-spacing:-.025em}
+.tm-head p{margin:4px 0 0;color:var(--hm-2);font-size:13.5px}
+.tm-invito{border:1px solid var(--line);background:var(--surface);border-radius:16px;padding:18px 20px;margin-bottom:16px}
+.tm-invito h3{font-size:17px;font-weight:700}
+.tm-invito > p{margin:4px 0 14px;font-size:13px;color:var(--hm-2);line-height:1.5}
+.tm-form{display:grid;grid-template-columns:1.4fr 1fr 1fr;gap:12px}
+.tm-invito .tm-az{display:flex;gap:8px;flex-wrap:wrap;margin-top:12px}
+.tm-invito.pronto{display:flex;gap:14px;align-items:flex-start;border-color:color-mix(in srgb,var(--t-verde) 50%,var(--line));background:color-mix(in srgb,var(--t-verde) 8%,var(--surface))}
+.tm-invito.pronto .tx{flex:1;min-width:0;display:flex;flex-direction:column;gap:3px}
+.tm-invito.pronto .tx b{font-size:15px}
+.tm-invito.pronto .tx > span{font-size:13px;color:var(--hm-2)}
+.tm-ok{width:38px;height:38px;border-radius:50%;background:var(--t-verde);color:#fff;display:grid;place-items:center;flex:none}
+.tm-ok svg{width:18px;height:18px}
+.tm-filtri{display:flex;align-items:center;gap:14px;flex-wrap:wrap;margin-bottom:14px}
+.tm-filtri .seg button i{font-style:normal;opacity:.6;margin-left:3px}
+.tm-ruoli{display:flex;align-items:center;gap:6px;flex-wrap:wrap}
+.tm-ruoli .lb{font-size:12px;color:var(--hm-2);font-weight:600;margin-right:2px}
+.tm-r{height:30px;padding:0 11px;border-radius:15px;border:1px solid var(--line);font-size:12.5px;font-weight:600;color:var(--dim);background:var(--surface)}
+.tm-r i{font-style:normal;opacity:.6;margin-left:2px}
+.tm-r:hover{color:var(--text);border-color:var(--surface-3)}
+.tm-r.on{background:var(--amber);border-color:var(--amber);color:var(--on-amber,#15120a)}
+.tm-lista{display:grid;grid-template-columns:repeat(auto-fill,minmax(330px,1fr));gap:12px}
+.tm-c{display:grid;grid-template-columns:auto 1fr;grid-template-areas:"av tx" "st st" "az az";gap:10px 14px;padding:16px;border-radius:16px;border:1px solid var(--line);background:var(--surface);align-items:center}
+.tm-c > .av,.tm-c > .av-vuoto{grid-area:av;width:46px;height:46px;font-size:15px}
+.tm-c .av-vuoto{border-radius:50%;display:grid;place-items:center;border:1.5px dashed var(--line);color:var(--dim)}
+.tm-c .av-vuoto svg{width:18px;height:18px}
+.tm-c .tx{grid-area:tx;min-width:0;display:flex;flex-direction:column;gap:3px}
+.tm-c .tx b{font-size:15px;font-weight:700;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.tm-c .ru{display:flex;flex-wrap:wrap;gap:4px}
+.tm-c .ru i{font-style:normal;font-size:11.5px;font-weight:600;padding:2px 8px;border-radius:10px;background:var(--surface-2);color:var(--dim)}
+.tm-c .ru i.vuoto{background:none;padding:0;color:var(--mute);font-weight:500}
+.tm-c .em{font-size:12px;color:var(--mute);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.tm-c .st{grid-area:st;display:flex;align-items:center;gap:6px;flex-wrap:wrap}
+.tm-c .st .chip svg{width:12px;height:12px}
+.tm-c .tm-az .n{margin-left:auto;font-size:12px;color:var(--hm-2)}
+.tm-c .tm-az{grid-area:az;display:flex;align-items:center;gap:8px;flex-wrap:wrap;padding-top:10px;border-top:1px solid var(--line-soft)}
+.tm-c .tm-az .iconbtn{margin-left:auto}
+.tm-c.invito{border-style:dashed}
+.tm-fondo{margin-top:18px}
+.carta-team{padding:0!important;overflow:hidden}
+.ct-b{display:flex;align-items:center;gap:14px;width:100%;padding:16px 18px;text-align:left}
+.ct-b:hover{background:var(--surface-2)}
+.ct-b .av-stack{display:inline-flex;flex:none}
+.ct-b .av-stack .av{width:34px;height:34px;font-size:12px;margin-left:-6px;border:2px solid var(--surface);box-sizing:content-box}
+.ct-b .av-stack .av:first-child{margin-left:0}
+.ct-b .ct-ic{width:38px;height:38px;border-radius:50%;display:grid;place-items:center;background:var(--surface-2);color:var(--dim);flex:none}
+.ct-b .ct-ic svg{width:18px;height:18px}
+@media (min-width:621px){ .nl .wz-b{max-height:min(680px,calc(100vh - 250px))} }
+.ct-b .tx{flex:1;min-width:0;display:flex;flex-direction:column;gap:2px}
+.ct-b .tx b{font-size:15px}
+.ct-b .tx span{font-size:12.5px;color:var(--dim)}
+.ct-b > svg{width:16px;height:16px;color:var(--dim);flex:none}
+.preset-r{padding:0!important;gap:0!important}
+.preset-r .pr-main{display:flex;align-items:center;gap:12px;flex:1;min-width:0;padding:10px 12px;text-align:left}
+.preset-r .pr-main .tx{min-width:0}
+.preset-r .pr-az{display:flex;align-items:center;gap:6px;padding-right:10px;flex:none}
+.gate-invito{margin:0 0 14px;padding:11px 13px;border-radius:12px;background:var(--amber-soft);color:var(--text);font-size:13px;line-height:1.45;border:1px solid color-mix(in srgb,var(--amber) 45%,transparent)}
+body.sto-spostando .hm-spazi.griglia{scroll-snap-type:none}
+.hm-spc.preso{box-shadow:0 18px 40px rgba(0,0,0,.35);z-index:5;cursor:grabbing}
+@media (max-width:999px){ .tm-main.scroller{padding:16px 16px 26px} }
+@media (max-width:760px){
+  .tm-form{grid-template-columns:1fr}
+  .tm-lista{grid-template-columns:1fr}
+  .tm-head h1{font-size:25px}
+  .tm-filtri{gap:10px}
+}
+
+@media (max-width:760px){
+  .hm-scena{left:auto;right:12px;top:12px;bottom:auto}
+  /* telefono: il disegno sta in una fascia in basso, sopra c'e' il suo cielo e ci va il testo.
+     Giorno e ora in alto, lo stato della giornata in una pillola sul paesaggio */
+  .hm-hero{isolation:isolate;background:var(--cielo,#16203a);gap:6px;padding:16px 18px 150px;min-height:0;justify-content:flex-start}
+  .hm-pae{top:auto;bottom:0;height:190px;z-index:-1;left:-140px;width:calc(100% + 140px)}
+  :root .hm-hero .hm-ora{order:-1;position:static;align-self:stretch;flex-direction:row;flex-wrap:wrap;align-items:baseline;justify-content:flex-start;
+    gap:0 6px;min-width:0;padding:0 44px 0 0;border:0;border-radius:0;background:none;backdrop-filter:none;-webkit-backdrop-filter:none;color:inherit;text-align:left}
+  .hm-hero .hm-ora .g,.hm-hero .hm-ora .d{font-size:12.5px;font-weight:600;opacity:.8}
+  .hm-hero .hm-ora > b{order:-1;font-size:12.5px;font-weight:700;margin:0;letter-spacing:.01em}
+  .hm-hero .hm-ora > b::after{content:'\00b7';margin-left:6px;opacity:.6}
+  .hm-hero .hm-ora .st{position:absolute;z-index:2;left:12px;bottom:12px;max-width:calc(100% - 24px);gap:7px;padding:6px 13px 6px 8px;border-radius:999px;opacity:1;text-align:left;
+    background:rgba(12,18,34,.55);backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px);border:1px solid rgba(255,255,255,.16);color:#fff}
+  .hm-hero.tono-scuro .hm-ora .st{background:rgba(255,255,255,.66);border-color:rgba(255,255,255,.85);color:#13203a}
+  .hm-hero .hm-ora .st svg{width:17px;height:17px}
+  .hm-hero .hm-ora .st .lungo{display:none}
+  .hm-hero .hm-ora .st .corto{display:block;min-width:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;font-size:12px;font-weight:600}
+  .hm-pae .sc-alta{display:none}
+  .hm-saluto h1{font-size:27px;margin-bottom:8px}
+  .hm-saluto p{font-size:13px;line-height:1.45}
 }
 
 /* ---------- LE PROFESSIONI CHE FACCIO ---------- */
@@ -3011,7 +3173,30 @@ const TIPI = {
               3:['Racconto|Trascrizioni;Struttura;Grafiche e titoli;Musiche e diritti']}},
       corso:{n:'Corso o formazione', tags:['Formazione'],
         task:{1:['Scaletta delle lezioni|Argomenti;Durata per lezione;Slide e materiali;Set e luci'],
-              3:['Montaggio delle lezioni|Pulizia audio;Grafiche e titoli;Capitoli;Export per la piattaforma']}}
+              3:['Montaggio delle lezioni|Pulizia audio;Grafiche e titoli;Capitoli;Export per la piattaforma']}},
+      /* un video per un canale YouTube: dall'idea alla thumbnail, al titolo e alla descrizione */
+      youtube:{n:'Video YouTube', tags:['YouTube'], data:'Data di uscita', dataEv:'Uscita del video',
+        dett:{durata:'10-15 minuti', deliverable:'Video, Short di lancio e thumbnail', formato:'16:9 · 4K'},
+        fasi:{0:{nome:'Idea', icon:'spark', desc:'Argomento, ricerca, titolo provvisorio e scaletta',
+                 campi:[['Argomento','argomento'],['Keyword','keyword'],['Durata','durata'],['Pubblico','pubblico']]},
+              1:{nome:'Preparazione', desc:'Script, set, luci e audio'},
+              2:{nome:'Riprese', desc:'A-roll, B-roll e foto per la thumbnail'},
+              3:{nome:'Montaggio', desc:'Taglio, grafiche, musica, color, sottotitoli e Short',
+                 campi:[['Versione','versione'],['Durata','durata'],['Musica','musica'],['Sottotitoli','sottotitoli']]},
+              4:{nome:'Pubblicazione', icon:'send', desc:'Thumbnail, titolo, descrizione, caricamento e lancio',
+                 campi:[['Titolo','titoloYt'],['Uscita','consegna'],['Visibilità','visibilita'],['Link al video','linkYt']]}},
+        via:['Giornate di ripresa','Montaggio V1','Export finali','Consegna e chiusura'],
+        task:{0:['Idea e ricerca|Argomento e angolo;Ricerca keyword e trend;Video simili da studiare;Titolo provvisorio',
+                 'Scaletta|Hook dei primi 30 secondi;Struttura e capitoli;Call to action;Script o punti chiave'],
+              1:['Set e luci|Location;Luci e sfondo;Microfoni e audio;Lista delle inquadrature'],
+              2:['Riprese|A-roll (parlato);B-roll;Inserti e dettagli;Foto per la thumbnail [Espressioni del volto, Sfondo pulito, Più varianti]'],
+              3:['Montaggio|Taglio del parlato;B-roll e grafiche;Musica ed effetti;Color e mix audio;Sottotitoli',
+                 'Short di lancio|Momento migliore;Montaggio verticale 9:16;Testo a schermo;Export dello Short',
+                 'Export|Master 4K;Controllo audio (-14 LUFS);Revisione finale'],
+              4:['Thumbnail|Idea e bozza;Scatto o frame;Grafica e testo;Varianti per il test A/B;Prova di leggibilità dal telefono',
+                 'Titolo e descrizione|Titolo (3 varianti);Prima riga che invogli;Descrizione con i link;Capitoli con i minuti;Hashtag e tag',
+                 'Caricamento|Upload e anteprima;Schermata finale e schede;Sottotitoli caricati;Playlist e categoria;Data e ora di uscita',
+                 'Dopo l\'uscita|Commento fissato;Condivisione sui social;Risposte ai commenti;Statistiche dopo 48 ore']}}
     }},
 
   foto:{n:'Fotografia', prof:'Fotografo', c:'#F6A8C0', ic:'foto',
@@ -3610,9 +3795,39 @@ function pianoDi(tipo, lavoro){
   return T.fasi.map((f,i)=>{
     const base = (T.task[i]||[]).map(taskDa).filter(t=>via.indexOf(t.titolo)<0);
     const extra = ((L && L.task && L.task[i]) || []).map(taskDa);
-    return {nome:f.nome, icon:f.icon, desc:f.desc, campi:(f.campi||[]).map(c=>c.slice()), task:base.concat(extra)};
+    const o = (L && L.fasi && L.fasi[i]) || {};
+    return {nome:o.nome||f.nome, icon:o.icon||f.icon, desc:o.desc||f.desc, campi:(o.campi||f.campi||[]).map(c=>c.slice()), task:base.concat(extra)};
   });
 }
+
+/* ---------- PROGETTO PERSONALE ----------
+   Un lavoro tuo, senza cliente: via il brief col cliente, il preventivo,
+   la fattura e le voci che parlano di lui. Le spese restano. */
+const RE_CLIENTE = /\b(client[ei]|committent[ei]|preventiv\w*|fattur\w*|accont\w*|budget|contratt\w*|firmat\w*|call conoscitiva|referente)\b/i;
+function senzaCliente(t){
+  return String(t||'').replace(/\s*\b(con il|col|al|del|dal|per il|dei|ai|coi|con i)\s+client[ei]\b/gi, '').replace(/\s{2,}/g, ' ').trim();
+}
+function personalizzaPiano(piano, tipo){
+  const chi = String(TIPO(tipo).chi || 'Cliente').toLowerCase().replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+  const reChi = new RegExp('\\b' + chi + '\\b', 'i');
+  const parla = t => RE_CLIENTE.test(t) || reChi.test(t);
+  return piano.map((f, fi)=>{
+    const g = Object.assign({}, f);
+    if(fi === 0 && /brief/i.test(f.nome)){ g.nome = 'Idea'; g.desc = 'Obiettivi, riferimenti e idee'; }
+    else g.desc = String(f.desc || '').split(/,\s*/).filter(x=>x && !parla(x)).join(', ');
+    g.campi = (f.campi || []).filter(c=>['budget','referente','fattura','cliente','approv'].indexOf(c[1]) < 0);
+    g.task = (f.task || []).filter(t=>!/^(preventiv|fattur|contratt|accont)/i.test(t.titolo)).map(t=>{
+      const x = Object.assign({}, t);
+      x.titolo = senzaCliente(t.titolo) || t.titolo;
+      if(/^note$/i.test(x.titolo)) x.titolo = 'Revisioni';
+      x.items = (t.items || []).filter(v=>!parla(v.t)).map(v=>Object.assign({}, v, {t: senzaCliente(v.t) || v.t}));
+      return x;
+    }).filter(t=>t.items.length || !parla(t.titolo));
+    return g;
+  });
+}
+/* chi e' il cliente, se c'e': in un progetto personale non c'e' */
+function clienteDi(p){ return p && !p.personale ? (p.cliente || '') : ''; }
 
 /* ============ SEED ============ */
 const UTENTI = [
@@ -4139,7 +4354,7 @@ function renderTop(){
     /* Al centro c'e' scritto dove sei. Dentro a un lavoro basta il suo nome:
        tutto il resto sta piu' in basso, dove si lavora davvero. */
     const sp = SPZ();
-    const titoli = {spazi:'Home', mie:'Cosa tocca a te', cerca:'Cerca', profilo:'Profilo', guida:'Guida'};
+    const titoli = {spazi:'Home', mie:'Cosa tocca a te', cerca:'Cerca', profilo:'Profilo', guida:'Guida', team:'Team'};
     if(state.schermo==='progetto'){
       const pr = PROJ();
       c.innerHTML = '<button class="tel-titolo" data-action="toggle-rail" title="Scheda del lavoro: team, indirizzo, note">'+
@@ -4157,6 +4372,8 @@ function renderTop(){
       '<span class="cv">'+svg('chev',2.6)+'</span></button>' : '';
   } else if(state.schermo==='profilo'){
     c.innerHTML = '<b>Profilo</b>';
+  } else if(state.schermo==='team'){
+    c.innerHTML = '<b>Team</b>';
   } else if(state.schermo==='guida'){
     c.innerHTML = '<b>Guida</b>';
   } else c.innerHTML = '';
@@ -4372,7 +4589,7 @@ function rigaLista(p){
     '<span class="cerchio">'+svg('check',3)+'</span>'+
     '<span class="col"></span>'+
     '<span class="nome"><b>'+esc(p.nome)+'</b><span>'+esc(nomeLavoro(p))+
-      ((p.tags&&p.tags.length)? ' · '+esc(p.tags[0]) : '')+' · '+esc(p.cliente)+'</span></span>'+
+      ((p.tags&&p.tags.length)? ' · '+esc(p.tags[0]) : '')+' · '+esc(p.personale? 'Personale' : p.cliente)+'</span></span>'+
     '<span class="prio '+p.prio+'">'+PRIO[p.prio]+'</span>'+
     av(resp,'sm')+
     '<span class="quando'+(s.c==='alert'?' urg':'')+'">'+(p.consegna==='—'?'—':s.t)+'</span>'+
@@ -4439,9 +4656,9 @@ function tessera(p){
   (p.subs||[]).forEach(s=>(s.items||[]).forEach(i=>{ voci++; if(i.done) fatte++; }));
   const commenti = Object.values(p.commenti||{}).reduce((n,l)=>n+(Array.isArray(l)? l.length : 0), 0);
   const q = dataScheda(p), cop = sfondoSicuro(p.copertina), col = coloreOk(p.col, '#FFAD01');
-  const pill = p.cliente || nomeLavoro(p);
+  const pill = p.personale ? 'Personale' : (p.cliente || nomeLavoro(p));
   return '<button class="tile tk'+(p.completato?' fatto':(q.c==='rosso'?' urg':''))+'" style="--acc:'+col+'" data-action="apri" data-id="'+p.id+'">'+
-    '<span class="tk-tags"><span class="tk-pill">'+esc(pill)+'</span>'+(p.cliente? '<span class="tk-tipo">'+esc(nomeLavoro(p))+'</span>' : '')+
+    '<span class="tk-tags"><span class="tk-pill'+(p.personale?' pers':'')+'">'+esc(pill)+'</span>'+(p.cliente || p.personale? '<span class="tk-tipo">'+esc(nomeLavoro(p))+'</span>' : '')+
       '<span class="sep"></span>'+
       (isLock(p)? '<span class="lockchip">'+svg('lock')+'</span>':'')+
       (nuoveN? '<span class="unread">'+svg('bell')+nuoveN+'</span>':'')+
@@ -4599,7 +4816,7 @@ function renderProgetto(){
     tastoIndietro('home', SPZ()? SPZ().nome : 'Progetti')+
     '<span class="picona big">'+svg(p.icona||TT.ic)+'</span>'+
     '<div style="min-width:0" class="editabile">'+
-      '<div class="cli">'+esc(nomeLavoro(p))+(p.cliente? ' · '+esc(p.cliente) : '')+pen('proj','cliente',null,null,1)+'</div>'+
+      '<div class="cli">'+esc(nomeLavoro(p))+(p.personale? ' · Personale' : p.cliente? ' · '+esc(p.cliente) : '')+(p.personale? '' : pen('proj','cliente',null,null,1))+'</div>'+
       '<h1 style="display:flex;align-items:center;gap:8px">'+esc(p.nome)+pen('proj','nome',null,null,1)+'</h1></div>'+
     '<div class="side">'+
       '<button class="btn sm ghost solo-stretto no-tel" data-action="toggle-rail" title="Scheda progetto, team e blocco">'+svg('file')+'Scheda</button>'+
@@ -4624,9 +4841,9 @@ function renderProgetto(){
       pen('proj','tipo')+'</div>'+
     '<div class="kv"><span>Priorità</span><span class="prio '+p.prio+'">'+PRIO[p.prio]+'</span>'+
       pen('proj','prio')+'</div>'+
-    kv(esc(T.chi||'Cliente'),p.cliente,'cliente')+
-    (T.dett||[]).map(d=>kv(esc(d[1]), p[d[0]], d[0])).join('')+
-    kv(esc(etichettaData(p)),p.consegna,'consegna')+kv('Fattura',p.fattura,'fattura')+
+    (p.personale ? '<div class="kv"><span>Per chi</span><span class="chip pers-chip">'+svg('user',2.2)+'Progetto personale</span></div>' : kv(esc(T.chi||'Cliente'),p.cliente,'cliente'))+
+    (T.dett||[]).filter(d=>!(p.personale && d[0]==='referente')).map(d=>kv(esc(d[1]), p[d[0]], d[0])).join('')+
+    kv(esc(etichettaData(p)),p.consegna,'consegna')+(p.personale? '' : kv('Fattura',p.fattura,'fattura'))+
     '<div class="chip '+sc.c+'" style="margin-top:8px">'+svg('clock')+sc.t+'</div>'+
     '<div style="margin-top:10px" class="editabile"><div class="lbl" style="display:flex;align-items:center;gap:4px">'+esc(T.luogo||'Indirizzo')+pen('proj','indirizzo')+'</div>'+
       '<div class="nota-box">'+svg('pin').replace('<svg','<svg style="width:12px;height:12px;vertical-align:-1px;margin-right:4px;color:var(--amber-ink)"')+
@@ -4921,7 +5138,7 @@ function renderPhasebar(){
     return;
   }
   /* nel profilo la barra in basso non serve: si esce dal tasto rosso in fondo alla pagina */
-  if(state.schermo==='profilo' || state.schermo==='guida'){ bar.innerHTML = ''; bar.classList.add('vuota'); return; }
+  if(state.schermo==='profilo' || state.schermo==='guida' || state.schermo==='team'){ bar.innerHTML = ''; bar.classList.add('vuota'); return; }
   if(state.schermo==='home' && state.vista==='note'){
     const n = noteDi().length;
     bar.innerHTML = '<button class="btn primary" data-action="nuova-nota">'+svg('plus')+'Nuova nota</button>'+
@@ -5021,6 +5238,7 @@ function puo(k){
 }
 /* cose che restano solo dell'amministratore, qualunque permesso abbia il guest */
 const SOLO_ADMIN = ['nuovo-profilo','crea-profilo','togli-profilo','togli-profilo-ok','permessi','perm-toggle',
+  'team-invita','invito-crea','invito-copia','invito-condividi',
   'togli-accesso','togli-accesso-ok','registro','registro-chi','registrati','crea-utente'];
 const PERM_AZIONE = {
   'nuovo':'crea_lavori','nl-crea':'crea_lavori','duplica':'crea_lavori',
@@ -5029,7 +5247,7 @@ const PERM_AZIONE = {
   'pe-nuovo':'crea_lavori','pe-importa':'crea_lavori','pe-salva':'crea_lavori','pe-elimina':'crea_lavori','pe-usa':'crea_lavori',
   'conti':'soldi','conti-prev':'soldi-scrive','conti-add':'soldi-scrive','conti-togli':'soldi-scrive',
   'data-nuova':'modifica','data-salva':'modifica',
-  'edit':'modifica','cop-progetto':'modifica','rit-progetto':'modifica','togli-cop-progetto':'modifica','salva-campo':'modifica','nuova-task':'modifica','add-compito':'modifica',
+  'edit':'modifica','personale-toggle':'modifica','cop-progetto':'modifica','rit-progetto':'modifica','togli-cop-progetto':'modifica','salva-campo':'modifica','nuova-task':'modifica','add-compito':'modifica',
   'tagga':'modifica','tagga-chi':'modifica','stagga':'modifica','assegna-sub':'modifica','assegna-sub-chi':'modifica',
   'fase':'modifica','indietro':'modifica','torna-a-fase':'modifica','riprendi':'modifica','completa':'modifica',
   'riapri-progetto':'modifica','menu-sposta':'modifica','lock':'modifica','attiva-lock':'modifica','invia':'modifica',
@@ -5277,7 +5495,7 @@ function renderTabbar(){
     {k:'profilo',  l:'Profilo', ic:'user'}
   ];
   const attivo =
-    (state.schermo==='profilo' || state.schermo==='guida') ? 'profilo' :
+    (state.schermo==='profilo' || state.schermo==='guida' || state.schermo==='team') ? 'profilo' :
     state.schermo==='mie'     ? 'mie' :
     state.schermo==='cerca'   ? 'cerca' :
     (state.schermo==='home' && state.vista==='note') ? 'note' :
@@ -5521,7 +5739,7 @@ function barraSinistra(aperto){
       voce('hm-mie', 'check', 'Le mie task'+(mie? '<b class="hm-n">'+mie+'</b>' : ''))+
       (primo ? voce('hm-cal', 'calendar', 'Calendario', ' data-id="'+esc(primo.id)+'"') : '')+
       voce('notifiche', 'bell', 'Notifiche')+
-      voce('me', sonoAdmin ? 'users' : 'user', sonoAdmin ? 'Team e profilo' : 'Profilo')+
+      voce('team', 'users', 'Team', '', aperto==='team')+
     '</nav>'+
     '<div class="hm-sep"></div>'+
     '<button class="hm-side-t'+(chiusi?' chiuso':'')+'" data-action="hm-spazi-apri" aria-expanded="'+(!chiusi)+'"><span>Spazi di lavoro</span>'+svg('chev',2.2)+'</button>'+
@@ -5553,16 +5771,17 @@ function renderSpazi(){
   const puoCop = puo('spazi') && !state.ospite;
   let h = '<div class="pane"><div class="hm">'+barraSinistra()+'<div class="hm-main scroller">';
 
-  /* cerca */
-  h += '<label class="hm-cerca">'+svg('cerca',2)+'<input id="hmCerca" type="search" placeholder="Cerca progetti, task, persone…" autocomplete="off" enterkeyhint="search"></label>';
 
   /* saluto e ora */
-  h += '<section class="hm-hero">'+paesaggioHome()+
+  const scena = paesaggioHome();
+  h += '<section class="hm-hero tono-'+scena.tono+'" style="--cielo:'+scena.cielo+'">'+scena.svg+
+    '<button class="hm-scena" data-action="hm-scena" title="Cambia scena ('+esc(scena.nome)+')" aria-label="Cambia scena">'+svg('spark',2.2)+'</button>'+
     '<div class="hm-saluto"><h1>'+saluto()+',<br>'+esc(nomeVisibile().split(' ')[0])+' <span class="mano">👋</span></h1>'+
       '<p>"'+esc(fraseDelGiorno())+'"</p></div>'+
     '<div class="hm-ora"><span class="g" id="hmOraG">'+o.g+'</span><span class="d" id="hmOraD">'+o.data+'</span>'+
       '<b id="hmOraT">'+o.ora+'</b>'+
-      '<span class="st">'+svg(o.notte?'moon':'sun',2)+'<span>'+(mie.length ? '<b>'+(oggiN? oggiN+' da chiudere oggi' : 'Giornata produttiva')+'</b>ti aspettano '+mie.length+' task' : '<b>Niente in sospeso</b>goditi la giornata')+'</span></span>'+
+      '<span class="st">'+svg(o.notte?'moon':'sun',2)+'<span class="lungo">'+(mie.length ? '<b>'+(oggiN? oggiN+' da chiudere oggi' : 'Giornata produttiva')+'</b>ti aspettano '+mie.length+' task' : '<b>Niente in sospeso</b>goditi la giornata')+'</span>'+
+        '<span class="corto">'+(oggiN ? oggiN+' da chiudere oggi' : mie.length ? mie.length+(mie.length===1 ? ' task ti aspetta' : ' task ti aspettano') : 'Niente in sospeso')+'</span></span>'+
     '</div></section>';
 
   /* quattro numeri */
@@ -5576,7 +5795,7 @@ function renderSpazi(){
     carta('blu', 'grid', attivi.length, attivi.length===1?'Progetto attivo':'Progetti attivi', 'hm-giu', ' data-a="hmSpazi"', perSpazio)+
     carta('verde', 'check', taskAperte, taskAperte===1?'Task aperta':'Task aperte', 'hm-mie', '', perLavoro)+
     carta('rosso', 'clock', scad.length, 'Consegne entro 7 giorni', 'hm-giu', ' data-a="hmTre"', perGiorno)+
-    carta('viola', 'users', persone.length, persone.length===1?'Collaboratore':'Collaboratori', 'me', '', perPersona)+
+    carta('viola', 'users', persone.length, persone.length===1?'Collaboratore':'Collaboratori', 'team', '', perPersona)+
   '</div>';
 
   /* spazi di lavoro */
@@ -5656,20 +5875,278 @@ function renderSpazi(){
   h += '</section></div>';
 
   h += cartaInvitoGuida('in-pagina');
-  h += sezionePreset();
   h += '</div></div></div>';
   el('stage').innerHTML = h;
 }
-/* il paesaggio del saluto: montagne al tramonto, disegnate (niente foto da scaricare) */
+/* ============ LE SCENE DEL SALUTO ============
+   Il primo impatto della Home: una scena disegnata (niente foto da scaricare)
+   che cambia col momento della giornata. Tre scene per momento, scelte a caso
+   a ogni apertura; un tocco sul tasto in basso passa alla successiva.
+   Tutto vettoriale, animato con calma; con «riduci movimento» sta fermo. */
+const SCENE = {
+  mattino:   ['mongolfiere', 'mare', 'citta'],
+  pomeriggio:['aquilone', 'spiaggia', 'lago'],
+  sera:      ['tramonto', 'cittaSera', 'montagne'],
+  notte:     ['stelle', 'aurora', 'cittaNotte']
+};
+const NOMI_SCENA = {mongolfiere:'Mongolfiere all’alba', mare:'Mare al mattino', citta:'La città si sveglia',
+  aquilone:'Aquilone in campagna', spiaggia:'Spiaggia', lago:'Lago di montagna',
+  tramonto:'Tramonto sul mare', cittaSera:'Città al tramonto', montagne:'Montagne al tramonto',
+  stelle:'Cielo stellato', aurora:'Aurora boreale', cittaNotte:'Città di notte'};
+function momentoDelGiorno(d){
+  const h = (d || new Date()).getHours();
+  return h >= 5 && h < 12 ? 'mattino' : h >= 12 && h < 18 ? 'pomeriggio' : h >= 18 && h < 21 ? 'sera' : 'notte';
+}
+let scenaScelta = null;      // {momento, i}: resta la stessa finche' l'app e' aperta
+function scenaDiOra(){
+  const m = momentoDelGiorno();
+  if(!scenaScelta || scenaScelta.momento !== m) scenaScelta = {momento:m, i:Math.floor(Math.random() * SCENE[m].length)};
+  return SCENE[m][scenaScelta.i % SCENE[m].length];
+}
+function scenaSuccessiva(){
+  const m = momentoDelGiorno();
+  scenaScelta = {momento:m, i:((scenaScelta && scenaScelta.momento === m ? scenaScelta.i : 0) + 1) % SCENE[m].length};
+}
+
+/* ---- pezzi riutilizzabili ---- */
+function scRnd(seme){ let x = seme >>> 0 || 1; return ()=>{ x = (x * 1664525 + 1013904223) >>> 0; return x / 4294967296; }; }
+function scCielo(id, stops){
+  return '<linearGradient id="'+id+'" x1="0" y1="0" x2="0" y2="1">'+stops.map(s=>'<stop offset="'+s[0]+'" stop-color="'+s[1]+'"/>').join('')+'</linearGradient>';
+}
+function scAlone(id, col){
+  return '<radialGradient id="'+id+'"><stop offset="0" stop-color="'+col+'" stop-opacity=".85"/><stop offset=".45" stop-color="'+col+'" stop-opacity=".3"/><stop offset="1" stop-color="'+col+'" stop-opacity="0"/></radialGradient>';
+}
+function scSole(x, y, r, col, alone, raggi){
+  let h = '<circle cx="'+x+'" cy="'+y+'" r="'+(r*3.2)+'" fill="url(#'+alone+')" class="sc-pulsa"/>';
+  if(raggi){
+    h += '<g class="sc-gira" style="transform-origin:'+x+'px '+y+'px">';
+    for(let i = 0; i < 12; i++){
+      const a = i * Math.PI / 6, r1 = r * 1.35, r2 = r * (i % 2 ? 1.7 : 1.95);
+      h += '<line x1="'+(x+Math.cos(a)*r1).toFixed(1)+'" y1="'+(y+Math.sin(a)*r1).toFixed(1)+'" x2="'+(x+Math.cos(a)*r2).toFixed(1)+'" y2="'+(y+Math.sin(a)*r2).toFixed(1)+'" stroke="'+col+'" stroke-width="4" stroke-linecap="round" opacity=".75"/>';
+    }
+    h += '</g>';
+  }
+  return h + '<circle cx="'+x+'" cy="'+y+'" r="'+r+'" fill="'+col+'"/>';
+}
+function scNuvola(x, y, s, col, op, d){
+  return '<g'+(y < 100 ? ' class="sc-alta"' : '')+' transform="translate('+x+' '+y+') scale('+s+')"><g class="sc-vento" style="--d:'+(d||70)+'s" fill="'+col+'" opacity="'+(op||.9)+'">'+
+    '<ellipse cx="0" cy="0" rx="62" ry="17"/><circle cx="-24" cy="-9" r="19"/><circle cx="6" cy="-19" r="26"/><circle cx="34" cy="-7" r="17"/></g></g>';
+}
+function scUccelli(x, y, s, col, d){
+  const u = (dx, dy, k) => '<g transform="translate('+dx+' '+dy+') scale('+k+')"><path class="sc-ala" d="M-9 0 Q-4 -6 0 0 Q4 -6 9 0" fill="none" stroke="'+col+'" stroke-width="2.2" stroke-linecap="round"/></g>';
+  return '<g transform="translate('+x+' '+y+') scale('+s+')"><g class="sc-vola" style="--d:'+(d||46)+'s">'+u(0,0,1)+u(22,-9,.8)+u(40,4,.7)+'</g></g>';
+}
+function scStelle(n, seme, yMax, col){
+  const r = scRnd(seme); let h = '';
+  for(let i = 0; i < n; i++){
+    const x = (r() * 1200).toFixed(0), y = (r() * yMax).toFixed(0), rr = (0.6 + r() * 1.4).toFixed(1);
+    h += '<circle cx="'+x+'" cy="'+y+'" r="'+rr+'" fill="'+(col||'#fff')+'"'+(i % 3 === 0 ? ' class="sc-brilla" style="--d:'+(2 + r() * 4).toFixed(1)+'s;--r:'+(r() * 3).toFixed(1)+'s"' : ' opacity="'+(.35 + r() * .5).toFixed(2)+'"')+'/>';
+  }
+  return h;
+}
+function scSkyline(seme, base, hMin, hMax, col, finestre, pLuce, colLuce){
+  const r = scRnd(seme); let x = -10, h = '', luci = '';
+  while(x < 1210){
+    /* a sinistra c'e' il saluto: li' i palazzi restano bassi, per leggere bene */
+    const w = 26 + Math.round(r() * 46), alt = Math.round((hMin + r() * (hMax - hMin)) * (x < 440 ? .38 : x < 520 ? .7 : 1));
+    h += '<rect x="'+x+'" y="'+(base - alt)+'" width="'+w+'" height="'+(alt + 2)+'"/>';
+    if(r() < .25) h += '<rect x="'+(x + w/2 - 2)+'" y="'+(base - alt - 14)+'" width="4" height="14"/>';
+    if(finestre){
+      for(let yy = base - alt + 8; yy < base - 8; yy += 11) for(let xx = x + 5; xx < x + w - 6; xx += 8){
+        if(r() < pLuce) luci += '<rect x="'+xx+'" y="'+yy+'" width="4" height="5" rx=".6"'+(r() < .12 ? ' class="sc-luce" style="--d:'+(3 + r() * 6).toFixed(1)+'s"' : '')+'/>';
+      }
+    }
+    x += w + Math.round(r() * 4);
+  }
+  return '<g fill="'+col+'">'+h+'</g>'+(luci ? '<g fill="'+colLuce+'">'+luci+'</g>' : '');
+}
+function scMongolfiera(x, y, s, c1, c2, d){
+  return '<g transform="translate('+x+' '+y+') scale('+s+')"><g class="sc-galleggia" style="--d:'+d+'s">'+
+    '<path d="M0 -44 C30 -44 34 -12 13 11 L7 20 L-7 20 L-13 11 C-34 -12 -30 -44 0 -44Z" fill="'+c1+'"/>'+
+    '<path d="M0 -44 C11 -44 13 -12 5 11 L3 20 L-3 20 L-5 11 C-13 -12 -11 -44 0 -44Z" fill="'+c2+'"/>'+
+    '<path d="M-26 -22 C-10 -16 10 -16 26 -22" fill="none" stroke="'+c2+'" stroke-width="3" opacity=".7"/>'+
+    '<path d="M-6 20 L-5 28 M6 20 L5 28" stroke="#7a5236" stroke-width="1.2"/>'+
+    '<rect x="-6" y="28" width="12" height="8" rx="2" fill="#8a5a36"/></g></g>';
+}
+function scBarca(x, y, s, vela, scafo){
+  return '<g transform="translate('+x+' '+y+') scale('+s+')"><g class="sc-dondola">'+
+    '<path d="M0 -40 L0 0 L26 0Z" fill="'+vela+'"/><path d="M-3 -34 L-3 -2 L-20 -2Z" fill="'+vela+'" opacity=".85"/>'+
+    '<path d="M-26 2 L30 2 L22 12 L-18 12Z" fill="'+scafo+'"/></g></g>';
+}
+function scLuccichii(x, y, w, n, col, seme){
+  const r = scRnd(seme); let h = '';
+  for(let i = 0; i < n; i++){
+    const xx = x + (r() - .5) * w, yy = y + i * 7 + r() * 4, l = 10 + r() * 34;
+    h += '<rect x="'+xx.toFixed(0)+'" y="'+yy.toFixed(0)+'" width="'+l.toFixed(0)+'" height="2.2" rx="1.1" fill="'+col+'" class="sc-luccica" style="--d:'+(2.5 + r() * 3).toFixed(1)+'s;--r:'+(r() * 2).toFixed(1)+'s"/>';
+  }
+  return h;
+}
+
+/* ---- le dodici scene: [colore del testo, svg] ----
+   Disegnate su 1200x300 e allineate in basso: sul computer (riquadro largo e
+   basso) si vede la fascia da y≈125 in giu', sul telefono tutto il cielo.
+   Il soggetto sta tra x 450 e 1000: a sinistra c'e' il saluto, a destra l'ora. */
+const DISEGNI = {
+  mongolfiere(){
+    return ['scuro',
+      '<defs>'+scCielo('scC',[[0,'#86C2FF'],[.55,'#FFD9CC'],[1,'#FFEDBF']])+scAlone('scA','#FFE6A0')+'</defs>'+
+      '<rect width="1200" height="300" fill="url(#scC)"/>'+
+      scSole(770, 236, 30, '#FFD166', 'scA')+
+      scNuvola(330, 150, 1, '#fff', .9, 80)+scNuvola(990, 140, .8, '#fff', .85, 64)+scNuvola(620, 70, .7, '#fff', .8, 90)+scNuvola(200, 60, .6, '#fff', .7, 74)+
+      '<path d="M0 248 Q180 214 360 238 T720 232 T1200 226 V300 H0Z" fill="#A9DB9C"/>'+
+      '<path d="M0 268 Q240 240 470 262 T900 256 T1200 248 V300 H0Z" fill="#79C27F"/>'+
+      '<path d="M0 288 Q300 268 620 286 T1200 278 V300 H0Z" fill="#55A866"/>'+
+      scMongolfiera(560, 176, 1, '#FF6B6B', '#FFD166', 7)+scMongolfiera(870, 170, .72, '#3FC1C9', '#F7FFF7', 9)+scMongolfiera(1050, 196, .52, '#9B6BDB', '#FFD166', 8)+
+      scMongolfiera(720, 96, .45, '#FF9F1C', '#fff', 10)+
+      scUccelli(440, 168, 1, '#4A5A7A', 52)];
+  },
+  mare(){
+    return ['scuro',
+      '<defs>'+scCielo('scC',[[0,'#7DB8F6'],[.6,'#CFE6FF'],[1,'#FFF0D2']])+scCielo('scM',[[0,'#69B2EC'],[1,'#2E7BC6']])+scAlone('scA','#FFE6A0')+'</defs>'+
+      '<rect width="1200" height="300" fill="url(#scC)"/>'+
+      scSole(720, 228, 28, '#FFE08A', 'scA')+
+      scNuvola(320, 152, 1, '#fff', .85, 76)+scNuvola(960, 144, .7, '#fff', .8, 60)+scNuvola(600, 66, .8, '#fff', .8, 84)+
+      '<path d="M930 238 Q990 206 1050 222 Q1110 208 1200 226 V240 H930Z" fill="#7CA6D6"/>'+
+      '<rect y="238" width="1200" height="62" fill="url(#scM)"/>'+
+      scLuccichii(722, 244, 70, 7, '#FFF6D6', 7)+scLuccichii(380, 256, 520, 5, '#BFE2FF', 11)+
+      scBarca(900, 254, .85, '#FFFFFF', '#E25B45')+
+      scUccelli(520, 176, 1.1, '#3C4F73', 40)];
+  },
+  citta(){
+    return ['scuro',
+      '<defs>'+scCielo('scC',[[0,'#A6C6FF'],[.5,'#F6C5D8'],[1,'#FFD7A3']])+scAlone('scA','#FFD08A')+'</defs>'+
+      '<rect width="1200" height="300" fill="url(#scC)"/>'+
+      scSole(690, 238, 40, '#FFC56B', 'scA')+
+      scNuvola(270, 150, 1, '#fff', .8, 72)+scNuvola(900, 140, .8, '#FFF1F4', .85, 84)+scNuvola(560, 64, .8, '#fff', .75, 90)+
+      scSkyline(21, 300, 40, 104, '#B7A3D6', false)+
+      scSkyline(5, 300, 24, 78, '#6C5BA0', true, .07, '#FFE38A')+
+      scUccelli(480, 176, 1, '#4B3F72', 44)];
+  },
+  aquilone(){
+    return ['scuro',
+      '<defs>'+scCielo('scC',[[0,'#6BB8FF'],[1,'#D6F1FF']])+scAlone('scA','#FFF3A0')+'</defs>'+
+      '<rect width="1200" height="300" fill="url(#scC)"/>'+
+      scSole(930, 158, 26, '#FFE14D', 'scA', true)+
+      scNuvola(420, 168, 1.1, '#fff', .95, 70)+scNuvola(760, 146, .9, '#fff', .9, 90)+scNuvola(1120, 186, .7, '#fff', .9, 66)+scNuvola(600, 70, .9, '#fff', .9, 80)+
+      '<path d="M0 240 Q200 214 420 234 T860 226 T1200 218 V300 H0Z" fill="#9BD66E"/>'+
+      '<path d="M0 266 Q260 242 540 262 T1200 250 V300 H0Z" fill="#6DBE5B"/>'+
+      '<path d="M0 288 Q320 270 700 286 T1200 280 V300 H0Z" fill="#4AA34E"/>'+
+      '<g fill="#3E8E45"><circle cx="880" cy="226" r="12"/><circle cx="903" cy="230" r="9"/><circle cx="520" cy="238" r="9"/></g>'+
+      '<g stroke="#6B4A2E" stroke-width="2"><line x1="880" y1="236" x2="880" y2="246"/><line x1="520" y1="246" x2="520" y2="254"/></g>'+
+      '<path d="M640 196 Q624 246 604 292" fill="none" stroke="#fff" stroke-width="1.2" opacity=".9"/>'+
+      '<g class="sc-aquilone" style="transform-origin:640px 196px"><path d="M640 130 L664 162 L640 198 L616 162Z" fill="#FF5D73"/>'+
+        '<path d="M640 130 L664 162 L640 162Z" fill="#FFD23F"/><path d="M616 162 L640 162 L640 198Z" fill="#3FC1C9"/>'+
+        '<path d="M640 198 Q630 214 645 224 Q656 236 640 248" fill="none" stroke="#FF5D73" stroke-width="2"/>'+
+        '<g fill="#FFD23F"><path d="M634 210 l6 3 l-6 3z"/><path d="M644 228 l6 3 l-6 3z"/></g></g>'];
+  },
+  spiaggia(){
+    return ['scuro',
+      '<defs>'+scCielo('scC',[[0,'#62C1FF'],[.6,'#B9E8FF'],[1,'#E8FAFF']])+scCielo('scM',[[0,'#36C9C6'],[1,'#1C9DB4']])+scCielo('scS',[[0,'#F8E0A8'],[1,'#EFC985']])+scAlone('scA','#FFF3A0')+'</defs>'+
+      '<rect width="1200" height="300" fill="url(#scC)"/>'+
+      scSole(930, 156, 26, '#FFE14D', 'scA', true)+
+      scNuvola(360, 156, 1.1, '#fff', .95, 74)+scNuvola(720, 140, .8, '#fff', .9, 88)+scNuvola(560, 64, .8, '#fff', .9, 80)+
+      '<rect y="212" width="1200" height="54" fill="url(#scM)"/>'+
+      scLuccichii(600, 220, 900, 5, '#E6FFFF', 5)+
+      scBarca(830, 218, .5, '#fff', '#1D4E89')+scBarca(1080, 222, .38, '#FFD23F', '#1D4E89')+
+      '<path d="M0 264 Q300 252 600 262 T1200 258 V300 H0Z" fill="url(#scS)"/>'+
+      '<path class="sc-onda" d="M0 264 Q300 252 600 262 T1200 258" fill="none" stroke="#fff" stroke-width="3" opacity=".85"/>'+
+      '<g transform="translate(700 276)"><line x1="0" y1="-48" x2="0" y2="22" stroke="#7a5236" stroke-width="3"/>'+
+        '<path d="M-46 -40 Q0 -78 46 -40Z" fill="#FF5D5D"/><path d="M-23 -40 Q0 -78 23 -40Z" fill="#fff"/><path d="M-8 -40 Q0 -78 8 -40Z" fill="#FF5D5D"/></g>'+
+      '<rect x="740" y="282" width="54" height="14" rx="3" fill="#3FC1C9" transform="rotate(-6 767 289)"/>'+
+      '<circle cx="610" cy="286" r="8" fill="#fff"/><path d="M602 286 A8 8 0 0 1 618 286Z" fill="#FF5D5D"/>'+
+      scUccelli(500, 178, 1, '#2F4F6F', 38)];
+  },
+  lago(){
+    return ['scuro',
+      '<defs>'+scCielo('scC',[[0,'#5AA8EF'],[.7,'#BFE3FF'],[1,'#EAF6FF']])+scCielo('scL',[[0,'#8CCBEB'],[1,'#4D96C4']])+'</defs>'+
+      '<rect width="1200" height="300" fill="url(#scC)"/>'+
+      scNuvola(300, 150, 1, '#fff', .92, 82)+scNuvola(1060, 160, .8, '#fff', .9, 70)+scNuvola(620, 70, .8, '#fff', .9, 86)+
+      '<path d="M460 252 L600 172 L680 198 L790 140 L890 192 L980 162 L1120 252Z" fill="#A9C1DE"/>'+
+      '<path d="M790 140 L816 160 L802 158 L790 170 L778 158 L766 160Z M600 172 L620 186 L606 184 L596 192 L588 184Z M980 162 L998 176 L986 174 L976 182 L968 174Z" fill="#fff"/>'+
+      '<path d="M380 254 L520 206 L600 228 L700 196 L820 232 L920 210 L1200 250 V256 H380Z" fill="#6E93C2"/>'+
+      '<rect y="252" width="1200" height="48" fill="url(#scL)"/>'+
+      scLuccichii(780, 258, 600, 5, '#E8F7FF', 3)+
+      '<g class="sc-aereo"><path d="M0 0 L34 0 L42 -6 L46 -6 L42 2 L4 6Z" fill="#fff"/><path d="M14 2 L26 2 L20 12Z" fill="#E6EEF7"/>'+
+        '<line x1="-170" y1="1" x2="-4" y2="1" stroke="#fff" stroke-width="2.4" stroke-linecap="round" opacity=".7"/></g>'];
+  },
+  tramonto(){
+    return ['chiaro',
+      '<defs>'+scCielo('scC',[[0,'#2B1E5A'],[.45,'#B03A6E'],[.78,'#FF7A45'],[1,'#FFC15E']])+scCielo('scM',[[0,'#7A2F5C'],[1,'#26132F']])+scAlone('scA','#FFD08A')+'</defs>'+
+      '<rect width="1200" height="300" fill="url(#scC)"/>'+
+      scStelle(16, 9, 110, '#FFE9F3')+
+      scSole(700, 246, 48, '#FFD36E', 'scA')+
+      scNuvola(330, 172, 1.2, '#FF9E7A', .45, 90)+scNuvola(960, 156, .9, '#FFB38A', .5, 76)+
+      '<path d="M0 230 Q80 208 170 220 L250 246 H0Z" fill="#3A1E47"/><path d="M980 246 Q1060 210 1200 216 V246Z" fill="#3A1E47"/>'+
+      '<rect y="244" width="1200" height="56" fill="url(#scM)"/>'+
+      scLuccichii(702, 250, 120, 7, '#FFC77A', 13)+
+      scUccelli(470, 182, 1.2, '#2A1438', 44)];
+  },
+  cittaSera(){
+    return ['chiaro',
+      '<defs>'+scCielo('scC',[[0,'#3B2A6B'],[.55,'#E0607E'],[1,'#FFB36B']])+scAlone('scA','#FFCF70')+'</defs>'+
+      '<rect width="1200" height="300" fill="url(#scC)"/>'+
+      scStelle(10, 12, 90, '#FFE9F3')+
+      scSole(650, 250, 54, '#FFCF70', 'scA')+
+      scNuvola(300, 164, 1.1, '#FF9AA8', .4, 80)+scNuvola(900, 150, .9, '#FFB0B8', .45, 70)+
+      scSkyline(31, 300, 50, 116, '#7A4C8C', false)+
+      scSkyline(17, 300, 30, 90, '#3A2350', true, .18, '#FFD27A')+
+      scUccelli(520, 176, 1, '#2A1A3C', 40)];
+  },
+  montagne(){
+    return ['chiaro',
+      '<defs>'+scCielo('scC',[[0,'#16203A'],[.55,'#5A3552'],[1,'#D8704A']])+scAlone('scA','#FFB35C')+'</defs>'+
+      '<rect width="1200" height="300" fill="url(#scC)"/>'+
+      scStelle(20, 4, 120, '#FFE7D6')+
+      scSole(930, 222, 34, '#FFC27A', 'scA')+
+      scNuvola(420, 176, 1.1, '#E58A6A', .35, 86)+
+      '<path d="M540 300 L690 196 L760 226 L850 140 L930 212 L990 172 L1080 240 L1200 188 L1200 300Z" fill="#111A2D"/>'+
+      '<path d="M590 300 L720 250 L800 270 L900 210 L980 262 L1060 236 L1200 274 L1200 300Z" fill="#0B1120"/>'+
+      '<path d="M850 140 L870 162 L858 160 L846 174 L838 154Z M990 172 L1004 188 L992 186 L982 194Z" fill="#D6DCEA" opacity=".55"/>'+
+      scUccelli(640, 178, 1.1, '#1A1328', 50)];
+  },
+  stelle(){
+    return ['chiaro',
+      '<defs>'+scCielo('scC',[[0,'#070B1F'],[.6,'#141B3D'],[1,'#27305E']])+scAlone('scA','#CFE0FF')+
+        '<linearGradient id="scS" x1="0" y1="0" x2="1" y2="0"><stop offset="0" stop-color="#fff" stop-opacity="0"/><stop offset="1" stop-color="#fff"/></linearGradient></defs>'+
+      '<rect width="1200" height="300" fill="url(#scC)"/>'+
+      scStelle(100, 17, 250)+
+      '<circle cx="860" cy="160" r="80" fill="url(#scA)" opacity=".45" class="sc-pulsa"/>'+
+      '<mask id="scLuna"><rect width="1200" height="300" fill="#fff"/><circle cx="872" cy="151" r="21" fill="#000"/></mask>'+
+      '<circle cx="860" cy="160" r="24" fill="#F3F6FF" mask="url(#scLuna)"/>'+
+      '<g class="sc-cometa"><rect x="0" y="0" width="120" height="2" rx="1" fill="url(#scS)"/></g>'+
+      '<path d="M0 300 L0 250 L120 214 L220 244 L340 196 L470 248 L560 226 L680 266 L800 230 L940 258 L1060 220 L1200 248 V300Z" fill="#121A3A"/>'+
+      '<path d="M0 300 L0 274 L160 250 L300 270 L460 246 L620 276 L780 256 L960 280 L1200 262 V300Z" fill="#0A0F26"/>'];
+  },
+  aurora(){
+    return ['chiaro',
+      '<defs>'+scCielo('scC',[[0,'#04101A'],[.7,'#0B2234'],[1,'#123247']])+
+        '<linearGradient id="scV" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#3DFFB0" stop-opacity="0"/><stop offset=".55" stop-color="#3DFFB0" stop-opacity=".55"/><stop offset="1" stop-color="#3DFFB0" stop-opacity="0"/></linearGradient>'+
+        '<linearGradient id="scW" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#9A7CFF" stop-opacity="0"/><stop offset=".5" stop-color="#9A7CFF" stop-opacity=".45"/><stop offset="1" stop-color="#5BE3FF" stop-opacity="0"/></linearGradient>'+
+        '<linearGradient id="scH" x1="0" y1="0" x2="1" y2="0"><stop offset=".22" stop-color="#000"/><stop offset=".42" stop-color="#fff"/><stop offset=".92" stop-color="#fff"/><stop offset="1" stop-color="#000"/></linearGradient>'+
+        '<mask id="scAM"><rect width="1200" height="300" fill="url(#scH)"/></mask></defs>'+
+      '<rect width="1200" height="300" fill="url(#scC)"/>'+
+      scStelle(80, 29, 240)+
+      '<g mask="url(#scAM)"><path class="sc-aurora" style="--d:14s" d="M380 112 C520 178 640 96 780 146 C900 196 1020 124 1200 166 L1200 236 C1010 204 900 252 780 214 C640 168 520 244 380 204Z" fill="url(#scV)"/>'+
+      '<path class="sc-aurora b" style="--d:18s" d="M300 150 C460 200 600 130 760 176 C880 210 1000 160 1200 196 L1200 246 C1000 220 880 268 760 236 C600 196 460 262 300 226Z" fill="url(#scW)"/></g>'+
+      '<path d="M0 300 L0 266 Q160 248 320 260 T700 254 T1200 244 V300Z" fill="#9FB7CC"/>'+
+      '<path d="M0 300 L0 284 Q220 270 520 282 T1200 274 V300Z" fill="#DCE8F2"/>'+
+      '<g transform="translate(830 258)"><path d="M0 0 L22 -18 L44 0 V22 H0Z" fill="#5A3E2E"/><path d="M-4 2 L22 -21 L48 2" fill="none" stroke="#F4F8FB" stroke-width="5" stroke-linejoin="round"/>'+
+        '<rect x="15" y="6" width="12" height="10" rx="1.5" fill="#FFD27A" class="sc-luce" style="--d:7s"/><rect x="33" y="-14" width="5" height="10" fill="#4A3426"/></g>'];
+  },
+  cittaNotte(){
+    return ['chiaro',
+      '<defs>'+scCielo('scC',[[0,'#0A0F24'],[1,'#1D2550']])+scAlone('scA','#DCE6FF')+'</defs>'+
+      '<rect width="1200" height="300" fill="url(#scC)"/>'+
+      scStelle(50, 41, 200)+
+      '<circle cx="840" cy="156" r="70" fill="url(#scA)" opacity=".45" class="sc-pulsa"/><circle cx="840" cy="156" r="22" fill="#F3F6FF"/>'+
+      scSkyline(53, 300, 60, 124, '#1A2147', true, .05, '#8FB8FF')+
+      scSkyline(9, 300, 34, 96, '#10152F', true, .22, '#FFD27A')];
+  }
+};
 function paesaggioHome(){
-  return '<svg class="hm-pae" viewBox="0 0 1200 300" preserveAspectRatio="xMidYMid slice" aria-hidden="true">'+
-    '<defs><linearGradient id="hmCielo" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="var(--pae-1)"/><stop offset=".55" stop-color="var(--pae-2)"/><stop offset="1" stop-color="var(--pae-3)"/></linearGradient>'+
-    '<radialGradient id="hmSole" cx=".78" cy=".62" r=".35"><stop offset="0" stop-color="var(--pae-sole)" stop-opacity=".9"/><stop offset="1" stop-color="var(--pae-sole)" stop-opacity="0"/></radialGradient></defs>'+
-    '<rect width="1200" height="300" fill="url(#hmCielo)"/><rect width="1200" height="300" fill="url(#hmSole)"/>'+
-    '<path d="M560 300 L700 150 L760 190 L850 90 L930 170 L990 120 L1080 200 L1200 140 L1200 300Z" fill="var(--pae-m1)"/>'+
-    '<path d="M600 300 L720 210 L800 240 L900 160 L980 230 L1060 190 L1200 250 L1200 300Z" fill="var(--pae-m2)"/>'+
-    '<path d="M850 90 L870 112 L858 110 L846 124 L838 104Z M990 120 L1004 136 L992 134 L982 142Z" fill="var(--pae-neve)" opacity=".55"/>'+
-  '</svg>';
+  const k = scenaDiOra(), x = DISEGNI[k]();
+  const cielo = (/stop-color="(#[0-9A-Fa-f]{3,8})"/.exec(x[1]) || [])[1] || '#16203a';
+  return {tono:x[0], nome:NOMI_SCENA[k], cielo, svg:'<svg class="hm-pae" viewBox="0 0 1200 300" preserveAspectRatio="xMidYMax slice" aria-hidden="true" data-scena="'+k+'">'+x[1]+'</svg>'};
 }
 
 /* ============ WIZARD NUOVO SPAZIO ============ */
@@ -6523,12 +7000,12 @@ function renderProfilo(){
       '</div>'+
     '</div></div></div>';
 
+  h += cartaTeam() + cartaModelli();
   h += cartaGuida();
   h += cartaProfessioni();
-  h += sonoAdmin ? cartaAmministrazione()
-    : '<div class="card"><h3>Profilo guest</h3><div class="hint" style="margin:0">Vedi solo i lavori che l\u2019amministratore ha aperto per te. '+
+  if(!sonoAdmin) h += '<div class="card"><h3>Profilo guest</h3><div class="hint" style="margin:0">Vedi solo i lavori che l\u2019amministratore ha aperto per te. '+
       'Per vedere altro, o per aggiungere persone, chiedi a lui.</div></div>';
-  h += cartaSoldi() + cartaCalendario() + cartaModelli();
+  h += cartaSoldi() + cartaCalendario();
 
   h += '<div class="card"><h3 style="display:flex;align-items:center;gap:8px">Dati personali<span class="chip" id="statoProfilo" style="margin-left:auto">Si salva da solo</span></h3><div class="hint">Se compili il nickname, sarà quello mostrato ovunque nel software.</div>'+
     '<div class="griglia">'+
@@ -6588,6 +7065,15 @@ function renderProfilo(){
   h += '</div></div></div>';
   el('stage').innerHTML = h;
 }
+/* il team ha la sua pagina: dal profilo ci si arriva da qui (sul telefono e' l'unica strada) */
+function cartaTeam(){
+  const persone = personeOrg(), attesa = sonoAdmin ? (state.inviti||[]).filter(i=>!i.usato).length : 0;
+  return '<div class="card carta-team"><button class="ct-b" data-action="team">'+
+    (persone.length ? '<span class="av-stack">'+persone.slice(0,4).map(u=>av(u)).join('')+'</span>' : '<span class="ct-ic">'+svg('users',2)+'</span>')+
+    '<span class="tx"><b>Il tuo team</b><span>'+persone.length+(persone.length===1?' persona':' persone')+
+      (attesa? ' \u00b7 '+attesa+(attesa===1?' invito in attesa':' inviti in attesa') : '')+
+      (sonoAdmin? ' \u00b7 inviti, permessi e ruoli' : '')+'</span></span>'+svg('right',2.4)+'</button></div>';
+}
 /* ---------- AMMINISTRAZIONE ----------
    Chi c'e', chi aspetta di registrarsi, quanti lavori vede ognuno. */
 function cartaAmministrazione(){
@@ -6620,6 +7106,148 @@ function cartaAmministrazione(){
     '<button class="btn primary" data-action="nuovo-profilo">'+svg('plus')+'Nuovo profilo</button>'+
     '<button class="btn" data-action="registro">'+svg('list')+'Registro delle attivit\u00e0</button></div></div>';
   return h;
+}
+
+/* ============ IL TEAM ============
+   Una pagina sola per le persone: chi lavora con te, chi hai invitato e non
+   si e' ancora registrato, cosa puo' fare ognuno. L'amministratore invita
+   per email: FOSS prepara l'invito e il messaggio, lui lo manda dalla sua posta. */
+const RUOLI_SUGGERITI = ['Videomaker','Operatore video','Operatrice video','Montatore','Montatrice','Regia','Fotografo','Fotografa',
+  'Grafico','Grafica','Motion designer','Social media manager','Copywriter','Fonico','Pilota drone','Assistente','Produzione',
+  'Sviluppatore','Event planner','Consulente','Cliente','Collaboratore'];
+function datalistRuoli(id){
+  const tutti = [...new Set(RUOLI_SUGGERITI.concat(state.utenti.map(u=>u.ruolo||'')).concat((state.inviti||[]).map(i=>i.ruolo||'')).filter(Boolean))];
+  return '<datalist id="'+id+'">'+tutti.map(r=>'<option value="'+esc(r)+'">').join('')+'</datalist>';
+}
+/* un ruolo scritto come «Regia · Montaggio» vale per tutti e due i filtri */
+function ruoliDi(tx){
+  return String(tx||'').split(/\s*[·,/|]\s*|\s+e\s+/).map(x=>x.trim()).filter(Boolean)
+    .map(x=>x.charAt(0).toUpperCase()+x.slice(1));
+}
+function linkInvito(inv){
+  inv = inv || {};
+  const q = new URLSearchParams();
+  if((inv.nome||'').trim()) q.set('nome', inv.nome.trim());
+  if((inv.ruolo||'').trim()) q.set('ruolo', inv.ruolo.trim());
+  const qs = q.toString();
+  return location.origin + location.pathname + '#/registrati/' + encodeURIComponent(inv.email||'') + (qs ? '?' + qs : '');
+}
+function testoInvito(inv){
+  const nome = (inv.nickname || inv.nome || '').trim();
+  return 'Ciao' + (nome ? ' ' + nome : '') + ',\n\n' +
+    'ti ho aggiunto al mio team su FOSS, il gestionale dove organizziamo i progetti.\n\n' +
+    'Registrati da questo link con questa email (' + inv.email + '):\n' + linkInvito(inv) + '\n\n' +
+    'Appena entri sei già nel team e vedi i lavori che ti apro.\n\n' + nomeVisibile();
+}
+function mailtoInvito(inv){
+  return 'mailto:' + encodeURIComponent(inv.email) + '?subject=' + encodeURIComponent('Ti invito su FOSS') +
+    '&body=' + encodeURIComponent(testoInvito(inv));
+}
+/* un tasto che per un attimo dice cosa e' successo (i messaggi «ok» non compaiono) */
+function diceSulTasto(t, html, ms){
+  if(!t) return;
+  if(t.__orig == null) t.__orig = t.innerHTML;
+  t.innerHTML = html; clearTimeout(t.__t);
+  t.__t = setTimeout(()=>{ if(t.isConnected && t.__orig != null){ t.innerHTML = t.__orig; } t.__orig = null; }, ms || 1800);
+}
+function dataInvito(i){
+  const d = i.creato_il ? new Date(i.creato_il) : null;
+  if(!d || isNaN(d)) return '';
+  return d.getDate() + ' ' + MESI_BREVI[d.getMonth()] + (d.getFullYear() !== OGGI.getFullYear() ? ' ' + d.getFullYear() : '');
+}
+
+function renderTeam(){
+  const admin = sonoAdmin && !state.ospite;
+  const persone = personeOrg();
+  const inviti = admin ? (state.inviti||[]).filter(i=>!i.usato) : [];
+  const vede = id => state.progetti.filter(p=>(p.team||[]).includes(id)).length;
+  /* i ruoli, per i filtri: dalle persone e dagli inviti */
+  const conta = {};
+  persone.forEach(u=>ruoliDi(u.ruolo).forEach(r=>{ conta[r] = (conta[r]||0) + 1; }));
+  inviti.forEach(i=>ruoliDi(i.ruolo).forEach(r=>{ conta[r] = (conta[r]||0) + 1; }));
+  const ruoli = Object.keys(conta).sort((a,b)=>conta[b]-conta[a] || a.localeCompare(b));
+  if(state.teamRuolo && !conta[state.teamRuolo]) state.teamRuolo = '';
+  const stato = admin ? (state.teamStato || 'tutti') : 'team';
+  const passa = tx => !state.teamRuolo || ruoliDi(tx).indexOf(state.teamRuolo) >= 0;
+  const pv = stato === 'invitati' ? [] : persone.filter(u=>passa(u.ruolo));
+  const iv = stato === 'team' ? [] : inviti.filter(i=>passa(i.ruolo));
+
+  let h = '<div class="pane"><div class="hm tm-lay">' + barraSinistra('team') + '<div class="hm-main scroller tm-main">';
+  h += '<div class="tm-head"><div class="tx"><h1>Team</h1><p>' +
+    (admin ? persone.length + (persone.length === 1 ? ' persona' : ' persone') + ' nel tuo archivio' +
+             (inviti.length ? ' · ' + inviti.length + (inviti.length === 1 ? ' invito in attesa' : ' inviti in attesa') : '')
+           : 'Le persone con cui lavori.') + '</p></div>' +
+    (admin ? '<button class="btn primary" data-action="team-invita">' + svg('plus', 2.4) + 'Invita una persona</button>' : '') + '</div>';
+
+  /* l'invito */
+  if(admin && (state.teamForm || state.teamPronto)){
+    const pronto = state.teamPronto && inviti.find(i=>i.id === state.teamPronto);
+    if(pronto){
+      h += '<section class="tm-invito pronto"><div class="tm-ok">' + svg('check', 3) + '</div><div class="tx"><b>Invito pronto per ' + esc(pronto.email) + '</b>' +
+        '<span>Mandaglielo: quando si registra con questa email entra da solo nel team, come guest.</span>' +
+        '<div class="tm-az"><a class="btn primary sm" href="' + esc(mailtoInvito(pronto)) + '" target="_blank" rel="noopener">' + svg('send') + 'Scrivi l’email</a>' +
+          '<button class="btn sm" data-action="invito-copia" data-id="' + esc(pronto.id) + '">' + svg('link') + 'Copia il link</button>' +
+          (navigator.share ? '<button class="btn sm" data-action="invito-condividi" data-id="' + esc(pronto.id) + '">' + svg('share') + 'Condividi</button>' : '') +
+          '<button class="btn sm ghost" data-action="team-chiudi">Fatto</button></div></div></section>';
+    } else {
+      h += '<section class="tm-invito"><h3>Invita una persona</h3>' +
+        '<p>Scrivi la sua email: FOSS prepara l’invito e un messaggio già scritto da mandare dalla tua posta. Nome e ruolo li trova già scritti quando si registra, e può correggerli.</p>' +
+        '<div class="tm-form">' +
+          '<div class="field"><label>Email</label><input id="tm_mail" type="email" inputmode="email" autocomplete="off" placeholder="nome@studio.it" maxlength="120"></div>' +
+          '<div class="field"><label>Nome (facoltativo)</label><input id="tm_nome" autocomplete="off" placeholder="Es. Laura" maxlength="40"></div>' +
+          '<div class="field"><label>Ruolo (facoltativo)</label><input id="tm_ruolo" list="tmRuoli" autocomplete="off" placeholder="Es. Operatrice video" maxlength="60">' + datalistRuoli('tmRuoli') + '</div>' +
+        '</div><div class="tm-az"><button class="btn primary" data-action="invito-crea">' + svg('send') + 'Crea l’invito</button>' +
+          '<button class="btn ghost" data-action="team-chiudi">Annulla</button></div></section>';
+    }
+  }
+
+  /* i filtri */
+  h += '<div class="tm-filtri">' +
+    (admin ? '<div class="seg">' + [['tutti','Tutti', persone.length + inviti.length],['team','Nel team', persone.length],['invitati','Invitati', inviti.length]].map(x=>
+      '<button class="' + (stato === x[0] ? 'on' : '') + '" data-action="team-stato" data-k="' + x[0] + '">' + x[1] + ' <i>' + x[2] + '</i></button>').join('') + '</div>' : '') +
+    (ruoli.length ? '<div class="tm-ruoli"><span class="lb">Ruolo</span>' +
+      '<button class="tm-r' + (!state.teamRuolo ? ' on' : '') + '" data-action="team-ruolo" data-k="">Tutti</button>' +
+      ruoli.map(r=>'<button class="tm-r' + (state.teamRuolo === r ? ' on' : '') + '" data-action="team-ruolo" data-k="' + esc(r) + '">' + esc(r) + ' <i>' + conta[r] + '</i></button>').join('') + '</div>' : '') +
+  '</div>';
+
+  /* le persone */
+  h += '<div class="tm-lista">';
+  pv.forEach(u=>{
+    const pm = permessiDi(u.id), n = vede(u.id), capo = u.id === adminId();
+    const tolti = PERMESSI.filter(x=>pm[x.k] === false).length;
+    const chips = (capo ? '<span class="chip ok">' + svg('lock', 2.2) + 'Amministratore</span>' : '') +
+      (!capo && pm.sola_lettura ? '<span class="chip now">Sola lettura</span>' : '') +
+      (!capo && !pm.sola_lettura && tolti ? '<span class="chip now">' + tolti + (tolti === 1 ? ' permesso tolto' : ' permessi tolti') + '</span>' : '') +
+      (!capo && pm.soldi ? '<span class="chip" title="Vede i soldi">' + svg('euro', 2.2) + 'Soldi</span>' : '');
+    h += '<div class="tm-c">' + av(u) + '<div class="tx"><b>' + esc(u.nome) + '</b>' +
+      '<span class="ru">' + (ruoliDi(u.ruolo).map(r=>'<i>' + esc(r) + '</i>').join('') || '<i class="vuoto">Ruolo non indicato</i>') + '</span>' +
+      (u.email ? '<span class="em">' + esc(u.email) + '</span>' : '') + '</div>' +
+      (chips ? '<div class="st">' + chips + '</div>' : '') +
+      (admin && !capo ? '<div class="tm-az"><button class="btn sm" data-action="permessi" data-id="' + esc(u.id) + '">' + svg('ingranaggio') + 'Permessi</button>' +
+        '<button class="btn sm ghost" data-action="togli-accesso" data-id="' + esc(u.id) + '">Togli</button>' +
+        '<span class="n">vede ' + n + (n === 1 ? ' lavoro' : ' lavori') + '</span></div>' : '') +
+    '</div>';
+  });
+  iv.forEach(i=>{
+    const nomeVero = (i.nickname || ((i.nome || '') + ' ' + (i.cognome || '')).trim());
+    const nome = nomeVero || i.email;
+    const quando = dataInvito(i);
+    const sotto = [nomeVero ? i.email : '', quando ? 'invito del ' + quando : ''].filter(Boolean).join(' · ');
+    h += '<div class="tm-c invito"><span class="av-vuoto">' + svg('send', 2) + '</span><div class="tx"><b>' + esc(nome) + '</b>' +
+      '<span class="ru">' + (ruoliDi(i.ruolo).map(r=>'<i>' + esc(r) + '</i>').join('') || '<i class="vuoto">Il ruolo lo sceglie registrandosi</i>') + '</span>' +
+      (sotto ? '<span class="em">' + esc(sotto) + '</span>' : '') + '</div>' +
+      '<div class="st"><span class="chip now">In attesa</span></div>' +
+      '<div class="tm-az">' + (i.email ? '<a class="btn sm" href="' + esc(mailtoInvito(i)) + '" target="_blank" rel="noopener">' + svg('send') + 'Scrivi di nuovo</a>' +
+        '<button class="btn sm ghost" data-action="invito-copia" data-id="' + esc(i.id) + '">' + svg('link') + 'Copia link</button>' : '') +
+        '<button class="iconbtn" data-action="togli-profilo" data-id="' + esc(i.id) + '" title="Annulla l’invito" aria-label="Annulla l’invito">' + svg('x', 2.4) + '</button></div>' +
+    '</div>';
+  });
+  if(!pv.length && !iv.length) h += '<div class="hm-vuoto">' + svg('users', 2) + '<span>' +
+    (state.teamRuolo ? 'Nessuno con il ruolo «' + esc(state.teamRuolo) + '».' : admin ? 'Per ora ci sei solo tu: invita qualcuno con il tasto in alto.' : 'Nessun altro, per ora.') + '</span></div>';
+  h += '</div>';
+  if(admin) h += '<div class="tm-fondo"><button class="btn" data-action="registro">' + svg('list') + 'Registro delle attività</button></div>';
+  h += '</div></div></div>';
+  el('stage').innerHTML = h;
 }
 
 /* ---------- PERMESSI DI UN GUEST ---------- */
@@ -6777,6 +7405,9 @@ function iniziaPresa(target, x, y, tipo){
      solo per spostare le schede */
   if(tipo === 'mouse' && !spost) return;
   presa = {el:z, src:target, x0:x, y0:y, x, y, yDito:y, spostabile:!!spost, armato:false, trascina:false, tipo};
+  /* le schede degli spazi nella Home col mouse si prendono e si spostano subito,
+     senza tenere premuto: un clic resta un clic, un trascinamento le riordina */
+  if(tipo === 'mouse' && z.matches('.hm-spc')){ presa.armato = true; presa.subito = true; return; }
   clearTimeout(timerPresa);
   timerPresa = setTimeout(()=>{
     if(!presa) return;
@@ -6796,6 +7427,7 @@ function muoviPresa(x, y){
   if(!presa.spostabile) return true;          // tenuto su una task: niente scorrimento finche' non lascio
   if(!presa.trascina && mosso){
     presa.trascina = true;
+    if(presa.subito) presa.el.classList.add('preso');
     document.body.classList.add('sto-spostando');
     bloccaPagina();
   }
@@ -6810,6 +7442,15 @@ function muoviPresa(x, y){
 function aggiornaPresa(){
   if(!presa || !presa.trascina) return;
   const x = presa.x, y = presa.y;
+  /* nella fila di schede della Home, vicino ai bordi la fila scorre da sola
+     (e la scheda resta sotto il mouse) */
+  const fila = presa.el.parentElement;
+  if(fila && fila.classList.contains('griglia')){
+    const r = fila.getBoundingClientRect(), prima = fila.scrollLeft;
+    if(x > r.right - 60) fila.scrollLeft = prima + 14;
+    else if(x < r.left + 60) fila.scrollLeft = prima - 14;
+    presa.x0 -= (fila.scrollLeft - prima);
+  }
   presa.el.style.transform = 'translate('+(x - presa.x0)+'px,'+(y - presa.y0)+'px) scale(1.03)';
   const sotto = vicinoA(x, y, presa.el);
   if(sotto) scambia(presa.el, sotto, x, y);
@@ -6818,6 +7459,7 @@ function aggiornaPresa(){
 function rilasciaPresa(x, y){
   if(!presa) return false;
   const p = presa;
+  if(p.subito && !p.trascina){ fermaPresa(); return false; }      // era solo un clic
   if(p.armato && p.trascina){
     p.el.style.transform = '';
     fermaPresa();              // prima sblocco la pagina: cosi' il ridisegno la lascia dov'e'
@@ -7299,6 +7941,7 @@ function render(){
   else if(state.schermo==='spazi'){ renderSpazi(); }
   else if(state.schermo==='home'){ renderHome(); }
   else if(state.schermo==='profilo'){ renderProfilo(); }
+  else if(state.schermo==='team'){ renderTeam(); }
   else if(state.schermo==='mie'){ renderMie(); }
   else if(state.schermo==='cerca'){ renderCerca(); }
   else if(state.schermo==='guida'){ renderGuida(); }
@@ -7318,29 +7961,44 @@ let ultimoPosto = '';
 
 /* ============ GATE / UTENTI ============ */
 function renderGate(){
-  if(state.gateModo === 'invito') return renderInvito();
+  /* il link dell'invito porta qui: registrazione aperta, con l'email gia' scritta */
+  if(!state.regLetto){
+    state.regLetto = true;
+    const m = /^#\/registrati(?:\/([^?#]*))?(?:\?(.*))?/.exec(location.hash || '');
+    if(m){
+      state.gateModo = 'registra'; state.regInvito = true;
+      try{ state.regMail = decodeURIComponent(m[1] || ''); }catch(e){ state.regMail = ''; }
+      /* nome e ruolo scritti da chi ha invitato: li trova gia' compilati, e li puo' cambiare */
+      try{ const q = new URLSearchParams(m[2] || '');
+           state.regNome = (q.get('nome') || '').slice(0, 40); state.regRuolo = (q.get('ruolo') || '').slice(0, 60); }
+      catch(e){ state.regNome = state.regRuolo = ''; }
+    }
+  }
+  if(state.gateModo === 'invito'){ state.gateModo = 'registra'; state.regInvito = true; }
   const reg = state.gateModo === 'registra';
   el('stage').innerHTML =
   '<div class="gate"><div class="gate-card"><div class="mark"></div>'+
     '<h1>FOSS</h1><p>'+(reg
       ? 'Crea il tuo profilo: nome, ruolo e una password.'
       : 'Il gestionale dei tuoi progetti, dal brief alla consegna.')+'</p>'+
+    (reg && state.regInvito ?
+      '<div class="gate-invito">Ti hanno invitato? Registrati con <b>l\u2019email dell\u2019invito</b>: entri subito nel team.</div>' : '')+
     (reg?
       '<div class="griglia" style="margin-bottom:11px">'+
-        '<div class="field"><label>Nome</label><input id="g_nome" autocomplete="given-name"></div>'+
+        '<div class="field"><label>Nome</label><input id="g_nome" autocomplete="given-name" value="'+esc(state.regInvito ? (state.regNome||'') : '')+'"></div>'+
         '<div class="field"><label>Cognome</label><input id="g_cognome" autocomplete="family-name"></div>'+
       '</div>'+
       '<div class="field" style="margin-bottom:11px"><label>Nickname (facoltativo)</label><input id="g_nick"></div>'+
-      '<div class="field" style="margin-bottom:11px"><label>Ruolo di lavoro</label><input id="g_ruolo" placeholder="Es. Operatore video"></div>'
+      '<div class="field" style="margin-bottom:11px"><label>Il tuo ruolo</label><input id="g_ruolo" list="gRuoli" autocomplete="organization-title" placeholder="Es. Operatore video" maxlength="60" value="'+esc(state.regInvito ? (state.regRuolo||'') : '')+'">'+
+        '<datalist id="gRuoli">'+RUOLI_SUGGERITI.map(r=>'<option value="'+esc(r)+'">').join('')+'</datalist></div>'
       : '')+
-    '<div class="field" style="margin-bottom:11px"><label>Email</label><input id="g_mail" type="email" autocomplete="username" placeholder="nome@studio.it"></div>'+
+    '<div class="field" style="margin-bottom:11px"><label>Email</label><input id="g_mail" type="email" autocomplete="username" placeholder="nome@studio.it" value="'+esc(reg ? (state.regMail||'') : '')+'"></div>'+
     '<div class="field" style="margin-bottom:16px"><label>Password</label><input id="g_pw" type="password" autocomplete="'+(reg?'new-password':'current-password')+'" placeholder="'+(reg?'Almeno 6 caratteri':'')+'"></div>'+
     '<button class="btn primary" data-action="'+(reg?'crea-account':'login')+'" id="gateBtn">'+(reg?'Crea il profilo':'Entra')+'</button>'+
     '<div class="switch">'+(reg
       ? 'Hai gi\u00e0 un account? <button data-action="modo-login">Accedi</button>'
       : 'Non hai un account? <button data-action="modo-registra">Registrati</button>')+
-      '<div style="margin-top:7px">Sei nel team e non sei mai entrato? '+
-      '<button data-action="modo-invito">Primo accesso</button></div></div>'+
+      (reg ? '' : '<div style="margin-top:7px">Ti hanno invitato? <button data-action="modo-invito">Registrati con la tua email</button></div>')+'</div>'+
   '</div></div>';
   el('phasebar').classList.toggle('vuota', suTelefono());
   el('phasebar').innerHTML = '<span class="chip">FOSS \u00b7 '+(reg?'registrazione':'accesso')+'</span>'+
@@ -7482,6 +8140,12 @@ function scriveSoldi(){ return puo('soldi-scrive') && !state.ospite; }
 function soldiHTML(p){
   if(!vedeSoldi()) return '';
   const c = contiDi(p.id), r = riassuntoConti(c), scrive = scriveSoldi();
+  /* progetto personale: niente preventivo e niente incassi, solo le spese */
+  if(p.personale) return '<div class="rail-sec soldi-sec"><div class="lbl">Spese</div>'+
+    (c && c.spese.length ? '<div class="kv"><span>Spese</span><b class="mono">'+euro(r.sp)+'</b></div>'
+                         : '<div class="nota-box" style="color:var(--mute)">Nessuna spesa.</div>')+
+    '<button class="btn sm ghost" style="margin-top:8px;width:100%;justify-content:center" data-action="conti" data-pid="'+p.id+'">'+
+      svg('euro')+(scrive? 'Segna le spese' : 'Vedi le spese')+'</button></div>';
   const vuoto = !c || (r.prev==null && !c.incassi.length && !c.spese.length);
   const pc = r.prev ? Math.min(100, Math.round(r.inc / r.prev * 100)) : 0;
   return '<div class="rail-sec soldi-sec"><div class="lbl">Soldi</div>'+
@@ -7518,6 +8182,13 @@ function modaleConti(pid){
         '<input id="ct_'+k+'_n" placeholder="'+ph+'" maxlength="60" aria-label="Nota">'+
         '<button class="btn sm" data-action="conti-add" data-pid="'+pid+'" data-k="'+k+'">'+svg('plus')+'<span>Aggiungi</span></button></div>' : '');
   };
+  if(p.personale){
+    modale('<h3>Spese</h3><div class="sub-t">'+esc(p.nome)+' · progetto personale</div>'+
+      '<div class="modal-b"><div class="conti-top uno"><div><span>Spese totali</span><b class="mono">'+euro(r.sp)+'</b></div></div>'+
+        movimenti('spese', 'Es. noleggio, materiali, viaggio')+
+      '</div><div class="modal-f"><button class="btn" data-action="chiudi-modale">Fatto</button></div>', 'conti-m');
+    return;
+  }
   modale('<h3>Soldi del lavoro</h3><div class="sub-t">'+esc(p.nome)+(p.cliente? ' · '+esc(p.cliente) : '')+'</div>'+
     '<div class="modal-b">'+
       '<div class="conti-top">'+
@@ -8098,8 +8769,11 @@ function cartaModelli(){
     svg('salva',2.2).replace('<svg','<svg style="width:15px;height:15px;color:var(--amber-ink)"')+'I tuoi preset</h3>'+
     '<div class="hint">Li scegli quando crei un progetto o uno spazio. Li crei da zero, da un lavoro con «Salva come preset» o importando un file.</div>'+
     (ms.length ? '<div class="adm-lista">'+ms.map(m=>{ const X = TIPO(m.tipo);
-      return '<button class="adm-r" data-action="pe-apri" data-id="'+esc(m.id)+'"><span class="picona">'+svg(X.ic)+'</span><div class="tx"><b>'+esc(m.nome)+'</b>'+
-        '<span>'+esc(riassuntoPreset(m))+'</span></div>'+svg('right',2.2)+'</button>'; }).join('')+'</div>' : '')+
+      return '<div class="adm-r preset-r"><button class="pr-main" data-action="pe-apri" data-id="'+esc(m.id)+'"><span class="picona">'+svg(X.ic)+'</span><div class="tx"><b>'+esc(m.nome)+'</b>'+
+        '<span>'+esc(riassuntoPreset(m))+'</span></div></button>'+
+        '<div class="pr-az">'+(posso ? '<button class="btn sm" data-action="pe-usa" data-id="'+esc(m.id)+'" title="Nuovo progetto da questo preset">'+svg('plus')+'<span class="no-tel">Usa</span></button>' : '')+
+        '<button class="iconbtn" data-action="pe-esporta-uno" data-id="'+esc(m.id)+'" title="Esporta in un file" aria-label="Esporta">'+svg('deliver',2)+'</button></div></div>'; }).join('')+'</div>'
+      : '<div class="hint" style="margin:0 0 4px">Ancora nessun preset.</div>')+
     '<div class="cal-az" style="margin-top:12px">'+
       (posso ? '<button class="btn sm primary" data-action="pe-nuovo">'+svg('plus')+'Nuovo preset</button>'+
                '<button class="btn sm" data-action="pe-importa">'+svg('clip')+'Importa</button>' : '')+
@@ -8111,15 +8785,16 @@ function cartaModelli(){
    Come si fa tutto, capitolo per capitolo: dai primi passi alle cose per chi
    organizza un team. Si cerca per parola (anche senza accenti); in fondo c'e'
    il tasto per segnalare quello che manca o non funziona. */
-const VERSIONE = 'v36';
+const VERSIONE = 'v37';
 const LIVELLI_GUIDA = {base:'Per cominciare', medio:'Tutti i giorni', esperto:'Per chi organizza', aiuto:'Se qualcosa non va'};
 const GUIDA = [
 {id:'primi-passi', liv:'base', ic:'spark', t:'Primi passi', s:'Cos’è FOSS e come ci si muove', v:[
   ['Che cos’è FOSS', 'È il posto dove tieni i tuoi lavori. Ogni progetto ha le sue fasi, le task da fare, le date, i soldi e le persone che ci lavorano. Funziona dal computer, dall’iPad e dal telefono: quello che cambi su uno compare anche sugli altri.'],
   ['Come è organizzato', 'Quattro livelli, uno dentro l’altro: gli <b>spazi di lavoro</b> (un ambito, per esempio «Video Milano»), i <b>progetti</b> (un lavoro per un cliente), le <b>task</b> divise per fase e, dentro ogni task, le <b>subtask</b> da spuntare. Una subtask può avere anche una sua piccola checklist.'],
-  ['Entrare la prima volta', 'Apri FOSS e scegli <b>Registrati</b> con la tua email e una password. Se qualcuno ti ha invitato, registrati con l’email che ha usato lui: entri direttamente nel suo archivio e vedi i lavori che ti ha aperto. Dalla volta dopo il dispositivo si ricorda di te.'],
-  ['La Home', 'FOSS si apre sempre sulla <b>Home</b>. A sinistra il menu (Home, Le mie task, Calendario, Notifiche, Profilo) e l’elenco dei tuoi spazi. Al centro il saluto, quattro numeri (progetti attivi, task aperte, consegne entro 7 giorni, collaboratori: toccali per andarci), le schede degli spazi e, in fondo, le task in scadenza da spuntare al volo, le attività recenti e gli impegni di oggi.'],
-  ['Sul computer e sull’iPad', 'Dalla Home entri in uno spazio: a sinistra resta il menu con i tuoi spazi, in alto il nome dello spazio con <b>Modifica spazio</b> e <b>Nuovo progetto</b>, sotto le viste (Bacheca, Lista, Calendario, Mappa, Note). La <b>Bacheca</b> mette i progetti in colonne: per stato, per priorità o per scadenza, a scelta con <b>Dividi per</b>. Sugli schermi larghi a destra trovi la scheda dello spazio: copertina, avanzamento, persone e ultime attività. In alto a destra restano Annulla, il tema, la <b>Guida</b>, la campanella e la tua foto.'],
+  ['Entrare la prima volta', 'Apri FOSS e scegli <b>Registrati</b>: nome, il tuo <b>ruolo</b> (videomaker, montatrice, fotografo…), email e una password. Se qualcuno ti ha invitato, apri il link che ti ha mandato: trovi già scritte la tua email e, se li ha indicati, nome e ruolo. Entri direttamente nel suo archivio e vedi i lavori che ti apre. Dalla volta dopo il dispositivo si ricorda di te.'],
+  ['La Home', 'FOSS si apre sempre sulla <b>Home</b>. A sinistra il menu (Home, Le mie task, Calendario, Notifiche, <b>Team</b>) e l’elenco dei tuoi spazi. Al centro il saluto, quattro numeri (progetti attivi, task aperte, consegne entro 7 giorni, collaboratori: toccali per andarci), le schede degli spazi e, in fondo, le task in scadenza da spuntare al volo, le attività recenti e gli impegni di oggi. Il tuo <b>profilo</b> si apre dalla tua foto in alto a destra.'],
+  ['Il saluto', 'Dietro al saluto c’è una scena disegnata che segue la giornata: mattino, pomeriggio, sera e notte, con tre scene ciascuno (mongolfiere, spiaggia, tramonto, cielo stellato…). Ogni volta che apri FOSS ne esce una a caso; il tasto '+svg('spark',2.2).replace('<svg','<svg style="width:13px;height:13px;vertical-align:-2px"')+' passa alla successiva. Se sul dispositivo hai chiesto di ridurre il movimento, la scena sta ferma.'],
+  ['Sul computer e sull’iPad', 'Dalla Home entri in uno spazio: a sinistra resta il menu con i tuoi spazi, in alto il nome dello spazio con <b>Modifica spazio</b> e <b>Nuovo progetto</b>, sotto le viste (Bacheca, Lista, Calendario, Mappa, Note). La <b>Bacheca</b> mette i progetti in colonne: per stato, per priorità o per scadenza, a scelta con <b>Dividi per</b>. Sugli schermi larghi a destra trovi la scheda dello spazio: copertina, avanzamento, persone e ultime attività. In alto a destra restano Annulla, il tema, la <b>Guida</b>, la campanella e la tua foto, che apre il profilo.'],
   ['Sul telefono', 'In basso ci sono cinque sezioni: <b>Lavori</b>, <b>Per te</b>, <b>Note</b>, <b>Cerca</b> e <b>Profilo</b>. In alto a sinistra il <b>+</b> per creare, al centro il nome di dove sei, a destra la campanella. Dentro a un lavoro la freccia in alto a sinistra ti riporta ai lavori.'],
   ['I lavori che fai', 'Al primo accesso FOSS ti chiede che lavori fai (videomaker, fotografo, social media manager…): quando crei spazi, progetti e preset ti propone solo quelli. Li aggiungi o togli quando vuoi da <b>Profilo → I lavori che fai</b>.'],
   ['Metterlo sulla schermata Home', 'Sull’iPhone apri FOSS con Safari, tocca <b>Condividi</b> e poi <b>Aggiungi alla schermata Home</b>. Su Android, dal menu di Chrome, <b>Installa app</b> o <b>Aggiungi a schermata Home</b>. Si apre a tutto schermo come un’app; sull’iPhone è anche l’unico modo per ricevere gli avvisi.']
@@ -8127,6 +8802,7 @@ const GUIDA = [
 {id:'spazi', liv:'base', ic:'grid', t:'Spazi di lavoro', s:'Gli ambiti in cui dividi i lavori', v:[
   ['A cosa servono', 'Uno spazio raccoglie i progetti di un ambito: un cliente fisso, una città, un tipo di attività. Ha una professione, che decide fasi, task e campi di partenza dei progetti che ci crei, e ha i suoi tag e filtri. Progetti, task e calendario di uno spazio restano separati dagli altri.'],
   ['Creare uno spazio', 'Nella Home premi <b>Nuovo spazio</b> (sul telefono: <b>+</b> in alto → Nuovo spazio di lavoro). Quattro passi: la professione (oppure un tuo preset); nome, icona e colore; i tag; i filtri veloci.'],
+  ['L’ordine degli spazi', 'Nella Home trascina la scheda di uno spazio col mouse e lasciala dove vuoi: gli altri si fanno da parte (sul telefono e sull’iPad tienila premuta mezzo secondo, poi trascinala). Il primo è quello più importante; l’ordine vale su tutti i tuoi dispositivi.'],
   ['La copertina', 'Ogni spazio può avere una foto di copertina. Nella Home passa sopra alla sua scheda e premi <b>Aggiungi copertina</b> (sul telefono e sull’iPad il tasto è sempre visibile), poi scegli la foto. Compare sulla scheda e, leggera, dietro ai progetti dello spazio. Puoi sceglierla anche mentre crei lo spazio; per cambiarla premi <b>Cambia</b> sulla scheda, per toglierla vai in <b>Modifica spazio</b>.'],
   ['Il ritaglio della copertina', 'Appena carichi una foto si apre il <b>ritaglio</b>: in alto scegli la schermata (la scheda nella Home, la scheda dello spazio, lo sfondo della pagina), poi trascini la foto per decidere cosa si vede e con lo zoom la avvicini. Ogni schermata tiene il suo ritaglio; <b>Usa questo ritaglio ovunque</b> lo copia sulle altre. Per rifarlo più tardi premi <b>Ritaglia</b> sulla scheda o in Modifica spazio; per un progetto, tasto destro sulla sua scheda → <b>Ritaglia la copertina</b>.'],
   ['La copertina di un progetto', 'Anche un progetto può avere la sua foto, che compare sulla sua scheda nella bacheca. Tasto destro sulla scheda (sul telefono tienila premuta) e <b>Aggiungi una copertina</b>, oppure dentro al progetto il tasto <b>Copertina</b> in alto. Dallo stesso menu la cambi o la togli.'],
@@ -8138,6 +8814,8 @@ const GUIDA = [
 ]},
 {id:'progetti', liv:'base', ic:'file', t:'Progetti', s:'Creare un lavoro e portarlo alla consegna', v:[
   ['Creare un progetto', 'Dentro uno spazio premi <b>Nuovo progetto</b> (sul telefono il <b>+</b> in alto). Si parte dalla professione dello spazio; se fai più lavori puoi cambiarla con una di quelle scelte nel profilo. Cinque pagine: <b>che lavoro è</b>; <b>per chi è</b> (cliente, date, priorità e i dettagli del tuo mestiere); <b>fasi e task</b> (spegni quello che non serve, aggiungi quello che manca); <b>soldi</b> (preventivo e acconto); <b>chi lo vede</b>. Tutto si può cambiare anche dopo.'],
+  ['Un progetto personale', 'Se il lavoro è tuo e non per un cliente (il tuo canale, un corto, il portfolio), nella pagina «Per chi è» accendi <b>Progetto personale</b>: spariscono cliente, referente, preventivo e fattura, le task legate al cliente e la pagina dei soldi; il Brief diventa «Idea». Le <b>spese</b> restano. Sulla scheda compare «Personale». Per cambiarlo dopo: tasto destro sulla scheda → <b>È un progetto personale</b> oppure <b>È per un cliente</b>.'],
+  ['Video YouTube', 'Tra i tipi di lavoro del videomaker c’è <b>Video YouTube</b>: fasi Idea, Preparazione, Riprese, Montaggio e Pubblicazione, con le task del canale (scaletta, foto per la thumbnail sul set, Short di lancio, thumbnail, titolo e descrizione con i capitoli, caricamento, controllo dopo l’uscita). Nella pubblicazione segni titolo, visibilità e link del video.'],
   ['Partire da un tuo preset', 'Nella prima pagina, sotto i tipi di lavoro, c’è <b>Oppure parti da un tuo preset</b>: fasi e task arrivano come le hai salvate. Se lo spazio ha un preset predefinito, è già scelto. Vedi il capitolo <b>Preset</b>.'],
   ['Le fasi', 'Ogni progetto avanza per fasi (per un video: preproduzione, riprese, montaggio, consegna…). Vedi le task della fase in cui sei; quando sono tutte spuntate compare il tasto <b>COMPLETATO</b>, che passa alla fase dopo. All’ultima fase il progetto si chiude; <b>Riapri il progetto</b> lo rimette in corsa.'],
   ['Andare avanti o tornare indietro', 'Nella barra delle fasi tocca una fase più avanti: FOSS chiede conferma e ti dice cosa resta aperto. Il tasto con la freccia all’indietro, a sinistra delle fasi, riapre una fase già chiusa per rivederla o correggerla; da lì <b>Torna avanti</b> ti riporta dov’eri.'],
@@ -8168,8 +8846,8 @@ const GUIDA = [
   ['Cercare', 'Sul computer usa il campo <b>Cerca</b> in alto: filtra i progetti dello spazio mentre scrivi. Sul telefono la sezione <b>Cerca</b> trova progetti, task, subtask e voci delle checklist in tutti gli spazi. Se non vedi più niente, controlla di non aver lasciato una parola nella ricerca.']
 ]},
 {id:'commenti', liv:'medio', ic:'chat', t:'Commenti, chat e attività', s:'I commenti stanno nelle task, la chat è del lavoro', v:[
-  ['Commenti dentro task e subtask', 'Ogni task e ogni subtask ha il suo fumetto '+svg('chat',2.2).replace('<svg','<svg style="width:13px;height:13px;vertical-align:-2px"')+'. Toccalo e si apre, al centro dello schermo, la sua discussione: tutti i commenti su quella cosa, dal primo all’ultimo, anche se arrivano a giorni di distanza. Il numero sul fumetto dice quanti sono.'],
-  ['Il pallino rosso', 'Quando qualcuno scrive, il fumetto di quella task (o subtask) diventa rosso col pallino finché non apri la discussione. Il pallino compare anche sulla fase in basso, così sai dove guardare; dentro la discussione una riga «Nuovi» segna da dove riprendere.'],
+  ['Commenti dentro task e subtask', 'Ogni task e ogni subtask ha il suo tasto <b>Commenta o allega</b>, il fumetto con la graffetta '+svg('chat',2.2).replace('<svg','<svg style="width:13px;height:13px;vertical-align:-2px"')+svg('clip',2.2).replace('<svg','<svg style="width:13px;height:13px;vertical-align:-2px"')+'. Toccalo e si apre, al centro dello schermo, la sua discussione: tutti i commenti e i file su quella cosa, dal primo all’ultimo, anche se arrivano a giorni di distanza. Il numero sul tasto dice quanti sono.'],
+  ['Il tasto rosso', 'Quando qualcuno scrive, il tasto di quella task (o subtask) diventa rosso finché non apri la discussione. Il pallino compare anche sulla fase in basso, così sai dove guardare; dentro la discussione una riga «Nuovi» segna da dove riprendere.'],
   ['Chi ha scritto', 'Ogni commento ha la foto, il nome, il ruolo e l’ora di chi l’ha scritto: non si può scrivere a nome di un altro. Un tuo commento lo togli col tasto destro (o tenendolo premuto) → <b>Elimina il commento</b>.'],
   ['Link e file', 'Nella discussione, la graffetta allega un file fino a 25 MB (foto, PDF, video brevi, documenti): lo vede solo chi lavora al progetto. Per i file più grossi incolla un link di WeTransfer, Drive o Frame.io. La scheda <b>Link e file</b> li raccoglie tutti in un posto.'],
   ['Taggare qualcuno', 'Nei commenti e nella chat scrivi <b>@</b> (o tocca il tasto @ nella finestra dei commenti): compare chi lavora al progetto, scegli il nome. Gli arriva subito la notifica, col box a schermo intero se l’ha acceso (con <b>APRI</b> va dritto alla discussione), e l’avviso sul telefono.'],
@@ -8188,7 +8866,7 @@ const GUIDA = [
 ]},
 {id:'preset', liv:'medio', ic:'salva', t:'Preset', s:'Il tuo metodo di lavoro, pronto da riusare', v:[
   ['Cos’è un preset', 'È il tuo modo di lavorare salvato con un nome: le fasi, le task e le subtask (con le checklist) che usi sempre per un certo tipo di lavoro, per esempio «Video YouTube». Quando crei un progetto o uno spazio lo scegli e parti da lì. Prima si chiamavano «modelli».'],
-  ['Dove li trovi', 'Nella pagina degli spazi, sezione <b>I tuoi preset</b>; nel <b>Profilo</b>; nel <b>+</b> del telefono (Nuovo preset, Importa un preset); nella prima pagina di Nuovo progetto e nel primo passo di Nuovo spazio.'],
+  ['Dove li trovi', 'Nel <b>Profilo</b> (la tua foto in alto a destra), sezione <b>I tuoi preset</b>: da lì li crei, li importi, li usi o li esporti. Poi nel <b>+</b> del telefono (Nuovo preset, Importa un preset), nella prima pagina di Nuovo progetto e nel primo passo di Nuovo spazio.'],
   ['Crearne uno da zero', '<b>Nuovo preset</b>: dai un nome, scegli la professione, poi costruisci le fasi e, per ogni fase, le task. Nelle subtask scrivi una riga per ciascuna; se una riga ha i due punti, quello che segue diventa la sua checklist: «Attrezzatura: camera, microfoni, luci».'],
   ['Crearlo da un lavoro fatto', 'Dal progetto riuscito meglio: tasto destro sulla tessera → <b>Salva come preset</b>. Oppure, nell’ultima pagina di Nuovo progetto, accendi <b>Salva anche come preset</b>.'],
   ['Usarlo', 'In Nuovo progetto tocca il preset sotto <b>Oppure parti da un tuo preset</b>. Per non sceglierlo ogni volta, impostalo come preset dello spazio (Modifica lo spazio → Preset dei nuovi progetti): sarà già selezionato.'],
@@ -8215,11 +8893,12 @@ const GUIDA = [
   ['Cambiare link o spegnerla', '<b>Cambia link</b> fa smettere di funzionare quello vecchio (messaggio e impostazioni restano). Spegnendo <b>Pagina attiva</b>, chi apre il link vede «Pagina non attiva» finché non la riaccendi.']
 ]},
 {id:'persone', liv:'esperto', ic:'users', t:'Persone e permessi', s:'Chi entra, cosa vede, cosa può fare', v:[
-  ['Amministratore e guest', 'Chi crea l’archivio è l’<b>amministratore</b>: vede tutti i lavori, crea i profili e decide chi vede cosa. Gli altri sono <b>guest</b>: vedono solo i lavori che l’amministratore apre loro.'],
-  ['Aggiungere una persona', 'Profilo → Amministrazione → <b>Nuovo profilo</b>: nome, cognome, email e ruolo. Poi dille di aprire FOSS e registrarsi con quella stessa email: entra già come guest del tuo archivio.'],
+  ['Amministratore e guest', 'Chi crea l’archivio è l’<b>amministratore</b>: vede tutti i lavori, invita le persone e decide chi vede cosa. Gli altri sono <b>guest</b>: vedono solo i lavori che l’amministratore apre loro.'],
+  ['La pagina Team', '<b>Team</b>, nel menu a sinistra (sul telefono: Profilo → <b>Il tuo team</b>), raccoglie chi lavora con te e chi hai invitato, con ruolo ed email. In alto filtri per <b>Nel team</b> o <b>Invitati</b> e per <b>ruolo</b>: tocca «Montatrice» e restano solo le montatrici.'],
+  ['Invitare una persona', 'In Team premi <b>Invita una persona</b> e scrivi la sua email (nome e ruolo se vuoi). FOSS prepara l’invito e un messaggio già scritto: <b>Scrivi l’email</b> lo apre nella tua posta, oppure <b>Copia il link</b> e lo mandi come preferisci. Chi lo apre si registra con quella email, conferma il suo ruolo ed entra come guest del tuo archivio. Finché non si registra lo trovi tra gli <b>Invitati</b>: puoi riscrivergli o annullare l’invito con la ×.'],
   ['Aprirle un lavoro', 'Nel progetto, <b>Aggiungi qualcuno al team</b> (dalla scheda del lavoro o col tasto destro sul titolo). Da quel momento lo vede e riceve le sue notifiche. Puoi farlo anche mentre crei il progetto, nella pagina «Chi lo vede».'],
-  ['Cosa può fare', 'Profilo → Amministrazione → tocca la persona. Puoi spegnerle: creare lavori, creare e modificare task, spuntare, eliminare, decidere chi vede un lavoro, gestire gli spazi. A parte: vedere i soldi e la <b>sola lettura</b>, che lascia solo guardare.'],
-  ['Togliere l’accesso', 'Dalla scheda della persona in Amministrazione: non entra più nel tuo archivio.']
+  ['Cosa può fare', 'In Team, <b>Permessi</b> sulla scheda della persona. Puoi spegnerle: creare lavori, creare e modificare task, spuntare, eliminare, decidere chi vede un lavoro, gestire gli spazi. A parte: vedere i soldi e la <b>sola lettura</b>, che lascia solo guardare.'],
+  ['Togliere l’accesso', 'In Team, <b>Togli</b> sulla scheda della persona (o dai suoi Permessi, in fondo): non entra più nel tuo archivio. Le task che ha fatto restano.']
 ]},
 {id:'dati', liv:'esperto', ic:'deliver', t:'I tuoi dati', s:'Dove stanno, come si torna indietro', v:[
   ['Dove stanno', 'Nel database del team, con una copia su questo dispositivo. Gli aggiornamenti dell’app non toccano mai i contenuti: progetti, task, note e registro restano dove sono.'],
@@ -8230,7 +8909,7 @@ const GUIDA = [
 {id:'trucchi', liv:'esperto', ic:'spark', t:'Scorciatoie e trucchi', s:'Fare prima le cose di tutti i giorni', v:[
   ['Il tasto destro', 'Quasi tutto ha un menu: tessere, spazi, task, subtask, campi, date, note, fasi, commenti. Con il mouse è il tasto destro; con il dito o la Apple Pencil tieni premuto mezzo secondo e lascia.'],
   ['Niente matite', 'Per cambiare qualcosa non servono matite: tasto destro (o tieni premuto) e scegli Modifica, Rinomina o Elimina. Sui campi della scheda e della fase, tenendo premuto, una banda gialla si riempie e quando arriva in fondo si apre direttamente la modifica.'],
-  ['Trascinare', 'Tieni premuta una tessera o uno spazio e muovi il dito: lo sposti e gli altri si fanno da parte.'],
+  ['Trascinare', 'Tieni premuta una tessera o uno spazio e muovi il dito: lo sposti e gli altri si fanno da parte. Col mouse, le schede degli spazi nella Home si trascinano subito, senza aspettare.'],
   ['Tastiera', '<b>Ctrl+Z</b> annulla, <b>Esc</b> chiude menu e finestre, <b>Invio</b> manda un messaggio, <b>Maiusc+Invio</b> va a capo.'],
   ['Temi', 'Profilo → <b>Tema dell’interfaccia</b>: diversi temi di colore e la modalità chiara, che cambi al volo anche dal sole e dalla luna in alto.'],
   ['Nascondere i riquadri di benvenuto', 'Hanno una <b>×</b>: li nasconde fino al prossimo accesso.']
@@ -8270,13 +8949,13 @@ function apriGuida(cap){
 function esciGuida(){
   const d = guida.da || {};
   if(d.schermo === 'progetto' && d.pid && state.progetti.some(p=>p.id===d.pid)){ state.progettoId = d.pid; state.schermo = 'progetto'; }
-  else if(['home','spazi','profilo','mie','cerca'].indexOf(d.schermo) >= 0 && (d.schermo !== 'home' || SPZ())) state.schermo = d.schermo;
+  else if(['home','spazi','profilo','mie','cerca','team'].indexOf(d.schermo) >= 0 && (d.schermo !== 'home' || SPZ())) state.schermo = d.schermo;
   else state.schermo = SPZ() ? 'home' : 'spazi';
   render();
 }
 function renderGuida(){
   const da = guida.da && guida.da.schermo;
-  const torna = {profilo:'Profilo', progetto:'Il lavoro', home:'I progetti', spazi:'Gli spazi', mie:'Per te', cerca:'Cerca'}[da] || 'Indietro';
+  const torna = {profilo:'Profilo', progetto:'Il lavoro', home:'I progetti', spazi:'Gli spazi', mie:'Per te', cerca:'Cerca', team:'Team'}[da] || 'Indietro';
   let h = '<div class="pane"><div class="scroller"><div class="guida">'+
     tastoIndietro('guida-esci', torna)+
     '<div class="g-testa"><span class="g-logo">'+svg('libro',2)+'</span><div>'+
@@ -8610,11 +9289,11 @@ function nuoviCommentiTask(p){
 function tastoCommenti(p, st, s, i){
   const k = i ? chiaveThr(s.id, idVoce(i)) : s.id, x = st[k] || {n:0, nuovi:0};
   const nuovi = i ? x.nuovi : nuoviInTask(st, s);
-  const titolo = x.n ? x.n + (x.n === 1 ? ' commento' : ' commenti') + (nuovi ? ', ' + nuovi + ' da leggere' : '') : 'Commenti, link e file';
+  const titolo = x.n ? x.n + (x.n === 1 ? ' commento' : ' commenti') + (nuovi ? ', ' + nuovi + ' da leggere' : '') + ' · commenta o allega' : 'Commenta o allega un file';
   return '<button class="cm-btn' + (x.n ? ' ha' : '') + (nuovi ? ' nuovi' : '') + (i ? ' su-voce' : '') + '" data-action="cm-apri" ' +
     'data-pid="' + esc(p.id) + '" data-task="' + esc(s.id) + '"' + (i ? ' data-voce="' + esc(i.id) + '"' : '') +
-    ' title="' + titolo + '" aria-label="' + titolo + '">' + svg('chat', 2.2) +
-    (x.n ? '<span class="cm-n">' + (x.n > 99 ? '99+' : x.n) + '</span>' : '') + (nuovi ? '<i class="cm-dot"></i>' : '') + '</button>';
+    ' title="' + titolo + '" aria-label="' + titolo + '">' + '<span class="cm-ics">' + svg('chat', 2.2) + svg('clip', 2.2) + '</span>' +
+    (x.n ? '<span class="cm-n">' + (x.n > 99 ? '99+' : x.n) + '</span>' : '') + '</button>';
 }
 
 function apriCommenti(pid, task, voce){
@@ -8859,27 +9538,27 @@ function apriNuovoLavoro(dataIso){
   nl = {passo:0, tipo, lavoro:null, modello:null, altre:false,
         cliente:'', nome:'', data:dataIso||'', prio:'media', luogo:'', dett:{}, giorni:[],
         piano:null, chiavePiano:'', prev:'', acconto:'', vis:[], nota:'', bozze:{}, togliere:null,
-        comeModello:false, nomeModello:'', _pagina:''};
+        comeModello:false, nomeModello:'', _pagina:'', personale:false};
   tmpAllegati = [];
   const Mb = sp && sp.preset ? presetDi(sp.preset) : null;
   if(Mb) nlCambia(Mb.tipo, null, Mb.id);
   renderNuovoLavoro();
 }
 function chiudiNuovoLavoro(){ nl = null; tmpAllegati = []; const n = el('nlLayer'); if(n) n.remove(); }
-function passiNL(){ return ['lavoro','dati','fasi'].concat(vedeSoldi()? ['soldi'] : []).concat(['chi']); }
+function passiNL(){ return ['lavoro','dati','fasi'].concat(vedeSoldi() && !(nl && nl.personale)? ['soldi'] : []).concat(['chi']); }
 function lavoroNL(){ const T = TIPO(nl.tipo); return (nl.lavoro && T.lavori && T.lavori[nl.lavoro]) || null; }
 function giorniNL(){ const T = TIPO(nl.tipo), L = lavoroNL(); return (L && L.giorni) || T.giorni || []; }
 function modelloNL(){ return nl.modello ? (state.modelli||[]).find(m=>m.id===nl.modello) || null : null; }
 function titoloDiBase(){
   const T = TIPO(nl.tipo), L = lavoroNL(), M = modelloNL();
   const base = M ? M.nome : L ? L.n : T.n;
-  return base + (nl.cliente ? ' ' + nl.cliente : '');
+  return base + (nl.cliente && !nl.personale ? ' ' + nl.cliente : '');
 }
 
 /* fasi e task proposte, con l'interruttore di ognuna */
 function pianoNL(){
   const M = modelloNL();
-  const chiave = M ? 'm:'+M.id : 't:'+nl.tipo+'/'+(nl.lavoro||'');
+  const chiave = (M ? 'm:'+M.id : 't:'+nl.tipo+'/'+(nl.lavoro||'')) + (nl.personale ? '|pers' : '');
   if(nl.piano && nl.chiavePiano===chiave) return nl.piano;
   let piano;
   if(M){
@@ -8891,6 +9570,7 @@ function pianoNL(){
   } else {
     piano = pianoDi(nl.tipo, nl.lavoro).map(f=>Object.assign(f, {on:true, task:f.task.map(t=>Object.assign(t, {on:true}))}));
   }
+  if(nl.personale) piano = personalizzaPiano(piano, nl.tipo);
   nl.piano = piano; nl.chiavePiano = chiave;
   return piano;
 }
@@ -8953,7 +9633,8 @@ function renderNuovoLavoro(){
   const vecchio = el('nlCorpo'), scroll = (vecchio && nl._pagina===k) ? vecchio.scrollTop : 0;
   const TIT = {
     lavoro:['Che lavoro è?', 'Preparo fasi, task e campi adatti a quel tipo di incarico.'],
-    dati:['Per chi è?', 'Cliente, date e i dettagli che contano nel tuo mestiere.'],
+    dati: nl.personale ? ['Il tuo progetto', 'Titolo, date e i dettagli che contano. Nessun cliente: è un lavoro tuo.']
+                       : ['Per chi è?', 'Cliente, date e i dettagli che contano nel tuo mestiere.'],
     fasi:['Fasi e task', 'Spegni quello che non ti serve e aggiungi quello che manca. Potrai cambiare tutto anche dopo.'],
     soldi:['Soldi', 'Preventivo e acconto. Incassi e spese li aggiungi dopo, quando arrivano.'],
     chi:['Chi lo vede', 'Le persone che ci lavorano, le note e gli allegati.']
@@ -8981,7 +9662,7 @@ function renderNuovoLavoro(){
   if(corpo) corpo.scrollTop = scroll;
   nl._pagina = k;
   if(k==='chi') renderAllegati();
-  if(k==='dati') setTimeout(()=>{ const i = el('nl_cli'); if(i && !i.value && !suTelefono()) i.focus(); }, 60);
+  if(k==='dati') setTimeout(()=>{ const i = el('nl_cli') || el('nl_nome'); if(i && !i.value && !suTelefono()) i.focus({preventScroll:true}); }, 60);
 }
 
 function nlPaginaLavoro(T){
@@ -9021,10 +9702,15 @@ function nlPaginaLavoro(T){
 }
 
 function nlPaginaDati(T, L){
-  const clienti = [...new Set(state.progetti.map(p=>p.cliente).filter(Boolean))].sort((a,b)=>a.localeCompare(b));
-  let h = '<div class="griglia2">'+
-      '<div class="field"><label>'+esc(T.chi||'Cliente')+'</label><input id="nl_cli" value="'+esc(nl.cliente)+'" placeholder="'+esc(T.es[0])+'" list="nl_clienti" autocomplete="off" maxlength="80"></div>'+
-      '<div class="field"><label>Titolo</label><input id="nl_nome" value="'+esc(nl.nome)+'" placeholder="'+esc(nl.cliente||L||nl.modello? titoloDiBase() : T.es[1])+'" maxlength="90"></div>'+
+  const clienti = [...new Set(state.progetti.map(p=>clienteDi(p)).filter(Boolean))].sort((a,b)=>a.localeCompare(b));
+  let h = '<div class="nl-pers'+(nl.personale?' on':'')+'"><span class="ic">'+svg('user',2.2)+'</span>'+
+      '<span class="tx"><b>Progetto personale</b><span>'+(nl.personale
+        ? 'È un lavoro tuo: niente cliente, preventivo né fattura. Le spese le segni lo stesso.'
+        : 'Accendilo se il lavoro è tuo e non per un cliente.')+'</span></span>'+
+      '<button class="sw'+(nl.personale?' on':'')+'" data-action="nl-personale" aria-pressed="'+nl.personale+'" aria-label="Progetto personale"></button></div>'+
+    '<div class="griglia2'+(nl.personale?' uno':'')+'">'+
+      (nl.personale ? '' : '<div class="field"><label>'+esc(T.chi||'Cliente')+'</label><input id="nl_cli" value="'+esc(nl.cliente)+'" placeholder="'+esc(T.es[0])+'" list="nl_clienti" autocomplete="off" maxlength="80"></div>')+
+      '<div class="field"><label>Titolo</label><input id="nl_nome" value="'+esc(nl.nome)+'" placeholder="'+esc((nl.cliente && !nl.personale)||L||nl.modello? titoloDiBase() : T.es[1])+'" maxlength="90"></div>'+
     '</div>'+
     '<datalist id="nl_clienti">'+clienti.map(c=>'<option value="'+esc(c)+'">').join('')+'</datalist>'+
     '<div class="griglia2 stretta">'+
@@ -9039,7 +9725,7 @@ function nlPaginaDati(T, L){
     '</div>';
   });
   h += '<div class="field"><label>'+esc(T.luogo||'Indirizzo')+'</label><input id="nl_luogo" value="'+esc(nl.luogo)+'" placeholder="Via, civico, città" maxlength="140"></div>';
-  const dett = T.dett||[];
+  const dett = (T.dett||[]).filter(d=>!(nl.personale && d[0]==='referente'));
   if(dett.length) h += '<div class="griglia2">'+dett.map(d=>{
       const v = nl.dett[d[0]]!=null ? nl.dett[d[0]] : ((L && L.dett && L.dett[d[0]]) || '');
       return '<div class="field"><label>'+esc(d[1])+'</label><input id="nl_d_'+d[0]+'" value="'+esc(v)+'" placeholder="'+esc(d[2]||'')+'" maxlength="80"></div>';
@@ -9113,7 +9799,7 @@ function nlPaginaChi(){
 }
 
 function nlValida(k){
-  if(k==='dati' && !nl.cliente && !nl.nome){
+  if(k==='dati' && !nl.personale && !nl.cliente && !nl.nome){
     toast('Scrivi almeno '+(TIPO(nl.tipo).chi||'il cliente').toLowerCase()+' o il titolo.','warn','Manca qualcosa');
     const i = el('nl_cli'); if(i) i.focus();
     return false;
@@ -9130,7 +9816,7 @@ function nlCrea(){
   if(!nlValida('dati')){ nl.passo = passiNL().indexOf('dati'); renderNuovoLavoro(); return; }
   if(!nlValida('fasi')){ nl.passo = passiNL().indexOf('fasi'); renderNuovoLavoro(); return; }
   const T = TIPO(nl.tipo), L = lavoroNL(), M = modelloNL();
-  const cli = nl.cliente, nome = nl.nome || titoloDiBase();
+  const cli = nl.personale ? '' : nl.cliente, nome = nl.nome || titoloDiBase();
   const piano = pianoNL().filter(f=>f.on);
   const fasi = piano.map(f=>({nome:f.nome, icon:f.icon||'list', desc:f.desc||'', campi:(f.campi||[]).map(c=>c.slice())}));
   const pid = 'p'+Date.now();
@@ -9153,7 +9839,7 @@ function nlCrea(){
   const team = [state.utente].concat(nl.vis.filter(id=>id!==state.utente));
   const faseAss = {}; fasi.forEach((f,i)=>{ faseAss[i] = state.utente; });
   const extra = {};
-  Object.keys(nl.dett).forEach(k=>{ if(nl.dett[k]) extra[k] = nl.dett[k]; });
+  Object.keys(nl.dett).forEach(k=>{ if(nl.dett[k] && !(nl.personale && k==='referente')) extra[k] = nl.dett[k]; });
   if(L && L.dett) Object.keys(L.dett).forEach(k=>{ if(extra[k]==null && nl.dett[k]==null) extra[k] = L.dett[k]; });
   const q = nl.data ? nl.data.split('-') : null;
   const np = P(Object.assign(extra, {
@@ -9162,8 +9848,9 @@ function nlCrea(){
     fasi, subs, faseAss, team, eventi,
     indirizzo:nl.luogo, nota:String(nl.nota||'').replace(/<(?!\/?(b|strong|u|i|em|br|div)\b)[^>]*>/gi,''),
     allegati:tmpAllegati.slice(), tags:((M && M.tags) || (L && L.tags) || []).slice(),
-    consegna: q ? q[2]+'/'+q[1]+'/'+q[0] : '', fattura:'Da emettere'
+    consegna: q ? q[2]+'/'+q[1]+'/'+q[0] : '', fattura: nl.personale ? '' : 'Da emettere'
   }));
+  if(nl.personale) np.personale = true;
   if(nl.lavoro) np.lavoro = nl.lavoro;
   else if(M && M.lavoro && T.lavori && T.lavori[M.lavoro]) np.lavoro = M.lavoro;
   np.icona = T.ic;
@@ -9171,7 +9858,7 @@ function nlCrea(){
   if(np.allegati.length) np.log.unshift({tx:np.allegati.length+' allegati caricati', ts:'oggi '+oraOra(), acc:false, u:state.utente, t:Date.now()});
   np.visti = {commenti:0, chat:0, attivita:np.log.length};
   /* i soldi, se li posso vedere */
-  if(vedeSoldi()){
+  if(vedeSoldi() && !nl.personale){
     const prev = numeroDa(nl.prev), acc = numeroDa(nl.acconto);
     if(prev!=null || acc){
       const c = contiDi(np.id, true);
@@ -9210,6 +9897,7 @@ const CAMPI = {
 ORDINE_TIPI.forEach(k=>{
   TIPI[k].dett.forEach(d=>{ if(!CAMPI[d[0]]) CAMPI[d[0]] = {l:d[1]}; });
   TIPI[k].fasi.forEach(f=>(f.campi||[]).forEach(c=>{ if(!CAMPI[c[1]]) CAMPI[c[1]] = {l:c[0]}; }));
+  Object.values(TIPI[k].lavori||{}).forEach(L=>Object.values(L.fasi||{}).forEach(f=>(f.campi||[]).forEach(c=>{ if(!CAMPI[c[1]]) CAMPI[c[1]] = {l:c[0]}; })));
 });
 function lavoroDi(p){ const T = TIPO(p && p.tipo); return (p && p.lavoro && T.lavori && T.lavori[p.lavoro]) || null; }
 function nomeLavoro(p){ const L = lavoroDi(p); return L ? L.n : TIPO(p.tipo).n; }
@@ -10357,6 +11045,7 @@ document.addEventListener('click', function(e){
       hmCopDi = t.dataset.id; if(!hmCopDi || !state.spazi.some(x=>x.id===hmCopDi)) break;
       const f = el('hmCopFile'); if(f) f.click(); break; }
     case 'wz-cop-via': if(wz){ wzLeggi(); delete wz.sfondo; delete wz.copRit; renderWizard(); } break;
+    case 'hm-scena': scenaSuccessiva(); render(); break;
     case 'hm-vista': state.hmVista = t.dataset.v==='lista' ? 'lista' : 'griglia'; render(); break;
     case 'hm-scorri':{ const n = el('hmSpaziL'); if(n) n.scrollBy({left:n.clientWidth*0.9, behavior:'smooth'}); break; }
 
@@ -10493,14 +11182,14 @@ document.addEventListener('click', function(e){
     case 'togli-profilo':{
       const r = t.getBoundingClientRect();
       const inv = (state.inviti||[]).find(i=>i.id===t.dataset.id); if(!inv) break;
-      apriCtx(r.left-160, r.bottom+6, 'Profilo in attesa', [
-        {a:'togli-profilo-ok', l:'Elimina il profilo di <b>'+esc(inv.nome)+'</b>', ic:'x', danger:1, d:D({id:inv.id})}
+      apriCtx(r.left-160, r.bottom+6, 'Invito in attesa', [
+        {a:'togli-profilo-ok', l:'Annulla l\u2019invito a <b>'+esc(inv.nome || inv.email || '')+'</b>', ic:'x', danger:1, d:D({id:inv.id})}
       ], t);
       break; }
 
     case 'togli-profilo-ok':{
       const id = t.dataset.id;
-      const via = () => { state.inviti = (state.inviti||[]).filter(i=>i.id!==id); render(); toast('Profilo eliminato: con quella email non entra pi\u00f9 come guest.','ok'); };
+      const via = () => { state.inviti = (state.inviti||[]).filter(i=>i.id!==id); if(state.teamPronto===id) state.teamPronto = null; render(); toast('Invito annullato: con quella email non entra pi\u00f9 nel team.','ok'); };
       if(typeof togliProfiloCloud === 'function') togliProfiloCloud(id).then(ok=>{ if(ok) via(); });
       else via();
       break; }
@@ -10572,6 +11261,13 @@ document.addEventListener('click', function(e){
       break; }
     case 'nl-come-modello': if(nl){ nlLeggi(); nl.comeModello = !nl.comeModello; renderNuovoLavoro(); } break;
     case 'nl-crea': if(nl) nlCrea(); break;
+    case 'nl-personale': if(nl){ nlLeggi(); nl.personale = !nl.personale; nl.piano = null; renderNuovoLavoro(); } break;
+    case 'personale-toggle':{
+      const pr = state.progetti.find(x=>x.id===t.dataset.pid); if(!pr || isLock(pr)) break;
+      snap((pr.personale? 'Progetto per un cliente' : 'Progetto personale')+': «'+pr.nome+'»');
+      pr.personale = !pr.personale; if(!pr.personale) delete pr.personale;
+      logga(pr, pr.personale ? 'Diventa un <b>progetto personale</b>' : 'Torna a essere un progetto <b>per un cliente</b>');
+      render(); break; }
 
     /* ---- preset ---- */
     case 'pe-nuovo': chiudiModale(); apriEditorPreset(null, {ritorno: nl ? 'nl' : null}); break;
@@ -10680,8 +11376,8 @@ document.addEventListener('click', function(e){
         if(l) toast('Link nuovo pronto: ricollega il calendario sul telefono, quello vecchio non funziona più.','warn','Link cambiato'); });
       break; }
 
-    case 'modo-login': state.gateModo='login'; state.invitoScelto=null; render(); break;
-    case 'modo-invito': state.gateModo='invito'; state.invitoScelto=null; render(); break;
+    case 'modo-login': state.gateModo='login'; state.regInvito=false; state.invitoScelto=null; render(); break;
+    case 'modo-invito': state.gateModo='registra'; state.regInvito=true; state.invitoScelto=null; render(); break;
 
     case 'scegli-invito':
       state.invitoScelto = (state.invitiCache||[]).find(x=>x.id===t.dataset.id) || null;
@@ -10704,6 +11400,7 @@ document.addEventListener('click', function(e){
     case 'modo-registra': state.gateModo='registra'; render(); break;
 
     case 'crea-account':{
+      if(!(el('g_ruolo').value||'').trim()){ toast('Scrivi il tuo ruolo: serve al team per capire cosa fai.','warn','Manca il ruolo'); el('g_ruolo').focus(); break; }
       const b = el('gateBtn'); b.disabled = true; b.textContent = 'Creo il profilo\u2026';
       const nuovo = {
         nome:(el('g_nome').value||'').trim(), cognome:(el('g_cognome').value||'').trim(),
@@ -10711,7 +11408,9 @@ document.addEventListener('click', function(e){
         email:(el('g_mail').value||'').trim(), pw:el('g_pw').value
       };
       (uscita || Promise.resolve()).then(()=>registraCloud(nuovo)).then(ok=>{
-        if(ok){ state.schermo='spazi'; render();
+        if(ok){ state.schermo='spazi'; state.regInvito = false;
+                try{ if(/^#\/registrati/.test(location.hash)) history.replaceState(null, '', location.pathname + location.search); }catch(e){}
+                render();
                 if(!state.spazi.length) apriWizard(true);
                 toast('Benvenuto, '+nomeVisibile().split(' ')[0]+'.','ok','Profilo creato'); }
         else { state.gateModo='login'; render(); }
@@ -10749,6 +11448,48 @@ document.addEventListener('click', function(e){
       });
       break; }
 
+    case 'team':
+      if(state.schermo==='gate') break;
+      state.schermo = 'team'; state.drawer = false; state.progettoId = null; chiudiModale(); render(); break;
+    case 'team-invita':
+      state.teamForm = true; state.teamPronto = null; render();
+      setTimeout(()=>{ const i = el('tm_mail'); if(i) i.focus(); }, 40); break;
+    case 'team-chiudi': state.teamForm = false; state.teamPronto = null; render(); break;
+    case 'team-stato': state.teamStato = t.dataset.k || 'tutti'; render(); break;
+    case 'team-ruolo': state.teamRuolo = t.dataset.k || ''; render(); break;
+    case 'invito-crea':{
+      const email = (el('tm_mail').value||'').trim().toLowerCase();
+      const nome = (el('tm_nome').value||'').trim().slice(0, 40), ruolo = (el('tm_ruolo').value||'').trim().slice(0, 60);
+      if(!/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(email)){ toast('Scrivi un\u2019email valida: \u00e8 quella con cui si registrer\u00e0.','warn','Email mancante'); const i = el('tm_mail'); if(i) i.focus(); break; }
+      if((state.inviti||[]).some(i=>!i.usato && (i.email||'').toLowerCase()===email)){ toast('Questa persona \u00e8 gi\u00e0 invitata: la trovi qui sotto.','warn','Gi\u00e0 invitata'); break; }
+      if(state.utenti.some(u=>(u.email||'').toLowerCase()===email)){ toast('Questa persona \u00e8 gi\u00e0 nel team.','warn','Gi\u00e0 nel team'); break; }
+      const d = {nome, cognome:'', nickname:'', email, ruolo};
+      t.disabled = true;
+      const fatto = inv => {
+        t.disabled = false;
+        if(!inv) return;
+        state.teamForm = false; state.teamPronto = inv.id; state.teamStato = 'tutti';
+        azione('Invito preparato per <b>'+esc(email)+'</b>');
+        render();
+      };
+      if(typeof creaProfiloCloud === 'function') creaProfiloCloud(d).then(fatto);
+      else {
+        state.inviti = state.inviti || [];
+        const inv = Object.assign({id:'i'+Date.now(), usato:false, creato_il:new Date().toISOString()}, d);
+        state.inviti.push(inv); fatto(inv);
+      }
+      break; }
+    case 'invito-copia':{
+      const inv = (state.inviti||[]).find(i=>i.id===t.dataset.id); if(!inv || !inv.email) break;
+      const link = linkInvito(inv);
+      const ok = () => diceSulTasto(t, svg('check')+'Copiato', 1800);
+      try{ navigator.clipboard.writeText(link).then(ok, ()=>toast(link, 'warn', 'Copia questo link')); }
+      catch(e){ toast(link, 'warn', 'Copia questo link'); }
+      break; }
+    case 'invito-condividi':{
+      const inv = (state.inviti||[]).find(i=>i.id===t.dataset.id); if(!inv || !navigator.share) break;
+      navigator.share({title:'Invito a FOSS', text:testoInvito(inv)}).catch(()=>{});
+      break; }
     case 'me':
       if(state.schermo==='gate') break;
       if(state.schermo!=='profilo') state.push = null;       // rileggo gli avvisi: il permesso puo' essere cambiato
@@ -10955,7 +11696,7 @@ function menuTelefono(bottone){
     voci.push({a:'toggle-feed', l:'Chat del progetto', ic:'chat'});
     if(vedeSoldi()) voci.push({a:'conti', l:'Soldi del lavoro', ic:'euro', d:D({pid:p.id})});
     if(puo('crea_lavori')) voci.push({a:'salva-modello-apri', l:'Salva come preset', ic:'salva', d:D({pid:p.id})});
-    if(cloudAttivo() && puo('visibilita')) voci.push({a:'cliente-pagina', l:'Pagina del cliente', ic:'review', d:D({pid:p.id})});
+    if(cloudAttivo() && puo('visibilita') && !p.personale) voci.push({a:'cliente-pagina', l:'Pagina del cliente', ic:'review', d:D({pid:p.id})});
     voci.push({sep:1});
   }
   if(state.schermo==='home'){
@@ -11068,14 +11809,15 @@ document.addEventListener('contextmenu', function(e){
     apriCtx(x,y, esc(pr.nome), [
       {a:'apri', l:'Apri il progetto', ic:'right', d:D({id:pr.id})},
       {a:'edit', l:'Rinomina progetto', ic:'pen', d:dd+' data-t="proj" data-k="nome"', off:isLock(pr)},
-      {a:'edit', l:'Cambia cliente', ic:'user', d:dd+' data-t="proj" data-k="cliente"', off:isLock(pr)},
+      (pr.personale? null : {a:'edit', l:'Cambia cliente', ic:'user', d:dd+' data-t="proj" data-k="cliente"', off:isLock(pr)}),
       {a:'edit', l:'Cambia priorità', ic:'spark', d:dd+' data-t="proj" data-k="prio"', off:isLock(pr)},
       {a:'edit', l:'Cambia consegna', ic:'calendar', d:dd+' data-t="proj" data-k="consegna"', off:isLock(pr)},
       {sep:1},
       {a:'lock', l:isLock(pr)?'Sblocca progetto':'Blocca progetto', ic:isLock(pr)?'unlock':'lock', d:dd},
       {a:'duplica', l:'Duplica progetto', ic:'grid', d:dd},
       {a:'salva-modello-apri', l:'Salva come preset', ic:'salva', d:dd},
-      (cloudAttivo()? {a:'cliente-pagina', l:'Pagina del cliente\u2026', ic:'review', d:dd} : null),
+      (cloudAttivo() && !pr.personale? {a:'cliente-pagina', l:'Pagina del cliente\u2026', ic:'review', d:dd} : null),
+      {a:'personale-toggle', l:pr.personale? 'È per un cliente' : 'È un progetto personale', ic:'user', d:dd, off:isLock(pr)},
       {a:'cop-progetto', l:pr.copertina? 'Cambia la copertina' : 'Aggiungi una copertina', ic:'foto', d:dd, off:isLock(pr)},
       (pr.copertina? {a:'rit-progetto', l:'Ritaglia la copertina', ic:'foto', d:dd, off:isLock(pr)} : null),
       (pr.copertina? {a:'togli-cop-progetto', l:'Togli la copertina', ic:'x', d:dd, off:isLock(pr)} : null),
@@ -11213,7 +11955,17 @@ document.addEventListener('scroll', chiudiCtx, true);
 /* ---------- IL RITAGLIO DELLE COPERTINE ----------
    La foto resta intera; per ogni punto in cui compare si salva solo come
    inquadrarla: x e y (0-100, dove guarda) e z (zoom 1-3). */
-const RIT_SP = [{k:'home', n:'Scheda nella Home', r:4.2}, {k:'scheda', n:'Scheda dello spazio', r:2}, {k:'sfondo', n:'Sfondo della pagina', r:16/9}];
+const RIT_SP = [{k:'home', n:'Scheda nella Home', r:3.6}, {k:'scheda', n:'Scheda dello spazio', r:2}, {k:'sfondo', n:'Sfondo della pagina', r:16/9}];
+/* lo sfondo copre tutta la pagina: le sue proporzioni sono quelle di questo schermo */
+function rapportoSfondo(){
+  /* se la pagina dello spazio e' aperta, misuro quella vera */
+  const vera = document.querySelector('.sp2-main, .pane.con-sfondo');
+  if(vera && vera.clientWidth > 100 && vera.clientHeight > 100) return Math.max(.4, Math.min(3, vera.clientWidth / vera.clientHeight));
+  const W = innerWidth, H = innerHeight;
+  if(suTelefono()) return Math.max(.4, Math.min(3, W / Math.max(200, H - 54 - 64)));
+  const w = W - (W >= 1000 ? 240 : 0) - (W >= 1440 ? 340 : 0), h = H - 52 - 50;
+  return Math.max(.4, Math.min(3, w / Math.max(200, h)));
+}
 const RIT_PR = [{k:'bacheca', n:'Scheda nella bacheca', r:2.4}];
 function ritOk(v){
   const n = (x, a, b, d) => { x = Number(x); return isFinite(x) ? Math.min(b, Math.max(a, x)) : d; };
@@ -11232,6 +11984,7 @@ function pulisciRit(o, frames){
 
 let rit = null;         // {src, frames, vals, cur, onSave, iw, ih}
 function apriRitaglio(src, frames, vals, onSave){
+  frames = frames.map(f=>f.k==='sfondo' ? Object.assign({}, f, {r:rapportoSfondo()}) : f);
   rit = {src, frames, cur:frames[0].k, onSave, vals:{}};
   frames.forEach(f=>{ rit.vals[f.k] = ritOk(vals && vals[f.k]); });
   const im = new Image();
@@ -11249,14 +12002,33 @@ function disegnaRitaglio(){
     '<div class="rit-h"><h3>Ritaglia la copertina</h3><button class="iconbtn" data-action="rit-annulla" title="Chiudi">'+svg('x',2.4)+'</button></div>'+
     '<p class="rit-sub">Trascina la foto per scegliere cosa si vede, usa lo zoom per avvicinarla. Ogni schermata ha il suo ritaglio.</p>'+
     (rit.frames.length>1 ? '<div class="rit-tabs">'+rit.frames.map(x=>'<button class="'+(x.k===rit.cur?'on':'')+'" data-action="rit-tab" data-k="'+x.k+'">'+
-      '<span class="mini" style="aspect-ratio:'+x.r+'">'+imgRit(rit.src, rit.vals[x.k])+'</span><span>'+x.n+'</span></button>').join('')+'</div>' : '')+
-    '<div class="rit-quadro" id="ritQuadro" style="aspect-ratio:'+f.r+'">'+imgRit(rit.src, v)+'<span class="rit-griglia"></span></div>'+
+      '<span class="mini" data-r="'+x.r+'">'+imgRit(rit.src, rit.vals[x.k])+'</span><span>'+x.n+'</span></button>').join('')+'</div>' : '')+
+    '<div class="rit-qw"><div class="rit-quadro" id="ritQuadro" data-r="'+f.r+'">'+imgRit(rit.src, v)+'<span class="rit-griglia"></span></div></div>'+
     '<div class="rit-zoom">'+svg('foto',2)+'<input type="range" id="ritZ" min="1" max="3" step="0.01" value="'+v.z+'" aria-label="Zoom">'+
       '<b id="ritZn">'+Math.round(v.z*100)+'%</b><button class="btn sm ghost" data-action="rit-centra">Centra</button></div>'+
     '<div class="rit-f">'+(rit.frames.length>1? '<button class="btn sm ghost" data-action="rit-tutti">Usa questo ritaglio ovunque</button>' : '')+
       '<span class="spacer"></span><button class="btn ghost" data-action="rit-annulla">Annulla</button><button class="btn primary" data-action="rit-salva">Salva</button></div>'+
   '</div>';
+  misuraRitaglio();
 }
+/* le misure dei riquadri le calcolo io: con una larghezza e un'altezza massima
+   le proporzioni del CSS si rompono, e l'anteprima non sarebbe piu' quella vera */
+function misuraRitaglio(){
+  if(!rit) return;
+  const q = el('ritQuadro');
+  if(q){
+    const r = +q.dataset.r || 2, W = q.parentElement.clientWidth || 300;
+    const Hmax = Math.max(140, Math.round(innerHeight * (suTelefono() ? .42 : .5)));
+    const w = Math.min(W, Hmax * r);
+    q.style.width = Math.round(w) + 'px'; q.style.height = Math.round(w / r) + 'px';
+  }
+  document.querySelectorAll('.rit-tabs .mini').forEach(m=>{
+    const r = +m.dataset.r || 2, W = Math.max(40, m.parentElement.clientWidth - 18);
+    const w = Math.min(W, 64 * r);
+    m.style.width = Math.round(w) + 'px'; m.style.height = Math.round(w / r) + 'px';
+  });
+}
+window.addEventListener('resize', ()=>{ if(rit) misuraRitaglio(); });
 /* aggiorna solo la foto, senza ridisegnare: cosi' il trascinamento resta fluido */
 function aggiornaRitaglio(){
   if(!rit) return;
@@ -11828,7 +12600,7 @@ async function registraCloud(dati){
     options:{ data:{nome:dati.nome, cognome:dati.cognome, nickname:dati.nick, ruolo:dati.ruolo} }
   });
   if(error){ toast(error.message,'warn','Registrazione non riuscita'); return false; }
-  if(!data.session){ toast('Ti ho mandato una mail: confermala e poi accedi.','ok','Account creato'); return false; }
+  if(!data.session){ toast('Ti ho mandato una mail: confermala e poi accedi con la password che hai scelto.','warn','Controlla la posta'); return false; }
   utenteCloud = data.user; await caricaCloud(); return true;
 }
 
@@ -12058,7 +12830,7 @@ async function caricaCloud(){
     const altri = (tutti||[]).filter(u=>u.id!==utenteCloud.id).map((u,i)=>({
       id:u.id, nome:(u.nickname||((u.nome||'')+' '+(u.cognome||'')).trim()||u.email),
       ini:((u.nome||u.email||'?')[0]+(u.cognome?u.cognome[0]:'')).toUpperCase(),
-      ruolo:u.ruolo||'Collaboratore', col:COL(i+1), foto:u.foto_url||null
+      ruolo:u.ruolo||'Collaboratore', col:COL(i+1), foto:u.foto_url||null, email:u.email||''
     }));
     state.utenti = [io].concat(altri);
 
@@ -12135,7 +12907,7 @@ async function caricaCloud(){
     /* i profili creati dall'amministratore che non si sono ancora registrati */
     state.inviti = [];
     if(sonoAdmin && orgMia){
-      const {data:inv} = await sb.from('inviti').select('id,nome,cognome,nickname,email,ruolo,usato').eq('org_id', orgMia);
+      const {data:inv} = await sb.from('inviti').select('id,nome,cognome,nickname,email,ruolo,usato,creato_il').eq('org_id', orgMia);
       state.inviti = inv || [];
     }
 
@@ -13011,11 +13783,12 @@ async function primoAccesso(invito, email, pw){
 async function creaProfiloCloud(d){
   if(!sb || !utenteCloud || !orgMia){ toast('Serve la connessione al database.','warn','Non creato'); return false; }
   const {data, error} = await sb.from('inviti').insert({org_id:orgMia, nome:d.nome, cognome:d.cognome,
-    nickname:d.nickname, email:d.email, ruolo:d.ruolo||'Collaboratore', usato:false})
-    .select('id,nome,cognome,nickname,email,ruolo,usato').single();
-  if(error){ toast(error.message,'warn','Profilo non creato'); return false; }
+    nickname:d.nickname, email:d.email, ruolo:d.ruolo||'', usato:false})
+    .select('id,nome,cognome,nickname,email,ruolo,usato,creato_il').single();
+  if(error){ toast(error.message,'warn','Invito non creato'); return false; }
+  if(data && !data.creato_il) data.creato_il = new Date().toISOString();
   state.inviti = (state.inviti||[]).concat([data]);
-  return true;
+  return data;
 }
 async function salvaPermessiCloud(uid, pm){
   if(!sb || !utenteCloud || !orgMia) return false;
