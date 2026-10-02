@@ -2347,6 +2347,22 @@ a.btn.primary{color:var(--on-amber)}
 .tk-pill{max-width:60%;padding:2px 7px;border-radius:5px;background:var(--acc);color:#15120a;font-size:10px;font-weight:800;letter-spacing:.04em;text-transform:uppercase;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .tk-tipo{font-size:10.5px;font-weight:600;letter-spacing:.06em;text-transform:uppercase;color:var(--hm-2,var(--dim));white-space:nowrap;overflow:hidden;text-overflow:ellipsis;min-width:0}
 .tk-tags .sep{flex:1}
+.msg-task{display:inline-flex;align-items:center;gap:5px;max-width:100%;border:0;background:var(--amber-soft);color:var(--amber-ink);font:600 11.5px/1.3 inherit;padding:4px 8px;border-radius:7px;cursor:pointer;margin:3px 0 4px;text-align:left}
+.msg-task b{font-weight:700;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;min-width:0}
+.msg-task svg{width:12px;height:12px;flex:none}
+.msg-task:hover{filter:brightness(.97)}
+.ruoli-team{display:flex;flex-direction:column;gap:9px}
+.ruoli-team .rt{display:flex;align-items:flex-start;gap:12px;text-align:left;padding:13px 14px;border-radius:14px;border:1.5px solid var(--line);background:var(--surface);color:var(--text);cursor:pointer;font:inherit;transition:.15s}
+.ruoli-team .rt:hover{border-color:var(--amber)}
+.ruoli-team .rt.on{border-color:var(--amber);background:var(--amber-soft)}
+.ruoli-team .rt-ic{width:34px;height:34px;border-radius:10px;display:grid;place-items:center;background:var(--bg);flex:none;color:var(--amber-ink)}
+.ruoli-team .rt-ic svg{width:17px;height:17px}
+.ruoli-team .tx{flex:1;min-width:0;display:flex;flex-direction:column;gap:3px}
+.ruoli-team .tx b{font-size:14.5px}
+.ruoli-team .tx span{font-size:12.5px;line-height:1.45;color:var(--dim)}
+.ruoli-team .rt-ok{width:22px;height:22px;border-radius:50%;display:grid;place-items:center;flex:none;border:1.5px solid var(--line);color:transparent;margin-top:6px}
+.ruoli-team .rt.on .rt-ok{background:var(--amber);border-color:var(--amber);color:var(--on-amber)}
+.ruoli-team .rt-ok svg{width:12px;height:12px}
 .tk-via{display:inline-grid;place-items:center;width:28px;height:28px;border-radius:8px;color:var(--mute);flex:none;cursor:pointer;transition:.15s}
 .tk-via svg{width:15px;height:15px}
 .tk-via:hover,.tk-via:focus-visible{color:var(--alert);background:color-mix(in srgb,var(--alert) 14%,transparent)}
@@ -3331,7 +3347,7 @@ button.pf-p:hover{background:var(--surface-2);border-radius:10px}
     <button class="iconbtn solo-tel" data-action="menu-telefono" title="Altro">
       <svg viewBox="0 0 24 24" fill="currentColor" stroke="none"><circle cx="5" cy="12" r="2"/><circle cx="12" cy="12" r="2"/><circle cx="19" cy="12" r="2"/></svg>
     </button>
-    <button class="iconbtn only-narrow" data-action="toggle-feed" title="Chat del progetto e attività">
+    <button class="iconbtn only-narrow" data-action="toggle-feed" title="Conversazione e attività">
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 12a8 8 0 0 1-11.2 7.3L4 20l.8-5A8 8 0 1 1 21 12z"/></svg>
     </button>
     <button class="iconbtn" data-action="annulla" title="Annulla ultima azione (Ctrl+Z)" id="undoBtn"></button>
@@ -4413,8 +4429,15 @@ function commentiDelLavoro(p){
   return out;
 }
 function totCommenti(p){ return commentiDelLavoro(p).length; }
-/* la chat del lavoro: i messaggi, piu' i commenti senza task, in ordine di tempo */
-function vociChat(p){ return (p.chat||[]).concat(commentiDelLavoro(p)).sort((a,b)=>tempoMsg(a)-tempoMsg(b)); }
+/* i commenti scritti dentro task e subtask */
+function commentiDelleTask(p){
+  const out = [];
+  Object.keys(p.commenti||{}).forEach(f=>(p.commenti[f]||[]).forEach(m=>{ if(m && m.task) out.push(m); }));
+  return out;
+}
+/* una sola conversazione per lavoro: i messaggi al team, i commenti delle task e delle
+   subtask (con la task a cui si riferiscono) e le risposte del cliente, in ordine di tempo */
+function vociChat(p){ return (p.chat||[]).concat(commentiDelLavoro(p), commentiDelleTask(p)).sort((a,b)=>tempoMsg(a)-tempoMsg(b)); }
 /* nelle note gli indirizzi diventano link cliccabili */
 /* ---------- PERSONE TAGGATE SU UNA TASK ----------
    Taggare non è decorativo: chi viene taggato riceve un ruolo su quella task
@@ -4491,7 +4514,8 @@ function tuttiTag(tipo){
 function nonLetti(p){
   const v = p.visti || {commenti:0,chat:0,attivita:0};
   return {
-    chat: Math.max(0, p.chat.length-(v.chat||0)) + Math.max(0, totCommenti(p)-(v.commenti||0)),
+    chat: Math.max(0, p.chat.length-(v.chat||0)) + Math.max(0, totCommenti(p)-(v.commenti||0)) +
+          (v.task == null ? 0 : Math.max(0, commentiDelleTask(p).length - v.task)),
     attivita: Math.max(0, p.log.length-(v.attivita||0))
   };
 }
@@ -5045,7 +5069,7 @@ function renderHome(){
       if(!g.ps.length) return;
       h += '<div class="gruppo-tiles" style="--gc:'+g.c+'"><div class="gruppo-h">'+
         '<span class="pallo"></span><h3>'+g.nome+'</h3>'+
-        '<span class="n">'+g.ps.length+(g.ds? ' · '+g.ds:'')+'</span></div><div class="tiles">'+
+        '<span class="n">'+g.ps.length+(g.ds? ' · '+g.ds:'')+'</span><span style="flex:1"></span>'+tastoTogliTutti(g)+'</div><div class="tiles">'+
         g.ps.map(tessera).join('')+'</div></div>';
     });
     h += '</div>';
@@ -5304,14 +5328,14 @@ function renderProgetto(){
   const nl = nonLetti(p);
   h += '<aside class="rail rail-r"><div class="tabs">'+
     '<button class="tab chiudi-feed" data-action="feed" title="Chiudi il pannello">'+svg('x',2.6)+'</button>'+
-    [['chat','Chat del progetto'],['attivita','Attivit\u00e0']].map(t=>'<button class="tab'+(tab===t[0]?' on':'')+'" data-action="tab" data-t="'+t[0]+'">'+t[1]+
+    [['chat','Conversazione'],['attivita','Attivit\u00e0']].map(t=>'<button class="tab'+(tab===t[0]?' on':'')+'" data-action="tab" data-t="'+t[0]+'">'+t[1]+
       (nl[t[0]] && tab!==t[0] ? '<span class="n">'+(nl[t[0]]>9?'9+':nl[t[0]])+'</span>' : '')+
       '</button>').join('')+'</div>';
   h += '<div class="feed" id="feed">';
   if(tab==='chat'){
     const voci = vociChat(p);
-    if(!voci.length) h += '<div class="empty">Qui il team parla del lavoro intero, in tempo reale. '+
-      'Per discutere una task o una subtask usa il suo fumetto '+svg('chat',2.2).replace('<svg','<svg style="width:13px;height:13px;vertical-align:-2px"')+'.</div>';
+    if(!voci.length) h += '<div class="empty">Qui c\u2019\u00e8 tutta la conversazione del lavoro: i messaggi al team e i commenti di task e subtask, in tempo reale. '+
+      'Per scrivere su una task precisa usa il suo fumetto '+svg('chat',2.2).replace('<svg','<svg style="width:13px;height:13px;vertical-align:-2px"')+'.</div>';
     voci.forEach(c=>{ h += msg(autoreDi(c), c, p); });
   } else {
     if(!p.log.length) h += '<div class="empty">Nessuna attivit\u00e0 registrata.</div>';
@@ -5329,7 +5353,7 @@ function renderProgetto(){
   /* la scheda aperta si considera vista */
   /* ...ma solo se il pannello e' davvero aperto davanti agli occhi */
   if(state.showFeed){
-    if(tab==='chat'){ p.visti.chat = p.chat.length; p.visti.commenti = totCommenti(p); }
+    if(tab==='chat'){ p.visti.chat = p.chat.length; p.visti.commenti = totCommenti(p); p.visti.task = commentiDelleTask(p).length; }
     else p.visti.attivita = p.log.length;
   }
 }
@@ -5436,10 +5460,14 @@ function msg(u,c,p){
     (c.esito==='ok' ? svg('check',2.6)+'Approvato' : svg('review',2.4)+'Chiede modifiche')+'</span>' : '';
   const t = tempoMsg(c), quando = c.t ? quandoBreve({t}) : (c.ts || (t > 1e12 ? quandoBreve({t}) : ''));
   const fase = (p && c._fase != null && FZ(p)[c._fase]) ? FZ(p)[c._fase].nome : '';
+  const sTask = (p && c.task) ? (p.subs||[]).find(x=>x.id===c.task) : null;
+  const iVoce = (sTask && c.voce) ? (sTask.items||[]).find(x=>x.id===c.voce) : null;
+  const suTask = sTask ? '<button class="msg-su msg-task" data-action="cm-apri" data-pid="'+p.id+'" data-task="'+esc(sTask.id)+'"'+(iVoce?' data-voce="'+esc(c.voce)+'"':'')+'>'+
+    svg('chat',2.2)+'Su <b>'+esc(iVoce ? (iVoce.t||'subtask') : (sTask.titolo||'task'))+'</b>'+(iVoce ? ' \u00b7 '+esc(sTask.titolo||'') : '')+svg('right',2.4)+'</button>' : '';
   return '<div class="msg'+(cl?' da-cliente':'')+'">'+av(u,'sm')+'<div class="bd"><div class="hd"><span class="nm">'+
     esc(u.nome)+'</span>'+(cl? '<span class="chip-cl">Cliente</span>' : '')+
     '<span class="ts">'+esc(quando)+'</span></div>'+
-    (fase ? '<div class="msg-su">'+(cl? 'Sulla fase ' : 'Commento sulla fase ')+'<b>'+esc(fase)+'</b></div>' : '')+esito+
+    (suTask || (fase ? '<div class="msg-su">'+(cl? 'Sulla fase ' : 'Commento sulla fase ')+'<b>'+esc(fase)+'</b></div>' : ''))+esito+
     '<div class="tx">'+linkifica(sicuro(c.tx))+'</div></div></div>';
 }
 function kv(k,v,campo){
@@ -5544,7 +5572,7 @@ function renderPhasebar(){
      ci metto anche la chat, sennò dal telefono non si raggiunge. */
   if(suTelefono()){
     const n = totaleNonLetti(p);
-    h += '<button class="step chat-step'+(n?' ha-nuovi':'')+'" data-action="feed" title="Chat del progetto">'+
+    h += '<button class="step chat-step'+(n?' ha-nuovi':'')+'" data-action="feed" title="Conversazione del lavoro">'+
       '<span class="ic">'+svg('chat')+'</span>'+
       (n? '<span class="n">'+(n>9?'9+':n)+'</span>':'')+'</button>';
   }
@@ -5591,7 +5619,7 @@ function puo(k){
   return mieiPermessi[k] !== false;
 }
 /* cose che restano solo dell'amministratore, qualunque permesso abbia il guest */
-const SOLO_ADMIN = ['iv-aggiungi','tm-cerca','tm-aggiungi','tm-cerca-invita','pf-invita','iv-anteprima','iv-invia','iv-reinvia','nuovo-profilo','crea-profilo','togli-profilo','togli-profilo-ok','permessi','perm-toggle',
+const SOLO_ADMIN = ['ruolo-team','iv-aggiungi','tm-cerca','tm-aggiungi','tm-cerca-invita','pf-invita','iv-anteprima','iv-invia','iv-reinvia','nuovo-profilo','crea-profilo','togli-profilo','togli-profilo-ok','permessi','perm-toggle',
   'team-invita','invito-crea','invito-copia','invito-condividi',
   'togli-accesso','togli-accesso-ok','registro','registro-chi','registrati','crea-utente'];
 const PERM_AZIONE = {
@@ -7141,6 +7169,10 @@ function renderBacheca(){
   return h;
 }
 
+function colNote(){
+  const b = document.getElementById('bacheca'), w = (b && b.clientWidth) || innerWidth;
+  return Math.max(1, Math.min(5, Math.floor((w - 24) / 212)));
+}
 function nuovaNota(x, y){
   const sp = SPZ(); if(!sp) return;
   if(!sp.note) sp.note = [];
@@ -7149,8 +7181,9 @@ function nuovaNota(x, y){
     tx:'', autore:state.utente,
     col:PASTELLI[sp.note.length % PASTELLI.length],
     rot:+(Math.random()*5-2.5).toFixed(1),
-    x: x!=null? x : 24 + (sp.note.length%5)*212,
-    y: y!=null? y : 22 + Math.floor(sp.note.length/5)*196
+    /* tante colonne quante ne stanno nella bacheca: sul telefono una sotto l'altra, mai fuori dallo schermo */
+    x: x!=null? x : 24 + (sp.note.length%colNote())*212,
+    y: y!=null? y : 22 + Math.floor(sp.note.length/colNote())*196
   };
   sp.note.push(n);
   azione('Nuova nota nello spazio <b>'+esc(sp.nome)+'</b>');
@@ -7644,8 +7677,7 @@ function pfAmministrazione(){
       '<button class="btn sm ghost" data-action="team">Apri il Team '+svg('right',2.4)+'</button>')+'<div class="pf-pers">';
   persone.forEach(u=>{
     const n = vede(u.id), pm = permessiDi(u.id);
-    const tolti = PERMESSI.filter(x=>pm[x.k]===false).length;
-    const chip = pm.sola_lettura ? '<span class="chip now">Sola lettura</span>' : tolti ? '<span class="chip now">'+tolti+(tolti===1?' permesso tolto':' permessi tolti')+'</span>' : '<span class="chip">Guest</span>';
+    const chip = chipRuolo(pm);
     h += '<button class="pf-p" data-action="permessi" data-id="'+esc(u.id)+'">'+av(u)+'<span class="tx"><b>'+esc(u.nome)+'</b><span>'+
       esc(ruoliDi(u.ruolo).join(' · ') || 'Ruolo non indicato')+' · vede '+n+(n===1?' lavoro':' lavori')+'</span></span>'+chip+svg('right',2.2)+'</button>';
   });
@@ -7681,11 +7713,7 @@ function cartaAmministrazione(){
     '<div class="adm-lista">';
   persone.forEach(u=>{
     const n = vede(u.id), pm = permessiDi(u.id);
-    const tolti = PERMESSI.filter(x=>pm[x.k]===false).length;
-    const stato = (pm.soldi? '<span class="chip" title="Vede i soldi">'+svg('euro',2.2)+'</span>' : '')+
-                  (pm.sola_lettura? '<span class="chip now">Sola lettura</span>'
-                : tolti? '<span class="chip now">'+tolti+(tolti===1?' permesso tolto':' permessi tolti')+'</span>'
-                : '<span class="chip">Guest</span>');
+    const stato = chipRuolo(pm);
     h += '<button class="adm-r" data-action="permessi" data-id="'+u.id+'">'+av(u)+'<div class="tx"><b>'+esc(u.nome)+'</b><span>'+esc(u.ruolo||'')+
       ' \u00b7 vede '+n+(n===1?' lavoro':' lavori')+'</span></div>'+stato+
       '<span class="adm-chev">'+svg('right',2.4)+'</span></button>';
@@ -7810,16 +7838,12 @@ function renderTeam(){
   h += '<div class="tm-lista">';
   pv.forEach(u=>{
     const pm = permessiDi(u.id), n = vede(u.id), capo = u.id === adminId();
-    const tolti = PERMESSI.filter(x=>pm[x.k] === false).length;
-    const chips = (capo ? '<span class="chip ok">' + svg('lock', 2.2) + 'Amministratore</span>' : '') +
-      (!capo && pm.sola_lettura ? '<span class="chip now">Sola lettura</span>' : '') +
-      (!capo && !pm.sola_lettura && tolti ? '<span class="chip now">' + tolti + (tolti === 1 ? ' permesso tolto' : ' permessi tolti') + '</span>' : '') +
-      (!capo && pm.soldi ? '<span class="chip" title="Vede i soldi">' + svg('euro', 2.2) + 'Soldi</span>' : '');
+    const chips = capo ? '<span class="chip ok">' + svg('lock', 2.2) + 'Amministratore</span>' : chipRuolo(pm);
     h += '<div class="tm-c">' + av(u) + '<div class="tx"><b>' + esc(u.nome) + '</b>' +
       '<span class="ru">' + (ruoliDi(u.ruolo).map(r=>'<i>' + esc(r) + '</i>').join('') || '<i class="vuoto">Ruolo non indicato</i>') + '</span>' +
       (u.email ? '<span class="em">' + esc(u.email) + '</span>' : '') + '</div>' +
       (chips ? '<div class="st">' + chips + '</div>' : '') +
-      (admin && !capo ? '<div class="tm-az"><button class="btn sm" data-action="permessi" data-id="' + esc(u.id) + '">' + svg('ingranaggio') + 'Permessi</button>' +
+      (admin && !capo ? '<div class="tm-az"><button class="btn sm" data-action="permessi" data-id="' + esc(u.id) + '">' + svg('ingranaggio') + 'Ruolo</button>' +
         '<button class="btn sm ghost" data-action="togli-accesso" data-id="' + esc(u.id) + '">Togli</button>' +
         '<span class="n">vede ' + n + (n === 1 ? ' lavoro' : ' lavori') + '</span></div>' : '') +
     '</div>';
@@ -7848,7 +7872,42 @@ function renderTeam(){
 }
 
 /* ---------- PERMESSI DI UN GUEST ---------- */
+/* Tre ruoli al posto dei sette interruttori: si scrivono negli stessi permessi del database */
+const RUOLI_TEAM = [
+  {k:'collaboratore', l:'Collaboratore', ic:'users', pm:{},
+   d:'Lavora sui lavori che gli apri: crea, modifica, spunta, commenta, elimina. Non vede i soldi.'},
+  {k:'soldi', l:'Collaboratore con soldi', ic:'euro', pm:{soldi:true},
+   d:'Come il collaboratore, e in pi\u00f9 vede e scrive preventivi, incassi e spese dei suoi lavori.'},
+  {k:'lettura', l:'Solo lettura', ic:'eye', pm:{sola_lettura:true},
+   d:'Guarda i lavori che gli apri ma non cambia niente. Adatto ai clienti.'}
+];
+function ruoloTeam(pm){
+  pm = pm || {};
+  if(pm.sola_lettura) return RUOLI_TEAM[2];
+  return pm.soldi ? RUOLI_TEAM[1] : RUOLI_TEAM[0];
+}
+/* qualche interruttore spento a mano, dai vecchi permessi */
+function ruoloSuMisura(pm){ return !pm.sola_lettura && PERMESSI.some(x=>pm && pm[x.k]===false); }
+function chipRuolo(pm){
+  const r = ruoloTeam(pm);
+  return '<span class="chip'+(r.k==='lettura'?' now':'')+'">'+svg(r.ic,2.2)+r.l+(ruoloSuMisura(pm)?' *':'')+'</span>';
+}
 function modalePermessi(uid){
+  const u = U(uid), pm = permessiDi(uid), att = ruoloTeam(pm), primo = esc(u.nome.split(' ')[0]);
+  modale('<h3>Che ruolo ha '+primo+'?</h3>'+
+    '<div class="sub-t">Vale per tutti i lavori del tuo archivio che gli apri. Lo cambi quando vuoi.</div>'+
+    '<div class="modal-b"><div class="ruoli-team">'+
+      RUOLI_TEAM.map(r=>'<button class="rt'+(r.k===att.k?' on':'')+'" data-action="ruolo-team" data-u="'+esc(uid)+'" data-k="'+r.k+'" aria-pressed="'+(r.k===att.k)+'">'+
+        '<span class="rt-ic">'+svg(r.ic,2)+'</span><span class="tx"><b>'+r.l+'</b><span>'+r.d+'</span></span>'+
+        '<span class="rt-ok">'+svg('check',3)+'</span></button>').join('')+
+    '</div>'+
+    (ruoloSuMisura(pm) ? '<div class="nota-box" style="margin-top:12px">Ha ancora dei permessi spenti a mano dalla versione precedente. Scegliendo un ruolo tornano quelli del ruolo.</div>' : '')+
+    '<div class="adm-pericolo"><div class="tx"><b>Togli dal team</b>'+
+        '<span>Non vedr\u00e0 pi\u00f9 nessun lavoro del tuo archivio. Le task che ha fatto restano.</span></div>'+
+        '<button class="btn danger" data-action="togli-accesso" data-id="'+esc(uid)+'">Togli</button></div>'+
+    '</div><div class="modal-f"><button class="btn" data-action="chiudi-modale">Fatto</button></div>');
+}
+function modalePermessiVecchio(uid){
   const u = U(uid), pm = permessiDi(uid), sl = !!pm.sola_lettura;
   const riga = (k, l, d, on, off) =>
     '<div class="riga'+(off?' spenta':'')+'"><div class="tx"><b>'+l+'</b><span>'+d+'</span></div>'+
@@ -9396,7 +9455,7 @@ function cartaModelli(){
    Come si fa tutto, capitolo per capitolo: dai primi passi alle cose per chi
    organizza un team. Si cerca per parola (anche senza accenti); in fondo c'e'
    il tasto per segnalare quello che manca o non funziona. */
-const VERSIONE = 'v45';
+const VERSIONE = 'v47';
 const LIVELLI_GUIDA = {base:'Per cominciare', medio:'Tutti i giorni', esperto:'Per chi organizza', aiuto:'Se qualcosa non va'};
 const GUIDA = [
 {id:'primi-passi', liv:'base', ic:'spark', t:'Primi passi', s:'Cos’è FOSS e come ci si muove', v:[
@@ -9458,13 +9517,13 @@ const GUIDA = [
   ['Filtri e ordine', 'Nella barra in basso: <b>Tutti</b> e i tuoi filtri salvati. <b>Nuovo filtro</b> li crea per tipo di progetto, tag e priorità. Accanto, <b>Ordina</b> per priorità, scadenza, cliente, fase o nel tuo ordine.'],
   ['Cercare', 'Sul computer usa il campo <b>Cerca</b> in alto: filtra i progetti dello spazio mentre scrivi. Sul telefono la sezione <b>Cerca</b> trova progetti, task, subtask e voci delle checklist in tutti gli spazi. Se non vedi più niente, controlla di non aver lasciato una parola nella ricerca.']
 ]},
-{id:'commenti', liv:'medio', ic:'chat', t:'Commenti, chat e attività', s:'I commenti stanno nelle task, la chat è del lavoro', v:[
+{id:'commenti', liv:'medio', ic:'chat', t:'Commenti, chat e attività', s:'Una sola conversazione per lavoro, anche coi commenti delle task', v:[
   ['Commenti dentro task e subtask', 'Ogni task e ogni subtask ha il suo tasto <b>Commenta o allega</b>, il fumetto con la graffetta '+svg('chat',2.2).replace('<svg','<svg style="width:13px;height:13px;vertical-align:-2px"')+svg('clip',2.2).replace('<svg','<svg style="width:13px;height:13px;vertical-align:-2px"')+'. Toccalo e si apre, al centro dello schermo, la sua discussione: tutti i commenti e i file su quella cosa, dal primo all’ultimo, anche se arrivano a giorni di distanza. Il numero sul tasto dice quanti sono.'],
   ['Il tasto rosso', 'Quando qualcuno scrive, il tasto di quella task (o subtask) diventa rosso finché non apri la discussione. Il pallino compare anche sulla fase in basso, così sai dove guardare; dentro la discussione una riga «Nuovi» segna da dove riprendere.'],
   ['Chi ha scritto', 'Ogni commento ha la foto, il nome, il ruolo e l’ora di chi l’ha scritto: non si può scrivere a nome di un altro. Un tuo commento lo togli col tasto destro (o tenendolo premuto) → <b>Elimina il commento</b>.'],
   ['Link e file', 'Nella discussione, la graffetta allega un file fino a 25 MB (foto, PDF, video brevi, documenti): lo vede solo chi lavora al progetto. Per i file più grossi incolla un link di WeTransfer, Drive o Frame.io. La scheda <b>Link e file</b> li raccoglie tutti in un posto.'],
   ['Taggare qualcuno', 'Nei commenti e nella chat scrivi <b>@</b> (o tocca il tasto @ nella finestra dei commenti): compare chi lavora al progetto, scegli il nome. Gli arriva subito la notifica, col box a schermo intero se l’ha acceso (con <b>APRI</b> va dritto alla discussione), e l’avviso sul telefono.'],
-  ['La chat del progetto', 'Il tasto <b>Chat</b> '+svg('pannello',2).replace('<svg','<svg style="width:13px;height:13px;vertical-align:-2px"')+', in alto a destra dentro il progetto (sul telefono il fumetto nella barra in basso), apre il pannello laterale: la <b>Chat del progetto</b> è la conversazione di tutto il lavoro, in tempo reale; <b>Attività</b> è il diario automatico di cosa è cambiato e chi l’ha fatto.'],
+  ['La chat del progetto', 'Il tasto <b>Chat</b> '+svg('pannello',2).replace('<svg','<svg style="width:13px;height:13px;vertical-align:-2px"')+', in alto a destra dentro il progetto (sul telefono il fumetto nella barra in basso), apre il pannello laterale: la <b>Conversazione</b> raccoglie tutto il lavoro in tempo reale: i messaggi al team e i commenti di task e subtask, ognuno col tasto per aprire la sua discussione; <b>Attività</b> è il diario automatico di cosa è cambiato e chi l’ha fatto.'],
   ['Inviare', '<b>Invio</b> manda, <b>Maiusc+Invio</b> va a capo; sul telefono si manda col tasto giallo. Chi lavora al progetto riceve una notifica; più messaggi ravvicinati si sommano in una sola.'],
   ['Le risposte del cliente e i vecchi commenti', 'Le risposte che il cliente dà dalla sua pagina arrivano nella chat del progetto, con l’etichetta <b>Cliente</b> e l’esito. Lì trovi anche i commenti scritti prima di questa versione, con la fase a cui si riferivano.']
 ]},
@@ -11827,6 +11886,15 @@ document.addEventListener('click', function(e){
 
     case 'permessi': modalePermessi(t.dataset.id); break;
 
+    case 'ruolo-team':{
+      const uid = t.dataset.u, r = RUOLI_TEAM.find(x=>x.k===t.dataset.k); if(!uid || !r) break;
+      state.permessi = state.permessi || {};
+      const pm = Object.assign({}, r.pm);
+      state.permessi[uid] = pm;
+      modalePermessi(uid); render();
+      if(typeof salvaPermessiCloud === 'function') salvaPermessiCloud(uid, pm);
+      azione('Ruolo di <b>'+esc(U(uid).nome)+'</b>: '+r.l);
+      break; }
     case 'perm-toggle':{
       const uid = t.dataset.u, k = t.dataset.k;
       state.permessi = state.permessi || {};
@@ -12457,7 +12525,7 @@ function menuTelefono(bottone){
   const p = state.schermo==='progetto' ? PROJ() : null;
   if(p){
     voci.push({a:'toggle-rail', l:'Scheda progetto', ic:'file'});
-    voci.push({a:'toggle-feed', l:'Chat del progetto', ic:'chat'});
+    voci.push({a:'toggle-feed', l:'Conversazione', ic:'chat'});
     if(vedeSoldi()) voci.push({a:'conti', l:'Soldi del lavoro', ic:'euro', d:D({pid:p.id})});
     if(puo('crea_lavori')) voci.push({a:'salva-modello-apri', l:'Salva come preset', ic:'salva', d:D({pid:p.id})});
     if(cloudAttivo() && puo('visibilita') && !p.personale) voci.push({a:'cliente-pagina', l:'Pagina del cliente', ic:'review', d:D({pid:p.id})});
