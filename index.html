@@ -7,7 +7,10 @@
 <meta name="theme-color" content="#0D1926">
 <title>FOSS</title>
 <link rel="manifest" href="manifest.json">
-<link rel="icon" href="icone/favicon-32-v2.png" sizes="32x32">
+<link rel="icon" href="favicon.ico?v=45" sizes="48x48">
+<link rel="icon" href="icone/favicon.svg?v=45" type="image/svg+xml">
+<link rel="icon" href="icone/favicon-32.png?v=45" type="image/png" sizes="32x32">
+<link rel="icon" href="icone/favicon-16.png?v=45" type="image/png" sizes="16x16">
 <link rel="apple-touch-icon" href="icone/apple-touch-icon-v2.png">
 <link rel="apple-touch-icon" sizes="180x180" href="icone/apple-touch-icon-v2.png">
 <meta name="apple-mobile-web-app-capable" content="yes">
@@ -2344,6 +2347,24 @@ a.btn.primary{color:var(--on-amber)}
 .tk-pill{max-width:60%;padding:2px 7px;border-radius:5px;background:var(--acc);color:#15120a;font-size:10px;font-weight:800;letter-spacing:.04em;text-transform:uppercase;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .tk-tipo{font-size:10.5px;font-weight:600;letter-spacing:.06em;text-transform:uppercase;color:var(--hm-2,var(--dim));white-space:nowrap;overflow:hidden;text-overflow:ellipsis;min-width:0}
 .tk-tags .sep{flex:1}
+.tk-via{display:inline-grid;place-items:center;width:28px;height:28px;border-radius:8px;color:var(--mute);flex:none;cursor:pointer;transition:.15s}
+.tk-via svg{width:15px;height:15px}
+.tk-via:hover,.tk-via:focus-visible{color:var(--alert);background:color-mix(in srgb,var(--alert) 14%,transparent)}
+.rg .tk-via{order:99;margin-left:4px}
+.tk-via-tutti{display:inline-flex;align-items:center;gap:6px;font:600 12px/1 inherit;color:var(--mute);background:none;border:1px solid var(--line);border-radius:999px;padding:6px 10px;cursor:pointer;white-space:nowrap}
+.tk-via-tutti svg{width:13px;height:13px}
+.tk-via-tutti:hover{color:var(--alert);border-color:var(--alert)}
+.kb-agg.kb-via:hover{color:var(--alert);border-color:var(--alert)}
+.via-lista{margin:12px 0 0;padding:0;list-style:none;display:flex;flex-direction:column;gap:6px;max-height:240px;overflow:auto}
+.via-lista li{font-size:13.5px;padding:8px 11px;border-radius:9px;background:var(--surface)}
+.via-lista li span{color:var(--mute);margin-left:6px}
+.via-lista li.altri{background:none;color:var(--mute)}
+.togli-cosa{margin:0;padding:0;list-style:none;display:flex;flex-direction:column;gap:9px}
+.togli-cosa li{position:relative;padding:10px 12px 10px 38px;border-radius:11px;background:var(--surface);font-size:13.5px;line-height:1.45;color:var(--dim)}
+.togli-cosa li b{color:var(--text)}
+.togli-cosa li::before{position:absolute;left:12px;top:10px;width:18px;height:18px;border-radius:50%;display:grid;place-items:center;font:800 11px/1 inherit}
+.togli-cosa li.no::before{content:'\2715';background:color-mix(in srgb,var(--alert) 20%,transparent);color:var(--alert)}
+.togli-cosa li.si::before{content:'\2713';background:color-mix(in srgb,var(--ok) 20%,transparent);color:var(--ok)}
 .tk-prio{color:var(--t-rosso,var(--alert));display:grid;place-items:center}
 .tk-prio svg{width:14px;height:14px}
 .tk-t{display:flex;align-items:flex-start;gap:10px;min-width:0}
@@ -3381,6 +3402,7 @@ const I = {
   out:'<path d="M16 17l5-5-5-5M21 12H9M12 3H6a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h6"/>',
   spark:'<path d="M12 3v4M12 17v4M3 12h4M17 12h4M5.6 5.6 8.5 8.5M15.5 15.5l2.9 2.9M18.4 5.6 15.5 8.5M8.5 15.5l-2.9 2.9"/>',
   x:'<path d="M18 6 6 18M6 6l12 12"/>',
+  cestino:'<path d="M3 6h18M8 6V4h8v2M19 6l-1 14H6L5 6M10 11v6M14 11v6"/>',
   tag:'<circle cx="12" cy="12" r="4"/><path d="M16 12v1.5a2.5 2.5 0 0 0 5 0V12a9 9 0 1 0-5.3 8.2"/>',
   file:'<path d="M14 3H7a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V8z"/><path d="M14 3v5h5"/>',
   clip:'<path d="M21 11.5 12.5 20a5 5 0 0 1-7-7l8.5-8.5a3.3 3.3 0 0 1 4.7 4.7L10 17.8a1.7 1.7 0 0 1-2.4-2.4l7.8-7.8"/>',
@@ -4816,6 +4838,7 @@ function bachecaColonne(lista){
       '<div class="tiles kb-lista">'+g.ps.map(tessera).join('')+'</div>'+
       (!g.ps.length ? '<div class="kb-vuota">Qui per ora non c\'è niente</div>' : '')+
       (aggiunge ? '<button class="kb-agg" data-action="nuovo">'+svg('plus',2.2)+'Aggiungi progetto</button>' : '')+
+      (tastoTogliTutti(g) ? '<button class="kb-agg kb-via" data-action="rimuovi-fatti">'+svg('cestino',2)+'Rimuovi tutti i completati</button>' : '')+
     '</section>';
   });
   return h + '</div></div>';
@@ -4882,13 +4905,22 @@ const GRUPPI = [
   {id:'fatto',  nome:'Completati',c:'var(--ok)',   ds:'chiusi'}
 ];
 
+/* i lavori completati si possono togliere: solo i miei, mai quelli dell'archivio di un altro */
+function puoTogliereFatto(p){ return !!(p && p.completato) && !state.ospite && !(p.lock && p.lock.on) && !titolareDiProgetto(p) && puo('elimina'); }
+function tastoTogliFatto(p){
+  return puoTogliereFatto(p) ? '<span class="tk-via" role="button" tabindex="0" data-action="togli-fatto" data-pid="'+p.id+'" title="Rimuovi questo lavoro" aria-label="Rimuovi '+esc(p.nome)+'">'+svg('cestino',2)+'</span>' : '';
+}
+function tastoTogliTutti(g){
+  const n = (g.ps||[]).filter(puoTogliereFatto).length;
+  return (g.id==='fatto' || g.id==='Completati') && n > 1 ? '<button class="tk-via-tutti" data-action="rimuovi-fatti">'+svg('cestino',2)+'Rimuovi tutti</button>' : '';
+}
 function rigaLista(p){
   const s = scadenza(p), T = TIPO(p.tipo), pc = prog(p);
   const resp = U(p.faseAss? (p.faseAss[p.fase]||p.team[0]) : p.team[0]);
   return '<div class="rg'+(p.completato?' fatto':'')+'" style="--acc:'+p.col+'" role="button" tabindex="0" '+
     'data-action="apri" data-id="'+p.id+'">'+
     '<span class="cerchio">'+svg('check',3)+'</span>'+
-    '<span class="col"></span>'+
+    '<span class="col"></span>'+tastoTogliFatto(p)+
     '<span class="nome"><b>'+esc(p.nome)+'</b><span>'+esc(nomeLavoro(p))+
       ((p.tags&&p.tags.length)? ' · '+esc(p.tags[0]) : '')+' · '+esc(p.personale? 'Personale' : p.cliente)+'</span></span>'+
     '<span class="prio '+p.prio+'">'+PRIO[p.prio]+'</span>'+
@@ -4934,7 +4966,7 @@ function renderLista(lista){
     if(!g.ps.length) return;
     h += '<div class="gruppo" style="--gc:'+g.c+'"><div class="gruppo-h">'+
       '<span class="pallo"></span><h3>'+g.nome+'</h3>'+
-      '<span class="n">'+g.ps.length+(g.ps.length===1?' progetto':' progetti')+'</span></div>'+
+      '<span class="n">'+g.ps.length+(g.ps.length===1?' progetto':' progetti')+'</span><span style="flex:1"></span>'+tastoTogliTutti(g)+'</div>'+
       '<div class="righe">'+g.ps.map(rigaLista).join('')+'</div></div>';
   });
   return h + '</div>';
@@ -4963,7 +4995,7 @@ function tessera(p){
       '<span class="sep"></span>'+
       (isLock(p)? '<span class="lockchip">'+svg('lock')+'</span>':'')+
       (nuoveN? '<span class="unread">'+svg('bell')+nuoveN+'</span>':'')+
-      (p.prio==='alta' && !p.completato? '<span class="tk-prio" title="Priorità alta">'+svg('bandiera',2.2)+'</span>' : '')+'</span>'+
+      (p.prio==='alta' && !p.completato? '<span class="tk-prio" title="Priorità alta">'+svg('bandiera',2.2)+'</span>' : '')+tastoTogliFatto(p)+'</span>'+
     '<span class="tk-t"><span class="tk-ic">'+(p.completato? svg('check',3) : svg(p.icona||T.ic,2))+'</span>'+
       '<span class="tk-n"><h3>'+esc(p.nome)+'</h3><span>'+(p.completato? 'Completato' : esc(fase ? fase.nome : ''))+'</span></span></span>'+
     (cop? '<span class="tk-cop">'+imgRit(cop, ritDi(p,'bacheca'))+'</span>' : '')+
@@ -5575,7 +5607,7 @@ const PERM_AZIONE = {
   'riapri-progetto':'modifica','menu-sposta':'modifica','lock':'modifica','attiva-lock':'modifica','invia':'modifica',
   'nuova-lista':'modifica','add-lista':'modifica','togli-voce':'modifica',
   'check':'spunta','voce-stato':'spunta','voce-data':'modifica','togli-data-voce':'modifica','check-riga':'spunta','check-mia':'spunta','mie-stato':'spunta','check-lista':'spunta',
-  'elimina-progetto':'elimina','conferma-elimina':'elimina','elimina-task':'elimina','elimina-compito':'elimina',
+  'elimina-progetto':'elimina','conferma-elimina':'elimina','rimuovi-fatti':'elimina','rimuovi-fatti-ok':'elimina','togli-fatto':'elimina','togli-fatto-ok':'elimina','elimina-task':'elimina','elimina-compito':'elimina',
   'elimina-nota':'elimina','elimina-ev':'elimina','elimina-spazio':'elimina','conferma-elimina-spazio':'elimina',
   'add-user':'visibilita','assegna':'visibilita','togli-team':'visibilita',
   'cliente-pagina':'visibilita','cliente-crea':'visibilita','cliente-date':'visibilita','cliente-attiva':'visibilita','cliente-rinnova':'visibilita',
@@ -7061,7 +7093,7 @@ function applicaIndirizzo(){
 
 /* ============ BACHECA NOTE ============ */
 const PASTELLI = ['#FFF2A8','#C9F2D4','#CFE6FF','#FFD9E0','#E6D9FF','#FFE0C2','#D4F3F0','#F2E6C9'];
-const MAX_NOTA = 50;
+const MAX_NOTA = 150;
 
 const NOTA_ESEMPIO = [
   'Chiamare il cliente per confermare la data',
@@ -8536,11 +8568,14 @@ function renderGate(){
       try{ state.regMail = decodeURIComponent(m[1] || ''); }catch(e){ state.regMail = ''; }
       /* nome e ruolo scritti da chi ha invitato: li trova gia' compilati, e li puo' cambiare */
       try{ const q = new URLSearchParams(m[2] || '');
-           state.regNome = (q.get('nome') || '').slice(0, 40); state.regRuolo = (q.get('ruolo') || '').slice(0, 60); }
-      catch(e){ state.regNome = state.regRuolo = ''; }
+           state.regNome = (q.get('nome') || '').slice(0, 40); state.regRuolo = (q.get('ruolo') || '').slice(0, 60);
+           /* codice segreto della mail: l'account nasce gia' confermato */
+           const c = q.get('i') || ''; state.regCodice = /^[0-9a-f]{64}$/i.test(c) ? c : ''; }
+      catch(e){ state.regNome = state.regRuolo = ''; state.regCodice = ''; }
     }
   }
   if(state.gateModo === 'invito'){ state.gateModo = 'registra'; state.regInvito = true; }
+  if(state.gateModo === 'conferma'){ renderGateConferma(); return; }
   const reg = state.gateModo === 'registra';
   el('stage').innerHTML =
   '<div class="gate"><div class="gate-card"><div class="mark"></div>'+
@@ -8558,7 +8593,7 @@ function renderGate(){
       '<div class="field" style="margin-bottom:11px"><label>Il tuo ruolo</label><input id="g_ruolo" list="gRuoli" autocomplete="organization-title" placeholder="Es. Operatore video" maxlength="60" value="'+esc(state.regInvito ? (state.regRuolo||'') : '')+'">'+
         '<datalist id="gRuoli">'+RUOLI_SUGGERITI.map(r=>'<option value="'+esc(r)+'">').join('')+'</datalist></div>'
       : '')+
-    '<div class="field" style="margin-bottom:11px"><label>Email</label><input id="g_mail" type="email" autocomplete="username" placeholder="nome@studio.it" value="'+esc(reg ? (state.regMail||'') : '')+'"></div>'+
+    '<div class="field" style="margin-bottom:11px"><label>Email</label><input id="g_mail" type="email" autocomplete="username" placeholder="nome@studio.it" value="'+esc(reg ? (state.regMail||'') : (state.loginMail||''))+'"></div>'+
     '<div class="field" style="margin-bottom:16px"><label>Password</label><input id="g_pw" type="password" autocomplete="'+(reg?'new-password':'current-password')+'" placeholder="'+(reg?'Almeno 6 caratteri':'')+'"></div>'+
     '<button class="btn primary" data-action="'+(reg?'crea-account':'login')+'" id="gateBtn">'+(reg?'Crea il profilo':'Entra')+'</button>'+
     '<div class="switch">'+(reg
@@ -8570,7 +8605,23 @@ function renderGate(){
   el('phasebar').innerHTML = '<span class="chip">FOSS \u00b7 '+(reg?'registrazione':'accesso')+'</span>'+
     '<div class="spacer" style="flex:1"></div>'+
     '<span class="chip">'+(sb?'connesso al database':'modalit\u00e0 locale')+'</span>';
-  setTimeout(()=>{ const n = el(reg?'g_nome':'g_mail'); if(n) n.focus(); }, 60);
+  setTimeout(()=>{ const n = el(reg?'g_nome':(state.loginMail?'g_pw':'g_mail')); if(n) n.focus(); }, 60);
+}
+/* registrazione fatta, manca solo il clic nella mail di conferma */
+function renderGateConferma(){
+  const m = state.confMail || '';
+  el('stage').innerHTML =
+  '<div class="gate"><div class="gate-card"><div class="mark"></div>'+
+    '<h1>Controlla la posta</h1>'+
+    '<p>Ti ho mandato una mail a <b>'+esc(m)+'</b>. Apri il link che c’è dentro per confermare l’email, poi torna qui e accedi con la password che hai scelto.</p>'+
+    '<div class="gate-invito">Non la trovi? Guarda nello spam o nelle promozioni. Arriva da Supabase, a nome di FOSS.</div>'+
+    '<button class="btn primary" data-action="modo-login" id="gateBtn">Ho confermato: accedi</button>'+
+    '<div class="switch">Non è arrivata? <button data-action="rimanda-conferma" id="gateRimanda">Rimandala</button>'+
+      '<div style="margin-top:7px">Email sbagliata? <button data-action="modo-registra">Registrati di nuovo</button></div></div>'+
+  '</div></div>';
+  el('phasebar').classList.toggle('vuota', suTelefono());
+  el('phasebar').innerHTML = '<span class="chip">FOSS · conferma email</span><div class="spacer" style="flex:1"></div>'+
+    '<span class="chip">'+(sb?'connesso al database':'modalità locale')+'</span>';
 }
 
 function modale(html, classe){
@@ -9345,7 +9396,7 @@ function cartaModelli(){
    Come si fa tutto, capitolo per capitolo: dai primi passi alle cose per chi
    organizza un team. Si cerca per parola (anche senza accenti); in fondo c'e'
    il tasto per segnalare quello che manca o non funziona. */
-const VERSIONE = 'v43';
+const VERSIONE = 'v45';
 const LIVELLI_GUIDA = {base:'Per cominciare', medio:'Tutti i giorni', esperto:'Per chi organizza', aiuto:'Se qualcosa non va'};
 const GUIDA = [
 {id:'primi-passi', liv:'base', ic:'spark', t:'Primi passi', s:'Cos’è FOSS e come ci si muove', v:[
@@ -9403,7 +9454,7 @@ const GUIDA = [
   ['Tessere e lista', 'Una scheda per progetto con fase, avanzamento e consegna. In alto scegli come raggrupparli: per <b>Compiti</b> (da fare, in corso, completati), per <b>Priorità</b> o per <b>Scadenza</b>. Tieni premuta una tessera e trascinala per cambiare l’ordine.'],
   ['Calendario', 'Il mese con riprese, consegne e le altre date dei lavori; le frecce cambiano mese. Tasto destro su una data per spostarla a domani o di una settimana, o per rinominarla.'],
   ['Mappa', 'I lavori che hanno un indirizzo, sulla mappa. L’indirizzo si mette nella scheda del lavoro.'],
-  ['La bacheca delle note', 'Post-it dello spazio, al massimo 50 caratteri l’uno: <b>Nuova nota</b>, oppure doppio tocco sulla bacheca. Si trascinano col dito o col mouse; dal menu ne cambi il colore o la elimini.'],
+  ['La bacheca delle note', 'Post-it dello spazio, al massimo 150 caratteri l’uno: <b>Nuova nota</b>, oppure doppio tocco sulla bacheca. Si trascinano col dito o col mouse; dal menu ne cambi il colore o la elimini.'],
   ['Filtri e ordine', 'Nella barra in basso: <b>Tutti</b> e i tuoi filtri salvati. <b>Nuovo filtro</b> li crea per tipo di progetto, tag e priorità. Accanto, <b>Ordina</b> per priorità, scadenza, cliente, fase o nel tuo ordine.'],
   ['Cercare', 'Sul computer usa il campo <b>Cerca</b> in alto: filtra i progetti dello spazio mentre scrivi. Sul telefono la sezione <b>Cerca</b> trova progetti, task, subtask e voci delle checklist in tutti gli spazi. Se non vedi più niente, controlla di non aver lasciato una parola nella ricerca.']
 ]},
@@ -10961,6 +11012,40 @@ document.addEventListener('click', function(e){
         '<button class="btn" style="background:var(--alert);border-color:var(--alert);color:#fff" data-action="conferma-elimina" data-pid="'+p.id+'">Elimina</button></div>');
       break;
 
+    /* un lavoro completato e' chiuso alle modifiche, ma si puo' togliere */
+    case 'togli-fatto':{
+      if(!puoTogliereFatto(p)) break;
+      modale('<h3>Rimuovere questo lavoro?</h3><div class="sub-t">'+esc(p.nome)+(p.cliente?' \u00b7 '+esc(p.cliente):'')+'</div>'+
+        '<div class="modal-b"><div class="nota-box">\u00c8 completato: sparisce con task, commenti, chat, file ed eventi in calendario, anche per chi ci lavorava con te. Con <b>Ctrl+Z</b> puoi recuperarlo subito dopo.</div></div>'+
+        '<div class="modal-f"><button class="btn ghost" data-action="chiudi-modale">Annulla</button>'+
+        '<button class="btn" style="background:var(--alert);border-color:var(--alert);color:#fff" data-action="togli-fatto-ok" data-pid="'+p.id+'">Rimuovi</button></div>');
+      break; }
+    case 'togli-fatto-ok':{
+      if(!puoTogliereFatto(p)){ chiudiModale(); break; }
+      snap('Rimozione di «'+p.nome+'»');
+      azione('Rimosso il lavoro completato <b>'+esc(p.nome)+'</b>');
+      state.progetti = state.progetti.filter(x=>x.id!==p.id);
+      chiudiModale(); render();
+      toast(p.nome+' rimosso. Ctrl+Z per recuperarlo.','warn','Rimosso'); break; }
+    case 'rimuovi-fatti':{
+      const fatti = progettiDi(state.spazioId).filter(puoTogliereFatto);
+      if(!fatti.length) break;
+      modale('<h3>Rimuovere '+fatti.length+' lavori completati?</h3><div class="sub-t">'+esc((SPZ()||{}).nome||'')+'</div>'+
+        '<div class="modal-b"><div class="nota-box">Spariscono per sempre, con task, commenti, chat, file ed eventi in calendario, anche per chi ci lavorava con te. Con <b>Ctrl+Z</b> puoi recuperarli subito dopo.</div>'+
+        '<ul class="via-lista">'+fatti.slice(0,12).map(x=>'<li>'+esc(x.nome)+(x.cliente?' <span>'+esc(x.cliente)+'</span>':'')+'</li>').join('')+
+        (fatti.length>12? '<li class="altri">e altri '+(fatti.length-12)+'</li>' : '')+'</ul></div>'+
+        '<div class="modal-f"><button class="btn ghost" data-action="chiudi-modale">Annulla</button>'+
+        '<button class="btn" style="background:var(--alert);border-color:var(--alert);color:#fff" data-action="rimuovi-fatti-ok">Rimuovi tutti</button></div>');
+      break; }
+    case 'rimuovi-fatti-ok':{
+      const via = progettiDi(state.spazioId).filter(puoTogliereFatto).map(x=>x.id);
+      if(!via.length){ chiudiModale(); break; }
+      snap('Rimozione di '+via.length+' lavori completati');
+      azione('Rimossi <b>'+via.length+'</b> lavori completati');
+      state.progetti = state.progetti.filter(x=>via.indexOf(x.id)<0);
+      chiudiModale(); render();
+      toast(via.length+' lavori completati rimossi. Ctrl+Z per recuperarli.','warn','Rimossi'); break; }
+
     case 'conferma-elimina':
       snap('Eliminazione di «'+p.nome+'»');
       azione('Eliminato il progetto <b>'+esc(p.nome)+'</b>');
@@ -11760,10 +11845,18 @@ document.addEventListener('click', function(e){
       break; }
 
     case 'togli-accesso':{
-      const u = U(t.dataset.id), r = t.getBoundingClientRect();
-      apriCtx(r.left-120, r.bottom+6, 'Togliere l\u2019accesso?', [
-        {a:'togli-accesso-ok', l:'S\u00ec, <b>'+esc(u.nome)+'</b> non entra pi\u00f9', ic:'x', danger:1, d:D({id:u.id})}
-      ], t);
+      const u = U(t.dataset.id), primo = esc(u.nome.split(' ')[0]);
+      const lavori = state.progetti.filter(pr=>!titolareDiProgetto(pr) && (pr.team||[]).indexOf(u.id)>=0);
+      modale('<h3>Togliere '+esc(u.nome)+' dal team?</h3><div class="sub-t">Prima di confermare, ecco cosa succede.</div>'+
+        '<div class="modal-b"><ul class="togli-cosa">'+
+          '<li class="no"><b>Non vede pi\u00f9 il tuo archivio.</b> Esce '+(lavori.length ? (lavori.length===1 ? 'dall\u2019unico lavoro' : 'dai <b>'+lavori.length+'</b> lavori')+' dove \u00e8 nel team'+(lavori.length<=4 ? ' ('+lavori.map(x=>esc(x.nome)).join(', ')+')' : '') : 'dal team (al momento non \u00e8 in nessun lavoro)')+' e dagli spazi condivisi.</li>'+
+          '<li class="no"><b>Non riceve pi\u00f9 avvisi</b> sui tuoi lavori e sparisce dalle persone che puoi assegnare.</li>'+
+          '<li class="si"><b>Il suo lavoro resta:</b> task, commenti, file e attivit\u00e0 che ha fatto nei tuoi lavori non vengono cancellati.</li>'+
+          '<li class="si"><b>Il suo account resta:</b> '+primo+' pu\u00f2 entrare in FOSS e usare il suo archivio. Niente gli viene notificato.</li>'+
+          '<li class="si"><b>Puoi riaggiungerlo</b> quando vuoi cercando la sua email nel Team, ma dovrai riaprirgli i lavori uno per uno.</li>'+
+        '</ul></div>'+
+        '<div class="modal-f"><button class="btn ghost" data-action="chiudi-modale">Annulla</button>'+
+        '<button class="btn danger" data-action="togli-accesso-ok" data-id="'+esc(u.id)+'">Togli dal team</button></div>');
       break; }
 
     case 'togli-accesso-ok':{
@@ -12001,6 +12094,13 @@ document.addEventListener('click', function(e){
       break; }
 
     case 'modo-login': state.gateModo='login'; state.regInvito=false; state.invitoScelto=null; render(); break;
+    case 'rimanda-conferma':{
+      const b = el('gateRimanda'); if(b){ b.disabled = true; b.textContent = 'La rimando…'; }
+      rimandaConferma(state.confMail||'').then(ok=>{
+        const n = el('gateRimanda'); if(!n) return;
+        n.textContent = ok ? 'Rimandata ✓' : 'Rimandala'; n.disabled = !!ok;
+      });
+      break; }
     case 'modo-invito': state.gateModo='registra'; state.regInvito=true; state.invitoScelto=null; render(); break;
 
     case 'scegli-invito':
@@ -12029,15 +12129,19 @@ document.addEventListener('click', function(e){
       const nuovo = {
         nome:(el('g_nome').value||'').trim(), cognome:(el('g_cognome').value||'').trim(),
         nick:(el('g_nick').value||'').trim(), ruolo:(el('g_ruolo').value||'').trim()||'Collaboratore',
-        email:(el('g_mail').value||'').trim(), pw:el('g_pw').value
+        email:(el('g_mail').value||'').trim(), pw:el('g_pw').value,
+        codice: state.regInvito ? (state.regCodice||'') : ''
       };
+      if(!nuovo.email){ toast('Scrivi la tua email.','warn','Manca l’email'); b.disabled = false; b.textContent = 'Crea il profilo'; break; }
+      if((nuovo.pw||'').length < 6){ toast('La password deve avere almeno 6 caratteri.','warn','Password corta'); b.disabled = false; b.textContent = 'Crea il profilo'; break; }
       (uscita || Promise.resolve()).then(()=>registraCloud(nuovo)).then(ok=>{
-        if(ok){ state.schermo='spazi'; state.regInvito = false;
+        if(ok === true){ state.schermo='spazi'; state.regInvito = false;
                 try{ if(/^#\/registrati/.test(location.hash)) history.replaceState(null, '', location.pathname + location.search); }catch(e){}
                 render();
                 if(!state.spazi.length) apriWizard(true);
                 toast('Benvenuto, '+nomeVisibile().split(' ')[0]+'.','ok','Profilo creato'); }
-        else { state.gateModo='login'; render(); }
+        else if(state.gateModo !== 'registra') render();   // conferma via mail, o accesso se e' gia' iscritto
+        else { const n = el('gateBtn'); if(n){ n.disabled = false; n.textContent = 'Crea il profilo'; } }   // errore: il modulo resta compilato
       });
       break; }
 
@@ -13251,19 +13355,68 @@ try{ if(window.supabase) sb = window.supabase.createClient(SUPA_URL, SUPA_KEY); 
 
 function COL(i){ return ['#FFAD01','#7FC8F8','#9AE6B4','#F6A8C0','#C3B1F0','#FFD79A','#8FD3C4'][i%7]; }
 
+/* i messaggi di Supabase, in italiano e con cosa fare */
+function erroreAccesso(error){
+  const m = String((error && error.message) || '').toLowerCase();
+  if(/not confirmed/.test(m)) return 'conferma';
+  if(/invalid login|invalid credentials/.test(m)) return 'Email o password sbagliate. Controlla e riprova.';
+  if(/already registered|already been registered|already exists/.test(m)) return 'esiste';
+  if(/password.*(at least|characters|short|weak)/.test(m)) return 'La password \u00e8 troppo corta o debole: almeno 6 caratteri.';
+  if(/rate limit|too many|security purposes/.test(m)) return 'Troppi tentativi ravvicinati. Aspetta un minuto e riprova.';
+  if(/invalid.*email|email.*invalid|unable to validate email/.test(m)) return 'Questa email non sembra scritta bene.';
+  if(/fetch|network|failed to/.test(m)) return 'Non riesco a collegarmi. Controlla la connessione e riprova.';
+  return 'Qualcosa non ha funzionato. Riprova tra poco.';
+}
+/* l'email non e' ancora confermata: la schermata lo dice e permette di rimandare la mail */
+function chiediConferma(email){ state.gateModo = 'conferma'; state.confMail = email; state.loginMail = email; }
+function giaIscritto(email){
+  state.gateModo = 'login'; state.loginMail = email; state.regInvito = false;
+  toast('Con questa email c\u2019\u00e8 gi\u00e0 un account: inserisci la password e accedi.','warn','Hai gi\u00e0 un account');
+}
 async function entraCloud(email, pw){
+  state.loginMail = email;      // se qualcosa va storto, l'email resta scritta
   const {data, error} = await sb.auth.signInWithPassword({email, password:pw});
-  if(error){ toast(error.message,'warn','Accesso non riuscito'); return false; }
+  if(error){
+    const e = erroreAccesso(error);
+    if(e === 'conferma') chiediConferma(email);
+    else toast(e === 'esiste' ? 'Email o password sbagliate.' : e,'warn','Accesso non riuscito');
+    return false;
+  }
   utenteCloud = data.user; await caricaCloud(); return true;
 }
 async function registraCloud(dati){
+  /* dal link dell'invito: l'account nasce gia' confermato, si entra subito */
+  if(dati.codice){
+    const {data, error} = await sb.functions.invoke('registra-invitato', {body:{codice:dati.codice, email:dati.email, password:dati.pw,
+      nome:dati.nome, cognome:dati.cognome, nickname:dati.nick, ruolo:dati.ruolo}});
+    let err = data && data.errore;
+    if(error){ err = error.message || 'rete';
+      try{ if(error.context && typeof error.context.json === 'function'){ const j = await error.context.json(); if(j && j.errore) err = j.errore; } }catch(x){} }
+    if(!err) return entraCloud(dati.email, dati.pw);
+    if(err === 'esiste'){ giaIscritto(dati.email); return false; }
+    if(err === 'password'){ toast('La password \u00e8 troppo corta o debole: almeno 6 caratteri.','warn','Registrazione non riuscita'); return 'resta'; }
+    /* codice scaduto o gia' usato, o email diversa: registrazione normale con la mail di conferma */
+  }
   const {data, error} = await sb.auth.signUp({
     email:dati.email, password:dati.pw,
-    options:{ data:{nome:dati.nome, cognome:dati.cognome, nickname:dati.nick, ruolo:dati.ruolo} }
+    options:{ emailRedirectTo: location.origin + location.pathname,
+              data:{nome:dati.nome, cognome:dati.cognome, nickname:dati.nick, ruolo:dati.ruolo} }
   });
-  if(error){ toast(error.message,'warn','Registrazione non riuscita'); return false; }
-  if(!data.session){ toast('Ti ho mandato una mail: confermala e poi accedi con la password che hai scelto.','warn','Controlla la posta'); return false; }
+  if(error){
+    const e = erroreAccesso(error);
+    if(e === 'esiste'){ giaIscritto(dati.email); return false; }
+    if(e === 'conferma'){ chiediConferma(dati.email); return 'resta'; }
+    toast(e,'warn','Registrazione non riuscita'); return 'resta';
+  }
+  /* Supabase non dice se l'email esiste gia': in quel caso torna un utente senza identita' */
+  if(data.user && Array.isArray(data.user.identities) && !data.user.identities.length){ giaIscritto(dati.email); return false; }
+  if(!data.session){ chiediConferma(dati.email); return 'resta'; }
   utenteCloud = data.user; await caricaCloud(); return true;
+}
+async function rimandaConferma(email){
+  const {error} = await sb.auth.resend({type:'signup', email, options:{emailRedirectTo: location.origin + location.pathname}});
+  if(error){ const e = erroreAccesso(error); toast(e === 'conferma' || e === 'esiste' ? 'Non riesco a rimandarla adesso. Riprova tra poco.' : e,'warn','Mail non rimandata'); return false; }
+  return true;
 }
 
 /* ---------- identita' e mappe ---------- */
@@ -13505,7 +13658,10 @@ async function caricaCloud(){
     permessiContesto = () => {
       const o = orgQui();
       if(!o || titolareDi[o]) return null;
-      return Object.assign({}, permessiOrg[o] || {}, {visibilita:false});
+      /* gli spazi di un altro archivio non li salvo (sincronizza li salta): niente tasti che non funzionerebbero */
+      const pm = Object.assign({}, permessiOrg[o] || {}, {visibilita:false});
+      if(o !== orgMia) pm.spazi = false;
+      return pm;
     };
     const altrui = o => (o && o !== orgMia && !titolareDi[o] && capoOrg[o]) ? capoOrg[o] : null;
     titolareDiSpazio = sp => altrui(sp && orgSpazio[sp.id]);
