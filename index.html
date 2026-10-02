@@ -3049,6 +3049,11 @@ body.sto-spostando .hm-spazi.griglia{scroll-snap-type:none}
 .iv-esito{align-items:center;line-height:1.45}
 .chip.iv-ko{background:color-mix(in srgb,var(--alert) 16%,transparent);color:var(--alert);border-color:transparent}
 @media (max-width:1100px){ .iv-box{grid-template-columns:1fr} .iv-prev{display:none} .iv-solo-tel{display:inline-flex} }
+/* di chi e' */
+em.capo{font-style:normal;font-weight:700;color:var(--amber-ink)}
+.chip.condiviso{display:inline-flex;align-items:center;gap:5px;margin-left:8px;vertical-align:1px;background:color-mix(in srgb,#5B8DEF 16%,transparent);color:#7FA6F5;border-color:transparent}
+.chip.condiviso svg{width:12px;height:12px}
+.hm-spc .ds b.di{color:#7FA6F5;font-weight:700}
 /* ---------- LE MIE TASK (v38) ---------- */
 .mt.hm-main.scroller{padding:24px 28px 40px}
 .mt-head h1{font-size:30px;font-weight:700;letter-spacing:-.025em;margin:0}
@@ -4398,7 +4403,7 @@ function taggabili(){
   const p = state.progettoId ? PROJ() : null;
   /* il guest assegna solo a chi il lavoro lo vede gia': aprirlo ad altri
      lo decide l'amministratore */
-  if(!sonoAdmin && p) return p.team.filter(id=>state.utenti.some(u=>u.id===id)).map(id=>U(id));
+  if(!adminQui(p) && p) return p.team.filter(id=>state.utenti.some(u=>u.id===id)).map(id=>U(id));
   const sp = SPZ();
   const primi = [].concat(p? p.team : [], (sp && sp.membri) || []);
   const visti = [];
@@ -4762,8 +4767,8 @@ function numeriSpazio(ps){
   return {voci, fatte, task, taskFatte, urg, pct: voci ? Math.round(fatte/voci*100) : 0};
 }
 function membriSpazio(sp){
-  const ps = progettiDi(sp.id);
-  return [...new Set((sp.membri||[]).concat(ps.flatMap(p=>p.team||[])))].filter(id=>state.utenti.some(u=>u.id===id));
+  const ps = progettiDi(sp.id), capo = titolareDiSpazio(sp) || state.utente;
+  return [...new Set([capo].concat(sp.membri||[], ps.flatMap(p=>p.team||[])))].filter(id=>state.utenti.some(u=>u.id===id));
 }
 function testataSpazioLarga(sp, lista){
   const ps = progettiDi(sp.id), n = numeriSpazio(ps), membri = membriSpazio(sp);
@@ -4773,7 +4778,7 @@ function testataSpazioLarga(sp, lista){
     '<span class="ic">'+svg(sp.icona,2)+'</span>'+
     '<div class="sp2-t">'+
       '<h1>'+esc(sp.nome)+'</h1>'+
-      '<div class="desc">'+esc(sp.desc || TIPO(sp.tipo).prof || '')+'</div>'+
+      '<div class="desc">'+esc(sp.desc || TIPO(sp.tipo).prof || '')+(titolareDiSpazio(sp) ? ' <span class="chip condiviso">'+svg('users',2.2)+'Spazio di '+esc(U(titolareDiSpazio(sp)).nome)+'</span>' : '')+'</div>'+
       '<div class="sp2-meta">'+
         '<span>'+svg('users',2)+membri.length+(membri.length===1?' membro':' membri')+'</span>'+
         '<span>'+svg('grid',2)+ps.filter(p=>!p.completato).length+(state.filtroAttivo?' filtrati':' progetti')+'</span>'+
@@ -4838,8 +4843,8 @@ function schedaSpazio(sp){
       '<span class="verde"><b>'+n.taskFatte+'</b>Completate</span><span class="'+(n.urg?'rosso':'')+'"><b>'+n.urg+'</b>In scadenza</span>'+
     '</div></section>';
   h += '<section class="sp2-card"><div class="sp2-ch"><h3>Membri del team</h3>'+(puoCop? '<button class="lnk" data-action="modifica-spazio" data-id="'+esc(sp.id)+'">Gestisci</button>' : '')+'</div>'+
-    (membri.length ? membri.slice(0,6).map(id=>{ const u = U(id);
-      return '<div class="sp2-m">'+av(u)+'<span class="tx"><b>'+esc(u.nome)+(id===sp.creatore? ' '+svg('spark',2.2) : '')+'</b><span>'+esc(u.ruolo||'Collaboratore')+'</span></span>'+
+    (membri.length ? membri.slice(0,6).map(id=>{ const u = U(id), capo = id === (titolareDiSpazio(sp) || state.utente);
+      return '<div class="sp2-m">'+av(u)+'<span class="tx"><b>'+esc(id===state.utente ? u.nome+' (tu)' : u.nome)+'</b><span>'+(capo ? '<em class="capo">Proprietario</em> · ' : '')+esc(u.ruolo||'Collaboratore')+'</span></span>'+
         '<i class="pt" title="'+(ps.some(p=>!p.completato && (p.team||[]).indexOf(id)>=0)? 'Ha lavori aperti qui' : 'Nessun lavoro aperto qui')+'"'+
         (ps.some(p=>!p.completato && (p.team||[]).indexOf(id)>=0)? ' data-on="1"' : '')+'></i></div>'; }).join('')+
       (membri.length>6 ? '<div class="sp2-piu">e altri '+(membri.length-6)+'</div>' : '')
@@ -5164,8 +5169,11 @@ function renderProgetto(){
         '<span class="nm">'+esc(a.nome)+'</span><span class="sz">'+fmtSize(a.size)+'</span></div>').join('')+
       '</div>';
   }
-  h += '<div class="rail-sec"><div class="lbl">Chi lo vede · '+p.team.length+'</div>'+
-    p.team.map(id=>{ const u=U(id); return '<div class="team-row">'+av(u,'sm')+'<div style="min-width:0"><div class="nm">'+esc(u.nome)+'</div><div class="rl">'+esc(u.ruolo)+'</div></div></div>'; }).join('')+
+  const capoP = titolareDiProgetto(p) || adminId() || state.utente;
+  const vedono = [...new Set([capoP].concat(p.team||[]))];
+  h += '<div class="rail-sec"><div class="lbl">Chi lo vede · '+vedono.length+'</div>'+
+    vedono.map(id=>{ const u=U(id); return '<div class="team-row">'+av(u,'sm')+'<div style="min-width:0"><div class="nm">'+esc(id===state.utente ? u.nome+' (tu)' : u.nome)+'</div><div class="rl">'+
+      (id===capoP ? '<em class="capo">Proprietario</em> · ' : '')+esc(u.ruolo||'')+'</div></div></div>'; }).join('')+
     (puo('visibilita')? '<button class="btn sm ghost" style="margin-top:8px;width:100%;justify-content:center" data-action="add-user">'+svg('users')+'Decidi chi lo vede</button>' : '')+'</div>';
   h += soldiHTML(p) + dateHTML(p);
   if(puo('crea_lavori') && !state.ospite) h += '<div class="rail-sec"><button class="btn sm ghost" style="width:100%;justify-content:center" data-action="salva-modello-apri" data-pid="'+p.id+'">'+
@@ -5535,8 +5543,15 @@ const PERMESSI = [
   {k:'visibilita',  l:'Decidere chi vede un lavoro',d:'Aprire o chiudere i suoi lavori ad altre persone'},
   {k:'spazi',       l:'Gestire gli spazi',          d:'Creare e rinominare spazi, scrivere nella bacheca'}
 ];
+/* i permessi che valgono qui: null = posso tutto (e' il mio archivio). Nel cloud
+   cloud.js la ridefinisce guardando di chi e' il lavoro o lo spazio aperto. */
+let permessiContesto = () => sonoAdmin ? null : mieiPermessi;
+/* di chi e' uno spazio o un lavoro: l'id del titolare se e' di un altro archivio */
+let titolareDiSpazio = () => null;
+let titolareDiProgetto = () => null;
 function puo(k){
-  if(sonoAdmin) return true;
+  const mieiPermessi = permessiContesto();
+  if(!mieiPermessi) return true;
   /* i soldi sono l'eccezione: di base un guest non li vede */
   if(k==='soldi') return mieiPermessi.soldi === true;
   if(k==='soldi-scrive') return mieiPermessi.soldi === true && !mieiPermessi.sola_lettura;
@@ -5569,8 +5584,9 @@ const PERM_AZIONE = {
 };
 /* torna false se si puo', altrimenti il motivo */
 function negato(a){
-  if(sonoAdmin || !a) return false;
-  if(SOLO_ADMIN.indexOf(a)>=0) return 'admin';
+  if(!a) return false;
+  if(SOLO_ADMIN.indexOf(a)>=0) return sonoAdmin ? false : 'admin';
+  if(!permessiContesto()) return false;
   let k = PERM_AZIONE[a];
   if(a==='nuovo-da-tel') k = (state.schermo==='spazi' || !state.spazioId)? 'spazi' : 'crea_lavori';
   if((a==='elimina-spazio' || a==='conferma-elimina-spazio') && !puo('spazi')) return 'spazi';
@@ -5578,9 +5594,14 @@ function negato(a){
 }
 /* chi e' l'amministratore dell'archivio (in locale sono io) */
 function adminId(){ return state.adminId || (sonoAdmin? state.utente : null); }
+/* comando io su questo lavoro? (e' del mio archivio e ne sono il titolare) */
+function adminQui(p){ return sonoAdmin && !(p && titolareDiProgetto(p)); }
 function permessiDi(uid){ return (state.permessi && state.permessi[uid]) || {}; }
 /* le persone vere che posso rendere partecipi di un lavoro (non me) */
-function personeOrg(){ return state.utenti.filter(u=>u.id!==state.utente && !u.senzaAccount); }
+function personeOrg(){
+  const mb = state.permessi && Object.keys(state.permessi).length ? state.permessi : null;
+  return state.utenti.filter(u=>u.id!==state.utente && !u.senzaAccount && (!mb || mb[u.id] !== undefined));
+}
 /* Nel cloud e' il database a decidere cosa mi arriva: qui resta solo la
    domanda "questo spazio e' mio?", per non mostrare scatole vuote altrui. */
 let spazioMio = () => true;
@@ -6179,9 +6200,10 @@ function renderSpazi(){
       (s.items||[]).forEach(i=>{ tot++; if(i.done) fatte++; }); }));
     const pct = tot ? Math.round(fatte/tot*100) : 0;
     const col = coloreOk(sp.col, '#FFAD01'), bg = sfondoSicuro(sp.sfondo);
-    const team = [...new Set(ps.flatMap(p=>p.team||[]).concat(sp.membri||[]))];
+    const team = membriSpazio(sp);
     const prof = TIPO(sp.tipo).prof;
-    const ds = sp.desc ? esc(sp.desc)+(prof && sp.desc.toLowerCase()!==String(prof).toLowerCase() ? ' <i>•</i> '+esc(prof) : '') : esc(prof||'');
+    const ds = (titolareDiSpazio(sp) ? '<b class="di">di '+esc(U(titolareDiSpazio(sp)).nome)+'</b> <i>•</i> ' : '')+
+      (sp.desc ? esc(sp.desc)+(prof && sp.desc.toLowerCase()!==String(prof).toLowerCase() ? ' <i>•</i> '+esc(prof) : '') : esc(prof||''));
     h += '<button class="hm-spc spazio'+(tantiSp && ix >= 6 ? ' oltre' : '')+'" style="--acc:'+col+'" data-action="apri-spazio" data-id="'+esc(sp.id)+'">'+
       '<span class="cop'+(bg?' con-foto':'')+'">'+(bg? imgRit(bg, ritDi(sp,'home')) : '<span class="cop-ic">'+svg(sp.icona,1.4)+'</span>')+
         (puoCop ? '<span class="cop-b'+(bg?'':' vuota')+'" role="button" tabindex="0" data-action="hm-copertina" data-id="'+esc(sp.id)+'" title="'+(bg?'Cambia la copertina':'Aggiungi una copertina')+'">'+
@@ -9323,7 +9345,7 @@ function cartaModelli(){
    Come si fa tutto, capitolo per capitolo: dai primi passi alle cose per chi
    organizza un team. Si cerca per parola (anche senza accenti); in fondo c'e'
    il tasto per segnalare quello che manca o non funziona. */
-const VERSIONE = 'v42';
+const VERSIONE = 'v43';
 const LIVELLI_GUIDA = {base:'Per cominciare', medio:'Tutti i giorni', esperto:'Per chi organizza', aiuto:'Se qualcosa non va'};
 const GUIDA = [
 {id:'primi-passi', liv:'base', ic:'spark', t:'Primi passi', s:'Cos’è FOSS e come ci si muove', v:[
@@ -10060,7 +10082,7 @@ async function apriFileCommento(b){
 function togliCommento(mid){
   const x = thrCorrente(); if(!x || !mid) return;
   const m = x.lista.find(y=>y.id === mid); if(!m) return;
-  if(m.u !== state.utente && !sonoAdmin) return;
+  if(m.u !== state.utente && !adminQui(x.p)) return;
   Object.keys(x.p.commenti).forEach(f=>{ x.p.commenti[f] = x.p.commenti[f].filter(y=>y !== m); });
   if(m.file && m.file.path && typeof togliAllegato === 'function') togliAllegato(m.file.path, x.p.id);
   disegnaCommenti(false);
@@ -10504,7 +10526,7 @@ function apriEdit(ctx){
 
   let campoHtml;
   if(tipo==='utente'){
-    const scelti = (!sonoAdmin && p)? state.utenti.filter(u=>p.team.includes(u.id)) : state.utenti;
+    const scelti = (!adminQui(p) && p)? state.utenti.filter(u=>p.team.includes(u.id)) : personeOrg().concat([U(state.utente)]);
     campoHtml = '<select id="ed_val">'+scelti.map(u=>'<option value="'+u.id+'"'+(u.id===valore?' selected':'')+'>'+
       esc(u.nome)+' — '+esc(u.ruolo)+'</option>').join('')+'</select>';
   } else if(tipo==='opt'){
@@ -12299,7 +12321,7 @@ function apriCtx(x, y, titolo, voci, bersaglio){
     if(!gia) voci = [v, {sep:1}].concat(voci);
   }
   ctxModifica = null;
-  if(!sonoAdmin){
+  if(permessiContesto()){
     voci = voci.filter(v => !v || !v.a || !negato(v.a));
     /* niente separatori doppi o in cima/fondo dopo il filtro */
     voci = voci.filter((v,i,arr) => !(v && v.sep) || (i>0 && i<arr.length-1 && !(arr[i-1]&&arr[i-1].sep)));
@@ -12374,7 +12396,7 @@ document.addEventListener('contextmenu', function(e){
   const cmm = e.target.closest('.cm-msg');
   if(cmm){
     const x = thrCorrente(), m = x && x.lista.find(y=>y.id===cmm.dataset.mid);
-    if(m && (m.u===state.utente || sonoAdmin) && puoCommentare(x.p))
+    if(m && (m.u===state.utente || adminQui(x.p)) && puoCommentare(x.p))
       apriCtx(e.clientX, e.clientY, 'Commento', [{a:'cm-elimina', l:'Elimina il commento', ic:'x', danger:1, d:D({mid:m.id})}], cmm);
     return;
   }
@@ -13246,6 +13268,8 @@ async function registraCloud(dati){
 
 /* ---------- identita' e mappe ---------- */
 let orgMia = null;
+/* gli archivi di cui faccio parte: il mio (titolare) e quelli dove mi hanno invitato */
+let mieOrg = new Set(), titolareDi = {}, permessiOrg = {}, capoOrg = {};
 const orgSpazio = {}, orgProg = {};
 let ombraSp = {};
 
@@ -13446,8 +13470,14 @@ async function caricaCloud(){
     }
 
     /* le organizzazioni di cui faccio parte: la mia e' quella dove sono titolare */
-    const {data:mie, error:errOrg} = await sb.from('membri_org').select('org_id,ruolo').eq('utente_id', utenteCloud.id);
+    const {data:mie, error:errOrg} = await sb.from('membri_org').select('org_id,ruolo,permessi').eq('utente_id', utenteCloud.id);
     if(errOrg) throw errOrg;
+    mieOrg = new Set((mie||[]).map(m=>m.org_id)); titolareDi = {}; permessiOrg = {}; capoOrg = {};
+    (mie||[]).forEach(m=>{ titolareDi[m.org_id] = m.ruolo==='titolare'; permessiOrg[m.org_id] = m.permessi || {}; });
+    if(mieOrg.size){
+      const {data:os} = await sb.from('organizzazioni').select('id,titolare').in('id', Array.from(mieOrg));
+      (os||[]).forEach(o=>{ capoOrg[o.id] = o.titolare; });
+    }
     const titolare = (mie||[]).find(m=>m.ruolo==='titolare');
     orgMia = titolare ? titolare.org_id : ((mie||[])[0]||{}).org_id || null;
     /* amministratore e' chi e' titolare dell'archivio; tutti gli altri sono guest */
@@ -13462,6 +13492,24 @@ async function caricaCloud(){
     /* il guest vede gli spazi dove ha lavori e quelli che ha creato lui */
     spazioMio = sp => sonoAdmin ? (orgSpazio[sp.id] || orgMia) === orgMia : sp.creatore === utenteCloud.id;
     mioProgetto = p => (orgProg[p.id] || orgMia) === orgMia;
+    /* dentro il lavoro (o lo spazio) di un altro valgono i permessi che mi ha dato lui;
+       chi lo vede lo decide sempre e solo il suo titolare */
+    const orgQui = () => {
+      if(state.schermo==='progetto' && state.progettoId){
+        const p = state.progetti.find(x=>x.id===state.progettoId);
+        return orgProg[state.progettoId] || (p && orgSpazio[p.spazio]) || orgMia;
+      }
+      if(state.schermo==='home' && state.spazioId) return orgSpazio[state.spazioId] || orgMia;
+      return orgMia;
+    };
+    permessiContesto = () => {
+      const o = orgQui();
+      if(!o || titolareDi[o]) return null;
+      return Object.assign({}, permessiOrg[o] || {}, {visibilita:false});
+    };
+    const altrui = o => (o && o !== orgMia && !titolareDi[o] && capoOrg[o]) ? capoOrg[o] : null;
+    titolareDiSpazio = sp => altrui(sp && orgSpazio[sp.id]);
+    titolareDiProgetto = p => altrui(p && (orgProg[p.id] || orgSpazio[p.spazio]));
 
     /* le persone: solo quelle che condividono un'organizzazione con me */
     const {data:tutti} = await sb.from('profili').select('*');
@@ -13513,7 +13561,7 @@ async function caricaCloud(){
 
     /* soldi: arrivano solo a chi li puo' vedere */
     state.conti = {};
-    if(puo('soldi')){
+    {
       const {data:cs} = await sb.from('conti').select('progetto_id,dati');
       (cs||[]).forEach(c=>{ state.conti[c.progetto_id] = c.dati || {}; ombraConti[c.progetto_id] = canon(c.dati||{}); });
     }
@@ -13664,7 +13712,7 @@ async function sincronizza(){
     for(let i=0;i<state.spazi.length;i++){
       const sp = state.spazi[i];
       const org = orgSpazio[sp.id] || orgMia;
-      if(org !== orgMia || !puo('spazi')) continue;      // senza permesso gli spazi non li scrivo
+      if(org !== orgMia) continue;      // senza permesso gli spazi non li scrivo
       const d = datiSpazio(sp), j = JSON.stringify(d)+'|'+i;
       if(j === ombraSp[sp.id]) continue;
       const {error} = await sb.from('spazi').upsert({org_id:org, id:sp.id, dati:d, ordine:i}, {onConflict:'org_id,id'});
@@ -13800,7 +13848,11 @@ async function caricaLavoro(pid, org){
   if(caricoInCorso[pid]) return;
   caricoInCorso[pid] = true;
   try{
-    const {data:r} = await sb.from('progetti').select('org_id,id,spazio_id,dati').eq('org_id', org||orgMia).eq('id', pid).maybeSingle();
+    /* il lavoro puo' essere di un altro archivio (mi hanno aggiunto al suo team): cerco per id */
+    let q = sb.from('progetti').select('org_id,id,spazio_id,dati').eq('id', pid);
+    if(org) q = q.eq('org_id', org);
+    const {data:rr} = await q.limit(1);
+    const r = (rr||[])[0];
     if(!r || !r.dati || String(r.dati._formato)!=='2') return;
     const righe = await tutteLeRighe(()=>sb.from('elementi').select(COLONNE_EL)
       .eq('org_id', r.org_id).eq('progetto_id', pid).order('id'));
@@ -13813,7 +13865,7 @@ async function caricaLavoro(pid, org){
     } else {
       const p = lavoroDaRighe(r, righe, null, {visti:{}});
       state.progetti.push(p);
-      if(puo('soldi')){
+      {
         const {data:c} = await sb.from('conti').select('dati').eq('org_id', r.org_id).eq('progetto_id', pid).maybeSingle();
         if(c){ state.conti[pid] = c.dati||{}; ombraConti[pid] = canon(c.dati||{}); }
       }
@@ -13845,34 +13897,33 @@ function svuotaCoda(){
     const ev = m.eventType;
     if(tab==='el'){
       if(ev==='DELETE'){
-        if(vecchio.org_id && vecchio.org_id !== orgMia) return;
+        if(vecchio.org_id && !mieOrg.has(vecchio.org_id)) return;
         const x = perLavoro(vecchio.progetto_id); x.via.add(vecchio.id); x.su.delete(vecchio.id);
-      } else if(nuovo.org_id === orgMia){
+      } else if(mieOrg.has(nuovo.org_id)){
         const x = perLavoro(nuovo.progetto_id); x.su.set(nuovo.id, nuovo); x.via.delete(nuovo.id);
       }
     } else if(tab==='pr'){
       if(ev==='DELETE'){
-        if(vecchio.org_id && vecchio.org_id !== orgMia) return;
+        if(vecchio.org_id && !mieOrg.has(vecchio.org_id)) return;
         if(togliLavoroLocale(vecchio.id)) tocca = true;
-      } else if(nuovo.org_id === orgMia && nuovo.dati && String(nuovo.dati._formato)==='2'){
+      } else if(mieOrg.has(nuovo.org_id) && nuovo.dati && String(nuovo.dati._formato)==='2'){
         const p = state.progetti.find(x=>x.id===nuovo.id);
         if(p){ if(applicaNucleo(p, nuovo.dati, nuovo.spazio_id)){ normalizzaLavoro(p); tocca = true; } }
         else daCaricare.add(nuovo.id);
       }
     } else if(tab==='mb'){
       const r = ev==='DELETE' ? vecchio : nuovo;
-      if(r.utente_id !== state.utente || sonoAdmin) return;
-      if(r.org_id && r.org_id !== orgMia) return;
+      if(r.utente_id !== state.utente || titolareDi[r.org_id]) return;
+      if(r.org_id && !mieOrg.has(r.org_id)) return;
       if(ev==='DELETE'){ if(togliLavoroLocale(r.progetto_id, 'L\u2019amministratore ti ha chiuso questo lavoro.')) tocca = true; }
       else if(!state.progetti.some(x=>x.id===r.progetto_id)) daCaricare.add(r.progetto_id);
     } else if(tab==='co'){
-      if(!puo('soldi')) return;
       if(ev==='DELETE'){
-        if(vecchio.org_id && vecchio.org_id !== orgMia) return;
+        if(vecchio.org_id && !mieOrg.has(vecchio.org_id)) return;
         if(state.conti[vecchio.progetto_id] && canon(state.conti[vecchio.progetto_id]) === ombraConti[vecchio.progetto_id]){
           delete state.conti[vecchio.progetto_id]; delete ombraConti[vecchio.progetto_id]; tocca = true;
         }
-      } else if(nuovo.org_id === orgMia){
+      } else if(mieOrg.has(nuovo.org_id)){
         const pid = nuovo.progetto_id, c = canon(nuovo.dati||{});
         if(ombraConti[pid] === c) return;
         const loc = state.conti[pid] ? canon(state.conti[pid]) : undefined;
@@ -13883,11 +13934,12 @@ function svuotaCoda(){
       if(nuovo.utente_id === utenteCloud.id) arrivaNotifica(nuovo, ev==='INSERT');
     } else if(tab==='sp'){
       if(ev==='DELETE'){
-        if(vecchio.org_id && vecchio.org_id !== orgMia) return;
+        if(vecchio.org_id && !mieOrg.has(vecchio.org_id)) return;
         const i = state.spazi.findIndex(x=>x.id===vecchio.id);
         if(i>=0 && state.spazi.length>1){ state.spazi.splice(i,1); delete ombraSp[vecchio.id];
           if(state.spazioId===vecchio.id) state.spazioId = state.spazi[0].id; tocca = true; }
-      } else if(nuovo.org_id === orgMia){
+      } else if(mieOrg.has(nuovo.org_id)){
+        orgSpazio[nuovo.id] = nuovo.org_id;
         const i = state.spazi.findIndex(x=>x.id===nuovo.id);
         const j = JSON.stringify(nuovo.dati)+'|'+nuovo.ordine;
         if(ombraSp[nuovo.id] === j) return;
@@ -13948,7 +14000,8 @@ async function ascoltaCloud(){
     if(data && data.session && sb.realtime && sb.realtime.setAuth) sb.realtime.setAuth(data.session.access_token);
   }catch(e){}
   if(canale){ try{ await sb.removeChannel(canale); }catch(e){} canale = null; }
-  const filtro = 'org_id=eq.' + orgMia;
+  const tutte = Array.from(mieOrg.size ? mieOrg : new Set([orgMia]));
+  const filtro = tutte.length === 1 ? 'org_id=eq.' + tutte[0] : 'org_id=in.(' + tutte.join(',') + ')';
   const pc = (ev, tabella, f, tab) => ['postgres_changes', f ? {event:ev, schema:'public', table:tabella, filter:f}
                                                              : {event:ev, schema:'public', table:tabella}, m=>inCoda(tab, m)];
   const ascolti = [
@@ -14004,7 +14057,7 @@ async function aggiornaDaCloud(){
     state.progetti.slice().forEach(p=>{
       if(!remoti.has(p.id) && ombraNucleo[p.id]){ if(togliLavoroLocale(p.id)) tocca = true; }
     });
-    if(puo('soldi')){
+    {
       const {data:cs} = await sb.from('conti').select('progetto_id,dati');
       (cs||[]).forEach(c=>{
         const cc = canon(c.dati||{});
