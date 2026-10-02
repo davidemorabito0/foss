@@ -2605,6 +2605,8 @@ img.rit{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;displa
 .tm-invito h3{font-size:17px;font-weight:700}
 .tm-invito > p{margin:4px 0 14px;font-size:13px;color:var(--hm-2);line-height:1.5}
 .tm-form{display:grid;grid-template-columns:1.4fr 1fr 1fr;gap:12px}
+.tm-form .tm-msg{grid-column:1 / -1}
+.tm-form textarea{width:100%;resize:vertical;font:inherit;font-size:13.5px;padding:10px 12px;border-radius:10px;border:1px solid var(--line);background:var(--surface-2);color:var(--text);outline:none}
 .tm-invito .tm-az{display:flex;gap:8px;flex-wrap:wrap;margin-top:12px}
 .tm-invito.pronto{display:flex;gap:14px;align-items:flex-start;border-color:color-mix(in srgb,var(--t-verde) 50%,var(--line));background:color-mix(in srgb,var(--t-verde) 8%,var(--surface))}
 .tm-invito.pronto .tx{flex:1;min-width:0;display:flex;flex-direction:column;gap:3px}
@@ -2980,6 +2982,73 @@ body.sto-spostando .hm-spazi.griglia{scroll-snap-type:none}
   .mov-add{grid-template-columns:1fr 1fr}
   .mov-add input[id$="_n"]{grid-column:1 / 2}
 }
+
+/* riquadro della guida con la X */
+.hm-guida{position:relative}
+.hm-guida-x{position:absolute;top:10px;right:10px;width:26px;height:26px;border-radius:8px;display:grid;place-items:center;color:var(--mute)}
+.hm-guida-x:hover{background:var(--surface-2);color:var(--text)}
+.hm-guida-x svg{width:14px;height:14px}
+/* home: sei spazi, poi «Mostra altro» */
+@media (min-width:761px){
+  .hm-spazi.griglia{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));overflow:visible;scroll-snap-type:none}
+  .hm-spazi.griglia > .hm-spc{flex:none;min-width:0}
+  .hm-spazi.griglia > .hm-spc.oltre{display:none}
+  .hm-spazi-w .hm-freccia{display:none}
+}
+@media (min-width:761px) and (max-width:1100px){ .hm-spazi.griglia{grid-template-columns:repeat(2,minmax(0,1fr))} }
+.hm-altro{display:flex;align-items:center;gap:6px;margin:14px auto 0;padding:9px 18px;border-radius:11px;border:1px solid var(--line);background:var(--surface);font-size:13px;font-weight:700;color:var(--dim)}
+.hm-altro:hover{color:var(--text);border-color:var(--surface-3)}
+.hm-altro svg{width:14px;height:14px}
+@media (max-width:760px){ .hm-altro{display:none} .hm-spazi.griglia > .hm-spc.oltre{display:flex} }
+/* calendario di tutti i lavori */
+.ct.hm-main.scroller{padding:24px 28px 40px}
+.ct-sp{display:flex;gap:8px;flex-wrap:wrap;margin:16px 0 18px}
+.ct-s i{width:10px;height:10px;border-radius:50%;background:var(--acc);display:inline-block}
+.ct-s:not(.on){opacity:.55}
+.ct-s:not(.on) i{background:transparent;border:2px solid var(--acc)}
+
+/* team: cerca chi e' gia' su FOSS */
+.tm-cerca{display:flex;flex-wrap:wrap;align-items:center;gap:12px 18px;border:1px solid var(--line);background:var(--surface);border-radius:16px;padding:14px 18px;margin-bottom:16px}
+.tm-cerca > .tx{flex:1 1 260px;min-width:0;display:flex;flex-direction:column;gap:2px}
+.tm-cerca > .tx b{display:flex;align-items:center;gap:8px;font-size:15px}
+.tm-cerca > .tx b svg{width:16px;height:16px;color:var(--amber)}
+.tm-cerca > .tx span{font-size:12.5px;color:var(--dim)}
+.tm-cerca-f{display:flex;gap:8px;flex:1 1 340px}
+.tm-cerca-f input{flex:1;min-width:0;height:38px;padding:0 12px;border-radius:10px;border:1px solid var(--line);background:var(--surface-2);color:var(--text);font-size:14px;outline:none}
+.tm-cerca-f input:focus{border-color:var(--amber)}
+.tm-cerca-r{flex:1 1 100%;display:flex;align-items:center;gap:12px;padding:10px 12px;border-radius:12px;background:var(--surface-2);font-size:13px}
+.tm-cerca-r > svg{width:16px;height:16px;flex:none}
+.tm-cerca-r.ok{background:color-mix(in srgb,#22A565 16%,transparent);color:#2FBF75}
+.tm-cerca-r.no{color:var(--dim)}
+.tm-cerca-r.no > span{flex:1}
+.tm-cerca-r .av-vuoto{width:36px;height:36px;border-radius:50%;border:1.5px solid var(--line);display:grid;place-items:center;color:var(--dim);flex:none}
+.tm-cerca-r .av-vuoto svg{width:16px;height:16px}
+.tm-cerca-r .tx2{flex:1;min-width:0;display:flex;flex-direction:column}
+.tm-cerca-r .tx2 b{font-size:14px}
+.tm-cerca-r .tx2 span{font-size:12px;color:var(--mute)}
+
+/* il modulo dell'invito con l'anteprima a fianco */
+.iv-box{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:18px;align-items:stretch}
+.tm-main .iv-box{border:1px solid var(--line);background:var(--surface);border-radius:16px;padding:18px 20px;margin-bottom:16px}
+.iv-h{display:flex;align-items:center;justify-content:space-between}
+.iv-h h3{font-size:17px;font-weight:700;margin:0}
+.iv-p{margin:4px 0 14px;font-size:13px;color:var(--dim);line-height:1.5}
+.iv-form{grid-template-columns:1fr 1fr}
+.iv-prev{display:flex;flex-direction:column;border-radius:14px;overflow:hidden;border:1px solid var(--line);background:#0A1220;min-height:420px}
+.iv-prev-h{display:flex;align-items:center;gap:7px;padding:8px 12px;font-size:11.5px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;color:#9FB0C8;background:#0F1A2C;border-bottom:1px solid #1C2B42}
+.iv-prev-h svg{width:14px;height:14px}
+.iv-live{flex:1;width:100%;min-height:400px;border:0;background:#0A1220}
+.iv-solo-tel{display:none}
+.iv-gira{width:14px;height:14px;border-radius:50%;border:2px solid currentColor;border-right-color:transparent;display:inline-block;animation:ivGira .8s linear infinite}
+@keyframes ivGira{to{transform:rotate(360deg)}}
+.iv-esito.ko{background:color-mix(in srgb,var(--alert) 14%,transparent);color:var(--alert)}
+.iv-esito.info{background:var(--surface-2);color:var(--text)}
+.iv-esito .av-vuoto{width:34px;height:34px;border-radius:50%;border:1.5px solid var(--line);display:grid;place-items:center;flex:none}
+.iv-esito .av-vuoto svg{width:15px;height:15px}
+.iv-esito > span{flex:1}
+.iv-esito{align-items:center;line-height:1.45}
+.chip.iv-ko{background:color-mix(in srgb,var(--alert) 16%,transparent);color:var(--alert);border-color:transparent}
+@media (max-width:1100px){ .iv-box{grid-template-columns:1fr} .iv-prev{display:none} .iv-solo-tel{display:inline-flex} }
 /* ---------- LE MIE TASK (v38) ---------- */
 .mt.hm-main.scroller{padding:24px 28px 40px}
 .mt-head h1{font-size:30px;font-weight:700;letter-spacing:-.025em;margin:0}
@@ -3167,7 +3236,7 @@ button.pf-p:hover{background:var(--surface-2);border-radius:10px}
 .pf .esci-rosso{width:100%;justify-content:center}
 .pf .card.pf-adm{padding:18px 20px!important;overflow:visible}
 /* inviti nel profilo */
-.iv-form{display:grid;grid-template-columns:1.3fr 1fr 1fr;gap:12px}
+.iv-form{display:grid;grid-template-columns:1fr 1fr;gap:12px}
 .iv-form .lungo{grid-column:1 / -1}
 .iv-form .field{margin:0}
 .iv-form textarea{width:100%;resize:vertical;min-height:70px;font:inherit;font-size:13.5px;line-height:1.45;padding:10px 12px;border-radius:10px;border:1px solid var(--line);background:var(--surface-2);color:var(--text);outline:none}
@@ -4579,7 +4648,7 @@ function renderTop(){
     /* Al centro c'e' scritto dove sei. Dentro a un lavoro basta il suo nome:
        tutto il resto sta piu' in basso, dove si lavora davvero. */
     const sp = SPZ();
-    const titoli = {spazi:'Home', mie:'Cosa tocca a te', cerca:'Cerca', profilo:'Profilo', guida:'Guida', team:'Team'};
+    const titoli = {spazi:'Home', mie:'Cosa tocca a te', cerca:'Cerca', profilo:'Profilo', guida:'Guida', team:'Team', calendario:'Calendario'};
     if(state.schermo==='progetto'){
       const pr = PROJ();
       c.innerHTML = '<button class="tel-titolo" data-action="toggle-rail" title="Scheda del lavoro: team, indirizzo, note">'+
@@ -4599,6 +4668,8 @@ function renderTop(){
     c.innerHTML = '<b>Profilo</b>';
   } else if(state.schermo==='team'){
     c.innerHTML = '<b>Team</b>';
+  } else if(state.schermo==='calendario'){
+    c.innerHTML = '<b>Calendario</b>';
   } else if(state.schermo==='guida'){
     c.innerHTML = '<b>Guida</b>';
   } else c.innerHTML = '';
@@ -4955,6 +5026,17 @@ function renderHome(){
   else if(mappaLeaflet){ try{ mappaLeaflet.remove(); }catch(e){} mappaLeaflet = null; }
 }
 
+/* il calendario di tutti i lavori, dalla Home: ogni spazio col suo colore, si possono nascondere */
+function renderCalTutti(){
+  const sp = spaziVisibili(), no = state.calNo || new Set();
+  const lista = sp.filter(s=>!no.has(s.id)).flatMap(s=>progettiDi(s.id)).filter(p=>vedeProgetto(p));
+  let h = '<div class="pane"><div class="hm ct-lay">'+barraSinistra('calendario')+'<div class="hm-main scroller ct">';
+  h += '<div class="mt-head"><div class="tx"><h1>Calendario</h1><p>Le date di tutti i tuoi lavori, in tutti gli spazi.</p></div></div>';
+  if(sp.length > 1) h += '<div class="ct-sp"><button class="mt-f'+(no.size?'':' on')+'" data-action="cal-spazio" data-id="">Tutti</button>'+
+    sp.map(s=>'<button class="mt-f ct-s'+(no.has(s.id)?'':' on')+'" style="--acc:'+coloreOk(s.col,'#FFAD01')+'" data-action="cal-spazio" data-id="'+esc(s.id)+'"><i></i>'+esc(s.nome)+'</button>').join('')+'</div>';
+  h += renderCal(lista) + '</div></div></div>';
+  el('stage').innerHTML = h;
+}
 function renderCal(lista){
   const m = state.meseCal, anno = m.getFullYear(), mese = m.getMonth();
   const nomeMese = m.toLocaleDateString('it-IT',{month:'long'});
@@ -5363,7 +5445,7 @@ function renderPhasebar(){
     return;
   }
   /* nel profilo la barra in basso non serve: si esce dal tasto rosso in fondo alla pagina */
-  if(state.schermo==='profilo' || state.schermo==='guida' || state.schermo==='team'){ bar.innerHTML = ''; bar.classList.add('vuota'); return; }
+  if(state.schermo==='profilo' || state.schermo==='guida' || state.schermo==='team' || state.schermo==='calendario'){ bar.innerHTML = ''; bar.classList.add('vuota'); return; }
   if(state.schermo==='home' && state.vista==='note'){
     const n = noteDi().length;
     bar.innerHTML = '<button class="btn primary" data-action="nuova-nota">'+svg('plus')+'Nuova nota</button>'+
@@ -5462,7 +5544,7 @@ function puo(k){
   return mieiPermessi[k] !== false;
 }
 /* cose che restano solo dell'amministratore, qualunque permesso abbia il guest */
-const SOLO_ADMIN = ['pf-invita','iv-anteprima','iv-invia','iv-reinvia','nuovo-profilo','crea-profilo','togli-profilo','togli-profilo-ok','permessi','perm-toggle',
+const SOLO_ADMIN = ['iv-aggiungi','tm-cerca','tm-aggiungi','tm-cerca-invita','pf-invita','iv-anteprima','iv-invia','iv-reinvia','nuovo-profilo','crea-profilo','togli-profilo','togli-profilo-ok','permessi','perm-toggle',
   'team-invita','invito-crea','invito-copia','invito-condividi',
   'togli-accesso','togli-accesso-ok','registro','registro-chi','registrati','crea-utente'];
 const PERM_AZIONE = {
@@ -5772,6 +5854,7 @@ function renderTabbar(){
   ];
   const attivo =
     (state.schermo==='profilo' || state.schermo==='guida' || state.schermo==='team') ? 'profilo' :
+    state.schermo==='calendario' ? 'lavori' :
     state.schermo==='mie'     ? 'mie' :
     state.schermo==='cerca'   ? 'cerca' :
     (state.schermo==='home' && state.vista==='note') ? 'note' :
@@ -6013,7 +6096,7 @@ function barraSinistra(aperto){
     '<nav class="hm-navs">'+
       voce('spazi', 'casa', 'Home', '', !aperto)+
       voce('hm-mie', 'check', 'Le mie task'+(mie? '<b class="hm-n">'+mie+'</b>' : ''), '', aperto==='mie')+
-      (primo ? voce('hm-cal', 'calendar', 'Calendario', ' data-id="'+esc(primo.id)+'"') : '')+
+      (primo ? voce('hm-cal', 'calendar', 'Calendario', '', aperto==='calendario') : '')+
       voce('notifiche', 'bell', 'Notifiche')+
       voce('team', 'users', 'Team', '', aperto==='team')+
     '</nav>'+
@@ -6028,8 +6111,13 @@ function barraSinistra(aperto){
     cartaInvitoGuida()+
   '</aside>';
 }
+/* il riquadro «Scopri FOSS»: al primo avvio e poi una volta ogni cinque */
+const AVVIO_N = (()=>{ try{ const n = (parseInt(localStorage.getItem('foss_avvii')||'0',10)||0) + 1; localStorage.setItem('foss_avvii', String(n)); return n; }catch(e){ return 1; } })();
+function mostraBoxGuida(){ return !state.cfg.noBoxGuida && !state.boxGuidaChiuso && (AVVIO_N % 5 === 1); }
 function cartaInvitoGuida(cls){
+  if(!mostraBoxGuida()) return '';
   return '<div class="hm-guida'+(cls?' '+cls:'')+'">'+
+    '<button class="hm-guida-x" data-action="box-guida-chiudi" title="Chiudi" aria-label="Chiudi">'+svg('x',2.4)+'</button>'+
     '<span class="ic">'+svg('libro',2)+'</span>'+
     '<b>Scopri tutto quello<br>che FOSS sa fare</b>'+
     '<span>Leggi la guida per usarlo al meglio, dai primi passi ai trucchi.</span>'+
@@ -6081,8 +6169,9 @@ function renderSpazi(){
     '<span class="hm-vis"><button class="'+(lista?'':'on')+'" data-action="hm-vista" data-v="griglia" title="Schede" aria-label="Schede">'+svg('grid',2)+'</button>'+
       '<button class="'+(lista?'on':'')+'" data-action="hm-vista" data-v="lista" title="Elenco" aria-label="Elenco">'+svg('list',2)+'</button></span></div>';
   h += '<input type="file" id="hmCopFile" accept="image/*" hidden>';
+  const tantiSp = !lista && elenco.length > 6 && !state.hmSpaziTutti;
   h += '<div class="hm-spazi-w"><div class="hm-spazi '+(lista?'lista':'griglia')+'" id="hmSpaziL">';
-  elenco.forEach(sp=>{
+  elenco.forEach((sp, ix)=>{
     const ps = progettiDi(sp.id), aperti = ps.filter(p=>!p.completato);
     const urg = aperti.filter(p=>{ const g = giorniA(p.consegna); return g!=null && g<=7; }).length;
     let tot = 0, fatte = 0, taskTot = 0, taskAp = 0;
@@ -6093,7 +6182,7 @@ function renderSpazi(){
     const team = [...new Set(ps.flatMap(p=>p.team||[]).concat(sp.membri||[]))];
     const prof = TIPO(sp.tipo).prof;
     const ds = sp.desc ? esc(sp.desc)+(prof && sp.desc.toLowerCase()!==String(prof).toLowerCase() ? ' <i>•</i> '+esc(prof) : '') : esc(prof||'');
-    h += '<button class="hm-spc spazio" style="--acc:'+col+'" data-action="apri-spazio" data-id="'+esc(sp.id)+'">'+
+    h += '<button class="hm-spc spazio'+(tantiSp && ix >= 6 ? ' oltre' : '')+'" style="--acc:'+col+'" data-action="apri-spazio" data-id="'+esc(sp.id)+'">'+
       '<span class="cop'+(bg?' con-foto':'')+'">'+(bg? imgRit(bg, ritDi(sp,'home')) : '<span class="cop-ic">'+svg(sp.icona,1.4)+'</span>')+
         (puoCop ? '<span class="cop-b'+(bg?'':' vuota')+'" role="button" tabindex="0" data-action="hm-copertina" data-id="'+esc(sp.id)+'" title="'+(bg?'Cambia la copertina':'Aggiungi una copertina')+'">'+
           svg('foto',2)+'<span>'+(bg?'Cambia':'Aggiungi copertina')+'</span></span>'+
@@ -6106,7 +6195,8 @@ function renderSpazi(){
         '<span><b>'+taskTot+'</b>Task totali</span>'+(urg? '<span class="urg"><b>'+urg+'</b>In scadenza</span>' : '')+'</span></span></button>';
   });
   if(!elenco.length) h += '<div class="empty" style="padding:24px">Ancora nessuno spazio: creane uno per iniziare.</div>';
-  h += '</div>'+(!lista && elenco.length>3 ? '<button class="hm-freccia" data-action="hm-scorri" title="Altri spazi" aria-label="Altri spazi">'+svg('right',2.4)+'</button>' : '')+'</div>';
+  h += '</div>'+(!lista && elenco.length>3 ? '<button class="hm-freccia" data-action="hm-scorri" title="Altri spazi" aria-label="Altri spazi">'+svg('right',2.4)+'</button>' : '')+
+    (!lista && elenco.length > 6 ? '<button class="hm-altro" data-action="hm-spazi-tutti">'+(state.hmSpaziTutti ? 'Mostra meno' : 'Mostra altro ('+(elenco.length-6)+')')+svg('chev',2.4)+'</button>' : '')+'</div>';
 
   /* le tre cose di oggi */
   h += '<div class="hm-tre" id="hmTre">';
@@ -7347,37 +7437,132 @@ function renderProfilo(){
   h += '<button class="btn esci-rosso" data-action="esci">'+svg('out')+'Esci da FOSS</button>';
   h += '</div></div></div></div></div>';
   el('stage').innerHTML = h;
+  if(el('ivLive')) aggiornaAnteprimaLive(true);
 }
 /* ---------- INVITI (nel profilo dell'amministratore) ----------
    Un'email vera, con la grafica di FOSS, mandata dalla funzione «invia-invito».
    Finche' l'invio automatico non e' attivo resta la mail dalla propria posta. */
-function pfInviti(){
-  const inv = (state.inviti||[]).slice().sort((a,b)=>String(b.creato_il||'').localeCompare(String(a.creato_il||'')));
-  const aperti = inv.filter(i=>!i.usato), fatti = inv.filter(i=>i.usato).slice(0,4);
-  const es = state.ivEsito, bz = state.ivBozza || {};
-  let h = '<div class="card" id="cartaInviti">'+pfTesta('send','Inviti','Riceve un’email con la grafica di FOSS e un link per registrarsi: entra subito nel tuo team.')+
+/* ---------- IL MODULO DELL'INVITO (Team e Profilo) ----------
+   Email, nome, ruolo e due righe; a fianco l'email vera come la ricevera'.
+   Invia: controlla l'indirizzo (scritto bene, dominio che riceve posta, non
+   gia' iscritto), crea l'invito, lo manda e poi verifica la consegna. */
+function formInvito(dove){
+  const bz = state.ivBozza || {}, es = state.ivEsito, lav = state.ivLavoro;
+  let h = '<section class="iv-box" id="ivBox"><div class="iv-col">'+
+    (dove === 'team' ? '<div class="iv-h"><h3>Invita una persona</h3><button class="iconbtn" data-action="team-chiudi" title="Chiudi" aria-label="Chiudi">'+svg('x',2.4)+'</button></div>'+
+      '<p class="iv-p">Le arriva un’email con la grafica di FOSS e il link per registrarsi: nome e ruolo li trova già scritti. Se ha già un account te lo dico e la persona entra subito nel team.</p>' : '')+
     '<div class="iv-form">'+
-      '<div class="field"><label>Email</label><input id="iv_mail" type="email" inputmode="email" autocomplete="off" placeholder="nome@studio.it" maxlength="120" value="'+esc(bz.email||'')+'"></div>'+
+      '<div class="field lungo"><label>Email</label><input id="iv_mail" type="email" inputmode="email" autocomplete="off" placeholder="nome@studio.it" maxlength="120" value="'+esc(bz.email||'')+'"></div>'+
       '<div class="field"><label>Nome (facoltativo)</label><input id="iv_nome" autocomplete="off" placeholder="Es. Laura" maxlength="40" value="'+esc(bz.nome||'')+'"></div>'+
       '<div class="field"><label>Ruolo (facoltativo)</label><input id="iv_ruolo" list="ivRuoli" autocomplete="off" placeholder="Es. Montatrice" maxlength="60" value="'+esc(bz.ruolo||'')+'">'+datalistRuoli('ivRuoli')+'</div>'+
       '<div class="field lungo"><label>Due righe tue (facoltativo)</label><textarea id="iv_msg" rows="3" maxlength="600" placeholder="Es. Ciao Laura, per i prossimi lavori ci servi tu al montaggio.">'+esc(bz.messaggio||'')+'</textarea></div>'+
     '</div>'+
-    '<div class="cal-az" style="margin-top:12px"><button class="btn primary" data-action="iv-invia">'+svg('send')+'Invia l’invito</button>'+
-      '<button class="btn" data-action="iv-anteprima">'+svg('eye')+'Anteprima</button></div>';
-  if(es){
-    const x = inv.find(i=>i.id===es.id);
-    if(es.ok && x) h += '<div class="iv-esito ok">'+svg('check',2.6)+'<span>Email inviata a <b>'+esc(x.email)+'</b>.</span></div>';
-    else if(es.chiave && x) h += '<div class="iv-esito">'+svg('bell',2.2)+'<span>L’invio automatico non è ancora attivo: l’invito è salvato. '+
-      '<a href="'+esc(mailtoInvito(x))+'" target="_blank" rel="noopener">Mandalo dalla tua posta</a>.</span></div>';
+    '<div class="cal-az" style="margin-top:12px"><button class="btn primary" data-action="iv-invia"'+(lav?' disabled':'')+'>'+
+      (lav ? '<span class="iv-gira"></span>'+esc(lav) : svg('send')+'Invia l’invito')+'</button>'+
+      '<button class="btn iv-solo-tel" data-action="iv-anteprima">'+svg('eye')+'Anteprima</button></div>'+
+    esitoInvitoHTML(es)+
+  '</div>'+
+  '<div class="iv-prev"><div class="iv-prev-h">'+svg('eye',2)+'Così la riceve</div><iframe class="iv-live" id="ivLive" sandbox="" title="Anteprima dell’email"></iframe></div></section>';
+  return h;
+}
+function chipEsitoInvito(i){
+  const d = i.inviato_il ? new Date(i.inviato_il) : null;
+  if(!d || isNaN(d)) return '<span class="chip now">Da inviare</span>';
+  const q = d.getDate()+' '+MESI_BREVI[d.getMonth()];
+  if(i.esito === 'delivered') return '<span class="chip ok">Consegnata il '+q+'</span>';
+  if(i.esito === 'bounced') return '<span class="chip iv-ko">Non consegnata</span>';
+  if(i.esito === 'complained') return '<span class="chip iv-ko">Segnata come spam</span>';
+  return '<span class="chip iv-inv">Inviata il '+q+((i.invii||0)>1?' · '+i.invii+' volte':'')+'</span>';
+}
+function esitoInvitoHTML(es){
+  if(!es) return '';
+  if(es.tipo === 'ok'){
+    const d = {inviata:['Email inviata a', 'In consegna…'], delivered:['Email consegnata a', 'È arrivata nella sua casella.'],
+               bounced:['Email non consegnata a', 'L’indirizzo non esiste o la casella non accetta posta: controlla come è scritto.'],
+               complained:['Email segnata come spam da', 'Chi l’ha ricevuta l’ha segnata come indesiderata.'],
+               delivery_delayed:['Email in ritardo per', 'Il server di chi riceve la sta trattenendo: riprova più tardi a controllare.']}[es.esito||'inviata'] || ['Email inviata a', ''];
+    const male = es.esito === 'bounced' || es.esito === 'complained';
+    return '<div class="iv-esito '+(male?'ko':'ok')+'">'+svg(male?'x':'check',2.6)+'<span><b>'+d[0]+' '+esc(es.email)+'</b>'+(d[1]?'<br>'+d[1]:'')+'</span></div>';
   }
+  if(es.tipo === 'iscritto'){
+    const u = es.u || {};
+    return '<div class="iv-esito info"><span class="av-vuoto">'+svg('user',2)+'</span><span><b>'+esc(u.nome||es.email)+' è già su FOSS</b><br>'+
+      (u.gia ? 'Ed è già nel tuo team.' : 'Non serve l’invito: puoi aggiungerla subito ai collaboratori.')+'</span>'+
+      (u.gia ? '' : '<button class="btn primary sm" data-action="iv-aggiungi">'+svg('plus',2.4)+'Aggiungi al team</button>')+'</div>';
+  }
+  if(es.tipo === 'aggiunto') return '<div class="iv-esito ok">'+svg('check',2.6)+'<span><b>'+esc((es.u||{}).nome||es.email)+' ora è nel tuo team.</b><br>Aprigli i lavori dalla scheda del progetto.</span></div>';
+  return '<div class="iv-esito ko">'+svg('x',2.6)+'<span><b>Invito non partito</b><br>'+esc(es.testo||'')+'</span></div>';
+}
+const ERR_INVITO = {
+  email:'L’email non è scritta bene.',
+  dominio:'Questo indirizzo non può ricevere email: il dominio non esiste o non ha la posta. Controlla come è scritto.',
+  chiave:'L’invio automatico non è configurato (manca la chiave di Resend su Supabase).',
+  troppi:'Questo invito è già partito tre volte, o hai superato i 30 inviti in un giorno.',
+  registrato:'Questa persona si è già registrata.',
+  invio:'Il servizio di posta ha rifiutato l’invio. Riprova tra poco.',
+  offline:'Serve la connessione: riprova quando sei online.',
+  rete:'Non riesco a raggiungere il server. Riprova tra poco.',
+  accesso:'Solo l’amministratore può mandare inviti.'
+};
+function testoErrInvito(e){ return ERR_INVITO[e] || ('Errore: '+e); }
+/* l'anteprima a fianco: si aggiorna mentre scrivi */
+let ivLiveT = null, ivLiveUltimo = '', ivLiveHtml = '';
+function aggiornaAnteprimaLive(subito){
+  clearTimeout(ivLiveT);
+  const f0 = el('ivLive');
+  if(f0 && ivLiveHtml && !f0.srcdoc) f0.srcdoc = ivLiveHtml;      // dopo un ridisegno rimetto subito l'ultima
+  ivLiveT = setTimeout(()=>{
+    const f = el('ivLive'); if(!f || typeof inviaInvitoCloud !== 'function') return;
+    const bz = state.ivBozza || {};
+    const bozza = {email:(bz.email||'').trim().toLowerCase() || 'nome@studio.it', nome:(bz.nome||'').trim(), ruolo:(bz.ruolo||'').trim(), messaggio:(bz.messaggio||'').trim()};
+    const k = JSON.stringify(bozza);
+    if(k === ivLiveUltimo && ivLiveHtml) return;
+    ivLiveUltimo = k;
+    inviaInvitoCloud({anteprima:true, bozza}).then(r=>{
+      if(!r || !r.html || ivLiveUltimo !== k) return;
+      ivLiveHtml = r.html; const g = el('ivLive'); if(g) g.srcdoc = r.html; });
+  }, subito ? 0 : 600);
+}
+/* dopo l'invio: com'e' andata la consegna */
+function controllaConsegna(inv, volte){
+  if(typeof inviaInvitoCloud !== 'function') return;
+  setTimeout(()=>{
+    inviaInvitoCloud({stato:inv.id}).then(r=>{
+      if(!r || !r.esito) return;
+      inv.esito = r.esito;
+      if(state.ivEsito && state.ivEsito.id === inv.id) state.ivEsito.esito = r.esito;
+      if(['team','profilo'].indexOf(state.schermo) >= 0) render();
+      if((r.esito === 'inviata' || r.esito === 'sent' || r.esito === 'delivery_delayed') && volte > 1) controllaConsegna(inv, volte-1);
+    });
+  }, volte > 2 ? 4000 : 12000);
+}
+async function mandaInvito(inv){
+  state.ivLavoro = 'Invio…'; render();
+  const r = typeof inviaInvitoCloud === 'function' ? await inviaInvitoCloud({id:inv.id}) : {errore:'offline'};
+  state.ivLavoro = null;
+  if(r && r.ok){
+    inv.inviato_il = r.inviato_il || new Date().toISOString(); inv.invii = r.invii || ((inv.invii||0)+1); inv.esito = r.esito || 'inviata';
+    state.ivEsito = {tipo:'ok', id:inv.id, email:inv.email, esito:inv.esito};
+    azione('Invito mandato a <b>'+esc(inv.email)+'</b>');
+    controllaConsegna(inv, 3);
+  } else if(r && r.errore === 'iscritto'){
+    state.ivEsito = {tipo:'iscritto', email:inv.email, u:r.utente || {}};
+  } else {
+    state.ivEsito = {tipo:'errore', email:inv.email, testo:testoErrInvito((r && r.errore) || 'rete')};
+  }
+  render();
+}
+function pfInviti(){
+  const inv = (state.inviti||[]).slice().sort((a,b)=>String(b.creato_il||'').localeCompare(String(a.creato_il||'')));
+  const aperti = inv.filter(i=>!i.usato), fatti = inv.filter(i=>i.usato).slice(0,4);
+  let h = '<div class="card" id="cartaInviti">'+pfTesta('send','Inviti','Riceve un’email con la grafica di FOSS e un link per registrarsi: entra subito nel tuo team.')+
+    (state.schermo === 'profilo' ? formInvito('profilo') : '');
   if(aperti.length || fatti.length){
     h += '<div class="iv-lista">';
     aperti.concat(fatti).forEach(i=>{
       const nome = (i.nickname || ((i.nome||'')+' '+(i.cognome||'')).trim());
       const d = i.inviato_il ? new Date(i.inviato_il) : null;
-      const st = i.usato ? '<span class="chip ok">Registrato</span>'
-        : d && !isNaN(d) ? '<span class="chip iv-inv">Inviata il '+d.getDate()+' '+MESI_BREVI[d.getMonth()]+((i.invii||0)>1?' · '+i.invii+' volte':'')+'</span>'
-        : '<span class="chip now">Da inviare</span>';
+      const st = i.usato ? '<span class="chip ok">Registrato</span>' : chipEsitoInvito(i);
       h += '<div class="iv-r'+(i.usato?' fatto':'')+'"><span class="av-vuoto">'+svg(i.usato?'check':'send',2)+'</span>'+
         '<span class="tx"><b>'+esc(nome || i.email)+'</b><span>'+esc([nome ? i.email : '', i.ruolo||''].filter(Boolean).join(' · ') || 'Ruolo da scegliere')+'</span></span>'+st+
         (i.usato ? '' : '<span class="iv-az">'+
@@ -7389,21 +7574,6 @@ function pfInviti(){
     h += '</div>';
   }
   return h + '</div>';
-}
-function esitoInvio(inv, r){
-  if(r && r.ok){
-    inv.inviato_il = r.inviato_il || new Date().toISOString(); inv.invii = r.invii || ((inv.invii||0)+1);
-    state.ivEsito = {id:inv.id, ok:true};
-    azione('Invito mandato a <b>'+esc(inv.email)+'</b>');
-  } else if(!r || r.errore==='chiave' || r.errore==='offline'){
-    state.ivEsito = {id:inv.id, chiave:true};
-  } else {
-    state.ivEsito = null;
-    toast({troppi:'Questo invito è già partito tre volte: aspetta che si registri o annullalo.',
-           registrato:'Questa persona si è già registrata.', email:'L’email non è valida.'}[r.errore] ||
-          'L’email non è partita ('+esc(r.errore)+'). Riprova tra poco.', 'warn', 'Invito non inviato');
-  }
-  render();
 }
 function mostraAnteprimaInvito(html){
   modale('<h3>Anteprima dell’invito</h3><div class="sub-t">Così la vede chi lo riceve.</div>'+
@@ -7552,25 +7722,25 @@ function renderTeam(){
     (admin ? '<button class="btn primary" data-action="team-invita">' + svg('plus', 2.4) + 'Invita una persona</button>' : '') + '</div>';
 
   /* l'invito */
-  if(admin && (state.teamForm || state.teamPronto)){
-    const pronto = state.teamPronto && inviti.find(i=>i.id === state.teamPronto);
-    if(pronto){
-      h += '<section class="tm-invito pronto"><div class="tm-ok">' + svg('check', 3) + '</div><div class="tx"><b>Invito pronto per ' + esc(pronto.email) + '</b>' +
-        '<span>Mandaglielo: quando si registra con questa email entra da solo nel team, come guest.</span>' +
-        '<div class="tm-az"><a class="btn primary sm" href="' + esc(mailtoInvito(pronto)) + '" target="_blank" rel="noopener">' + svg('send') + 'Scrivi l’email</a>' +
-          '<button class="btn sm" data-action="invito-copia" data-id="' + esc(pronto.id) + '">' + svg('link') + 'Copia il link</button>' +
-          (navigator.share ? '<button class="btn sm" data-action="invito-condividi" data-id="' + esc(pronto.id) + '">' + svg('share') + 'Condividi</button>' : '') +
-          '<button class="btn sm ghost" data-action="team-chiudi">Fatto</button></div></div></section>';
-    } else {
-      h += '<section class="tm-invito"><h3>Invita una persona</h3>' +
-        '<p>Scrivi la sua email: FOSS prepara l’invito e un messaggio già scritto da mandare dalla tua posta. Nome e ruolo li trova già scritti quando si registra, e può correggerli.</p>' +
-        '<div class="tm-form">' +
-          '<div class="field"><label>Email</label><input id="tm_mail" type="email" inputmode="email" autocomplete="off" placeholder="nome@studio.it" maxlength="120"></div>' +
-          '<div class="field"><label>Nome (facoltativo)</label><input id="tm_nome" autocomplete="off" placeholder="Es. Laura" maxlength="40"></div>' +
-          '<div class="field"><label>Ruolo (facoltativo)</label><input id="tm_ruolo" list="tmRuoli" autocomplete="off" placeholder="Es. Operatrice video" maxlength="60">' + datalistRuoli('tmRuoli') + '</div>' +
-        '</div><div class="tm-az"><button class="btn primary" data-action="invito-crea">' + svg('send') + 'Crea l’invito</button>' +
-          '<button class="btn ghost" data-action="team-chiudi">Annulla</button></div></section>';
+  if(admin && state.teamForm) h += formInvito('team');
+
+  /* chi e' gia' su FOSS: lo cerco per email e lo aggiungo */
+  if(admin){
+    const c = state.tmCerca || {};
+    h += '<section class="tm-cerca"><div class="tx"><b>' + svg('cerca', 2) + 'È già su FOSS?</b><span>Scrivi la sua email: se ha già un account lo aggiungi subito al tuo team.</span></div>' +
+      '<div class="tm-cerca-f"><input id="tm_cerca" type="email" inputmode="email" autocomplete="off" placeholder="nome@studio.it" maxlength="120" value="' + esc(c.q || '') + '">' +
+      '<button class="btn" data-action="tm-cerca">' + svg('cerca') + 'Cerca</button></div>';
+    if(c.esito === 'trovato' && c.u){
+      h += '<div class="tm-cerca-r"><span class="av-vuoto">' + svg('user', 2) + '</span><span class="tx2"><b>' + esc(c.u.nome) + '</b><span>' + esc(c.q) + (c.u.ruolo ? ' · ' + esc(c.u.ruolo) : '') + '</span></span>' +
+        (c.u.gia ? '<span class="chip ok">' + svg('check', 2.6) + 'È già nel tuo team</span>'
+                 : '<button class="btn primary sm" data-action="tm-aggiungi">' + svg('plus', 2.4) + 'Aggiungi ai collaboratori</button>') + '</div>';
+    } else if(c.esito === 'aggiunto' && c.u){
+      h += '<div class="tm-cerca-r ok">' + svg('check', 2.6) + '<span><b>' + esc(c.u.nome) + '</b> ora è nel tuo team. Aprigli i lavori dalla scheda del progetto.</span></div>';
+    } else if(c.esito === 'nessuno'){
+      h += '<div class="tm-cerca-r no">' + svg('x', 2.4) + '<span><b>' + esc(c.q) + '</b> non è ancora su FOSS.</span>' +
+        '<button class="btn sm" data-action="tm-cerca-invita">' + svg('send') + 'Invitalo</button></div>';
     }
+    h += '</section>';
   }
 
   /* i filtri */
@@ -7608,8 +7778,8 @@ function renderTeam(){
     h += '<div class="tm-c invito"><span class="av-vuoto">' + svg('send', 2) + '</span><div class="tx"><b>' + esc(nome) + '</b>' +
       '<span class="ru">' + (ruoliDi(i.ruolo).map(r=>'<i>' + esc(r) + '</i>').join('') || '<i class="vuoto">Il ruolo lo sceglie registrandosi</i>') + '</span>' +
       (sotto ? '<span class="em">' + esc(sotto) + '</span>' : '') + '</div>' +
-      '<div class="st"><span class="chip now">In attesa</span></div>' +
-      '<div class="tm-az">' + (i.email ? '<a class="btn sm" href="' + esc(mailtoInvito(i)) + '" target="_blank" rel="noopener">' + svg('send') + 'Scrivi di nuovo</a>' +
+      '<div class="st">' + chipEsitoInvito(i) + '</div>' +
+      '<div class="tm-az">' + (i.email ? ((i.invii||0) < 3 ? '<button class="btn sm" data-action="iv-reinvia" data-id="' + esc(i.id) + '">' + svg('send') + (i.inviato_il ? 'Reinvia' : 'Invia') + '</button>' : '') +
         '<button class="btn sm ghost" data-action="invito-copia" data-id="' + esc(i.id) + '">' + svg('link') + 'Copia link</button>' : '') +
         '<button class="iconbtn" data-action="togli-profilo" data-id="' + esc(i.id) + '" title="Annulla l’invito" aria-label="Annulla l’invito">' + svg('x', 2.4) + '</button></div>' +
     '</div>';
@@ -7620,6 +7790,7 @@ function renderTeam(){
   if(admin) h += '<div class="tm-fondo"><button class="btn" data-action="registro">' + svg('list') + 'Registro delle attività</button></div>';
   h += '</div></div></div>';
   el('stage').innerHTML = h;
+  if(el('ivLive')) aggiornaAnteprimaLive(true);
 }
 
 /* ---------- PERMESSI DI UN GUEST ---------- */
@@ -8315,6 +8486,7 @@ function render(){
   else if(state.schermo==='profilo'){ renderProfilo(); }
   else if(state.schermo==='team'){ renderTeam(); }
   else if(state.schermo==='mie'){ renderMie(); }
+  else if(state.schermo==='calendario'){ renderCalTutti(); }
   else if(state.schermo==='cerca'){ renderCerca(); }
   else if(state.schermo==='guida'){ renderGuida(); }
   else { renderProgetto(); }
@@ -9151,14 +9323,16 @@ function cartaModelli(){
    Come si fa tutto, capitolo per capitolo: dai primi passi alle cose per chi
    organizza un team. Si cerca per parola (anche senza accenti); in fondo c'e'
    il tasto per segnalare quello che manca o non funziona. */
-const VERSIONE = 'v39';
+const VERSIONE = 'v42';
 const LIVELLI_GUIDA = {base:'Per cominciare', medio:'Tutti i giorni', esperto:'Per chi organizza', aiuto:'Se qualcosa non va'};
 const GUIDA = [
 {id:'primi-passi', liv:'base', ic:'spark', t:'Primi passi', s:'Cos’è FOSS e come ci si muove', v:[
   ['Che cos’è FOSS', 'È il posto dove tieni i tuoi lavori. Ogni progetto ha le sue fasi, le task da fare, le date, i soldi e le persone che ci lavorano. Funziona dal computer, dall’iPad e dal telefono: quello che cambi su uno compare anche sugli altri.'],
   ['Come è organizzato', 'Quattro livelli, uno dentro l’altro: gli <b>spazi di lavoro</b> (un ambito, per esempio «Video Milano»), i <b>progetti</b> (un lavoro per un cliente), le <b>task</b> divise per fase e, dentro ogni task, le <b>subtask</b> da spuntare. Una subtask può avere anche una sua piccola checklist.'],
   ['Entrare la prima volta', 'Apri FOSS e scegli <b>Registrati</b>: nome, il tuo <b>ruolo</b> (videomaker, montatrice, fotografo…), email e una password. Se qualcuno ti ha invitato, apri il link che ti ha mandato: trovi già scritte la tua email e, se li ha indicati, nome e ruolo. Entri direttamente nel suo archivio e vedi i lavori che ti apre. Dalla volta dopo il dispositivo si ricorda di te.'],
-  ['La Home', 'FOSS si apre sempre sulla <b>Home</b>. A sinistra il menu (Home, Le mie task, Calendario, Notifiche, <b>Team</b>) e l’elenco dei tuoi spazi. Al centro il saluto, quattro numeri (progetti attivi, task aperte, consegne entro 7 giorni, collaboratori: toccali per andarci), le schede degli spazi e, in fondo, le task in scadenza da spuntare al volo, le attività recenti e gli impegni di oggi. Il tuo <b>profilo</b> si apre dalla tua foto in alto a destra.'],
+  ['La Home', 'FOSS si apre sempre sulla <b>Home</b>. A sinistra il menu (Home, Le mie task, Calendario, Notifiche, <b>Team</b>) e l’elenco dei tuoi spazi. Al centro il saluto, quattro numeri (progetti attivi, task aperte, consegne entro 7 giorni, collaboratori: toccali per andarci), le schede degli spazi (sul computer le prime sei; <b>Mostra altro</b> apre le altre) e, in fondo, le task in scadenza da spuntare al volo, le attività recenti e gli impegni di oggi. Il tuo <b>profilo</b> si apre dalla tua foto in alto a destra.'],
+  ['Il calendario di tutto', '<b>Calendario</b>, nel menu a sinistra della Home, mette insieme le date di tutti i lavori di tutti gli spazi, ognuno col suo colore; in alto puoi nascondere gli spazi che non ti servono. Dentro un singolo spazio il calendario mostra solo i suoi lavori.'],
+  ['Il riquadro «Scopri FOSS»', 'In basso a sinistra, una volta ogni cinque aperture, compare il riquadro che porta alla guida. La <b>×</b> lo chiude; per non vederlo più spegnilo in <b>Profilo → Guida e aiuto</b>.'],
   ['Il saluto', 'Dietro al saluto c’è una scena disegnata che segue la giornata: mattino, pomeriggio, sera e notte, con tre scene ciascuno (mongolfiere, spiaggia, tramonto, cielo stellato…). Ogni volta che apri FOSS ne esce una a caso; il tasto '+svg('spark',2.2).replace('<svg','<svg style="width:13px;height:13px;vertical-align:-2px"')+' passa alla successiva. Se sul dispositivo hai chiesto di ridurre il movimento, la scena sta ferma.'],
   ['Sul computer e sull’iPad', 'Dalla Home entri in uno spazio: a sinistra resta il menu con i tuoi spazi, in alto il nome dello spazio con <b>Modifica spazio</b> e <b>Nuovo progetto</b>, sotto le viste (Bacheca, Lista, Calendario, Mappa, Note). La <b>Bacheca</b> mette i progetti in colonne: per stato, per priorità o per scadenza, a scelta con <b>Dividi per</b>. Sugli schermi larghi a destra trovi la scheda dello spazio: copertina, avanzamento, persone e ultime attività. In alto a destra restano Annulla, il tema, la <b>Guida</b>, la campanella e la tua foto, che apre il profilo.'],
   ['Sul telefono', 'In basso ci sono cinque sezioni: <b>Lavori</b>, <b>Per te</b>, <b>Note</b>, <b>Cerca</b> e <b>Profilo</b>. In alto a sinistra il <b>+</b> per creare, al centro il nome di dove sei, a destra la campanella. Dentro a un lavoro la freccia in alto a sinistra ti riporta ai lavori.'],
@@ -9261,6 +9435,7 @@ const GUIDA = [
 {id:'persone', liv:'esperto', ic:'users', t:'Persone e permessi', s:'Chi entra, cosa vede, cosa può fare', v:[
   ['Amministratore e guest', 'Chi crea l’archivio è l’<b>amministratore</b>: vede tutti i lavori, invita le persone e decide chi vede cosa. Gli altri sono <b>guest</b>: vedono solo i lavori che l’amministratore apre loro.'],
   ['La pagina Team', '<b>Team</b>, nel menu a sinistra (sul telefono: Profilo → <b>Il tuo team</b>), raccoglie chi lavora con te e chi hai invitato, con ruolo ed email. In alto filtri per <b>Nel team</b> o <b>Invitati</b> e per <b>ruolo</b>: tocca «Montatrice» e restano solo le montatrici.'],
+  ['Chi è già su FOSS', 'In Team, nel riquadro <b>È già su FOSS?</b>, scrivi la sua email e premi Cerca. Se ha già un account vedi nome e ruolo e con <b>Aggiungi ai collaboratori</b> entra subito nel tuo team; se non c’è, FOSS te lo dice e con <b>Invitalo</b> parte l’invito.'],
   ['Invitare una persona', 'In Team premi <b>Invita una persona</b> e scrivi la sua email (nome e ruolo se vuoi). FOSS prepara l’invito e un messaggio già scritto: <b>Scrivi l’email</b> lo apre nella tua posta, oppure <b>Copia il link</b> e lo mandi come preferisci. Chi lo apre si registra con quella email, conferma il suo ruolo ed entra come guest del tuo archivio. Finché non si registra lo trovi tra gli <b>Invitati</b>: puoi riscrivergli o annullare l’invito con la ×.'],
   ['Aprirle un lavoro', 'Nel progetto, <b>Aggiungi qualcuno al team</b> (dalla scheda del lavoro o col tasto destro sul titolo). Da quel momento lo vede e riceve le sue notifiche. Puoi farlo anche mentre crei il progetto, nella pagina «Chi lo vede».'],
   ['Cosa può fare', 'In Team, <b>Permessi</b> sulla scheda della persona. Puoi spegnerle: creare lavori, creare e modificare task, spuntare, eliminare, decidere chi vede un lavoro, gestire gli spazi. A parte: vedere i soldi e la <b>sola lettura</b>, che lascia solo guardare.'],
@@ -9315,13 +9490,13 @@ function apriGuida(cap){
 function esciGuida(){
   const d = guida.da || {};
   if(d.schermo === 'progetto' && d.pid && state.progetti.some(p=>p.id===d.pid)){ state.progettoId = d.pid; state.schermo = 'progetto'; }
-  else if(['home','spazi','profilo','mie','cerca','team'].indexOf(d.schermo) >= 0 && (d.schermo !== 'home' || SPZ())) state.schermo = d.schermo;
+  else if(['home','spazi','profilo','mie','cerca','team','calendario'].indexOf(d.schermo) >= 0 && (d.schermo !== 'home' || SPZ())) state.schermo = d.schermo;
   else state.schermo = SPZ() ? 'home' : 'spazi';
   render();
 }
 function renderGuida(){
   const da = guida.da && guida.da.schermo;
-  const torna = {profilo:'Profilo', progetto:'Il lavoro', home:'I progetti', spazi:'Gli spazi', mie:'Per te', cerca:'Cerca', team:'Team'}[da] || 'Indietro';
+  const torna = {profilo:'Profilo', progetto:'Il lavoro', home:'I progetti', spazi:'Gli spazi', mie:'Per te', cerca:'Cerca', team:'Team', calendario:'Calendario'}[da] || 'Indietro';
   let h = '<div class="pane"><div class="scroller"><div class="guida">'+
     tastoIndietro('guida-esci', torna)+
     '<div class="g-testa"><span class="g-logo">'+svg('libro',2)+'</span><div>'+
@@ -9535,7 +9710,10 @@ function cartaGuida(){
       '<button class="btn sm primary" data-action="apri-guida">'+svg('help')+'Apri la guida</button>'+
       '<button class="btn sm" data-action="segnala">'+svg('bandiera')+'Segnala un problema</button>'+
       (adm ? '<button class="btn sm ghost" data-action="apri-guida" data-cap="segnalazioni">'+svg('list')+'Segnalazioni ricevute'+(aperte ? ' ('+aperte+')' : '')+'</button>' : '')+
-    '</div></div>';
+    '</div>'+
+    '<div class="riga pf-r" style="margin-top:8px"><span class="pf-ri">'+svg('libro',2)+'</span><div class="tx"><b>Riquadro «Scopri FOSS» nel menu</b><span>Compare una volta ogni cinque aperture. Spegnilo per non vederlo più</span></div>'+
+      '<button class="sw'+(state.cfg.noBoxGuida?'':' on')+'" data-action="cfg" data-k="noBoxGuida" aria-pressed="'+(!state.cfg.noBoxGuida)+'" aria-label="Riquadro della guida nel menu"></button></div>'+
+    '</div>';
 }
 
 /* ============ @ PER TAGGARE ============
@@ -9597,7 +9775,7 @@ document.addEventListener('keydown', function(e){
 }, true);
 document.addEventListener('input', function(e){ if(CAMPI_MENZ.indexOf(e.target.id) >= 0) aggiornaMenz(e.target); }, true);
 /* la bozza dell'invito sopravvive ai ridisegni (anteprima, altre azioni) */
-document.addEventListener('input', function(e){ const k = {iv_mail:'email', iv_nome:'nome', iv_ruolo:'ruolo', iv_msg:'messaggio'}[e.target.id]; if(k){ state.ivBozza = state.ivBozza || {}; state.ivBozza[k] = e.target.value; } }, true);
+document.addEventListener('input', function(e){ const k = {iv_mail:'email', iv_nome:'nome', iv_ruolo:'ruolo', iv_msg:'messaggio'}[e.target.id]; if(k){ state.ivBozza = state.ivBozza || {}; state.ivBozza[k] = e.target.value; aggiornaAnteprimaLive(); } }, true);
 document.addEventListener('pointerdown', function(e){ if(menz && !e.target.closest('#menzPop, [data-action="menz-apri"]') && e.target !== menz.ta) chiudiMenz(); }, true);
 
 /* ============ COMMENTI DELLE TASK E DELLE SUBTASK ============
@@ -11381,26 +11559,43 @@ document.addEventListener('click', function(e){
         if(r && r.html) mostraAnteprimaInvito(r.html); else toast('Anteprima non disponibile ('+esc((r&&r.errore)||'')+').','warn','Anteprima'); });
       break; }
     case 'iv-invia':{
+      if(state.ivLavoro) break;
       const email = (el('iv_mail').value||'').trim().toLowerCase();
       const nome = (el('iv_nome').value||'').trim().slice(0,40), ruolo = (el('iv_ruolo').value||'').trim().slice(0,60), messaggio = (el('iv_msg').value||'').trim().slice(0,600);
-      if(!/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(email)){ toast('Scrivi un\u2019email valida: \u00e8 quella con cui si registrer\u00e0.','warn','Email mancante'); el('iv_mail').focus(); break; }
-      if((state.inviti||[]).some(i=>!i.usato && (i.email||'').toLowerCase()===email)){ toast('L\u2019hai gi\u00e0 invitata: premi Reinvia nella lista qui sotto.','warn','Gi\u00e0 invitata'); break; }
-      if(state.utenti.some(u=>(u.email||'').toLowerCase()===email)){ toast('Questa persona \u00e8 gi\u00e0 nel team.','warn','Gi\u00e0 nel team'); break; }
-      const d = {nome, cognome:'', nickname:'', email, ruolo, messaggio};
-      t.disabled = true;
-      const dopo = inv => {
-        if(!inv){ t.disabled = false; return; }
-        state.ivBozza = null; ['iv_mail','iv_nome','iv_ruolo','iv_msg'].forEach(k=>{ const n = el(k); if(n) n.value = ''; });
-        if(typeof inviaInvitoCloud === 'function') inviaInvitoCloud({id:inv.id}).then(r=>esitoInvio(inv, r));
-        else esitoInvio(inv, {errore:'offline'});
-      };
-      if(typeof creaProfiloCloud === 'function') creaProfiloCloud(d).then(dopo);
-      else { state.inviti = state.inviti || []; const inv = Object.assign({id:'i'+Date.now(), usato:false, creato_il:new Date().toISOString()}, d); state.inviti.push(inv); dopo(inv); }
+      state.ivBozza = {email, nome, ruolo, messaggio};
+      if(!/^[^@\s]+@[^@\s]+\.[a-z]{2,}$/i.test(email)){ state.ivEsito = {tipo:'errore', email, testo:'Scrivi un’email completa: è quella con cui si registrerà.'}; render(); const n = el('iv_mail'); if(n) n.focus(); break; }
+      if(email === String(state.me.email||'').toLowerCase()){ state.ivEsito = {tipo:'errore', email, testo:'È la tua email.'}; render(); break; }
+      const gia = (state.inviti||[]).find(i=>!i.usato && (i.email||'').toLowerCase()===email);
+      if(gia){ state.ivEsito = {tipo:'errore', email, testo:'L’hai già invitata il '+dataInvito(gia)+': usa «Reinvia» sulla sua scheda.'}; render(); break; }
+      const inTeam = state.utenti.find(u=>(u.email||'').toLowerCase()===email);
+      if(inTeam){ state.ivEsito = {tipo:'iscritto', email, u:{id:inTeam.id, nome:inTeam.nome, gia:true}}; render(); break; }
+      (async ()=>{
+        state.ivLavoro = 'Controllo l’indirizzo…'; state.ivEsito = null; render();
+        const v = typeof inviaInvitoCloud === 'function' ? await inviaInvitoCloud({verifica:email}) : {errore:'offline'};
+        if(!v || !v.ok){
+          state.ivLavoro = null;
+          state.ivEsito = v && v.errore === 'iscritto' ? {tipo:'iscritto', email, u:v.utente || {}} : {tipo:'errore', email, testo:testoErrInvito((v && v.errore) || 'rete')};
+          render(); return;
+        }
+        state.ivLavoro = 'Preparo l’invito…'; render();
+        const inv = typeof creaProfiloCloud === 'function' ? await creaProfiloCloud({nome, cognome:'', nickname:'', email, ruolo, messaggio}) : null;
+        if(!inv){ state.ivLavoro = null; state.ivEsito = {tipo:'errore', email, testo:'Non sono riuscito a salvare l’invito. Riprova.'}; render(); return; }
+        state.ivBozza = null; ivLiveUltimo = '';
+        await mandaInvito(inv);
+      })();
       break; }
     case 'iv-reinvia':{
-      const inv = (state.inviti||[]).find(i=>i.id===t.dataset.id); if(!inv) break;
-      if(typeof inviaInvitoCloud !== 'function'){ esitoInvio(inv, {errore:'offline'}); break; }
-      t.disabled = true; inviaInvitoCloud({id:inv.id}).then(r=>esitoInvio(inv, r)); break; }
+      const inv = (state.inviti||[]).find(i=>i.id===t.dataset.id); if(!inv || state.ivLavoro) break;
+      mandaInvito(inv); break; }
+    case 'iv-aggiungi':{
+      const es = state.ivEsito; if(!es || !es.u || !es.u.id || typeof aggiungiCollaboratoreCloud !== 'function') break;
+      t.disabled = true;
+      aggiungiCollaboratoreCloud(es.u.id).then(ok=>{
+        if(ok){ state.ivEsito = {tipo:'aggiunto', email:es.email, u:es.u}; state.ivBozza = null; azione('<b>'+esc(es.u.nome||es.email)+'</b> aggiunto ai collaboratori'); }
+        else state.ivEsito = {tipo:'errore', email:es.email, testo:'Non sono riuscito ad aggiungerla. Riprova.'};
+        render();
+      });
+      break; }
     case 'mie-filtro': state.mieFiltro = t.dataset.k || 'tutte'; render(); break;
     case 'mie-chiudi':{ const c = state.mieChiusi || (state.mieChiusi = new Set()); const k = t.dataset.id; if(c.has(k)) c.delete(k); else c.add(k); render(); break; }
     case 'mie-stato':{
@@ -11410,10 +11605,10 @@ document.addEventListener('click', function(e){
       if(it.st==='corso'){ snap('«'+it.t+'» da iniziare'); delete it.st; }
       else { snap('«'+it.t+'» in corso'); it.st = 'corso'; logga(pr, 'In corso: <b>'+esc(it.t)+'</b> \u2014 '+esc(sb.titolo)); }
       render(); break; }
-    case 'hm-cal':{
-      const sp = state.spazi.find(x=>x.id===t.dataset.id) || SPZ(); if(!sp) break;
-      state.spazioId = sp.id; state.schermo = 'home'; state.progettoId = null; state.vista = 'calendario';
-      state.filtro = ''; state.filtroAttivo = null; render(); break; }
+    case 'hm-cal':
+      state.schermo = 'calendario'; state.progettoId = null; state.drawer = false; chiudiModale(); render(); break;
+    case 'cal-spazio':{ const c = state.calNo || (state.calNo = new Set()); const k = t.dataset.id;
+      if(!k) c.clear(); else if(c.has(k)) c.delete(k); else c.add(k); render(); break; }
     case 'hm-giu':{ const n = el(t.dataset.a); if(n) n.scrollIntoView({block:'start', behavior:'smooth'}); break; }
     case 'rit-tab': if(rit){ rit.cur = t.dataset.k; disegnaRitaglio(); } break;
     case 'rit-centra': if(rit){ rit.vals[rit.cur] = ritOk({}); aggiornaRitaglio(); } break;
@@ -11445,6 +11640,8 @@ document.addEventListener('click', function(e){
       const pr = state.progetti.find(x=>x.id===t.dataset.pid); if(!pr || isLock(pr)) break;
       snap('Copertina tolta da «'+pr.nome+'»');
       delete pr.copertina; delete pr.copRit; logga(pr, 'Copertina tolta'); render(); break; }
+    case 'hm-spazi-tutti': state.hmSpaziTutti = !state.hmSpaziTutti; render(); break;
+    case 'box-guida-chiudi': state.boxGuidaChiuso = true; render(); break;
     case 'hm-spazi-apri': state.hmSpaziChiusi = !state.hmSpaziChiusi; render(); break;
     case 'hm-copertina':{
       hmCopDi = t.dataset.id; if(!hmCopDi || !state.spazi.some(x=>x.id===hmCopDi)) break;
@@ -11860,9 +12057,36 @@ document.addEventListener('click', function(e){
     case 'team-invita':
       if(a === 'pf-invita' && el('iv_mail')){ const c = el('cartaInviti'); if(c) c.scrollIntoView({behavior:'smooth', block:'start'}); setTimeout(()=>el('iv_mail').focus({preventScroll:true}), 350); break; }
       if(a === 'pf-invita'){ state.schermo = 'team'; state.progettoId = null; }
-      state.teamForm = true; state.teamPronto = null; render();
-      setTimeout(()=>{ const i = el('tm_mail'); if(i) i.focus(); }, 40); break;
-    case 'team-chiudi': state.teamForm = false; state.teamPronto = null; render(); break;
+      state.teamForm = true; state.teamPronto = null; state.ivEsito = null; render();
+      setTimeout(()=>{ const i = el('iv_mail'); if(i) i.focus(); }, 40); break;
+    case 'team-chiudi': state.teamForm = false; state.teamPronto = null; state.ivEsito = null; render(); break;
+    case 'tm-cerca':{
+      const q = ((el('tm_cerca')||{}).value||'').trim().toLowerCase();
+      if(!/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(q)){ toast('Scrivi un\u2019email completa.','warn','Cerca'); break; }
+      if(q === String(state.me.email||'').toLowerCase()){ state.tmCerca = {q, esito:'trovato', u:{nome:nomeVisibile(), ruolo:state.me.ruolo, gia:true}}; render(); break; }
+      if(typeof cercaUtenteCloud !== 'function'){ toast('Serve la connessione al database.','warn','Cerca'); break; }
+      t.disabled = true;
+      cercaUtenteCloud(q).then(r=>{
+        t.disabled = false;
+        if(r.errore){ toast(esc(r.errore),'warn','Cerca'); return; }
+        state.tmCerca = r.trovato ? {q, esito:'trovato', u:r.trovato} : {q, esito:'nessuno'};
+        render();
+      });
+      break; }
+    case 'tm-aggiungi':{
+      const c = state.tmCerca; if(!c || !c.u || typeof aggiungiCollaboratoreCloud !== 'function') break;
+      t.disabled = true;
+      aggiungiCollaboratoreCloud(c.u.id).then(ok=>{
+        if(ok){ state.tmCerca = {q:c.q, esito:'aggiunto', u:c.u}; azione('<b>'+esc(c.u.nome)+'</b> aggiunto ai collaboratori'); }
+        render();
+      });
+      break; }
+    case 'tm-cerca-invita':{
+      const q = (state.tmCerca||{}).q || '';
+      state.teamForm = true; state.teamPronto = null; state.tmCerca = null; state.ivEsito = null;
+      state.ivBozza = Object.assign({}, state.ivBozza, {email:q}); render();
+      setTimeout(()=>{ const n = el('iv_nome'); if(n) n.focus(); }, 40);
+      break; }
     case 'team-stato': state.teamStato = t.dataset.k || 'tutti'; render(); break;
     case 'team-ruolo': state.teamRuolo = t.dataset.k || ''; render(); break;
     case 'invito-crea':{
@@ -11871,14 +12095,19 @@ document.addEventListener('click', function(e){
       if(!/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(email)){ toast('Scrivi un\u2019email valida: \u00e8 quella con cui si registrer\u00e0.','warn','Email mancante'); const i = el('tm_mail'); if(i) i.focus(); break; }
       if((state.inviti||[]).some(i=>!i.usato && (i.email||'').toLowerCase()===email)){ toast('Questa persona \u00e8 gi\u00e0 invitata: la trovi qui sotto.','warn','Gi\u00e0 invitata'); break; }
       if(state.utenti.some(u=>(u.email||'').toLowerCase()===email)){ toast('Questa persona \u00e8 gi\u00e0 nel team.','warn','Gi\u00e0 nel team'); break; }
-      const d = {nome, cognome:'', nickname:'', email, ruolo};
+      const d = {nome, cognome:'', nickname:'', email, ruolo, messaggio:((el('tm_msg')||{}).value||'').trim().slice(0,600)};
       t.disabled = true;
       const fatto = inv => {
         t.disabled = false;
         if(!inv) return;
-        state.teamForm = false; state.teamPronto = inv.id; state.teamStato = 'tutti';
-        azione('Invito preparato per <b>'+esc(email)+'</b>');
-        render();
+        state.teamForm = false; state.teamPronto = inv.id; state.teamStato = 'tutti'; state.teamInviata = null;
+        const fine = r => {
+          if(r && r.ok){ inv.inviato_il = r.inviato_il; inv.invii = r.invii || 1; state.teamInviata = inv.id; azione('Invito mandato a <b>'+esc(email)+'</b>'); }
+          else { azione('Invito preparato per <b>'+esc(email)+'</b>');
+                 if(r && r.errore && ['chiave','offline'].indexOf(r.errore) < 0) toast('L\u2019email non \u00e8 partita ('+esc(r.errore)+'): mandala dalla tua posta.','warn','Invito'); }
+          render();
+        };
+        if(typeof inviaInvitoCloud === 'function') inviaInvitoCloud({id:inv.id}).then(fine); else fine({errore:'offline'});
       };
       if(typeof creaProfiloCloud === 'function') creaProfiloCloud(d).then(fatto);
       else {
@@ -11920,6 +12149,7 @@ document.addEventListener('click', function(e){
 
     case 'cfg':{
       const k = t.dataset.k, nuovo = !state.cfg[k];
+      if(k==='noBoxGuida'){ state.cfg[k] = !state.cfg[k]; render(); if(typeof salvaProfiloCloud === 'function') salvaProfiloCloud(); break; }
       const et = k==='boxFull'?'Box a schermo intero':k==='toast'?'Avvisi in alto a destra':'Notifiche solo dei tuoi progetti';
       if(k==='toast' && !nuovo) toast(et+' disattivati.','info');   // ultimo avviso prima di spegnerli
       state.cfg[k] = nuovo; render();
@@ -13317,7 +13547,7 @@ async function caricaCloud(){
     /* i profili creati dall'amministratore che non si sono ancora registrati */
     state.inviti = [];
     if(sonoAdmin && orgMia){
-      const {data:inv} = await sb.from('inviti').select('id,nome,cognome,nickname,email,ruolo,usato,creato_il,messaggio,inviato_il,invii').eq('org_id', orgMia);
+      const {data:inv} = await sb.from('inviti').select('id,nome,cognome,nickname,email,ruolo,usato,creato_il,messaggio,inviato_il,invii,esito').eq('org_id', orgMia);
       state.inviti = inv || [];
     }
 
@@ -14194,7 +14424,7 @@ async function creaProfiloCloud(d){
   if(!sb || !utenteCloud || !orgMia){ toast('Serve la connessione al database.','warn','Non creato'); return false; }
   const {data, error} = await sb.from('inviti').insert({org_id:orgMia, nome:d.nome, cognome:d.cognome,
     nickname:d.nickname, email:d.email, ruolo:d.ruolo||'', messaggio:(d.messaggio||'').slice(0,600), usato:false})
-    .select('id,nome,cognome,nickname,email,ruolo,usato,creato_il,messaggio,inviato_il,invii').single();
+    .select('id,nome,cognome,nickname,email,ruolo,usato,creato_il,messaggio,inviato_il,invii,esito').single();
   if(error){ toast(error.message,'warn','Invito non creato'); return false; }
   if(data && !data.creato_il) data.creato_il = new Date().toISOString();
   state.inviti = (state.inviti||[]).concat([data]);
@@ -14211,6 +14441,26 @@ async function inviaInvitoCloud(corpo){
     try{ if(error.context && typeof error.context.json === 'function'){ const j = await error.context.json(); if(j && j.errore) e = j.errore; } }catch(x){}
     return {errore:e};
   }catch(x){ return {errore:'rete'}; }
+}
+/* chi e' gia' su FOSS: si cerca per email esatta (solo il titolare), e si aggiunge al team */
+async function cercaUtenteCloud(email){
+  if(!sb || !utenteCloud) return {errore:'offline'};
+  const {data, error} = await sb.rpc('cerca_utente', {p_email:email});
+  if(error) return {errore:error.message};
+  return {trovato:(data||[])[0] || null};
+}
+async function aggiungiCollaboratoreCloud(id){
+  if(!sb || !utenteCloud || !orgMia) return false;
+  const {data, error} = await sb.rpc('aggiungi_collaboratore', {p_utente:id});
+  if(error || !data){ toast((error && error.message) || 'Non aggiunto.','warn','Collaboratore'); return false; }
+  const {data:u} = await sb.from('profili').select('*').eq('id', id).maybeSingle();
+  if(u && !state.utenti.some(x=>x.id===u.id)){
+    state.utenti.push({id:u.id, nome:(u.nickname||((u.nome||'')+' '+(u.cognome||'')).trim()||u.email),
+      ini:((u.nome||u.email||'?')[0]+(u.cognome?u.cognome[0]:'')).toUpperCase(),
+      ruolo:u.ruolo||'Collaboratore', col:COL(state.utenti.length), foto:u.foto_url||null, email:u.email||''});
+  }
+  state.permessi[id] = state.permessi[id] || {};
+  return true;
 }
 async function salvaPermessiCloud(uid, pm){
   if(!sb || !utenteCloud || !orgMia) return false;
