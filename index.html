@@ -452,7 +452,7 @@ input,textarea,select{font:inherit;color:inherit}
 .topbar.senza-etichette .vs span{display:none}
 .topbar.senza-etichette .vs{padding:7px 12px}
 .topbar.senza-ricerca .search{display:none}
-.topbar.senza-tema #themeBtn{display:none}
+.topbar #themeBtn,.topbar #lockBtn{display:none!important}   /* v48: il tema si cambia dal profilo */
 .vs.on{background:var(--amber);color:var(--on-amber);box-shadow:0 2px 10px rgba(255,173,1,.28)}
 
 /* PRIORITÀ E TIPO SULLE TESSERE */
@@ -579,7 +579,7 @@ input,textarea,select{font:inherit;color:inherit}
 .rail-r{border-right:none;border-left:1px solid var(--line)}
 .rail-sec{padding:13px 14px;border-bottom:1px solid var(--line-soft)}
 .rail-sec:last-child{border-bottom:none}
-.lbl{font-size:10px;letter-spacing:.14em;text-transform:uppercase;color:var(--mute);font-family:Sora;font-weight:600;margin-bottom:7px}
+.lbl{font-size:12.5px;letter-spacing:0;text-transform:none;color:var(--dim);font-family:Sora;font-weight:600;margin-bottom:7px}
 .kv{display:flex;justify-content:space-between;gap:10px;padding:3px 0;font-size:12px}
 .kv span{color:var(--dim)}
 .kv b{font-weight:600;text-align:right}
@@ -744,6 +744,15 @@ input,textarea,select{font:inherit;color:inherit}
 .send{width:34px;height:34px;border-radius:var(--r-m);background:var(--amber);color:var(--on-amber);display:grid;place-items:center;flex:none}
 .send svg{width:15px;height:15px}
 .send:disabled{opacity:.35;cursor:default}
+.busta{width:34px;height:34px;border-radius:var(--r-m);border:1px solid var(--line);color:var(--mute);background:transparent;display:grid;place-items:center;flex:none;cursor:pointer}
+.busta svg{width:16px;height:16px}
+.busta.on{background:var(--amber-soft);border-color:var(--amber);color:var(--amber-ink)}
+.busta[hidden]{display:none!important}
+.cm-riga .busta{width:38px;height:38px}
+#bustaEsito{position:fixed;left:50%;bottom:calc(22px + env(safe-area-inset-bottom));transform:translateX(-50%);z-index:9999;display:flex;gap:8px;align-items:center;
+  padding:10px 16px;border-radius:999px;background:var(--surface);border:1px solid var(--line);box-shadow:0 10px 30px rgba(0,0,0,.35);font-size:13px;max-width:calc(100vw - 32px)}
+#bustaEsito svg{width:15px;height:15px;flex:none}
+#bustaEsito.va svg{color:var(--amber-ink)} #bustaEsito.ok svg{color:var(--ok)} #bustaEsito.ko{color:var(--alert)}
 
 /* ---------- BARRA FASI (stile Resolve) ---------- */
 .phasebar{
@@ -758,6 +767,9 @@ input,textarea,select{font:inherit;color:inherit}
 .rewind:hover:not(:disabled){border-color:var(--amber);color:var(--amber-ink);background:var(--amber-soft)}
 .rewind:disabled{opacity:.3;cursor:default}
 .rewind svg{width:19px;height:19px}
+.rewind .rw-l{font-size:12px;font-weight:600;white-space:nowrap}
+@media (min-width:1000px){ .rewind{width:auto!important;padding:0 14px;gap:7px;display:inline-flex;align-items:center} }
+@media (max-width:999px){ .rewind .rw-l{display:none} }
 .rewind.armed{border-color:var(--amber);color:var(--amber-ink);background:var(--amber-soft);
   animation:breathe 2.2s ease-in-out infinite}
 @keyframes breathe{0%,100%{box-shadow:0 0 0 0 var(--ring)}50%{box-shadow:0 0 0 6px transparent}}
@@ -2194,7 +2206,7 @@ a.btn.primary{color:var(--on-amber)}
   display:grid;place-items:center;box-shadow:var(--shadow);color:var(--text);z-index:3}
 .hm-freccia svg{width:16px;height:16px}
 
-.hm-tre{display:grid;grid-template-columns:1.25fr 1.1fr 1fr;gap:18px;margin-top:24px}
+.hm-tre{display:grid;grid-template-columns:1.4fr 1fr;gap:18px;margin-top:24px}
 .hm-box{border:1px solid var(--line);background:var(--surface);border-radius:16px;padding:16px 18px 10px;min-width:0}
 .hm-box-h{display:flex;align-items:center;gap:8px;margin-bottom:10px;min-height:26px}
 .hm-box-h h3{font-size:16px;font-weight:700;letter-spacing:-.01em;flex:1}
@@ -2260,7 +2272,7 @@ a.btn.primary{color:var(--on-amber)}
 .wz-cop{height:110px;border-radius:12px;background-size:cover;background-position:center;display:flex;align-items:flex-end;justify-content:flex-end;gap:6px;padding:8px}
 .wz-cop .btn{background:rgba(10,16,30,.7);color:#fff;border-color:transparent}
 
-@media (max-width:1400px){ .hm-tre{grid-template-columns:1fr 1fr} .hm-tre .hm-box:first-child{grid-column:1 / -1} }
+@media (max-width:1100px){ .hm-tre{grid-template-columns:1fr} }
 @media (max-width:1100px){ .hm-stats{grid-template-columns:repeat(2,minmax(0,1fr))} .hm-spazi.griglia > .hm-spc{flex-basis:calc((100% - 18px) / 2)} }
 @media (max-width:999px){ .hm-side{display:none} .hm-guida.in-pagina{display:flex} }
 @media (max-width:760px){
@@ -2347,6 +2359,33 @@ a.btn.primary{color:var(--on-amber)}
 .tk-pill{max-width:60%;padding:2px 7px;border-radius:5px;background:var(--acc);color:#15120a;font-size:10px;font-weight:800;letter-spacing:.04em;text-transform:uppercase;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .tk-tipo{font-size:10.5px;font-weight:600;letter-spacing:.06em;text-transform:uppercase;color:var(--hm-2,var(--dim));white-space:nowrap;overflow:hidden;text-overflow:ellipsis;min-width:0}
 .tk-tags .sep{flex:1}
+.pf .pf-t .tx p{display:none}   /* v48: i titoli delle schede bastano */
+.prof-riass{display:flex;flex-wrap:wrap;gap:7px;margin-top:6px}
+.prof-riass .chip svg{width:12px;height:12px;margin-right:2px}
+.pf-vuoto{font-size:13px;color:var(--dim)}
+.pf-avanzate summary{list-style:none;display:flex;align-items:center;gap:10px;cursor:pointer;font-size:15px}
+.pf-avanzate summary::-webkit-details-marker{display:none}
+.pf-avanzate summary svg{width:17px;height:17px;color:var(--dim)}
+.pf-avanzate summary svg:last-child{margin-left:auto;transition:transform .2s}
+.pf-avanzate[open] summary svg:last-child{transform:rotate(180deg)}
+.pf-avanzate[open] summary{margin-bottom:10px}
+.mt-r[role="button"]{cursor:pointer}
+.mt-r .mt-piu{display:grid;place-items:center;color:var(--mute)}
+.mt-r .mt-piu svg{width:16px;height:16px}
+/* v48: meno rumore sulle righe delle subtask (su computer i controlli vuoti compaiono passandoci sopra) */
+.v-st.muto{background:transparent!important}
+@media (hover:hover){
+  .chk.v2 .v-data.vuota{opacity:0}
+  .chk.v2 .cm-btn:not(.ha):not(.nuovi){opacity:0}
+  .chk.v2 .v-menu{opacity:0}
+  .chk.v2:hover .v-data.vuota,.chk.v2:hover .cm-btn,.chk.v2:hover .v-menu,.chk.v2 :focus-visible{opacity:1}
+  .sub-h .cm-btn:not(.ha):not(.nuovi){opacity:0}
+  .sub-h:hover .cm-btn{opacity:1}
+}
+.agg-dato{display:inline-flex;align-items:center;gap:6px;margin-top:10px;padding:6px 10px;border-radius:9px;border:1px dashed var(--line);background:none;color:var(--dim);font:600 12.5px/1 inherit;cursor:pointer}
+.agg-dato svg{width:13px;height:13px}
+.agg-dato:hover{border-color:var(--amber);color:var(--text)}
+.agg-fase{margin:4px 0 2px}
 .msg-task{display:inline-flex;align-items:center;gap:5px;max-width:100%;border:0;background:var(--amber-soft);color:var(--amber-ink);font:600 11.5px/1.3 inherit;padding:4px 8px;border-radius:7px;cursor:pointer;margin:3px 0 4px;text-align:left}
 .msg-task b{font-weight:700;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;min-width:0}
 .msg-task svg{width:12px;height:12px;flex:none}
@@ -3022,6 +3061,10 @@ body.sto-spostando .hm-spazi.griglia{scroll-snap-type:none}
 
 /* riquadro della guida con la X */
 .hm-guida{position:relative}
+.solo-stretto{display:none!important}
+@media (max-width:999px){ .solo-stretto{display:inline-flex!important} }
+.hm-spc .nums.corti{display:flex;gap:14px;font-size:12.5px;color:var(--hm-2);font-weight:500}
+.hm-spc .nums.corti .urg{color:var(--t-rosso)}
 .hm-guida-x{position:absolute;top:10px;right:10px;width:26px;height:26px;border-radius:8px;display:grid;place-items:center;color:var(--mute)}
 .hm-guida-x:hover{background:var(--surface-2);color:var(--text)}
 .hm-guida-x svg{width:14px;height:14px}
@@ -3401,6 +3444,7 @@ const I = {
   plus:'<path d="M12 5v14M5 12h14"/>',
   grid:'<rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/>',
   send:'<path d="m3 11 18-8-8 18-2-7z"/>',
+  posta:'<rect x="3" y="5" width="18" height="14" rx="2.5"/><path d="m3.5 7 8.5 6 8.5-6"/>',
   user:'<circle cx="12" cy="8" r="4"/><path d="M4 21a8 8 0 0 1 16 0"/>',
   users:'<circle cx="9" cy="8" r="3.5"/><path d="M2 20a7 7 0 0 1 14 0"/><path d="M17 5.2a3.5 3.5 0 0 1 0 6.6M18 20a7 7 0 0 0-2.5-5.4"/>',
   chat:'<path d="M21 12a8 8 0 0 1-11.2 7.3L4 20l.8-5A8 8 0 1 1 21 12z"/>',
@@ -4099,6 +4143,24 @@ function salvaProfessioni(l){
   save();
 }
 function cartaProfessioni(){
+  const scelte = haSceltoProfessioni() ? state.cfg.professioni.filter(k=>TIPI[k]) : [];
+  return '<div class="card" id="cartaProf">'+pfTesta('briefcase','I lavori che fai','',
+      '<button class="btn sm" data-action="prof-modale">'+svg('pen',2.2)+'Cambia</button>')+
+    '<div class="prof-riass">'+(scelte.length ? scelte.map(k=>'<span class="chip">'+svg(TIPI[k].ic,2)+esc(TIPI[k].prof)+'</span>').join('') : '<span class="pf-vuoto">Tutti i lavori</span>')+'</div></div>';
+}
+function griglieProfessioni(){
+  const scelte = haSceltoProfessioni() ? state.cfg.professioni : [];
+  return '<div class="prof-scelte">'+ORDINE_TIPI.map(k=>{ const on = scelte.indexOf(k)>=0;
+      return '<button class="prof-b'+(on?' on':'')+'" data-action="prof-cambia" data-k="'+k+'" aria-pressed="'+on+'">'+
+        '<span class="ic">'+svg(TIPI[k].ic,2)+'</span><span class="nm">'+esc(TIPI[k].prof)+'</span>'+
+        '<span class="sp">'+svg('check',3)+'</span></button>'; }).join('')+'</div>';
+}
+function modaleProfessioni(){
+  modale('<h3>I lavori che fai</h3><div class="sub-t">Quando crei uno spazio o un progetto ti propongo solo questi. Se non ne scegli nessuno li vedi tutti.</div>'+
+    '<div class="modal-b" id="profModale">'+griglieProfessioni()+'</div>'+
+    '<div class="modal-f"><button class="btn primary" data-action="chiudi-modale">Fatto</button></div>');
+}
+function cartaProfessioniVecchia(){
   const scelte = haSceltoProfessioni() ? state.cfg.professioni : [];
   return '<div class="card" id="cartaProf">'+pfTesta('briefcase','I lavori che fai','Quando crei uno spazio, un progetto o un preset ti propongo solo queste professioni. '+
       (scelte.length ? 'Tocca per aggiungerne o toglierne.' : 'Finché non ne scegli nessuna le vedi tutte.'))+
@@ -4826,11 +4888,9 @@ function testataSpazioLarga(sp, lista){
       '<h1>'+esc(sp.nome)+'</h1>'+
       '<div class="desc">'+esc(sp.desc || TIPO(sp.tipo).prof || '')+(titolareDiSpazio(sp) ? ' <span class="chip condiviso">'+svg('users',2.2)+'Spazio di '+esc(U(titolareDiSpazio(sp)).nome)+'</span>' : '')+'</div>'+
       '<div class="sp2-meta">'+
-        '<span>'+svg('users',2)+membri.length+(membri.length===1?' membro':' membri')+'</span>'+
-        '<span>'+svg('grid',2)+ps.filter(p=>!p.completato).length+(state.filtroAttivo?' filtrati':' progetti')+'</span>'+
-        '<span>'+svg('check',2.2)+'<b>'+n.task+'</b> task</span>'+
+        '<span class="sp2-chi" title="'+esc(membri.map((id,i)=>U(id).nome+(i===0?' (proprietario)':'')).join(', '))+'">'+pilaAvatar(membri, 4)+'</span>'+
+        '<span>'+ps.filter(p=>!p.completato).length+(state.filtroAttivo?' filtrati':' progetti')+'</span>'+
         (n.urg? '<span class="urg">'+svg('clock',2)+n.urg+' in scadenza</span>' : '')+
-        pilaAvatar(membri, 4)+
       '</div>'+
     '</div>'+
     (state.ospite? '' : '<div class="azioni">'+
@@ -4844,9 +4904,13 @@ function schedeViste(){
   Object.keys(VISTE).forEach(k=>{ if(ordine.indexOf(k)<0) ordine.push(k); });
   const conGruppi = state.vista==='tessere' || state.vista==='lista';
   const V = [['compiti','Stato'],['priorita','Priorità'],['scadenza','Scadenza']];
-  return '<div class="sp2-viste"><div class="sp2-tabs">'+ordine.map(k=>
+  const PRINC = ['tessere','lista','calendario'], extra = state.vista==='mappa' || state.vista==='note';
+  return '<div class="sp2-viste"><div class="sp2-tabs">'+ordine.filter(k=>PRINC.indexOf(k)>=0).map(k=>
       '<button class="vs sp2-tab'+(state.vista===k?' on':'')+'" data-vs="'+k+'" data-action="vista" data-v="'+k+'" title="'+VISTE[k].n+' — trascina per spostarlo">'+
-      svg(VISTE[k].ic,2)+'<span>'+VISTE[k].n+'</span></button>').join('')+'</div><span class="spacer"></span>'+
+      svg(VISTE[k].ic,2)+'<span>'+VISTE[k].n+'</span></button>').join('')+
+      '<button class="sp2-tab'+(extra?' on':'')+'" data-action="viste-altro" title="Mappa e Note">'+
+        (extra ? svg(VISTE[state.vista].ic,2)+'<span>'+VISTE[state.vista].n+'</span>' : svg('altro',2)+'<span>Altro</span>')+svg('chev',2.4)+'</button>'+
+    '</div><span class="spacer"></span>'+
     (conGruppi ? '<span class="sp2-per">Dividi per</span><div class="seg sp2-seg">'+V.map(v=>'<button class="'+(state.raggruppa===v[0]?'on':'')+'" data-action="raggruppa" data-k="'+v[0]+'">'+v[1]+'</button>').join('')+'</div>' : '')+
   '</div>';
 }
@@ -4856,7 +4920,7 @@ function bachecaColonne(lista){
   let h = '<div class="scroller kb-wrap"><div class="kb">';
   gruppiDi(lista).forEach(g=>{
     const tono = COL_GRUPPI[g.id] || 'grigio';
-    const aggiunge = puoCreare && g.id!=='fatto' && g.id!=='Completati';
+    const aggiunge = false;   /* v48: si crea solo da «Nuovo progetto» in alto */
     h += '<section class="kb-col k-'+tono+'"><div class="kb-h"><span class="pallo"></span><h3>'+esc(g.nome)+'</h3><span class="n">'+g.ps.length+'</span><span class="spacer"></span>'+
       (aggiunge ? '<button class="kb-piu" data-action="nuovo" title="Nuovo progetto">'+svg('plus',2.2)+'</button>' : '')+'</div>'+
       '<div class="tiles kb-lista">'+g.ps.map(tessera).join('')+'</div>'+
@@ -5048,7 +5112,7 @@ function renderHome(){
      schermo e trascinare una scheda farebbe correre subito la pagina. */
   const tutto = suTelefono() && (state.vista==='tessere' || state.vista==='lista');
   const largo = !suTelefono() && !!sp;
-  const conScheda = largo && (state.vista==='tessere' || state.vista==='lista');
+  const conScheda = false;   /* v48: la scheda a destra ripeteva l'intestazione */
   if(largo) h += '<div class="hm sp2-lay'+(conScheda?' con-scheda':'')+'">'+barraSinistra(sp.id)+'<div class="sp2-main'+(bgSp?' con-sfondo':'')+'"'+(bgSp? ' style="--bg-img:url(\''+bgSp+'\');'+varsRit(ritDi(sp,'sfondo'))+'"':'')+'>';
   if(tutto) h += '<div class="scroller tel-tutto">' + testataTelefono();
   h += intestazioneSpazio(lista);
@@ -5189,10 +5253,9 @@ function renderProgetto(){
     '<div class="side">'+
       '<button class="btn sm ghost solo-stretto no-tel" data-action="toggle-rail" title="Scheda progetto, team e blocco">'+svg('file')+'Scheda</button>'+
       '<button class="btn sm no-tel" data-action="condividi" data-pid="'+p.id+'">'+svg('share')+'Condividi</button>'+
-      (!state.ospite && !isLock(p) && puo('modifica') ? '<button class="btn sm ghost no-tel" data-action="cop-progetto" data-pid="'+p.id+'" title="La foto che compare sulla scheda del progetto">'+svg('foto')+(p.copertina? 'Cambia copertina' : 'Copertina')+'</button>' : '')+
+      (!state.ospite ? '<button class="btn sm ghost no-tel" data-action="menu-progetto" data-pid="'+p.id+'" title="Altre azioni: copertina, blocco, preset, completa…" aria-label="Altre azioni">'+svg('altro',2)+'</button>' : '')+
       ((p.lock&&p.lock.on)? '<button class="lockchip" data-action="lock" data-pid="'+p.id+'" title="Sblocca con password">'+svg('lock')+'Bloccato</button>':'')+
       '<span class="prio '+p.prio+'">'+PRIO[p.prio]+'</span>'+
-      '<span class="chip no-tel '+SC.c+'">'+svg('clock')+SC.t+'</span>'+
       '<span class="av-stack no-tel">'+p.team.slice(0,5).map(id=>av(U(id),'sm')).join('')+'</span>'+
       tastoFeed(p)+
     '</div></div>';
@@ -5210,17 +5273,22 @@ function renderProgetto(){
     '<div class="kv"><span>Priorità</span><span class="prio '+p.prio+'">'+PRIO[p.prio]+'</span>'+
       pen('proj','prio')+'</div>'+
     (p.personale ? '<div class="kv"><span>Per chi</span><span class="chip pers-chip">'+svg('user',2.2)+'Progetto personale</span></div>' : kv(esc(T.chi||'Cliente'),p.cliente,'cliente'))+
-    (T.dett||[]).filter(d=>!(p.personale && d[0]==='referente')).map(d=>kv(esc(d[1]), p[d[0]], d[0])).join('')+
-    kv(esc(etichettaData(p)),p.consegna,'consegna')+(p.personale? '' : kv('Fattura',p.fattura,'fattura'))+
-    '<div class="chip '+sc.c+'" style="margin-top:8px">'+svg('clock')+sc.t+'</div>'+
-    '<div style="margin-top:10px" class="editabile"><div class="lbl" style="display:flex;align-items:center;gap:4px">'+esc(T.luogo||'Indirizzo')+pen('proj','indirizzo')+'</div>'+
-      '<div class="nota-box">'+svg('pin').replace('<svg','<svg style="width:12px;height:12px;vertical-align:-1px;margin-right:4px;color:var(--amber-ink)"')+
-      (p.indirizzo? esc(p.indirizzo) : '<span style="color:var(--mute)">da definire</span>')+'</div></div>'+
+    (()=>{ /* v48: solo i campi compilati; quelli vuoti si aggiungono dal tasto qui sotto */
+      const campi = (T.dett||[]).filter(d=>!(p.personale && d[0]==='referente')).map(d=>[esc(d[1]), d[0]])
+        .concat([[esc(etichettaData(p)),'consegna']]).concat(p.personale? [] : [['Fattura','fattura']]);
+      const pieno = v => v!=null && v!=='' && v!=='\u2014';
+      const mancano = campi.filter(c=>!pieno(p[c[1]])).concat(pieno(p.indirizzo)? [] : [[esc(T.luogo||'Indirizzo'),'indirizzo']]);
+      return campi.filter(c=>pieno(p[c[1]])).map(c=>kv(c[0], p[c[1]], c[1])).join('')+
+        '<div class="chip '+sc.c+'" style="margin-top:8px">'+svg('clock')+sc.t+'</div>'+
+        (pieno(p.indirizzo) ? '<div style="margin-top:10px" class="editabile"><div class="lbl" style="display:flex;align-items:center;gap:4px">'+esc(T.luogo||'Indirizzo')+pen('proj','indirizzo')+'</div>'+
+          '<div class="nota-box">'+svg('pin').replace('<svg','<svg style="width:12px;height:12px;vertical-align:-1px;margin-right:4px;color:var(--amber-ink)"')+esc(p.indirizzo)+'</div></div>' : '')+
+        (mancano.length && !isLock(p) && !state.ospite && puo('modifica') ? '<button class="agg-dato" data-action="agg-dato" data-pid="'+p.id+'" data-campi="'+esc(JSON.stringify(mancano))+'">'+svg('plus',2.2)+'Aggiungi un dato</button>' : '');
+    })()+
     '</div>';
   {
     h += '<div class="rail-sec editabile"><div class="lbl" style="display:flex;align-items:center;gap:4px">Note e allegati'+pen('proj','nota')+'</div>'+
       (p.nota? '<div class="nota-box" style="margin-bottom:9px">'+sicuro(p.nota)+'</div>'
-             : '<div class="nota-box" style="margin-bottom:9px;color:var(--mute)">Nessuna nota.</div>')+
+             : '<button class="agg-dato" data-action="edit" data-t="proj" data-k="nota" data-pid="'+p.id+'">'+svg('plus',2.2)+'Scrivi una nota</button>')+
       (p.allegati||[]).map(a=>'<div class="file" style="margin-bottom:6px"><span class="ic">'+svg('file')+'</span>'+
         '<span class="nm">'+esc(a.nome)+'</span><span class="sz">'+fmtSize(a.size)+'</span></div>').join('')+
       '</div>';
@@ -5232,8 +5300,7 @@ function renderProgetto(){
       (id===capoP ? '<em class="capo">Proprietario</em> · ' : '')+esc(u.ruolo||'')+'</div></div></div>'; }).join('')+
     (puo('visibilita')? '<button class="btn sm ghost" style="margin-top:8px;width:100%;justify-content:center" data-action="add-user">'+svg('users')+'Decidi chi lo vede</button>' : '')+'</div>';
   h += soldiHTML(p) + dateHTML(p);
-  if(puo('crea_lavori') && !state.ospite) h += '<div class="rail-sec"><button class="btn sm ghost" style="width:100%;justify-content:center" data-action="salva-modello-apri" data-pid="'+p.id+'">'+
-    svg('salva')+'Salva come preset</button></div>';
+
   h += '</aside>';
 
   /* centro */
@@ -5253,14 +5320,21 @@ function renderProgetto(){
     '<div class="rail-compatta'+((!p.completato && pct<100)?' e-anello':'')+(p.completato?' e-chiuso':'')+'">'+
       avanzamentoHTML(p,pct,F,20,2*Math.PI*20,true)+'</div></div>';
   h += barraProssima(p);
-  h += '<div class="specs">'+specs(p,f).map(s=>'<div class="spec"><div class="k">'+s[0]+'</div><div class="v'+(s[2]?' mono':'')+'">'+
-    esc(s[1])+'</div>'+(s[3]==='budget'
-      ? (scriveSoldi()? '<button class="pen" data-action="conti" data-pid="'+p.id+'" title="Preventivo, incassi e spese">'+svg('pen',2.2)+'</button>' : '')
-      : pen('proj',s[3]))+'</div>').join('')+'</div>';
+  { /* v48: solo i dati della fase compilati; gli altri si aggiungono dal tasto */
+    const tutti = specs(p,f), pieno = x => x[1]!=null && x[1]!=='' && x[1]!=='\u2014';
+    const vuoti = tutti.filter(x=>!pieno(x) && x[3]!=='budget');
+    const pieni = tutti.filter(pieno);
+    if(pieni.length) h += '<div class="specs">'+pieni.map(s=>'<div class="spec"><div class="k">'+s[0]+'</div><div class="v'+(s[2]?' mono':'')+'">'+
+      esc(s[1])+'</div>'+(s[3]==='budget'
+        ? (scriveSoldi()? '<button class="pen" data-action="conti" data-pid="'+p.id+'" title="Preventivo, incassi e spese">'+svg('pen',2.2)+'</button>' : '')
+        : pen('proj',s[3]))+'</div>').join('')+'</div>';
+    if(vuoti.length && !isLock(p) && !state.ospite && puo('modifica'))
+      h += '<button class="agg-dato agg-fase solo-tel" data-action="agg-dato" data-pid="'+p.id+'" data-campi="'+esc(JSON.stringify(vuoti.map(x=>[esc(x[0]), x[3]])))+'">'+svg('plus',2.2)+'Dati della fase</button>';
+  }
 
   h += '<div class="subs" id="subs">';
   h += '<div class="lbl" style="margin:2px 0 -2px;display:flex;align-items:center;gap:6px">'+
-       '<span class="no-tel">Task di '+esc(F.nome)+'</span>'+
+
        ((state.ospite||p.completato||!puo('modifica'))?'':'<button class="btn sm ghost" style="margin-left:auto;padding:3px 8px" data-action="nuova-task">'+svg('plus')+'Nuova task</button>')+
        '</div>';
   const subs = p.subs.filter(s=>s.fase===f);
@@ -5276,8 +5350,7 @@ function renderProgetto(){
         pen('sub','titolo',s.id)+
         '<span class="sub-barra" aria-hidden="true"><i style="width:'+pc+'%"></i></span>'+
         tastoCommenti(p, stThr, s)+
-        '<button class="pen" data-action="condividi" data-pid="'+p.id+'" data-sid="'+s.id+'" title="Condividi questa task">'+svg('share',2.2)+'</button>'+
-        '<span class="chip '+(pc===100?'ok':pc>0?'now':'')+'">'+(pc===100?'Chiusa':pc>0?'In corso':'Da aprire')+'</span>'+
+
         av(resp,'sm')+
         '<span class="minibar"><i style="width:'+pc+'%"></i></span>'+
         '<span class="mono" style="font-size:11px;color:var(--mute);min-width:34px;text-align:right">'+fatti+'/'+tot+'</span>'+
@@ -5301,7 +5374,7 @@ function renderProgetto(){
           '<span class="v-data'+(q.t?'':' vuota')+' '+q.c+'"'+(fisso? '' : ' role="button" tabindex="0" data-action="voce-data" data-id="'+s.id+'" data-i="'+ix+'"')+
             ' title="'+(q.t? 'Scadenza della subtask' : 'Aggiungi una scadenza')+'">'+svg('calendar',2)+'<span>'+(q.t || 'Data')+'</span>'+
             (fisso? '' : '<input type="date" class="vd-in" tabindex="-1" aria-hidden="true" data-id="'+s.id+'" data-i="'+ix+'" value="'+esc(i.d||'')+'">')+'</span>'+
-          '<span class="v-st '+stv.c+'"'+(fisso? '' : ' role="button" tabindex="0" data-action="voce-stato" data-id="'+s.id+'" data-i="'+ix+'" title="Tocca per cambiare lo stato"')+'>'+stv.t+'</span>'+
+          '<span class="v-st '+stv.c+(stv.c==='corso'?'':' muto')+'"'+(fisso? '' : ' role="button" tabindex="0" data-action="voce-stato" data-id="'+s.id+'" data-i="'+ix+'" title="Tocca per cambiare lo stato"')+'>'+(stv.c==='corso'? stv.t : '')+'</span>'+
           tastoCommenti(p, stThr, s, i)+
           (fisso? '' : '<button class="v-menu" data-action="menu-voce" title="Altre azioni" aria-label="Altre azioni">'+svg('altro',2)+'</button>')+
           pen('item','',s.id,ix)+'</div>'+
@@ -5344,12 +5417,13 @@ function renderProgetto(){
   h += '</div>';
   if(tab==='chat' && !state.ospite){
     h += '<div class="composer"><textarea id="composer" rows="1" placeholder="Scrivi al team\u2026"></textarea>'+
+      '<button class="busta" data-action="busta" data-per="composer" hidden title="Avvisa anche via email" aria-label="Avvisa anche via email" aria-pressed="false">'+svg('posta',2)+'</button>'+
       '<button class="send" data-action="invia" title="Invia">'+svg('send',2)+'</button></div>';
   }
   h += '</aside></div></div>';
 
   el('stage').innerHTML = h;
-  const c = el('composer'); if(c){ c.value = p.draft||''; }
+  const c = el('composer'); if(c){ c.value = p.draft||''; aggiornaBusta(c); }
   /* la scheda aperta si considera vista */
   /* ...ma solo se il pannello e' davvero aperto davanti agli occhi */
   if(state.showFeed){
@@ -5423,6 +5497,7 @@ function xProssima(){
     'title="Nascondi: leggo la lista" aria-label="Nascondi">'+svg('x',2.6)+'</button>';
 }
 function barraProssima(p){
+  return '';   /* v48: ripeteva una subtask che e' gia' nell'elenco */
   if(p.completato || !boxProssima) return '';
   const {voce, mie, tutte} = prossimaCosa(p);
   if(!voce){
@@ -5490,8 +5565,8 @@ function totaleNonLetti(p){ return nonLetti(p).chat || 0; }
 function tastoFeed(p){
   const n = totaleNonLetti(p);
   return '<button class="btn sm feed-btn'+(n?' ha-nuovi':'')+'" data-action="feed" '+
-    'title="'+(n? n+' messaggi da leggere nella chat del progetto' : 'Apri il pannello: chat del progetto e attivit\u00e0')+'">'+
-    svg('chat')+'Chat'+'<span class="apre">'+svg('pannello',2)+'</span>'+(n? '<span class="n">'+(n>9?'9+':n)+'</span>' : '')+'</button>';
+    'title="'+(n? n+' messaggi da leggere' : 'Apri la conversazione e l\u2019attivit\u00e0 del lavoro')+'">'+
+    svg('chat')+'Conversazione'+'<span class="apre">'+svg('pannello',2)+'</span>'+(n? '<span class="n">'+(n>9?'9+':n)+'</span>' : '')+'</button>';
 }
 
 /* ============ BARRA FASI ============ */
@@ -5526,9 +5601,17 @@ function renderPhasebar(){
     if(suTelefono()){ bar.innerHTML = ''; bar.classList.add('vuota'); return; }
     bar.classList.remove('vuota');
     const snoozeOn = Date.now() < state.snoozeFino;
+    const fAtt = state.filtroAttivo ? (state.filtri||[]).find(f=>f.id===state.filtroAttivo) : null;
+    const ORD = {prio:'Priorità', scadenza:'Scadenza', cliente:'Cliente', fase:'Fase', manuale:'Il mio ordine'};
     bar.innerHTML =
-      '<span class="lbl" style="margin:0 4px 0 0;display:flex;align-items:center;gap:5px">'+
-        svg('filter').replace('<svg','<svg style="width:12px;height:12px"')+'Filtri</span>'+
+      '<button class="fchip'+(fAtt?' on':'')+'" data-action="filtri-menu">'+svg('filter').replace('<svg','<svg style="width:12px;height:12px"')+
+        (fAtt ? esc(fAtt.nome) : 'Filtri')+' <span class="cnt">'+(fAtt ? progettiDi(state.spazioId).filter(p=>passaFiltro(p,fAtt)).length : progettiDi(state.spazioId).length)+'</span></button>'+
+      (fAtt ? '<button class="fchip" data-action="filtro" data-id="" title="Togli il filtro">'+svg('x',2.6).replace('<svg','<svg style="width:11px;height:11px"')+'Tutti</button>' : '')+
+      '<span style="flex:1"></span>'+
+      '<button class="fchip" data-action="ordina-menu">Ordina: '+(ORD[state.ordina]||'Priorità')+svg('chev',2.4).replace('<svg','<svg style="width:11px;height:11px"')+'</button>'+
+      (snoozeOn? '<span class="snoozed">'+svg('clock').replace('<svg','<svg style="width:12px;height:12px"')+'silenziate</span>':'');
+    return;
+    bar.innerHTML =
       '<div class="filtri">'+
         '<button class="fchip'+(!state.filtroAttivo?' on':'')+'" data-action="filtro" data-id="">Tutti '+
           '<span class="cnt">'+progettiDi(state.spazioId).length+'</span></button>'+
@@ -5551,7 +5634,7 @@ function renderPhasebar(){
   const p = PROJ();
   let h = '<button class="rewind'+(p.revisione?' armed':'')+'" data-action="indietro" '+
     'title="Torna indietro su una fase gi\u00e0 chiusa"'+
-    (p.avanz===0 ?' disabled':'')+'>'+svg('rewind',1.9)+'</button><div class="steps">';
+    (p.avanz===0 ?' disabled':'')+'>'+svg('rewind',1.9)+'<span class="rw-l">Riapri fase</span></button><div class="steps">';
   /* le fasi dove ci sono commenti nuovi nelle task hanno il pallino */
   const stThr = statoThr(p), nuoviFase = {};
   p.subs.forEach(s=>{ const n = nuoviInTask(stThr, s); if(n) nuoviFase[s.fase] = (nuoviFase[s.fase]||0) + n; });
@@ -5838,7 +5921,7 @@ function renderMie(){
       g.vis.forEach(v=>{
         const i = v.i, d = dataVoce(i), st = statoVoce(i), fi = Math.min(v.s.fase||0, fasi.length-1), fase = fasi[fi];
         const chi = U(i.ass || v.s.assegnato || state.utente);
-        h += '<div class="mt-r'+(i.done?' fatta':'')+'">'+
+        h += '<div class="mt-r'+(i.done?' fatta':'')+'" role="button" tabindex="0" data-action="vai-primo" data-pid="'+p.id+'" data-sid="'+v.s.id+'">'+
           '<span class="box'+(i.done?' fatto':'')+'" role="button" tabindex="0" data-action="check-mia" data-pid="'+p.id+'" data-sid="'+v.s.id+'" data-i="'+v.ix+'" aria-label="'+(i.done?'Togli la spunta':'Segna come fatto')+'">'+svg('check',3.2)+'</span>'+
           '<button class="mt-t" data-action="vai-primo" data-pid="'+p.id+'" data-sid="'+v.s.id+'"><b>'+esc(i.t)+'</b>'+(v.taggato?'<em>taggato</em>':'')+'</button>'+
           '<span class="mt-task">'+esc(v.s.titolo)+'</span>'+
@@ -5846,7 +5929,7 @@ function renderMie(){
           '<span class="mt-d '+d.c+(d.t?'':' vuota')+'">'+svg('calendar',2)+(d.t || '—')+'</span>'+
           '<span class="mt-st '+st.c+'"'+(i.done? '' : ' role="button" tabindex="0" data-action="mie-stato" data-pid="'+p.id+'" data-sid="'+v.s.id+'" data-i="'+v.ix+'" title="Tocca per cambiare lo stato"')+'>'+st.t+'</span>'+
           '<span class="mt-fase" style="--fc:'+COL_FASI[fi % COL_FASI.length]+'">'+esc(fase ? fase.nome : '')+'</span>'+
-          '<button class="iconbtn mt-piu" data-action="vai-primo" data-pid="'+p.id+'" data-sid="'+v.s.id+'" title="Apri nel progetto" aria-label="Apri nel progetto">'+svg('altro',2.2)+'</button>'+
+          '<span class="mt-piu">'+svg('right',2.2)+'</span>'+
         '</div>';
       });
       h += '</div>';
@@ -6194,7 +6277,7 @@ function barraSinistra(aperto){
 }
 /* il riquadro «Scopri FOSS»: al primo avvio e poi una volta ogni cinque */
 const AVVIO_N = (()=>{ try{ const n = (parseInt(localStorage.getItem('foss_avvii')||'0',10)||0) + 1; localStorage.setItem('foss_avvii', String(n)); return n; }catch(e){ return 1; } })();
-function mostraBoxGuida(){ return !state.cfg.noBoxGuida && !state.boxGuidaChiuso && (AVVIO_N % 5 === 1); }
+function mostraBoxGuida(){ return false; }   /* v48: la guida si apre solo dal «?» in alto */
 function cartaInvitoGuida(cls){
   if(!mostraBoxGuida()) return '';
   return '<div class="hm-guida'+(cls?' '+cls:'')+'">'+
@@ -6220,13 +6303,9 @@ function renderSpazi(){
   /* saluto e ora */
   const scena = paesaggioHome();
   h += '<section class="hm-hero tono-'+scena.tono+'" style="--cielo:'+scena.cielo+'">'+scena.svg+
-    '<button class="hm-scena" data-action="hm-scena" title="Cambia scena ('+esc(scena.nome)+')" aria-label="Cambia scena">'+svg('spark',2.2)+'</button>'+
-    '<div class="hm-saluto"><h1>'+saluto()+',<br>'+esc(nomeVisibile().split(' ')[0])+' <span class="mano">👋</span></h1>'+
-      '<p>"'+esc(fraseDelGiorno())+'"</p></div>'+
+    '<div class="hm-saluto"><h1>'+saluto()+',<br>'+esc(nomeVisibile().split(' ')[0])+' <span class="mano">👋</span></h1></div>'+
     '<div class="hm-ora"><span class="g" id="hmOraG">'+o.g+'</span><span class="d" id="hmOraD">'+o.data+'</span>'+
       '<b id="hmOraT">'+o.ora+'</b>'+
-      '<span class="st">'+svg(o.notte?'moon':'sun',2)+'<span class="lungo">'+(mie.length ? '<b>'+(oggiN? oggiN+' da chiudere oggi' : 'Giornata produttiva')+'</b>ti aspettano '+mie.length+' task' : '<b>Niente in sospeso</b>goditi la giornata')+'</span>'+
-        '<span class="corto">'+(oggiN ? oggiN+' da chiudere oggi' : mie.length ? mie.length+(mie.length===1 ? ' task ti aspetta' : ' task ti aspettano') : 'Niente in sospeso')+'</span></span>'+
     '</div></section>';
 
   /* quattro numeri */
@@ -6246,7 +6325,7 @@ function renderSpazi(){
   /* spazi di lavoro */
   const lista = state.hmVista === 'lista';
   h += '<div class="hm-sez" id="hmSpazi"><h2>I tuoi spazi di lavoro'+svg('right',2.6)+'</h2><span class="spacer"></span>'+
-    (puoCop ? '<button class="hm-b-nuovo" data-action="nuovo-spazio">'+svg('plus',2.2)+'<span class="no-tel">Nuovo spazio di lavoro</span></button>' : '')+
+    (puoCop ? '<button class="hm-b-nuovo solo-stretto" data-action="nuovo-spazio">'+svg('plus',2.2)+'<span class="no-tel">Nuovo spazio</span></button>' : '')+
     '<span class="hm-vis"><button class="'+(lista?'':'on')+'" data-action="hm-vista" data-v="griglia" title="Schede" aria-label="Schede">'+svg('grid',2)+'</button>'+
       '<button class="'+(lista?'on':'')+'" data-action="hm-vista" data-v="lista" title="Elenco" aria-label="Elenco">'+svg('list',2)+'</button></span></div>';
   h += '<input type="file" id="hmCopFile" accept="image/*" hidden>';
@@ -6273,8 +6352,7 @@ function renderSpazi(){
       '<span class="cp"><span class="r1"><b>'+esc(sp.nome)+'</b>'+pilaAvatar(team, 3)+'</span>'+
       '<span class="ds">'+ds+'</span>'+
       '<span class="pb" title="'+pct+'% delle subtask fatte"><i style="width:'+pct+'%"></i></span>'+
-      '<span class="nums"><span><b>'+aperti.length+'</b>Progetti</span><span><b>'+taskAp+'</b>Task aperti</span>'+
-        '<span><b>'+taskTot+'</b>Task totali</span>'+(urg? '<span class="urg"><b>'+urg+'</b>In scadenza</span>' : '')+'</span></span></button>';
+      '<span class="nums corti"><span>'+aperti.length+(aperti.length===1?' progetto':' progetti')+'</span>'+(urg? '<span class="urg">'+urg+' in scadenza</span>' : '')+'</span></span></button>';
   });
   if(!elenco.length) h += '<div class="empty" style="padding:24px">Ancora nessuno spazio: creane uno per iniziare.</div>';
   h += '</div>'+(!lista && elenco.length>3 ? '<button class="hm-freccia" data-action="hm-scorri" title="Altri spazi" aria-label="Altri spazi">'+svg('right',2.4)+'</button>' : '')+
@@ -6293,20 +6371,6 @@ function renderSpazi(){
       '<span class="fl" title="'+(x.p.prio==='alta'?'Priorità alta':'')+'">'+(x.p.prio==='alta' || x.g<=1 ? svg('bandiera',2) : '')+'</span>'+
       pilaAvatar(chi, 2)+'</div>'; }).join('')
     : '<div class="hm-vuoto">'+svg('check',2)+'<span>Niente in sospeso per te. Quando ti assegnano qualcosa lo trovi qui.</span></div>';
-  h += '</section>';
-
-  const att = [];
-  state.progetti.forEach(p=>{ if(vedeProgetto(p)) (p.log||[]).forEach(l=>{ if(l && l.t) att.push({p, l}); }); });
-  att.sort((a,b)=>b.l.t-a.l.t);
-  h += '<section class="hm-box"><div class="hm-box-h"><button class="tit" data-action="notifiche"><h3>Attività recenti</h3>'+svg('right',2.6)+'</button></div>';
-  h += att.length ? att.slice(0,5).map(x=>{ const [tono, ic] = tipoAttivita(x.l.tx);
-    const chi = x.l.u ? (x.l.u===state.utente ? 'Tu' : (autoreCommento(x.l.u).nome||'').split(' ')[0]) : '';
-    return '<div class="hm-a a-'+tono+'" role="button" tabindex="0" data-action="apri" data-id="'+esc(x.p.id)+'">'+
-      '<span class="k">'+svg(ic,2.6)+'</span>'+
-      (x.l.u ? av(autoreCommento(x.l.u),'sm') : '<span class="av sm vuoto" style="--acc:'+coloreOk(x.p.col,'#FFAD01')+'"></span>')+
-      '<span class="tx"><span class="w">'+(chi? '<em>'+esc(chi)+'</em> ' : '')+sicuro(x.l.tx)+'</span><span>'+esc(x.p.nome)+'</span></span>'+
-      '<span class="q">'+esc(tempoFa(x.l.t))+'</span></div>'; }).join('')
-    : '<div class="hm-vuoto">'+svg('list',2)+'<span>Qui compare quello che succede nei tuoi lavori: fasi avanzate, spunte, progetti nuovi.</span></div>';
   h += '</section>';
 
   const oggi = impegniDelGiorno(isoDi(OGGI)), poi = oggi.length ? [] : prossimiImpegni(3);
@@ -7065,6 +7129,7 @@ function leggiIndirizzo(){
     let gid = null; try{ gid = gn ? decodeURIComponent(gn[1]) : null; }catch(e){ gid = null; }
     return {guida:true, cap:g[1] || null, nid:gid};
   }
+  if(/^#\/profilo/.test(h)) return {profilo:true};
   const sp = /^#\/s\/([^\/?]+)/.exec(h);
   if(sp) return {spid:sp[1], ospite:/[?&]v=1/.test(h)};
   const m = /^#\/p\/([^\/?]+)(?:\/t\/([^?]+))?/.exec(h);
@@ -7086,6 +7151,10 @@ function applicaIndirizzo(){
     state.ospite = false;
     apriGuida(a.cap && (a.cap === 'segnalazioni' || GUIDA.some(c=>c.id===a.cap)) ? a.cap : null);
     return true;
+  }
+  if(a.profilo){
+    try{ history.replaceState(null, '', location.pathname + location.search); }catch(e){}
+    state.ospite = false; state.schermo = 'profilo'; render(); return true;
   }
   if(a.spid){
     const sp = state.spazi.find(x=>x.id===a.spid);
@@ -7447,7 +7516,7 @@ function renderProfilo(){
   const scena = paesaggioHome();
   const ruoli = ruoliDi(m.ruolo);
   let h = '<div class="pane"><div class="hm pf-lay">'+barraSinistra('profilo')+'<div class="hm-main scroller pf">';
-  h += '<div class="pf-head"><h1>Profilo</h1><p>Gestisci il tuo account, le preferenze e le informazioni personali.</p></div>';
+  h += '<div class="pf-head"><h1>Profilo</h1></div>';
   h += '<div class="pf-grid"><div class="pf-col">';
 
   /* la copertina: la scena del momento, la foto, il nome */
@@ -7462,12 +7531,11 @@ function renderProfilo(){
         '<div class="pf-az"><input type="file" id="pf_foto" accept="image/*" hidden>'+
           '<label class="btn sm" for="pf_foto">'+svg('user')+'Cambia foto</label>'+
           (m.foto? '<button class="btn sm ghost" data-action="togli-foto">Rimuovi foto</button>':'')+'</div></div>'+
-      '<blockquote class="pf-frase">“'+esc(fraseDelGiorno())+'”</blockquote>'+
+
     '</div></section>';
 
   h += cartaProfessioni();
-  h += sonoAdmin && !state.ospite ? pfAmministrazione() + pfInviti() : cartaTeam();
-  if(!sonoAdmin) h += '<div class="card">'+pfTesta('user','Profilo guest','Vedi solo i lavori che l’amministratore ha aperto per te. Per vedere altro, o per aggiungere persone, chiedi a lui.')+'</div>';
+  h += cartaTeam();
   h += cartaModelli() + cartaSoldi();
 
   /* i tuoi dati */
@@ -7476,8 +7544,7 @@ function renderProfilo(){
       '<button class="pf-tile verde" data-action="esporta"><span class="q">'+svg('deliver',2)+'</span><span class="tx"><b>Scarica un backup</b><span>Spazi, progetti, task, note e registro</span></span>'+svg('right',2.2)+'</button>'+
       '<input type="file" id="pf_import" accept="application/json,.json" hidden>'+
       '<label class="pf-tile" for="pf_import"><span class="q">'+svg('undo',2)+'</span><span class="tx"><b>Ripristina da backup</b><span>Sostituisce i dati di adesso. Ctrl+Z annulla</span></span>'+svg('right',2.2)+'</label>'+
-      '<div class="pf-tile info"><span class="q">'+svg('list',2)+'</span><span class="tx"><b>Dove stanno i dati</b><span>'+
-        (typeof sb!=='undefined' && sb ? 'Database del team, con una copia su questo dispositivo' : 'In questo browser')+' · v'+SCHEMA+'</span></span></div>'+
+
     '</div></div>';
   h += '</div><div class="pf-col">';
 
@@ -7492,18 +7559,15 @@ function renderProfilo(){
 
   /* notifiche */
   h += '<div class="card">'+pfTesta('bell','Notifiche','Decidi come e quando il software può interromperti.')+
-    rigaIc('pannello','Box a schermo intero','Menzioni e assegnazioni oscurano lo schermo finché non premi VISUALIZZATO','boxFull',c.boxFull)+
     rigaIc('filter','Solo i miei progetti','Niente notifiche dai progetti in cui non sei assegnato','soloMiei',c.soloMiei)+
     rigaAvvisi()+
-    '<div class="riga pf-r"><span class="pf-ri">'+svg('clock',2)+'</span><div class="tx"><b>Durata del silenzio</b><span>Quanto dura la × sul box a schermo intero</span></div>'+
-      '<select id="pf_snooze" class="pf-sel">'+[10,30,60].map(v=>'<option value="'+v+'"'+(c.snoozeMin===v?' selected':'')+'>'+v+' minuti</option>').join('')+'</select></div>'+
   '</div>';
 
   h += cartaCalendario();
 
   /* tema */
   h += '<div class="card">'+pfTesta('palette','Tema dell’interfaccia','Scegli i colori che preferisci. Puoi cambiarli quando vuoi.')+
-    '<div class="pf-temi">'+TEMI.map(t=>'<button class="pf-tema'+(c.tema===t.id?' on':'')+'" data-action="tema-set" data-t="'+t.id+'" title="'+esc(t.ds)+'">'+
+    '<div class="pf-temi">'+TEMI.filter(t=>['brand','ardesia','nebbia','sabbia'].indexOf(t.id)>=0 || t.id===c.tema).map(t=>'<button class="pf-tema'+(c.tema===t.id?' on':'')+'" data-action="tema-set" data-t="'+t.id+'" title="'+esc(t.ds)+'">'+
       '<span class="sw3">'+t.c.map(x=>'<i style="background:'+x+'"></i>').join('')+'</span>'+
       '<b>'+t.nome+'</b><span>'+esc(t.breve||t.ds)+'</span></button>').join('')+'</div>'+
     '<div class="riga pf-r"><span class="pf-ri">'+svg('sun',2)+'</span><div class="tx"><b>Modalità chiara</b><span>Una versione più luminosa, vale su tutti i temi</span></div>'+
@@ -7512,14 +7576,20 @@ function renderProfilo(){
 
   h += cartaGuida();
 
-  h += '<div class="card">'+pfTesta('list','Registro delle azioni','Ogni modifica lascia una traccia. Ctrl+Z annulla l’ultima.')+
+  const segnAdm = Array.isArray(segnRicevute), segnAperte = segnAdm ? segnRicevute.filter(x=>x.stato!=='risolta').length : 0;
+  h += '<details class="card pf-avanzate"'+(state.pfAvanzate?' open':'')+'><summary data-action="pf-avanzate">'+svg('ingranaggio',2)+'<b>Avanzate</b>'+svg('chev',2.4)+'</summary>'+
+    rigaIc('pannello','Box a schermo intero','Menzioni e assegnazioni oscurano lo schermo finché non premi VISUALIZZATO','boxFull',c.boxFull)+
+    '<div class="riga pf-r"><span class="pf-ri">'+svg('clock',2)+'</span><div class="tx"><b>Durata del silenzio</b><span>Quanto dura la × sul box a schermo intero</span></div>'+
+      '<select id="pf_snooze" class="pf-sel">'+[10,30,60].map(v=>'<option value="'+v+'"'+(c.snoozeMin===v?' selected':'')+'>'+v+' minuti</option>').join('')+'</select></div>'+
+    (segnAdm ? '<div class="cal-az" style="margin:10px 0"><button class="btn sm ghost" data-action="apri-guida" data-cap="segnalazioni">'+svg('list')+'Segnalazioni ricevute'+(segnAperte ? ' ('+segnAperte+')' : '')+'</button></div>' : '')+
+    '<div class="lbl" style="margin-top:12px">Registro delle azioni</div>'+
     '<div class="reg">'+ (state.azioni.length? state.azioni.slice(0,40).map(a=>
       '<div class="r"><span class="t">'+esc(a.ts)+'</span><span class="w">'+sicuro(a.tx)+'</span><span class="chi">'+esc((a.chi||'').split(' ')[0])+'</span></div>'
     ).join('') : '<div class="empty">Nessuna azione registrata.</div>') +'</div>'+
     '<div class="cal-az" style="margin-top:12px">'+
       '<button class="btn sm" data-action="annulla">'+svg('undo')+'Annulla ultima ('+undoStack.length+')</button>'+
       '<button class="btn sm ghost" data-action="pulisci-registro">Svuota registro</button></div>'+
-  '</div>';
+  '</details>';
 
   h += '<button class="btn esci-rosso" data-action="esci">'+svg('out')+'Esci da FOSS</button>';
   h += '</div></div></div></div></div>';
@@ -9455,7 +9525,7 @@ function cartaModelli(){
    Come si fa tutto, capitolo per capitolo: dai primi passi alle cose per chi
    organizza un team. Si cerca per parola (anche senza accenti); in fondo c'e'
    il tasto per segnalare quello che manca o non funziona. */
-const VERSIONE = 'v47';
+const VERSIONE = 'v49';
 const LIVELLI_GUIDA = {base:'Per cominciare', medio:'Tutti i giorni', esperto:'Per chi organizza', aiuto:'Se qualcosa non va'};
 const GUIDA = [
 {id:'primi-passi', liv:'base', ic:'spark', t:'Primi passi', s:'Cos’è FOSS e come ci si muove', v:[
@@ -9522,7 +9592,7 @@ const GUIDA = [
   ['Il tasto rosso', 'Quando qualcuno scrive, il tasto di quella task (o subtask) diventa rosso finché non apri la discussione. Il pallino compare anche sulla fase in basso, così sai dove guardare; dentro la discussione una riga «Nuovi» segna da dove riprendere.'],
   ['Chi ha scritto', 'Ogni commento ha la foto, il nome, il ruolo e l’ora di chi l’ha scritto: non si può scrivere a nome di un altro. Un tuo commento lo togli col tasto destro (o tenendolo premuto) → <b>Elimina il commento</b>.'],
   ['Link e file', 'Nella discussione, la graffetta allega un file fino a 25 MB (foto, PDF, video brevi, documenti): lo vede solo chi lavora al progetto. Per i file più grossi incolla un link di WeTransfer, Drive o Frame.io. La scheda <b>Link e file</b> li raccoglie tutti in un posto.'],
-  ['Taggare qualcuno', 'Nei commenti e nella chat scrivi <b>@</b> (o tocca il tasto @ nella finestra dei commenti): compare chi lavora al progetto, scegli il nome. Gli arriva subito la notifica, col box a schermo intero se l’ha acceso (con <b>APRI</b> va dritto alla discussione), e l’avviso sul telefono.'],
+  ['Taggare qualcuno', 'Nei commenti e nella chat scrivi <b>@</b> (o tocca il tasto @ nella finestra dei commenti): compare chi lavora al progetto, scegli il nome. Gli arriva subito la notifica, col box a schermo intero se l’ha acceso (con <b>APRI</b> va dritto alla discussione), e l’avviso sul telefono. Quando serve davvero, accendi la <b>bustina</b> che compare accanto a Invia: oltre alla notifica gli arriva anche una <b>email</b>. Vale solo per quel messaggio, poi si spegne da sola.'],
   ['La chat del progetto', 'Il tasto <b>Chat</b> '+svg('pannello',2).replace('<svg','<svg style="width:13px;height:13px;vertical-align:-2px"')+', in alto a destra dentro il progetto (sul telefono il fumetto nella barra in basso), apre il pannello laterale: la <b>Conversazione</b> raccoglie tutto il lavoro in tempo reale: i messaggi al team e i commenti di task e subtask, ognuno col tasto per aprire la sua discussione; <b>Attività</b> è il diario automatico di cosa è cambiato e chi l’ha fatto.'],
   ['Inviare', '<b>Invio</b> manda, <b>Maiusc+Invio</b> va a capo; sul telefono si manda col tasto giallo. Chi lavora al progetto riceve una notifica; più messaggi ravvicinati si sommano in una sola.'],
   ['Le risposte del cliente e i vecchi commenti', 'Le risposte che il cliente dà dalla sua pagina arrivano nella chat del progetto, con l’etichetta <b>Cliente</b> e l’esito. Lì trovi anche i commenti scritti prima di questa versione, con la fase a cui si riferivano.']
@@ -9841,10 +9911,7 @@ function cartaGuida(){
     '<div class="cal-az">'+
       '<button class="btn sm primary" data-action="apri-guida">'+svg('help')+'Apri la guida</button>'+
       '<button class="btn sm" data-action="segnala">'+svg('bandiera')+'Segnala un problema</button>'+
-      (adm ? '<button class="btn sm ghost" data-action="apri-guida" data-cap="segnalazioni">'+svg('list')+'Segnalazioni ricevute'+(aperte ? ' ('+aperte+')' : '')+'</button>' : '')+
     '</div>'+
-    '<div class="riga pf-r" style="margin-top:8px"><span class="pf-ri">'+svg('libro',2)+'</span><div class="tx"><b>Riquadro «Scopri FOSS» nel menu</b><span>Compare una volta ogni cinque aperture. Spegnilo per non vederlo più</span></div>'+
-      '<button class="sw'+(state.cfg.noBoxGuida?'':' on')+'" data-action="cfg" data-k="noBoxGuida" aria-pressed="'+(!state.cfg.noBoxGuida)+'" aria-label="Riquadro della guida nel menu"></button></div>'+
     '</div>';
 }
 
@@ -9905,7 +9972,45 @@ document.addEventListener('keydown', function(e){
     scegliMenz(bs[menz.i].dataset.u);
   }
 }, true);
-document.addEventListener('input', function(e){ if(CAMPI_MENZ.indexOf(e.target.id) >= 0) aggiornaMenz(e.target); }, true);
+document.addEventListener('input', function(e){ if(CAMPI_MENZ.indexOf(e.target.id) >= 0){ aggiornaMenz(e.target); aggiornaBusta(e.target); } }, true);
+/* ---------- v49: LA BUSTINA ----------
+   Quando nel messaggio c'e' un @nome compare la bustina. Accesa, chi e' taggato
+   riceve anche una email (oltre alla notifica). Si spegne da sola dopo l'invio. */
+const busta = {composer:false, cm_tx:false};
+function taggatiNelTesto(tx){
+  const t = String(tx || '').toLowerCase();
+  return taggabiliQui().filter(u=>{ const n = primoNome(u).toLowerCase(); return n.length >= 2 && t.indexOf('@' + n) >= 0; });
+}
+function aggiornaBusta(ta){
+  if(!ta) return;
+  const b = document.querySelector('.busta[data-per="' + ta.id + '"]'); if(!b) return;
+  const chi = cloudAttivo() ? taggatiNelTesto(ta.value) : [];
+  if(!chi.length) busta[ta.id] = false;
+  b.hidden = !chi.length;
+  const on = !!busta[ta.id];
+  b.classList.toggle('on', on); b.setAttribute('aria-pressed', on);
+  b.title = on ? 'Riceverà anche una email: ' + chi.map(primoNome).join(', ') : 'Avvisa anche via email';
+}
+function esitoBusta(html, tipo, ms){
+  let b = el('bustaEsito');
+  if(!b){ b = document.createElement('div'); b.id = 'bustaEsito'; b.setAttribute('role', 'status'); document.body.appendChild(b); }
+  b.className = tipo || ''; b.innerHTML = html;
+  clearTimeout(b.__t); if(ms) b.__t = setTimeout(()=>b.remove(), ms);
+}
+const ERR_BUSTA = {troppi:'Oggi hai già mandato molte email: la notifica è arrivata, l’email no.',
+  chiave:'Le email non sono ancora attive: la notifica è arrivata comunque.',
+  rete:'Email non partita: controlla la connessione. La notifica è arrivata.',
+  offline:'Le email partono solo con il database del team.'};
+async function mandaBusta(pid, ids){
+  if(!ids.length || typeof avvisaEmailCloud !== 'function') return;
+  esitoBusta(svg('posta', 2) + '<span>Mando l’email…</span>', 'va');
+  const r = await avvisaEmailCloud(pid, ids) || {};
+  const nomi = l => l.map(id=>primoNome(U(id))).join(', ');
+  if(Array.isArray(r.inviate) && r.inviate.length)
+    esitoBusta(svg('check', 3) + '<span>Email inviata a <b>' + esc(nomi(r.inviate)) + '</b>' +
+      (r.saltate && r.saltate.length ? ' · a ' + esc(nomi(r.saltate)) + ' no' : '') + '</span>', 'ok', 4500);
+  else esitoBusta(svg('x', 2.6) + '<span>' + esc(ERR_BUSTA[r.errore] || 'Email non partita: la notifica è arrivata comunque.') + '</span>', 'ko', 7000);
+}
 /* la bozza dell'invito sopravvive ai ridisegni (anteprima, altre azioni) */
 document.addEventListener('input', function(e){ const k = {iv_mail:'email', iv_nome:'nome', iv_ruolo:'ruolo', iv_msg:'messaggio'}[e.target.id]; if(k){ state.ivBozza = state.ivBozza || {}; state.ivBozza[k] = e.target.value; aggiornaAnteprimaLive(); } }, true);
 document.addEventListener('pointerdown', function(e){ if(menz && !e.target.closest('#menzPop, [data-action="menz-apri"]') && e.target !== menz.ta) chiudiMenz(); }, true);
@@ -10086,6 +10191,7 @@ function disegnaCommenti(tutto){
             '<label class="iconbtn cm-clip" for="cm_file" title="Allega un file (fino a 25 MB)" aria-label="Allega un file">' + svg('clip', 2.2) + '</label>' +
             '<button class="iconbtn cm-clip cm-at" data-action="menz-apri" data-per="cm_tx" title="Tagga qualcuno: gli arriva la notifica" aria-label="Tagga qualcuno">@</button>' +
             '<textarea id="cm_tx" rows="1" maxlength="4000" placeholder="Scrivi un commento…"></textarea>' +
+            '<button class="busta" data-action="busta" data-per="cm_tx" hidden title="Avvisa anche via email" aria-label="Avvisa anche via email" aria-pressed="false">'+svg('posta', 2)+'</button>' +
             '<button class="send" data-action="cm-invia" id="cmInvia" title="Invia" aria-label="Invia">' + svg('send', 2) + '</button></div></div>'
           : '<div class="cm-sola">' + (p.completato ? 'Il lavoro è completato: i commenti restano da leggere.' : 'Puoi leggere i commenti, ma non scriverne.') + '</div>') +
       '</div>';
@@ -10137,6 +10243,7 @@ let inviaCommentoInCorso = false;
 async function inviaCommento(tasto){
   const x = thrCorrente(); if(!x || inviaCommentoInCorso) return;
   const t = el('cm_tx'), testo = t ? t.value.trim() : '', f = cm.file, mio = cm;
+  const avvisa = busta.cm_tx ? taggatiNelTesto(testo).map(u=>u.id) : [];
   if(!testo && !f){ erroreCommenti('Scrivi qualcosa o allega un file.'); if(t) t.focus(); return; }
   if(!puoCommentare(x.p)){ erroreCommenti('Non puoi scrivere commenti su questo lavoro.'); return; }
   erroreCommenti('');
@@ -10168,11 +10275,13 @@ async function inviaCommento(tasto){
   if(cm === mio){
     cm.file = null; cm.letto0 = m.t;
     if(t){ t.value = ''; t.style.height = ''; t.focus(); }
+    busta.cm_tx = false; aggiornaBusta(t);
     if(cm.tab !== 'commenti') cm.tab = 'commenti';
     disegnaCommenti(false);
     const c = el('cmCorpo'); if(c) c.scrollTop = c.scrollHeight;
   }
   save();
+  if(avvisa.length) mandaBusta(x.p.id, avvisa);
 }
 async function apriFileCommento(b){
   const path = b.dataset.path; if(!path) return;
@@ -10995,7 +11104,10 @@ document.addEventListener('click', function(e){
       const i = l.indexOf(k); if(i>=0) l.splice(i,1); else l.push(k);
       salvaProfessioni(l);
       const c = el('cartaProf'); if(c) c.outerHTML = cartaProfessioni();
+      const pm = el('profModale'); if(pm) pm.innerHTML = griglieProfessioni();
       break; }
+    case 'prof-modale': modaleProfessioni(); break;
+    case 'pf-avanzate':{ e.preventDefault(); state.pfAvanzate = !state.pfAvanzate; const d = t.closest('details'); if(d) d.open = state.pfAvanzate; break; }
     case 'wz-tipo': wzLeggi(); wz.tipo = t.dataset.k; wz.preset = null; wz.icona = TIPI[wz.tipo].ic; wz.col = TIPI[wz.tipo].c; renderWizard(); break;
     case 'wz-preset':{
       const M = presetDi(t.dataset.k); if(!M) break;
@@ -11316,6 +11428,23 @@ document.addEventListener('click', function(e){
     case 'apri':
       apriProgetto(t.dataset.id, false); break;
 
+    case 'agg-dato':{
+      let campi = []; try{ campi = JSON.parse(t.dataset.campi||'[]'); }catch(x){}
+      const r = t.getBoundingClientRect();
+      apriCtx(r.left, r.bottom+6, 'Aggiungi', campi.map(c=>({a:'edit', l:c[0], ic:'plus', d:D({pid:t.dataset.pid})+' data-t="proj" data-k="'+c[1]+'"'})), t);
+      break; }
+    case 'menu-progetto':{
+      const pr = state.progetti.find(x=>x.id===t.dataset.pid); if(!pr) break;
+      const r = t.getBoundingClientRect();
+      apriCtx(r.right - 240, r.bottom + 6, esc(pr.nome), vociMenuProgetto(pr).filter(v=>!v || v.a!=='apri'), t);
+      break; }
+    case 'viste-altro':{
+      const r = t.getBoundingClientRect();
+      apriCtx(r.left, r.bottom+6, 'Altre viste', [
+        {a:'vista', l:'Mappa', ic:'pin', d:D({v:'mappa'})},
+        {a:'vista', l:'Note', ic:'pen', d:D({v:'note'})}
+      ], t);
+      break; }
     case 'vista':
       if(state.vista===t.dataset.v) break;
       state.vista = t.dataset.v; render(); break;
@@ -11334,9 +11463,25 @@ document.addEventListener('click', function(e){
       animaTessere(()=>{ state.filtroAttivo = t.dataset.id || null; render(); }); break;
 
     case 'nuovo-filtro': modaleFiltro(); break;
+    case 'filtri-menu':{
+      const r = t.getBoundingClientRect(), fs = filtriDiSpazio(), tutti = progettiDi(state.spazioId);
+      const voci = [{a:'filtro', l:'Tutti ('+tutti.length+')', ic:state.filtroAttivo?'grid':'check', d:D({id:''})}]
+        .concat(fs.map(f=>({a:'filtro', l:esc(f.nome)+' ('+tutti.filter(p=>passaFiltro(p,f)).length+')', ic:state.filtroAttivo===f.id?'check':'filter', d:D({id:f.id})})))
+        .concat([{a:'nuovo-filtro', l:'Nuovo filtro', ic:'plus'}]);
+      const att = fs.find(f=>f.id===state.filtroAttivo);
+      if(att) voci.push({a:'elimina-filtro', l:'Elimina il filtro «'+esc(att.nome)+'»', ic:'x', danger:1, d:D({id:att.id})});
+      apriCtx(r.left, r.top - 8 - (voci.length*40 + 40), 'Filtri', voci, t);
+      break; }
+    case 'ordina-menu':{
+      const r = t.getBoundingClientRect();
+      const O = [['prio','Priorità'],['scadenza','Scadenza'],['cliente','Cliente'],['fase','Fase'],['manuale','Il mio ordine']];
+      apriCtx(r.left - 60, r.top - 8 - (O.length*40 + 40), 'Ordina per', O.map(o=>({a:'ordina-per', l:o[1], ic:state.ordina===o[0]?'check':'list', d:D({k:o[0]})})), t);
+      break; }
+    case 'ordina-per':{
+      const v = t.dataset.k; animaTessere(()=>{ state.ordina = v; render(); }); break; }
 
     case 'elimina-filtro':{
-      e.stopPropagation();
+      if(e.stopPropagation) e.stopPropagation();
       const f = state.filtri.find(x=>x.id===t.dataset.id);
       state.filtri = state.filtri.filter(x=>x.id!==t.dataset.id);
       if(state.filtroAttivo===t.dataset.id) state.filtroAttivo = null;
@@ -11699,6 +11844,7 @@ document.addEventListener('click', function(e){
       render(); break; }
 
     case 'invia': inviaMessaggio(); break;
+    case 'busta':{ const k = t.dataset.per; busta[k] = !busta[k]; const ta = el(k); if(ta){ aggiornaBusta(ta); ta.focus(); } break; }
 
     case 'notifiche':
       state.drawer = !state.drawer; render(); break;
@@ -12384,10 +12530,13 @@ function inviaMessaggio(){
   const p = PROJ(), c = el('composer'); if(!c) return;
   const tx = c.value.trim(); if(!tx){ toast('Scrivi qualcosa prima di inviare.','warn'); return; }
   const m = {u:state.utente, tx:esc(tx).replace(/\b(\d{2}:\d{2}:\d{2}:\d{2})\b/g,'<code>$1</code>'), t:Date.now()};
+  const avvisa = busta.composer ? taggatiNelTesto(tx).map(u=>u.id) : [];
+  busta.composer = false;
   p.chat.push(m);
   p.visti.chat = p.chat.length;
   p.draft=''; c.value='';
   render();
+  if(avvisa.length){ save(); mandaBusta(p.id, avvisa); }
   const f = el('feed'); if(f) f.scrollTop = f.scrollHeight;
 }
 
@@ -12516,6 +12665,31 @@ function apriCtx(x, y, titolo, voci, bersaglio){
   if(bersaglio){ bersaglio.classList.add('ctx-target'); ctxMarked = bersaglio; }
 }
 const D = o => Object.keys(o).map(k=>'data-'+k+'="'+o[k]+'"').join(' ');
+/* le azioni di un lavoro: tasto destro sulla scheda e tasto «...» dentro al lavoro */
+function vociMenuProgetto(pr){
+  const dd = D({pid:pr.id});
+  return [
+    {a:'apri', l:'Apri il progetto', ic:'right', d:D({id:pr.id})},
+    {a:'edit', l:'Rinomina progetto', ic:'pen', d:dd+' data-t="proj" data-k="nome"', off:isLock(pr)},
+    (pr.personale? null : {a:'edit', l:'Cambia cliente', ic:'user', d:dd+' data-t="proj" data-k="cliente"', off:isLock(pr)}),
+    {a:'edit', l:'Cambia priorità', ic:'spark', d:dd+' data-t="proj" data-k="prio"', off:isLock(pr)},
+    {a:'edit', l:'Cambia consegna', ic:'calendar', d:dd+' data-t="proj" data-k="consegna"', off:isLock(pr)},
+    {sep:1},
+    {a:'cop-progetto', l:pr.copertina? 'Cambia la copertina' : 'Aggiungi una copertina', ic:'foto', d:dd, off:isLock(pr)},
+    (pr.copertina? {a:'rit-progetto', l:'Ritaglia la copertina', ic:'foto', d:dd, off:isLock(pr)} : null),
+    (pr.copertina? {a:'togli-cop-progetto', l:'Togli la copertina', ic:'x', d:dd, off:isLock(pr)} : null),
+    {a:'lock', l:(pr.lock&&pr.lock.on)?'Sblocca con la password':'Blocca con una password', ic:(pr.lock&&pr.lock.on)?'unlock':'lock', d:dd},
+    {a:'duplica', l:'Duplica progetto', ic:'grid', d:dd},
+    {a:'salva-modello-apri', l:'Salva come preset', ic:'salva', d:dd},
+    (cloudAttivo() && !pr.personale? {a:'cliente-pagina', l:'Pagina del cliente\u2026', ic:'review', d:dd} : null),
+    {a:'personale-toggle', l:pr.personale? '\u00c8 per un cliente' : '\u00c8 un progetto personale', ic:'user', d:dd, off:isLock(pr)},
+    {a:'menu-sposta', l:'Sposta in un altro spazio\u2026', ic:'right', d:dd, off:isLock(pr)},
+    (pr.completato? {a:'riapri-progetto', l:'Riapri il progetto', ic:'undo', d:dd}
+                  : {a:'completa', l:'Segna come completato', ic:'check', d:dd}),
+    {sep:1},
+    {a:'elimina-progetto', l:'Elimina progetto', ic:'x', d:dd, danger:1, off:isLock(pr)}
+  ];
+}
 
 /* Sul telefono la barra in alto è quasi vuota: quello che ho tolto da lì
    (scheda, commenti, filtri, annulla, tema) sta tutto in questo menu. */
@@ -12637,7 +12811,11 @@ document.addEventListener('contextmenu', function(e){
   /* 3 — tessera progetto */
   const tile = e.target.closest('.tile');
   if(tile){
-    const pr = state.progetti.find(z=>z.id===tile.dataset.id), dd = D({pid:pr.id});
+    const pr = state.progetti.find(z=>z.id===tile.dataset.id);
+    apriCtx(x,y, esc(pr.nome), vociMenuProgetto(pr).concat([undoV]), tile); return;
+  }
+  if(false){
+    const pr = null, dd = '';
     apriCtx(x,y, esc(pr.nome), [
       {a:'apri', l:'Apri il progetto', ic:'right', d:D({id:pr.id})},
       {a:'edit', l:'Rinomina progetto', ic:'pen', d:dd+' data-t="proj" data-k="nome"', off:isLock(pr)},
@@ -12667,6 +12845,7 @@ document.addEventListener('contextmenu', function(e){
     const s = p.subs.find(z=>z.id===chk.dataset.id), i = Number(chk.dataset.i), dd = D({id:s.id, i:i});
     apriCtx(x,y, esc(s.items[i].t), [
       {a:'check', l:s.items[i].done?'Segna da fare':'Segna come fatto', ic:'check', d:dd, off:isLock(p)},
+      (s.items[i].done? null : {a:'voce-stato', l:s.items[i].st==='corso'? 'Non pi\u00f9 in corso' : 'Segna in corso', ic:'clock', d:dd, off:isLock(p)}),
       {a:'edit', l:'Rinomina la subtask', ic:'pen', d:dd+' data-t="item"', off:isLock(p)},
       {a:'cm-apri', l:'Commenti, link e file', ic:'chat', d:D({pid:p.id, task:s.id, voce:idVoce(s.items[i])})},
       {a:'add-compito', l:'Aggiungi subtask sotto', ic:'plus', d:dd, off:isLock(p)},
@@ -12690,6 +12869,7 @@ document.addEventListener('contextmenu', function(e){
       {a:'tagga', l:'Assegna a qualcuno…', ic:'users', d:dd, off:isLock(p)},
       {a:'edit', l:'Cambia il responsabile', ic:'user', d:dd+' data-t="sub" data-k="assegnato"', off:isLock(p)},
       {a:'add-compito', l:'Aggiungi subtask', ic:'plus', d:dd+' data-i="-1"', off:isLock(p)},
+      {a:'condividi', l:'Condividi questa task', ic:'share', d:D({pid:p.id, sid:s.id})},
       {sep:1},
       {a:'sub-tutto', l:'Segna tutto come fatto', ic:'check', d:dd, off:isLock(p)},
       {a:'sub-azzera', l:'Azzera le spunte', ic:'undo', d:dd, off:isLock(p)},
@@ -14713,6 +14893,21 @@ async function inviaInvitoCloud(corpo){
   if(!sb || !utenteCloud) return {errore:'offline'};
   try{
     const {data, error} = await sb.functions.invoke('invia-invito', {body:corpo});
+    if(!error) return data || {};
+    let e = error.message || 'invio';
+    try{ if(error.context && typeof error.context.json === 'function'){ const j = await error.context.json(); if(j && j.errore) e = j.errore; } }catch(x){}
+    return {errore:e};
+  }catch(x){ return {errore:'rete'}; }
+}
+/* v49: la bustina accesa. Prima il messaggio arriva al database (che crea la notifica
+   «menzione»), poi il server la manda anche per email. Gli indirizzi li conosce solo lui. */
+async function avvisaEmailCloud(pid, ids){
+  if(!sb || !utenteCloud) return {errore:'offline'};
+  const p = state.progetti.find(x=>x.id===pid);
+  const org = orgProg[pid] || (p && orgSpazio[p.spazio]) || orgMia;
+  try{ await salvaCloud(true); }catch(e){}
+  try{
+    const {data, error} = await sb.functions.invoke('avvisa-email', {body:{org, progetto:pid, a:ids}});
     if(!error) return data || {};
     let e = error.message || 'invio';
     try{ if(error.context && typeof error.context.json === 'function'){ const j = await error.context.json(); if(j && j.errore) e = j.errore; } }catch(x){}
