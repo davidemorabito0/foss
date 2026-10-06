@@ -1,0 +1,485 @@
+<!doctype html>
+<html lang="it">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="robots" content="noindex,nofollow,noarchive">
+<meta name="referrer" content="no-referrer">
+<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline' https://cdn.jsdelivr.net; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src https://fonts.gstatic.com; img-src 'self' data: blob:; connect-src https://suqpteanvnvvmfujlevi.supabase.co https://api.github.com; frame-src 'none'; object-src 'none'; base-uri 'none'; form-action 'none'">
+<title>FOSS · Amministrazione</title>
+<link rel="icon" href="icone/favicon.svg?v=45" type="image/svg+xml">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=JetBrains+Mono:wght@500&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#07111F; --side:#0A1628; --card:#0E1D33; --card-2:#13253F; --line:#1E3150; --line-2:#2A4166;
+  --text:#E8EEF7; --dim:#9FB0C8; --mute:#6F819C; --amber:#FFAD01; --on-amber:#1A1305;
+  --ok:#3FBF8F; --ok-soft:#0F2E26; --warn:#F2A33A; --warn-soft:#33240C; --alert:#F2635A; --alert-soft:#341A1C;
+  --r:14px; --font:"Plus Jakarta Sans",system-ui,-apple-system,"Segoe UI",sans-serif;
+}
+*{box-sizing:border-box}
+html,body{margin:0;background:var(--bg);color:var(--text);font:400 14px/1.45 var(--font);-webkit-font-smoothing:antialiased}
+button,input,select{font:inherit;color:inherit}
+button{cursor:pointer;border:0;background:none}
+a{color:var(--amber)}
+.mono{font-family:"JetBrains Mono",ui-monospace,monospace;font-size:12px}
+.btn{display:inline-flex;align-items:center;gap:7px;padding:9px 14px;border-radius:10px;background:var(--card-2);border:1px solid var(--line-2);font-weight:600;font-size:13px;white-space:nowrap}
+.btn:hover{border-color:var(--dim)}
+.btn.prim{background:var(--amber);color:var(--on-amber);border-color:var(--amber)}
+.btn.rosso{background:var(--alert-soft);color:var(--alert);border-color:#5A2A2D}
+.btn.sm{padding:6px 10px;font-size:12px;border-radius:8px}
+.btn:disabled{opacity:.4;cursor:default}
+input[type=email],input[type=password],input[type=text],input[inputmode]{width:100%;background:#0A1628;border:1px solid var(--line-2);border-radius:10px;padding:11px 13px;outline:none}
+input:focus{border-color:var(--amber)}
+.logo{display:flex;align-items:center;gap:10px;font-weight:800;letter-spacing:.06em;font-size:17px}
+.logo i{width:30px;height:30px;border-radius:8px;background:var(--amber);color:#0D1926;display:grid;place-items:center;font-style:normal;font-size:17px}
+.logo small{font-weight:600;letter-spacing:0;color:var(--mute);font-size:12px;margin-left:2px}
+
+/* accesso */
+#entra{min-height:100vh;display:grid;place-items:center;padding:24px 16px}
+.box{width:100%;max-width:400px;background:var(--card);border:1px solid var(--line);border-radius:18px;padding:28px 26px}
+.box h1{font-size:22px;margin:22px 0 6px;letter-spacing:-.01em}
+.box p{color:var(--dim);margin:0 0 18px}
+.box label{display:block;font-size:12px;font-weight:600;color:var(--dim);margin:12px 0 6px}
+.box .btn.prim{width:100%;justify-content:center;margin-top:18px;padding:12px}
+.err{background:var(--alert-soft);color:var(--alert);border-radius:10px;padding:9px 12px;font-size:13px;margin-top:12px}
+.qr{background:#fff;border-radius:12px;padding:12px;width:200px;height:200px;margin:4px auto 10px;display:block}
+.segreto{display:block;text-align:center;word-break:break-all;color:var(--dim);margin-bottom:6px}
+.codice{font-size:22px!important;letter-spacing:.4em;text-align:center}
+
+/* pannello */
+#app{display:none;min-height:100vh}
+#app.on{display:grid;grid-template-columns:230px 1fr}
+aside{background:var(--side);border-right:1px solid var(--line);padding:20px 14px;display:flex;flex-direction:column;gap:4px;position:sticky;top:0;height:100vh}
+aside .logo{margin:0 6px 20px}
+.nav{display:flex;align-items:center;gap:10px;padding:10px 12px;border-radius:10px;color:var(--dim);font-weight:600;text-align:left;width:100%}
+.nav:hover{background:#0F1E35;color:var(--text)}
+.nav.on{background:#162A47;color:var(--text)}
+.nav .n{margin-left:auto;font-size:11px;background:var(--alert-soft);color:var(--alert);border-radius:999px;padding:1px 7px}
+aside .fondo{margin-top:auto;border-top:1px solid var(--line);padding-top:14px;font-size:12px;color:var(--mute)}
+aside .fondo b{display:block;color:var(--dim);font-weight:600;margin-bottom:8px;word-break:break-all}
+main{padding:28px 32px 60px;min-width:0}
+.testa{display:flex;align-items:flex-end;justify-content:space-between;gap:16px;margin-bottom:22px;flex-wrap:wrap}
+.testa h2{margin:0;font-size:24px;letter-spacing:-.01em}
+.testa p{margin:4px 0 0;color:var(--dim)}
+.griglia{display:grid;grid-template-columns:repeat(auto-fill,minmax(250px,1fr));gap:14px}
+.card{background:var(--card);border:1px solid var(--line);border-radius:var(--r);padding:16px 18px}
+.card h3{margin:0 0 12px;font-size:14px;color:var(--dim);font-weight:600}
+.misura .val{font-size:22px;font-weight:800;letter-spacing:-.01em}
+.misura .val small{font-size:13px;font-weight:500;color:var(--mute)}
+.barra{height:8px;background:#0A1628;border-radius:99px;overflow:hidden;margin:10px 0 8px}
+.barra i{display:block;height:100%;border-radius:99px;background:var(--ok)}
+.misura.giallo .barra i{background:var(--warn)} .misura.rosso .barra i{background:var(--alert)}
+.misura .nota{font-size:12px;color:var(--mute)}
+.misura .pc{float:right;font-size:12px;font-weight:700;color:var(--ok)}
+.misura.giallo .pc{color:var(--warn)} .misura.rosso .pc{color:var(--alert)}
+.numeri{display:grid;grid-template-columns:repeat(auto-fill,minmax(140px,1fr));gap:14px;margin:14px 0}
+.numeri .card b{display:block;font-size:26px;font-weight:800}
+.numeri .card span{color:var(--dim);font-size:12.5px}
+.avviso{display:flex;gap:10px;align-items:flex-start;background:var(--warn-soft);color:#F7C77A;border-radius:12px;padding:12px 14px;margin-bottom:16px;font-size:13px}
+.avviso.ok{background:var(--ok-soft);color:#8FE0C0}
+.avviso.ko{background:var(--alert-soft);color:#F79A93}
+.sez{margin-top:26px}
+.sez > h3{font-size:15px;margin:0 0 10px}
+table{width:100%;border-collapse:collapse;font-size:13px}
+th{text-align:left;font-size:11.5px;color:var(--mute);font-weight:600;text-transform:uppercase;letter-spacing:.05em;padding:8px 10px;border-bottom:1px solid var(--line);white-space:nowrap}
+td{padding:10px;border-bottom:1px solid #15263F;vertical-align:middle}
+tr:hover td{background:#0C1A2E}
+.tab-wrap{background:var(--card);border:1px solid var(--line);border-radius:var(--r);overflow:auto}
+.chip{display:inline-block;padding:2px 9px;border-radius:999px;font-size:11.5px;font-weight:600;background:#1C2F4A;color:var(--dim);white-space:nowrap}
+.chip.ok{background:var(--ok-soft);color:var(--ok)} .chip.ko{background:var(--alert-soft);color:var(--alert)} .chip.am{background:#3A2D0C;color:var(--amber)}
+.barra-az{display:flex;gap:8px;flex-wrap:wrap;align-items:center;margin-bottom:12px}
+.seg{display:inline-flex;background:var(--card);border:1px solid var(--line);border-radius:10px;padding:3px}
+.seg button{padding:6px 11px;border-radius:8px;font-size:12.5px;font-weight:600;color:var(--dim)}
+.seg button.on{background:#162A47;color:var(--text)}
+.dx{text-align:right}
+.vuoto{padding:28px;text-align:center;color:var(--mute)}
+.piccolo{font-size:12px;color:var(--mute)}
+.nomefile{max-width:340px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;display:block}
+#modale{position:fixed;inset:0;background:rgba(3,8,16,.7);display:none;place-items:center;padding:16px;z-index:50}
+#modale.on{display:grid}
+#modale .box{max-width:440px}
+#modale h3{margin:0 0 8px;font-size:18px}
+#modale ul{color:var(--dim);padding-left:18px;margin:8px 0}
+#modale .az{display:flex;gap:8px;justify-content:flex-end;margin-top:18px}
+#toast{position:fixed;left:50%;bottom:22px;transform:translateX(-50%);background:var(--card-2);border:1px solid var(--line-2);border-radius:999px;padding:10px 16px;font-size:13px;display:none;z-index:60}
+#toast.on{display:block}
+.carica{color:var(--mute);padding:30px 0}
+@media (max-width:820px){
+  #app.on{grid-template-columns:1fr}
+  aside{position:static;height:auto;flex-direction:row;flex-wrap:wrap;padding:12px}
+  aside .logo{width:100%;margin:0 0 8px}
+  .nav{width:auto;padding:8px 10px;font-size:13px}
+  aside .fondo{width:100%;margin-top:8px}
+  main{padding:20px 16px 50px}
+  .nomefile{max-width:180px}
+}
+</style>
+</head>
+<body>
+
+<section id="entra">
+  <div class="box" id="entraBox">
+    <div class="logo"><i>F</i>FOSS <small>Amministrazione</small></div>
+    <div class="carica">Un attimo…</div>
+  </div>
+</section>
+
+<div id="app">
+  <aside>
+    <div class="logo"><i>F</i>FOSS <small>Admin</small></div>
+    <button class="nav on" data-vai="spazio">Spazio e limiti</button>
+    <button class="nav" data-vai="file">File</button>
+    <button class="nav" data-vai="utenti">Utenti</button>
+    <button class="nav" data-vai="inviti">Inviti</button>
+    <button class="nav" data-vai="segnalazioni">Segnalazioni<span class="n" id="nSegn" hidden></span></button>
+    <button class="nav" data-vai="email">Email inviate</button>
+    <button class="nav" data-vai="backup">Backup</button>
+    <div class="fondo"><b id="chiSono"></b><button class="btn sm" data-az="esci">Esci</button></div>
+  </aside>
+  <main id="main"></main>
+</div>
+
+<div id="modale"><div class="box" id="modaleBox"></div></div>
+<div id="toast" role="status"></div>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.4/dist/umd/supabase.js"></script>
+<script>
+'use strict';
+/* Il pannello non contiene chiavi segrete: la chiave qui sotto e' quella pubblica
+   (la stessa del sito). Tutto quello che vedi passa dalla funzione «admin» sul
+   server, che risponde solo a un amministratore con la verifica in due passaggi. */
+const SUPA_URL = 'https://suqpteanvnvvmfujlevi.supabase.co';
+const SUPA_KEY = 'sb_publishable_f5Kjp6NHT9yTxr1bhWJjhg_4y72V-Kj';
+const REPO = 'davidemorabito0/foss';
+const MB = 1024 * 1024, GB = 1024 * MB;
+const LIMITI = {db: 500 * MB, file: 1 * GB, github: 1 * GB, mau: 50000, emailGiorno: 100, emailMese: 3000};
+const INATTIVO = 30 * 60 * 1000;          // dopo 30 minuti fermo esce da solo
+
+const sb = window.supabase.createClient(SUPA_URL, SUPA_KEY, {auth:{storageKey:'foss-admin', persistSession:true, autoRefreshToken:true}});
+const $ = id => document.getElementById(id);
+const esc = s => String(s == null ? '' : s).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const peso = b => { b = +b || 0; return b >= GB ? (b / GB).toFixed(2) + ' GB' : b >= MB ? (b / MB).toFixed(1) + ' MB' : b >= 1024 ? Math.round(b / 1024) + ' KB' : b + ' B'; };
+const data = t => t ? new Date(t).toLocaleString('it-IT', {day:'2-digit', month:'short', year:'numeric', hour:'2-digit', minute:'2-digit'}) : '—';
+const giorni = t => t ? Math.floor((Date.now() - new Date(t)) / 864e5) : null;
+const fa = t => { const g = giorni(t); return g == null ? '—' : g === 0 ? 'oggi' : g === 1 ? 'ieri' : g + ' giorni fa'; };
+const st = {vista:'spazio', dati:{}, fileOrd:'vecchi', fileBucket:'', sel:new Set()};
+
+function toast(t){ const x = $('toast'); x.textContent = t; x.classList.add('on'); clearTimeout(x.__t); x.__t = setTimeout(()=>x.classList.remove('on'), 3500); }
+function modale(html){ $('modaleBox').innerHTML = html; $('modale').classList.add('on'); const f = $('modaleBox').querySelector('input,button.prim,button.rosso'); if(f) setTimeout(()=>f.focus(), 30); }
+function chiudi(){ $('modale').classList.remove('on'); }
+
+/* ---------- chiamata al server ---------- */
+async function chiedi(azione, extra){
+  const {data, error} = await sb.functions.invoke('admin', {body:Object.assign({azione}, extra || {})});
+  if(!error) return data;
+  let e = 'server';
+  try{ if(error.context && typeof error.context.json === 'function'){ const j = await error.context.json(); if(j && j.errore) e = j.errore; } }catch(x){}
+  if(e === '2fa'){ await passo(); throw new Error('2fa'); }
+  if(e === 'non-admin'){ await sb.auth.signOut(); schermoEntra('Questo account non è amministratore di FOSS.'); throw new Error(e); }
+  throw new Error(e);
+}
+
+/* ---------- accesso: email e password di FOSS, poi il codice dell'app di autenticazione ---------- */
+function schermoEntra(err){
+  $('app').classList.remove('on'); $('entra').style.display = '';
+  $('entraBox').innerHTML = '<div class="logo"><i>F</i>FOSS <small>Amministrazione</small></div>' +
+    '<h1>Accesso riservato</h1><p>Entra con il tuo account FOSS da amministratore.</p>' +
+    '<form id="fEntra" autocomplete="on"><label for="em">Email</label><input type="email" id="em" autocomplete="username" required>' +
+    '<label for="pw">Password</label><input type="password" id="pw" autocomplete="current-password" required>' +
+    (err ? '<div class="err">' + esc(err) + '</div>' : '') +
+    '<button class="btn prim" type="submit">Entra</button></form>';
+  $('fEntra').addEventListener('submit', async e=>{
+    e.preventDefault();
+    const b = e.target.querySelector('button'); b.disabled = true; b.textContent = 'Controllo…';
+    const {error} = await sb.auth.signInWithPassword({email:$('em').value.trim(), password:$('pw').value});
+    if(error){ schermoEntra(/invalid/i.test(error.message) ? 'Email o password sbagliate.' : /many|rate/i.test(error.message) ? 'Troppi tentativi: aspetta qualche minuto.' : 'Accesso non riuscito.'); return; }
+    passo();
+  });
+  setTimeout(()=>{ const x = $('em'); if(x) x.focus(); }, 30);
+}
+async function passo(){
+  const {data:s} = await sb.auth.getSession();
+  if(!s || !s.session){ schermoEntra(); return; }
+  const {data:l} = await sb.auth.mfa.getAuthenticatorAssuranceLevel();
+  if(l && l.currentLevel === 'aal2'){ entra(s.session); return; }
+  const {data:f} = await sb.auth.mfa.listFactors();
+  const pronto = ((f && f.totp) || []).find(x=>x.status === 'verified');
+  if(pronto) schermoCodice(pronto.id); else schermoIscrivi();
+}
+function boxCodice(titolo, testo, extra, err){
+  $('app').classList.remove('on'); $('entra').style.display = '';
+  $('entraBox').innerHTML = '<div class="logo"><i>F</i>FOSS <small>Amministrazione</small></div><h1>' + titolo + '</h1><p>' + testo + '</p>' + (extra || '') +
+    '<form id="fCod"><label for="cod">Codice di 6 cifre</label><input id="cod" inputmode="numeric" autocomplete="one-time-code" maxlength="6" pattern="[0-9]{6}" class="codice" required>' +
+    (err ? '<div class="err">' + esc(err) + '</div>' : '') +
+    '<button class="btn prim" type="submit">Conferma</button></form>' +
+    '<p style="margin:16px 0 0;text-align:center"><button class="btn sm" type="button" data-az="esci">Esci</button></p>';
+  setTimeout(()=>{ const x = $('cod'); if(x) x.focus(); }, 30);
+}
+function schermoCodice(fid, err){
+  boxCodice('Verifica in due passaggi', 'Apri l’app di autenticazione sul telefono e scrivi il codice di FOSS.', '', err);
+  $('fCod').addEventListener('submit', async e=>{
+    e.preventDefault();
+    const {error} = await sb.auth.mfa.challengeAndVerify({factorId:fid, code:$('cod').value.trim()});
+    if(error){ schermoCodice(fid, 'Codice sbagliato o scaduto: riprova con quello nuovo.'); return; }
+    passo();
+  });
+}
+async function schermoIscrivi(err){
+  /* prima volta: si collega l'app di autenticazione (Google Authenticator, Authy, 1Password…) */
+  const {data:f} = await sb.auth.mfa.listFactors();
+  for(const x of ((f && f.all) || []).filter(x=>x.status !== 'verified')) await sb.auth.mfa.unenroll({factorId:x.id});
+  const {data, error} = await sb.auth.mfa.enroll({factorType:'totp', friendlyName:'FOSS admin'});
+  if(error){ schermoEntra('Non riesco ad attivare la verifica in due passaggi: ' + error.message); return; }
+  boxCodice('Attiva la verifica in due passaggi',
+    'Serve una volta sola. Inquadra il codice con un’app di autenticazione (Google Authenticator, Authy, 1Password…), poi scrivi il codice che ti mostra.',
+    '<img class="qr" alt="Codice QR" src="' + esc(data.totp.qr_code) + '"><span class="segreto mono">' + esc(data.totp.secret) + '</span>', err);
+  $('fCod').addEventListener('submit', async e=>{
+    e.preventDefault();
+    const {error:e2} = await sb.auth.mfa.challengeAndVerify({factorId:data.id, code:$('cod').value.trim()});
+    if(e2){ toast('Codice sbagliato: riprova con quello nuovo.'); $('cod').value = ''; $('cod').focus(); return; }
+    passo();
+  });
+}
+function entra(sessione){
+  $('entra').style.display = 'none'; $('app').classList.add('on');
+  $('chiSono').textContent = sessione.user.email || '';
+  vai(st.vista);
+}
+async function esci(){ await sb.auth.signOut(); st.dati = {}; schermoEntra(); }
+
+/* ---------- uscita automatica ---------- */
+let ultimoGesto = Date.now();
+['pointerdown','keydown'].forEach(ev=>document.addEventListener(ev, ()=>{ ultimoGesto = Date.now(); }, true));
+setInterval(async ()=>{ if($('app').classList.contains('on') && Date.now() - ultimoGesto > INATTIVO){ await esci(); schermoEntra('Sei uscito dopo 30 minuti di inattività.'); } }, 30000);
+
+/* ---------- viste ---------- */
+function vai(v){
+  st.vista = v;
+  document.querySelectorAll('.nav').forEach(b=>b.classList.toggle('on', b.dataset.vai === v));
+  $('main').innerHTML = '<div class="carica">Carico…</div>';
+  ({spazio:vistaSpazio, file:vistaFile, utenti:vistaUtenti, inviti:vistaInviti, segnalazioni:vistaSegn, email:vistaEmail, backup:vistaBackup}[v])()
+    .catch(e=>{ if(e.message !== '2fa' && e.message !== 'non-admin') $('main').innerHTML = '<div class="avviso ko">Non riesco a leggere i dati (' + esc(e.message) + '). Riprova tra poco.</div>'; });
+}
+function misura(titolo, usato, limite, testo, nota){
+  const pc = limite ? Math.min(100, usato / limite * 100) : 0;
+  const cl = pc >= 85 ? 'rosso' : pc >= 60 ? 'giallo' : '';
+  return '<div class="card misura ' + cl + '"><h3>' + titolo + '<span class="pc">' + (pc < 1 && pc > 0 ? '<1' : Math.round(pc)) + '%</span></h3>' +
+    '<div class="val">' + testo + '</div><div class="barra"><i style="width:' + Math.max(pc, 0.6) + '%"></i></div><div class="nota">' + nota + '</div></div>';
+}
+async function github(){
+  try{ const r = await fetch('https://api.github.com/repos/' + REPO); if(!r.ok) return null; const j = await r.json(); return (j.size || 0) * 1024; }catch(e){ return null; }
+}
+async function vistaSpazio(){
+  const [s, gh] = await Promise.all([chiedi('stato'), github()]);
+  st.dati.stato = s;
+  const file = (s.file || []).reduce((a, x)=>a + (+x.byte || 0), 0), nFile = (s.file || []).reduce((a, x)=>a + (+x.n || 0), 0);
+  const allarmi = [];
+  const pcs = [[s.db_byte / LIMITI.db, 'il database'], [file / LIMITI.file, 'lo spazio file'], [gh != null ? gh / LIMITI.github : 0, 'il sito su GitHub'],
+               [s.email_oggi / LIMITI.emailGiorno, 'le email di oggi'], [s.email_mese / LIMITI.emailMese, 'le email del mese']];
+  pcs.forEach(([p, n])=>{ if(p >= .85) allarmi.push('<b>' + n + '</b> è oltre l’85% del limite'); else if(p >= .6) allarmi.push(n + ' ha superato il 60%'); });
+  let h = '<div class="testa"><div><h2>Spazio e limiti</h2><p>Quanto stai usando dei piani gratuiti, aggiornato adesso.</p></div>' +
+    '<button class="btn" data-az="ricarica">Aggiorna</button></div>';
+  h += allarmi.length ? '<div class="avviso">⚠ ' + allarmi.map((x, i)=>i ? x : x.replace(/^(<b>)?(\w)/, (m, b, c)=>(b || '') + c.toUpperCase())).join(' · ') + '.</div>' : '<div class="avviso ok">✓ Tutto sotto il 60% dei limiti gratuiti.</div>';
+  h += '<div class="griglia">' +
+    misura('Database (Supabase)', s.db_byte, LIMITI.db, peso(s.db_byte) + ' <small>su 500 MB</small>', 'Progetti, spazi, commenti, copertine e backup.') +
+    misura('File caricati (Supabase)', file, LIMITI.file, peso(file) + ' <small>su 1 GB</small>', nFile + ' file · ' + (s.file || []).map(x=>esc(x.bucket) + ' ' + peso(x.byte)).join(' · ')) +
+    misura('Sito su GitHub', gh || 0, LIMITI.github, gh == null ? 'non disponibile' : peso(gh) + ' <small>su 1 GB</small>', 'Dimensione del repository. Traffico: 100 GB al mese, non misurabile da qui.') +
+    misura('Utenti attivi nel mese', s.attivi_30, LIMITI.mau, s.attivi_30 + ' <small>su 50.000</small>', s.utenti + ' account in tutto.') +
+    misura('Email di oggi (Resend)', s.email_oggi, LIMITI.emailGiorno, s.email_oggi + ' <small>su 100</small>', 'Inviti e avvisi della bustina. Si azzera a mezzanotte.') +
+    misura('Email del mese (Resend)', s.email_mese, LIMITI.emailMese, s.email_mese + ' <small>su 3.000</small>', 'Si azzera il primo del mese.') +
+    '</div>';
+  h += '<div class="numeri">' + [[s.utenti, 'account'], [s.organizzazioni, 'team'], [s.spazi, 'spazi'], [s.progetti, 'progetti'], [s.progetti_fatti, 'completati'], [nFile, 'file']]
+    .map(x=>'<div class="card"><b>' + esc(x[0]) + '</b><span>' + x[1] + '</span></div>').join('') + '</div>';
+  h += '<div class="avviso" style="background:#0F1E35;color:var(--dim)">ℹ Il traffico scaricato (5 GB al mese su Supabase) e i progetti attivi (2 su 2: FOSS e Idratati) si vedono solo nel ' +
+    '<a href="https://supabase.com/dashboard/project/suqpteanvnvvmfujlevi" target="_blank" rel="noopener noreferrer">pannello di Supabase</a>.</div>';
+  h += '<div class="sez"><h3>Cosa occupa il database</h3><div class="tab-wrap"><table><thead><tr><th>Tabella</th><th class="dx">Righe</th><th class="dx">Spazio</th></tr></thead><tbody>' +
+    (s.tabelle || []).slice(0, 12).map(t=>'<tr><td>' + esc(NOMI_TAB[t.nome] || t.nome) + ' <span class="piccolo mono">' + esc(t.nome) + '</span></td><td class="dx">' + Math.max(0, +t.righe) + '</td><td class="dx">' + peso(t.byte) + '</td></tr>').join('') +
+    '</tbody></table></div></div>';
+  $('main').innerHTML = h;
+}
+const NOMI_TAB = {spazi:'Spazi (con le copertine)', progetti:'Progetti', elementi:'Task, voci, commenti, chat', spazio_lavoro:'Preferenze di ognuno', notifiche:'Notifiche',
+  backup_giornalieri:'Backup', avvisi_email:'Email della bustina', segnalazioni:'Segnalazioni', push_iscrizioni:'Telefoni iscritti agli avvisi', inviti:'Inviti', profili:'Profili',
+  membri_org:'Persone nei team', membri_progetto:'Persone nei progetti', organizzazioni:'Team', link_cliente:'Link per i clienti', calendari:'Calendari', modelli:'Preset', conti:'Soldi'};
+
+/* ---------- file ---------- */
+async function vistaFile(){
+  st.dati.file = await chiedi('file'); st.sel.clear(); disegnaFile();
+}
+function disegnaFile(){
+  let l = (st.dati.file || []).filter(f=>!st.fileBucket || f.bucket === st.fileBucket);
+  if(st.fileOrd === 'vecchi') l.sort((a, b)=>String(a.creato).localeCompare(String(b.creato)));
+  if(st.fileOrd === 'nuovi') l.sort((a, b)=>String(b.creato).localeCompare(String(a.creato)));
+  if(st.fileOrd === 'grandi') l.sort((a, b)=>(+b.byte || 0) - (+a.byte || 0));
+  const tot = l.reduce((a, f)=>a + (+f.byte || 0), 0), selB = l.filter(f=>st.sel.has(f.bucket + '|' + f.nome)).reduce((a, f)=>a + (+f.byte || 0), 0);
+  let h = '<div class="testa"><div><h2>File</h2><p>' + l.length + ' file · ' + peso(tot) + '. Ordina per data per trovare quelli vecchi da togliere.</p></div></div>';
+  h += '<div class="barra-az"><div class="seg">' + [['vecchi', 'Più vecchi'], ['nuovi', 'Più nuovi'], ['grandi', 'Più grandi']].map(x=>'<button data-ord="' + x[0] + '" class="' + (st.fileOrd === x[0] ? 'on' : '') + '">' + x[1] + '</button>').join('') + '</div>' +
+    '<div class="seg">' + [['', 'Tutti'], ['allegati', 'Allegati'], ['avatar', 'Foto profilo']].map(x=>'<button data-buck="' + x[0] + '" class="' + (st.fileBucket === x[0] ? 'on' : '') + '">' + x[1] + '</button>').join('') + '</div>' +
+    '<span style="flex:1"></span>' + (st.sel.size ? '<span class="piccolo">' + st.sel.size + ' scelti · ' + peso(selB) + '</span><button class="btn rosso sm" data-az="togli-file">Elimina i file scelti</button>' : '') + '</div>';
+  if(!l.length){ $('main').innerHTML = h + '<div class="card vuoto">Nessun file.</div>'; return; }
+  h += '<div class="tab-wrap"><table><thead><tr><th></th><th>File</th><th>Progetto</th><th>Di</th><th>Caricato</th><th class="dx">Peso</th><th></th></tr></thead><tbody>' +
+    l.map(f=>{ const k = f.bucket + '|' + f.nome, nome = String(f.nome).split('/').pop().replace(/^[a-z0-9]{8,14}-/, '');
+      return '<tr><td><input type="checkbox" data-sel="' + esc(k) + '"' + (st.sel.has(k) ? ' checked' : '') + ' aria-label="Scegli"></td>' +
+        '<td><span class="nomefile" title="' + esc(f.nome) + '">' + esc(nome) + '</span><span class="chip">' + (f.bucket === 'avatar' ? 'foto profilo' : 'allegato') + '</span></td>' +
+        '<td>' + esc(f.progetto || '—') + '</td><td>' + esc(f.chi || '—') + '</td>' +
+        '<td>' + data(f.creato) + '<div class="piccolo">' + fa(f.creato) + '</div></td><td class="dx">' + peso(f.byte) + '</td>' +
+        '<td class="dx"><button class="btn sm" data-apri="' + esc(k) + '">Apri</button></td></tr>'; }).join('') + '</tbody></table></div>';
+  $('main').innerHTML = h;
+}
+function chiediTogliFile(){
+  const l = (st.dati.file || []).filter(f=>st.sel.has(f.bucket + '|' + f.nome));
+  const b = l.reduce((a, f)=>a + (+f.byte || 0), 0);
+  modale('<h3>Eliminare ' + l.length + ' file?</h3><p style="color:var(--dim)">Liberi ' + peso(b) + '. Cosa succede:</p><ul>' +
+    '<li>I file spariscono per sempre: non sono nei backup.</li>' +
+    '<li>Nei commenti resta il nome del file, ma non si apre più.</li>' +
+    '<li>Una foto profilo tolta torna alle iniziali.</li></ul>' +
+    '<div class="az"><button class="btn" data-az="chiudi">Annulla</button><button class="btn rosso" data-az="togli-file-ok">Elimina</button></div>');
+}
+async function togliFile(){
+  chiudi();
+  const per = {};
+  [...st.sel].forEach(k=>{ const i = k.indexOf('|'); (per[k.slice(0, i)] = per[k.slice(0, i)] || []).push(k.slice(i + 1)); });
+  let n = 0;
+  try{ for(const bucket in per){ const r = await chiedi('togli-file', {bucket, nomi:per[bucket]}); n += r.tolti || 0; } toast(n + ' file eliminati.'); }
+  catch(e){ toast('Non tutti i file sono stati eliminati: ' + e.message); }
+  vai('file');
+}
+
+/* ---------- utenti ---------- */
+async function vistaUtenti(){
+  const l = st.dati.utenti = await chiedi('utenti');
+  let h = '<div class="testa"><div><h2>Utenti</h2><p>' + l.length + ' account. Bloccare toglie l’accesso senza cancellare niente.</p></div></div>';
+  h += '<div class="tab-wrap"><table><thead><tr><th>Persona</th><th>Team</th><th>Iscritto</th><th>Ultimo accesso</th><th class="dx">Progetti</th><th class="dx">File</th><th>Stato</th><th></th></tr></thead><tbody>' +
+    l.map(u=>'<tr><td><b>' + esc(u.nome || '—') + '</b>' + (u.admin ? ' <span class="chip am">admin</span>' : '') + '<div class="piccolo">' + esc(u.email) + '</div></td>' +
+      '<td>' + ((u.team || []).map(t=>esc(t.org) + ' <span class="piccolo">' + esc(t.ruolo) + '</span>').join('<br>') || '—') + '</td>' +
+      '<td>' + data(u.creato) + '</td><td>' + (u.ultimo ? fa(u.ultimo) : 'mai') + '</td>' +
+      '<td class="dx">' + esc(u.progetti) + '</td><td class="dx">' + peso(u.file_byte) + '</td>' +
+      '<td>' + (u.bloccato ? '<span class="chip ko">bloccato</span>' : !u.confermato ? '<span class="chip">da confermare</span>' : '<span class="chip ok">attivo</span>') + '</td>' +
+      '<td class="dx" style="white-space:nowrap">' + (u.admin ? '' :
+        (u.bloccato ? '<button class="btn sm" data-ut="sblocca" data-id="' + esc(u.id) + '">Sblocca</button>' : '<button class="btn sm" data-ut="blocca" data-id="' + esc(u.id) + '">Blocca</button>') +
+        ' <button class="btn sm rosso" data-ut="elimina" data-id="' + esc(u.id) + '">Elimina</button>') + '</td></tr>').join('') +
+    '</tbody></table></div>';
+  $('main').innerHTML = h;
+}
+function azioneUtente(az, id){
+  const u = (st.dati.utenti || []).find(x=>x.id === id); if(!u) return;
+  const nm = esc(u.nome || u.email);
+  if(az === 'blocca') modale('<h3>Bloccare ' + nm + '?</h3><ul><li>Non può più entrare in FOSS, da nessun dispositivo.</li><li>I suoi progetti, commenti e file restano.</li><li>Puoi sbloccarlo quando vuoi.</li></ul>' +
+    '<div class="az"><button class="btn" data-az="chiudi">Annulla</button><button class="btn rosso" data-ok="blocca" data-id="' + esc(id) + '">Blocca</button></div>');
+  if(az === 'sblocca') faiUtente('sblocca', id);
+  if(az === 'elimina') modale('<h3>Eliminare l’account di ' + nm + '?</h3><ul><li>L’account sparisce e non si recupera.</li><li>Il suo archivio personale e i progetti di cui è titolare possono andare persi.</li>' +
+    '<li>Se vuoi solo fermarlo, usa <b>Blocca</b>.</li></ul><label class="piccolo" for="confEl">Scrivi ELIMINA per confermare</label><input type="text" id="confEl" autocomplete="off">' +
+    '<div class="az"><button class="btn" data-az="chiudi">Annulla</button><button class="btn rosso" data-ok="elimina-utente" data-id="' + esc(id) + '">Elimina</button></div>');
+}
+async function faiUtente(az, id){
+  const conferma = az === 'elimina-utente' ? ($('confEl') ? $('confEl').value.trim() : '') : undefined;
+  if(az === 'elimina-utente' && conferma !== 'ELIMINA'){ toast('Scrivi ELIMINA per confermare.'); return; }
+  chiudi();
+  try{ await chiedi(az, {id, conferma}); toast({blocca:'Bloccato.', sblocca:'Sbloccato.', 'elimina-utente':'Account eliminato.'}[az]); }
+  catch(e){ toast({admin:'Un amministratore non si tocca da qui.', 'te-stesso':'Non puoi farlo su te stesso.', collegato:'Non si può eliminare: ha lavorato su progetti di altri team. Usa Blocca.'}[e.message] || 'Non riuscito: ' + e.message); }
+  vai('utenti');
+}
+
+/* ---------- inviti ---------- */
+async function vistaInviti(){
+  const l = await chiedi('inviti');
+  let h = '<div class="testa"><div><h2>Inviti</h2><p>Gli inviti mandati da tutti i team. Uno non ancora usato si può annullare.</p></div></div>';
+  if(!l.length){ $('main').innerHTML = h + '<div class="card vuoto">Nessun invito.</div>'; return; }
+  h += '<div class="tab-wrap"><table><thead><tr><th>Per</th><th>Team</th><th>Creato</th><th>Mandato</th><th>Stato</th><th></th></tr></thead><tbody>' +
+    l.map(i=>'<tr><td><b>' + esc([i.nome, i.cognome].filter(Boolean).join(' ') || '—') + '</b><div class="piccolo">' + esc(i.email) + (i.ruolo ? ' · ' + esc(i.ruolo) : '') + '</div></td>' +
+      '<td>' + esc(i.team) + '</td><td>' + data(i.creato_il) + '</td><td>' + (i.inviato_il ? data(i.inviato_il) + (i.invii > 1 ? ' <span class="piccolo">(' + i.invii + ' volte)</span>' : '') : '—') + '</td>' +
+      '<td>' + (i.usato ? '<span class="chip ok">registrato</span>' : i.esito ? '<span class="chip' + (/bounce|complain/.test(i.esito) ? ' ko' : '') + '">' + esc(i.esito) + '</span>' : '<span class="chip">non mandato</span>') + '</td>' +
+      '<td class="dx">' + (i.usato ? '' : '<button class="btn sm" data-annulla="' + esc(i.id) + '">Annulla</button>') + '</td></tr>').join('') + '</tbody></table></div>';
+  $('main').innerHTML = h;
+}
+
+/* ---------- segnalazioni ---------- */
+const TIPO_SEGN = {problema:'Non funziona', domanda:'Domanda', idea:'Idea'};
+async function vistaSegn(){
+  const l = await chiedi('segnalazioni');
+  const aperte = l.filter(s=>s.stato !== 'risolta').length;
+  $('nSegn').hidden = !aperte; $('nSegn').textContent = aperte;
+  let h = '<div class="testa"><div><h2>Segnalazioni</h2><p>' + aperte + ' da guardare su ' + l.length + '. Arrivano dal tasto «Segnala» nella Guida.</p></div></div>';
+  if(!l.length){ $('main').innerHTML = h + '<div class="card vuoto">Nessuna segnalazione.</div>'; return; }
+  h += '<div class="tab-wrap"><table><thead><tr><th>Quando</th><th>Chi</th><th>Cosa</th><th>Dove</th><th>Stato</th></tr></thead><tbody>' +
+    l.map(s=>'<tr><td>' + data(s.creata_il) + '</td><td>' + esc(s.chi || '—') + '</td>' +
+      '<td><span class="chip">' + esc(TIPO_SEGN[s.tipo] || s.tipo) + '</span><div style="margin-top:6px;white-space:pre-wrap">' + esc(s.testo) + '</div></td>' +
+      '<td class="piccolo">' + esc(s.dove || '') + '<br>' + esc(s.dispositivo || '') + ' · ' + esc(s.versione || '') + '</td>' +
+      '<td><div class="seg">' + [['aperta', 'Da fare'], ['vista', 'Vista'], ['risolta', 'Risolta']].map(x=>'<button data-segn="' + esc(s.id) + '" data-stato="' + x[0] + '" class="' + ((s.stato || 'aperta') === x[0] ? 'on' : '') + '">' + x[1] + '</button>').join('') + '</div></td></tr>').join('') +
+    '</tbody></table></div>';
+  $('main').innerHTML = h;
+}
+
+/* ---------- email ---------- */
+async function vistaEmail(){
+  const l = await chiedi('email');
+  let h = '<div class="testa"><div><h2>Email inviate</h2><p>Inviti e avvisi della bustina, le più recenti prima. Limite gratuito: 100 al giorno, 3.000 al mese.</p></div></div>';
+  if(!l.length){ $('main').innerHTML = h + '<div class="card vuoto">Ancora nessuna email.</div>'; return; }
+  h += '<div class="tab-wrap"><table><thead><tr><th>Quando</th><th>Tipo</th><th>Da</th><th>A</th><th>Progetto / esito</th></tr></thead><tbody>' +
+    l.map(x=>'<tr><td>' + data(x.quando) + '</td><td><span class="chip' + (x.tipo === 'tag' ? ' am' : '') + '">' + (x.tipo === 'tag' ? 'bustina' : 'invito') + '</span></td>' +
+      '<td>' + esc(x.da || '—') + '</td><td>' + esc(x.a) + '</td><td>' + esc(x.su || '') + '</td></tr>').join('') + '</tbody></table></div>';
+  $('main').innerHTML = h;
+}
+
+/* ---------- backup ---------- */
+async function vistaBackup(){
+  const s = st.dati.stato = await chiedi('stato');
+  const l = s.backup || [], g = s.backup_ultimo_giro;
+  let h = '<div class="testa"><div><h2>Backup</h2><p>Ogni notte alle 3:30 si salva una copia di tutti i dati. Restano le ultime 7, più 5 fatte a mano.</p></div>' +
+    '<button class="btn prim" data-az="backup-ora">Fai un backup adesso</button></div>';
+  if(g) h += g.stato === 'succeeded' ? '<div class="avviso ok">✓ Ultimo backup automatico riuscito: ' + data(g.quando) + '.</div>'
+                                     : '<div class="avviso ko">✕ L’ultimo backup automatico (' + data(g.quando) + ') non è riuscito: ' + esc(g.msg || g.stato) + '</div>';
+  h += '<div class="avviso" style="background:#0F1E35;color:var(--dim)">ℹ La copia sta sul database stesso: ti salva da un errore (un progetto cancellato per sbaglio). ' +
+    'Per averne una anche fuori, ogni tanto premi <b>Scarica</b> e tieni il file sul computer. I file caricati (allegati, foto) non sono nel backup: c’è solo il loro elenco.</div>';
+  h += '<div class="tab-wrap"><table><thead><tr><th>Quando</th><th>Tipo</th><th class="dx">Righe</th><th class="dx">Peso</th><th></th></tr></thead><tbody>' +
+    (l.length ? l.map(b=>'<tr><td>' + data(b.creato) + '<div class="piccolo">' + fa(b.creato) + '</div></td><td><span class="chip' + (b.tipo === 'manuale' ? ' am' : '') + '">' + (b.tipo === 'manuale' ? 'a mano' : 'notturno') + '</span></td>' +
+      '<td class="dx">' + esc(b.righe) + '</td><td class="dx">' + peso(b.byte) + '</td><td class="dx"><button class="btn sm" data-scarica="' + esc(b.posto) + '">Scarica</button></td></tr>').join('')
+      : '<tr><td colspan="5" class="vuoto">Ancora nessun backup.</td></tr>') + '</tbody></table></div>';
+  h += '<p class="piccolo" style="margin-top:14px">Per ripristinare un backup chiedi a Claude: si fa un pezzo alla volta, senza toccare il resto.</p>';
+  $('main').innerHTML = h;
+}
+async function scaricaBackup(posto, b){
+  b.disabled = true; b.textContent = '…';
+  try{
+    const r = await chiedi('scarica-backup', {posto});
+    const blob = new Blob([JSON.stringify(r.dati)], {type:'application/json'});
+    const a = document.createElement('a'); a.href = URL.createObjectURL(blob);
+    a.download = 'foss-backup-' + String(r.creato_il).slice(0, 16).replace(/[:T]/g, '-') + '.json';
+    document.body.appendChild(a); a.click(); a.remove(); setTimeout(()=>URL.revokeObjectURL(a.href), 5000);
+    toast('Backup scaricato: tienilo in un posto sicuro, contiene tutti i dati.');
+  }catch(e){ toast('Download non riuscito: ' + e.message); }
+  b.disabled = false; b.textContent = 'Scarica';
+}
+
+/* ---------- tocchi ---------- */
+document.addEventListener('click', async e=>{
+  const t = e.target.closest('button, [data-sel]'); if(!t) return;
+  const d = t.dataset;
+  if(d.vai) return vai(d.vai);
+  if(d.ord){ st.fileOrd = d.ord; return disegnaFile(); }
+  if(d.buck !== undefined){ st.fileBucket = d.buck; return disegnaFile(); }
+  if(d.sel){ t.checked ? st.sel.add(d.sel) : st.sel.delete(d.sel); return disegnaFile(); }
+  if(d.apri){ const i = d.apri.indexOf('|'); const w = window.open('about:blank', '_blank'); if(w) w.opener = null;
+    try{ const r = await chiedi('link-file', {bucket:d.apri.slice(0, i), nome:d.apri.slice(i + 1)}); if(w) w.location.href = r.url; }catch(x){ if(w) w.close(); toast('Il file non si apre.'); } return; }
+  if(d.ut) return azioneUtente(d.ut, d.id);
+  if(d.ok) return faiUtente(d.ok, d.id);
+  if(d.annulla){ try{ await chiedi('annulla-invito', {id:d.annulla}); toast('Invito annullato.'); }catch(x){ toast('Non riuscito.'); } return vai('inviti'); }
+  if(d.segn){ try{ await chiedi('segna', {id:d.segn, stato:d.stato}); }catch(x){ toast('Non riuscito.'); } return vai('segnalazioni'); }
+  if(d.scarica) return scaricaBackup(d.scarica, t);
+  switch(d.az){
+    case 'esci': return esci();
+    case 'chiudi': return chiudi();
+    case 'ricarica': return vai(st.vista);
+    case 'togli-file': return chiediTogliFile();
+    case 'togli-file-ok': return togliFile();
+    case 'backup-ora': t.disabled = true; t.textContent = 'Salvo…';
+      try{ await chiedi('backup-ora'); toast('Backup fatto.'); }catch(x){ toast('Backup non riuscito: ' + x.message); } return vai('backup');
+  }
+});
+document.addEventListener('keydown', e=>{ if(e.key === 'Escape') chiudi(); });
+$('modale').addEventListener('click', e=>{ if(e.target.id === 'modale') chiudi(); });
+sb.auth.onAuthStateChange(ev=>{ if(ev === 'SIGNED_OUT' && $('app').classList.contains('on')) schermoEntra(); });
+passo();
+</script>
+</body>
+</html>
