@@ -5,114 +5,176 @@
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <meta name="robots" content="noindex,nofollow,noarchive">
 <meta name="referrer" content="no-referrer">
-<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline' https://cdn.jsdelivr.net; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src https://fonts.gstatic.com; img-src 'self' data: blob:; connect-src https://suqpteanvnvvmfujlevi.supabase.co https://api.github.com; frame-src 'none'; object-src 'none'; base-uri 'none'; form-action 'none'">
+<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline' https://cdn.jsdelivr.net; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src https://fonts.gstatic.com; img-src 'self' data: blob: https://suqpteanvnvvmfujlevi.supabase.co; connect-src https://suqpteanvnvvmfujlevi.supabase.co https://api.github.com; frame-src 'none'; object-src 'none'; base-uri 'none'; form-action 'none'">
 <title>FOSS · Amministrazione</title>
 <link rel="icon" href="icone/favicon.svg?v=45" type="image/svg+xml">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=JetBrains+Mono:wght@500&display=swap" rel="stylesheet">
 <style>
 :root{
-  --bg:#07111F; --side:#0A1628; --card:#0E1D33; --card-2:#13253F; --line:#1E3150; --line-2:#2A4166;
-  --text:#E8EEF7; --dim:#9FB0C8; --mute:#6F819C; --amber:#FFAD01; --on-amber:#1A1305;
-  --ok:#3FBF8F; --ok-soft:#0F2E26; --warn:#F2A33A; --warn-soft:#33240C; --alert:#F2635A; --alert-soft:#341A1C;
-  --r:14px; --font:"Plus Jakarta Sans",system-ui,-apple-system,"Segoe UI",sans-serif;
+  --bg:#060F1C; --side:#081322; --card:#0C1A2D; --card-2:#102239; --card-3:#13294A; --line:#172B47; --line-2:#22395C;
+  --text:#EAF0F8; --dim:#A3B3CA; --mute:#6E819E; --amber:#FFAD01; --on-amber:#1A1305;
+  --blu:#3D8BFF; --verde:#2FC27A; --arancio:#F59E0B; --viola:#8B5CF6; --rosso:#F0506E; --azzurro:#38BDF8;
+  --ok:#2FC27A; --ok-soft:#0D2B22; --warn:#F2A33A; --warn-soft:#2E220C; --alert:#F0506E; --alert-soft:#2E1520;
+  --r:16px; --font:"Plus Jakarta Sans",system-ui,-apple-system,"Segoe UI",sans-serif;
 }
 *{box-sizing:border-box}
 html,body{margin:0;background:var(--bg);color:var(--text);font:400 14px/1.45 var(--font);-webkit-font-smoothing:antialiased}
 button,input,select{font:inherit;color:inherit}
 button{cursor:pointer;border:0;background:none}
 a{color:var(--amber)}
+svg.i{width:18px;height:18px;flex:none;fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
 .mono{font-family:"JetBrains Mono",ui-monospace,monospace;font-size:12px}
-.btn{display:inline-flex;align-items:center;gap:7px;padding:9px 14px;border-radius:10px;background:var(--card-2);border:1px solid var(--line-2);font-weight:600;font-size:13px;white-space:nowrap}
-.btn:hover{border-color:var(--dim)}
+.btn{display:inline-flex;align-items:center;gap:8px;padding:9px 15px;border-radius:11px;background:var(--card-2);border:1px solid var(--line-2);font-weight:600;font-size:13px;white-space:nowrap;transition:border-color .15s,background .15s}
+.btn:hover{border-color:#3A5683;background:var(--card-3)}
+.btn svg.i{width:16px;height:16px}
 .btn.prim{background:var(--amber);color:var(--on-amber);border-color:var(--amber)}
-.btn.rosso{background:var(--alert-soft);color:var(--alert);border-color:#5A2A2D}
-.btn.sm{padding:6px 10px;font-size:12px;border-radius:8px}
+.btn.prim:hover{background:#FFBC2E}
+.btn.rosso{background:var(--alert-soft);color:#FF8BA0;border-color:#4E2233}
+.btn.rosso:hover{background:#3E1A29;border-color:#6E2D45}
+.btn.sm{padding:6px 11px;font-size:12px;border-radius:9px}
+.btn.icona{padding:7px;border-radius:9px}
 .btn:disabled{opacity:.4;cursor:default}
-input[type=email],input[type=password],input[type=text],input[inputmode]{width:100%;background:#0A1628;border:1px solid var(--line-2);border-radius:10px;padding:11px 13px;outline:none}
+input[type=email],input[type=password],input[type=text],input[type=search],input[inputmode]{width:100%;background:#091526;border:1px solid var(--line-2);border-radius:11px;padding:11px 13px;outline:none}
 input:focus{border-color:var(--amber)}
-.logo{display:flex;align-items:center;gap:10px;font-weight:800;letter-spacing:.06em;font-size:17px}
-.logo i{width:30px;height:30px;border-radius:8px;background:var(--amber);color:#0D1926;display:grid;place-items:center;font-style:normal;font-size:17px}
-.logo small{font-weight:600;letter-spacing:0;color:var(--mute);font-size:12px;margin-left:2px}
+.logo{display:flex;align-items:center;gap:10px;font-weight:800;letter-spacing:.06em;font-size:18px}
+.logo i{width:32px;height:32px;border-radius:9px;background:var(--amber);color:#0D1926;display:grid;place-items:center;font-style:normal;font-size:18px}
+.logo small{font-weight:600;letter-spacing:0;color:var(--mute);font-size:12px;margin-left:4px}
 
 /* accesso */
-#entra{min-height:100vh;display:grid;place-items:center;padding:24px 16px}
-.box{width:100%;max-width:400px;background:var(--card);border:1px solid var(--line);border-radius:18px;padding:28px 26px}
-.box h1{font-size:22px;margin:22px 0 6px;letter-spacing:-.01em}
+#entra{min-height:100vh;display:grid;place-items:center;padding:24px 16px;background:radial-gradient(ellipse at 50% 0%,#0F2240 0%,var(--bg) 60%)}
+.box{width:100%;max-width:410px;background:var(--card);border:1px solid var(--line);border-radius:20px;padding:30px 28px;box-shadow:0 30px 80px rgba(0,0,0,.4)}
+.box h1{font-size:22px;margin:24px 0 6px;letter-spacing:-.01em}
 .box p{color:var(--dim);margin:0 0 18px}
 .box label{display:block;font-size:12px;font-weight:600;color:var(--dim);margin:12px 0 6px}
 .box .btn.prim{width:100%;justify-content:center;margin-top:18px;padding:12px}
-.err{background:var(--alert-soft);color:var(--alert);border-radius:10px;padding:9px 12px;font-size:13px;margin-top:12px}
+.err{background:var(--alert-soft);color:#FF8BA0;border-radius:10px;padding:9px 12px;font-size:13px;margin-top:12px}
 .qr{background:#fff;border-radius:12px;padding:12px;width:200px;height:200px;margin:4px auto 10px;display:block}
 .segreto{display:block;text-align:center;word-break:break-all;color:var(--dim);margin-bottom:6px}
 .codice{font-size:22px!important;letter-spacing:.4em;text-align:center}
 
-/* pannello */
+/* struttura */
 #app{display:none;min-height:100vh}
-#app.on{display:grid;grid-template-columns:230px 1fr}
-aside{background:var(--side);border-right:1px solid var(--line);padding:20px 14px;display:flex;flex-direction:column;gap:4px;position:sticky;top:0;height:100vh}
-aside .logo{margin:0 6px 20px}
-.nav{display:flex;align-items:center;gap:10px;padding:10px 12px;border-radius:10px;color:var(--dim);font-weight:600;text-align:left;width:100%}
-.nav:hover{background:#0F1E35;color:var(--text)}
-.nav.on{background:#162A47;color:var(--text)}
-.nav .n{margin-left:auto;font-size:11px;background:var(--alert-soft);color:var(--alert);border-radius:999px;padding:1px 7px}
-aside .fondo{margin-top:auto;border-top:1px solid var(--line);padding-top:14px;font-size:12px;color:var(--mute)}
-aside .fondo b{display:block;color:var(--dim);font-weight:600;margin-bottom:8px;word-break:break-all}
-main{padding:28px 32px 60px;min-width:0}
-.testa{display:flex;align-items:flex-end;justify-content:space-between;gap:16px;margin-bottom:22px;flex-wrap:wrap}
-.testa h2{margin:0;font-size:24px;letter-spacing:-.01em}
+#app.on{display:grid;grid-template-columns:236px 1fr}
+aside{background:var(--side);border-right:1px solid var(--line);padding:18px 12px;display:flex;flex-direction:column;gap:3px;position:sticky;top:0;height:100vh}
+aside .logo{margin:2px 8px 22px}
+.nav{display:flex;align-items:center;gap:12px;padding:11px 12px;border-radius:11px;color:var(--dim);font-weight:600;text-align:left;width:100%;transition:background .15s,color .15s}
+.nav svg.i{width:18px;height:18px;color:var(--mute)}
+.nav:hover{background:#0D1C31;color:var(--text)}
+.nav.on{background:#13284A;color:#fff}
+.nav.on svg.i{color:var(--amber)}
+.nav .n{margin-left:auto;font-size:11px;font-weight:700;background:var(--alert-soft);color:#FF8BA0;border-radius:999px;padding:1px 8px}
+.chi{margin-top:auto;border-top:1px solid var(--line);padding:14px 6px 4px;display:flex;flex-direction:column;gap:10px}
+.chi .io{display:flex;align-items:center;gap:10px;min-width:0}
+.av{width:34px;height:34px;border-radius:50%;background:var(--amber);color:#0D1926;display:grid;place-items:center;font-weight:800;font-size:13px;flex:none;background-size:cover;background-position:center}
+.chi b{display:block;font-size:12.5px;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.chi span{font-size:11.5px;color:var(--mute)}
+.chi .nav{padding:9px 10px}
+main{padding:26px 30px 60px;min-width:0}
+.testa{display:flex;align-items:flex-start;justify-content:space-between;gap:16px;margin-bottom:18px;flex-wrap:wrap}
+.testa h2{margin:0;font-size:26px;font-weight:800;letter-spacing:-.02em}
 .testa p{margin:4px 0 0;color:var(--dim)}
-.griglia{display:grid;grid-template-columns:repeat(auto-fill,minmax(250px,1fr));gap:14px}
+
+/* avvisi */
+.avviso{display:flex;gap:10px;align-items:center;background:var(--warn-soft);border:1px solid #4A3510;color:#F7C77A;border-radius:12px;padding:12px 14px;margin-bottom:16px;font-size:13.5px}
+.avviso svg.i{width:18px;height:18px}
+.avviso.ok{background:var(--ok-soft);border-color:#17513A;color:#8FE6BE}
+.avviso.ko{background:var(--alert-soft);border-color:#572036;color:#FF9DB0}
+.avviso.info{background:#0B1A2F;border-color:var(--line);color:var(--dim)}
+.avviso.info svg.i{color:var(--blu)}
+.avviso .x{margin-left:auto;color:inherit;opacity:.7;padding:2px;border-radius:6px}
+.avviso .x:hover{opacity:1}
+.avviso a{display:inline-flex;align-items:center;gap:4px}
+.avviso a svg.i{width:13px;height:13px;color:inherit}
+
+/* contatori */
+.griglia{display:grid;grid-template-columns:repeat(6,minmax(0,1fr));gap:12px}
 .card{background:var(--card);border:1px solid var(--line);border-radius:var(--r);padding:16px 18px}
-.card h3{margin:0 0 12px;font-size:14px;color:var(--dim);font-weight:600}
-.misura .val{font-size:22px;font-weight:800;letter-spacing:-.01em}
-.misura .val small{font-size:13px;font-weight:500;color:var(--mute)}
-.barra{height:8px;background:#0A1628;border-radius:99px;overflow:hidden;margin:10px 0 8px}
-.barra i{display:block;height:100%;border-radius:99px;background:var(--ok)}
-.misura.giallo .barra i{background:var(--warn)} .misura.rosso .barra i{background:var(--alert)}
-.misura .nota{font-size:12px;color:var(--mute)}
-.misura .pc{float:right;font-size:12px;font-weight:700;color:var(--ok)}
-.misura.giallo .pc{color:var(--warn)} .misura.rosso .pc{color:var(--alert)}
-.numeri{display:grid;grid-template-columns:repeat(auto-fill,minmax(140px,1fr));gap:14px;margin:14px 0}
-.numeri .card b{display:block;font-size:26px;font-weight:800}
-.numeri .card span{color:var(--dim);font-size:12.5px}
-.avviso{display:flex;gap:10px;align-items:flex-start;background:var(--warn-soft);color:#F7C77A;border-radius:12px;padding:12px 14px;margin-bottom:16px;font-size:13px}
-.avviso.ok{background:var(--ok-soft);color:#8FE0C0}
-.avviso.ko{background:var(--alert-soft);color:#F79A93}
-.sez{margin-top:26px}
-.sez > h3{font-size:15px;margin:0 0 10px}
+.misura .h{display:flex;align-items:center;gap:10px;margin-bottom:14px}
+.ic{width:36px;height:36px;border-radius:50%;display:grid;place-items:center;flex:none;background:color-mix(in srgb,var(--c) 16%,transparent);color:var(--c)}
+.ic svg.i{width:18px;height:18px}
+.misura .h b{font-size:13px;font-weight:600;flex:1;min-width:0;line-height:1.25}
+.misura .pc{font-size:12px;font-weight:700;color:var(--ok);white-space:nowrap}
+.misura .val{font-size:24px;font-weight:800;letter-spacing:-.02em;white-space:nowrap}
+.misura .val small{font-size:13px;font-weight:500;color:var(--mute);margin-left:4px;letter-spacing:0}
+.misura .riga{display:flex;align-items:center;gap:10px;margin:10px 0 10px}
+.barra{flex:1;height:6px;background:#0A1628;border-radius:99px;overflow:hidden}
+.barra i{display:block;height:100%;border-radius:99px;background:linear-gradient(90deg,#2B7BFF,#38BDF8)}
+.misura .riga em{font-style:normal;font-size:12px;color:var(--dim);min-width:30px;text-align:right}
+.misura.giallo .barra i{background:linear-gradient(90deg,#F59E0B,#FBBF24)} .misura.giallo .pc{color:var(--warn)}
+.misura.rosso .barra i{background:linear-gradient(90deg,#E11D48,#F0506E)} .misura.rosso .pc{color:var(--alert)}
+.misura .nota{font-size:12px;color:var(--mute);line-height:1.4}
+.numeri{display:grid;grid-template-columns:repeat(6,minmax(0,1fr));gap:12px;margin:12px 0 16px}
+.numeri .card{display:flex;align-items:center;gap:12px;padding:14px 16px}
+.numeri .ic{width:42px;height:42px}
+.numeri .ic svg.i{width:20px;height:20px}
+.numeri b{display:block;font-size:22px;font-weight:800;line-height:1.1}
+.numeri span{color:var(--dim);font-size:12.5px}
+
+/* tabelle */
+.pannello{background:var(--card);border:1px solid var(--line);border-radius:var(--r);overflow:hidden}
+.pannello-h{display:flex;align-items:center;gap:12px;padding:16px 18px;flex-wrap:wrap}
+.pannello-h .t{flex:1;min-width:200px}
+.pannello-h h3{margin:0;font-size:16px;font-weight:700}
+.pannello-h p{margin:2px 0 0;color:var(--mute);font-size:12.5px}
+.cerca{position:relative;width:260px;max-width:100%}
+.cerca svg.i{position:absolute;left:12px;top:50%;transform:translateY(-50%);width:15px;height:15px;color:var(--mute)}
+.cerca input{padding:9px 12px 9px 36px;font-size:13px}
+.tab-wrap{overflow:auto}
 table{width:100%;border-collapse:collapse;font-size:13px}
-th{text-align:left;font-size:11.5px;color:var(--mute);font-weight:600;text-transform:uppercase;letter-spacing:.05em;padding:8px 10px;border-bottom:1px solid var(--line);white-space:nowrap}
-td{padding:10px;border-bottom:1px solid #15263F;vertical-align:middle}
-tr:hover td{background:#0C1A2E}
-.tab-wrap{background:var(--card);border:1px solid var(--line);border-radius:var(--r);overflow:auto}
-.chip{display:inline-block;padding:2px 9px;border-radius:999px;font-size:11.5px;font-weight:600;background:#1C2F4A;color:var(--dim);white-space:nowrap}
-.chip.ok{background:var(--ok-soft);color:var(--ok)} .chip.ko{background:var(--alert-soft);color:var(--alert)} .chip.am{background:#3A2D0C;color:var(--amber)}
-.barra-az{display:flex;gap:8px;flex-wrap:wrap;align-items:center;margin-bottom:12px}
-.seg{display:inline-flex;background:var(--card);border:1px solid var(--line);border-radius:10px;padding:3px}
-.seg button{padding:6px 11px;border-radius:8px;font-size:12.5px;font-weight:600;color:var(--dim)}
-.seg button.on{background:#162A47;color:var(--text)}
+th{text-align:left;font-size:11px;color:var(--mute);font-weight:600;text-transform:uppercase;letter-spacing:.06em;padding:9px 14px;background:#0A1729;border-top:1px solid var(--line);border-bottom:1px solid var(--line);white-space:nowrap}
+td{padding:11px 14px;border-bottom:1px solid #12233B;vertical-align:middle}
+tr:last-child td{border-bottom:0}
+tbody tr:hover td{background:#0E1E35}
 .dx{text-align:right}
-.vuoto{padding:28px;text-align:center;color:var(--mute)}
+.tnome{display:flex;align-items:center;gap:10px}
+.tnome svg.i{width:16px;height:16px;color:var(--c,var(--dim))}
+.tnome .mono{color:var(--mute);font-size:11.5px}
+.quota{display:flex;align-items:center;gap:10px;min-width:180px}
+.quota .barra{height:6px}
+.quota em{font-style:normal;font-size:12px;color:var(--dim);width:34px;text-align:right}
+.chip{display:inline-block;padding:2px 9px;border-radius:999px;font-size:11.5px;font-weight:600;background:#17304F;color:var(--dim);white-space:nowrap}
+.chip.ok{background:var(--ok-soft);color:var(--ok)} .chip.ko{background:var(--alert-soft);color:#FF8BA0} .chip.am{background:#3A2D0C;color:var(--amber)}
+.barra-az{display:flex;gap:10px;flex-wrap:wrap;align-items:center;margin-bottom:14px}
+.seg{display:inline-flex;background:var(--card);border:1px solid var(--line);border-radius:11px;padding:3px}
+.seg button{padding:7px 12px;border-radius:8px;font-size:12.5px;font-weight:600;color:var(--dim)}
+.seg button.on{background:#17305A;color:#fff}
+.vuoto{padding:32px;text-align:center;color:var(--mute)}
 .piccolo{font-size:12px;color:var(--mute)}
-.nomefile{max-width:340px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;display:block}
-#modale{position:fixed;inset:0;background:rgba(3,8,16,.7);display:none;place-items:center;padding:16px;z-index:50}
+.nomefile{max-width:320px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;display:block;font-weight:600}
+.anteprima{width:42px;height:42px;border-radius:9px;background:#0A1628 center/cover no-repeat;border:1px solid var(--line);display:grid;place-items:center;flex:none;color:var(--mute)}
+.anteprima svg.i{width:18px;height:18px}
+.spunta{width:18px;height:18px;accent-color:var(--amber);cursor:pointer}
+.selbar{position:sticky;top:12px;z-index:5;display:flex;align-items:center;gap:12px;background:#2A1520;border:1px solid #5A2238;border-radius:12px;padding:10px 12px 10px 16px;margin-bottom:14px;box-shadow:0 10px 30px rgba(0,0,0,.35)}
+.selbar b{color:#FFC0CC}
+.selbar .sp{flex:1}
+.azr{display:flex;gap:6px;justify-content:flex-end}
+
+/* finestre */
+#modale{position:fixed;inset:0;background:rgba(3,8,16,.72);display:none;place-items:center;padding:16px;z-index:50;backdrop-filter:blur(3px)}
 #modale.on{display:grid}
-#modale .box{max-width:440px}
-#modale h3{margin:0 0 8px;font-size:18px}
-#modale ul{color:var(--dim);padding-left:18px;margin:8px 0}
+#modale .box{max-width:460px}
+#modale h3{margin:0 0 8px;font-size:18px;display:flex;align-items:center;gap:10px}
+#modale h3 .ic{--c:var(--rosso)}
+#modale ul{color:var(--dim);padding-left:18px;margin:10px 0}
+#modale li{margin:4px 0}
+#modale .elenco{max-height:150px;overflow:auto;background:#091526;border:1px solid var(--line);border-radius:10px;padding:8px 12px;font-size:12.5px;color:var(--dim)}
 #modale .az{display:flex;gap:8px;justify-content:flex-end;margin-top:18px}
-#toast{position:fixed;left:50%;bottom:22px;transform:translateX(-50%);background:var(--card-2);border:1px solid var(--line-2);border-radius:999px;padding:10px 16px;font-size:13px;display:none;z-index:60}
+#toast{position:fixed;left:50%;bottom:22px;transform:translateX(-50%);background:var(--card-3);border:1px solid var(--line-2);border-radius:999px;padding:10px 18px;font-size:13px;display:none;z-index:60;box-shadow:0 12px 30px rgba(0,0,0,.4)}
 #toast.on{display:block}
 .carica{color:var(--mute);padding:30px 0}
+@media (max-width:1500px){ .griglia{grid-template-columns:repeat(3,minmax(0,1fr))} }
+@media (max-width:1100px){ .numeri{grid-template-columns:repeat(3,minmax(0,1fr))} }
 @media (max-width:820px){
   #app.on{grid-template-columns:1fr}
-  aside{position:static;height:auto;flex-direction:row;flex-wrap:wrap;padding:12px}
+  aside{position:static;height:auto;flex-direction:row;flex-wrap:wrap;padding:12px;gap:4px}
   aside .logo{width:100%;margin:0 0 8px}
   .nav{width:auto;padding:8px 10px;font-size:13px}
-  aside .fondo{width:100%;margin-top:8px}
+  .chi{width:100%;flex-direction:row;align-items:center;justify-content:space-between;margin-top:8px}
   main{padding:20px 16px 50px}
-  .nomefile{max-width:180px}
+  .griglia,.numeri{grid-template-columns:repeat(2,minmax(0,1fr))}
+  .nomefile{max-width:150px}
+  .cerca{width:100%}
 }
 </style>
 </head>
@@ -128,20 +190,61 @@ tr:hover td{background:#0C1A2E}
 <div id="app">
   <aside>
     <div class="logo"><i>F</i>FOSS <small>Admin</small></div>
-    <button class="nav on" data-vai="spazio">Spazio e limiti</button>
-    <button class="nav" data-vai="file">File</button>
-    <button class="nav" data-vai="utenti">Utenti</button>
-    <button class="nav" data-vai="inviti">Inviti</button>
-    <button class="nav" data-vai="segnalazioni">Segnalazioni<span class="n" id="nSegn" hidden></span></button>
-    <button class="nav" data-vai="email">Email inviate</button>
-    <button class="nav" data-vai="backup">Backup</button>
-    <div class="fondo"><b id="chiSono"></b><button class="btn sm" data-az="esci">Esci</button></div>
+    <button class="nav on" data-vai="spazio"><svg class="i"><use href="#i-db"/></svg>Spazio e limiti</button>
+    <button class="nav" data-vai="file"><svg class="i"><use href="#i-file"/></svg>File</button>
+    <button class="nav" data-vai="utenti"><svg class="i"><use href="#i-users"/></svg>Utenti</button>
+    <button class="nav" data-vai="inviti"><svg class="i"><use href="#i-invito"/></svg>Inviti</button>
+    <button class="nav" data-vai="segnalazioni"><svg class="i"><use href="#i-bandiera"/></svg>Segnalazioni<span class="n" id="nSegn" hidden></span></button>
+    <button class="nav" data-vai="email"><svg class="i"><use href="#i-mail"/></svg>Email inviate</button>
+    <button class="nav" data-vai="errori"><svg class="i"><use href="#i-allerta"/></svg>Errori<span class="n" id="nErr" hidden></span></button>
+    <button class="nav" data-vai="backup"><svg class="i"><use href="#i-backup"/></svg>Backup</button>
+    <div class="chi">
+      <div class="io"><span class="av" id="chiAv"></span><div style="min-width:0"><b id="chiSono"></b><span>Amministratore</span></div></div>
+      <button class="nav" data-az="esci"><svg class="i"><use href="#i-esci"/></svg>Esci</button>
+    </div>
   </aside>
   <main id="main"></main>
 </div>
 
 <div id="modale"><div class="box" id="modaleBox"></div></div>
 <div id="toast" role="status"></div>
+
+<svg width="0" height="0" style="position:absolute" aria-hidden="true">
+  <symbol id="i-db" viewBox="0 0 24 24"><ellipse cx="12" cy="5" rx="8" ry="3"/><path d="M4 5v6c0 1.7 3.6 3 8 3s8-1.3 8-3V5"/><path d="M4 11v6c0 1.7 3.6 3 8 3s8-1.3 8-3v-6"/></symbol>
+  <symbol id="i-cartella" viewBox="0 0 24 24"><path d="M3 7a2 2 0 0 1 2-2h4l2 2h8a2 2 0 0 1 2 2v8a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/></symbol>
+  <symbol id="i-codice" viewBox="0 0 24 24"><path d="m8 8-4 4 4 4M16 8l4 4-4 4M14 5l-4 14"/></symbol>
+  <symbol id="i-users" viewBox="0 0 24 24"><circle cx="9" cy="8" r="3.5"/><path d="M2.5 20a6.5 6.5 0 0 1 13 0"/><path d="M16 4.6a3.5 3.5 0 0 1 0 6.8M18 14.2a6.5 6.5 0 0 1 3.5 5.8"/></symbol>
+  <symbol id="i-user" viewBox="0 0 24 24"><circle cx="12" cy="8" r="4"/><path d="M4 21a8 8 0 0 1 16 0"/></symbol>
+  <symbol id="i-mail" viewBox="0 0 24 24"><rect x="3" y="5" width="18" height="14" rx="2.5"/><path d="m3.5 7 8.5 6 8.5-6"/></symbol>
+  <symbol id="i-file" viewBox="0 0 24 24"><path d="M14 3H7a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V8z"/><path d="M14 3v5h5M9 13h6M9 17h4"/></symbol>
+  <symbol id="i-griglia" viewBox="0 0 24 24"><rect x="3" y="3" width="7.5" height="7.5" rx="1.5"/><rect x="13.5" y="3" width="7.5" height="7.5" rx="1.5"/><rect x="3" y="13.5" width="7.5" height="7.5" rx="1.5"/><rect x="13.5" y="13.5" width="7.5" height="7.5" rx="1.5"/></symbol>
+  <symbol id="i-fatto" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="m8 12.5 2.7 2.7L16 10"/></symbol>
+  <symbol id="i-info" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M12 11v5M12 8h.01"/></symbol>
+  <symbol id="i-esterno" viewBox="0 0 24 24"><path d="M14 4h6v6M20 4l-9 9M18 14v5a1 1 0 0 1-1 1H5a1 1 0 0 1-1-1V7a1 1 0 0 1 1-1h5"/></symbol>
+  <symbol id="i-aggiorna" viewBox="0 0 24 24"><path d="M20 11a8 8 0 0 0-14.6-4.5L4 8M4 4v4h4M4 13a8 8 0 0 0 14.6 4.5L20 16M20 20v-4h-4"/></symbol>
+  <symbol id="i-cestino" viewBox="0 0 24 24"><path d="M4 7h16M10 11v6M14 11v6M6 7l1 12a2 2 0 0 0 2 2h6a2 2 0 0 0 2-2l1-12M9 7V4h6v3"/></symbol>
+  <symbol id="i-esci" viewBox="0 0 24 24"><path d="M15 4h3a2 2 0 0 1 2 2v12a2 2 0 0 1-2 2h-3M10 16l-4-4 4-4M6 12h10"/></symbol>
+  <symbol id="i-allerta" viewBox="0 0 24 24"><path d="M12 3 2 20h20z"/><path d="M12 10v4M12 17h.01"/></symbol>
+  <symbol id="i-scarica" viewBox="0 0 24 24"><path d="M12 4v11M7 10l5 5 5-5M5 20h14"/></symbol>
+  <symbol id="i-occhio" viewBox="0 0 24 24"><path d="M2 12s3.6-7 10-7 10 7 10 7-3.6 7-10 7S2 12 2 12z"/><circle cx="12" cy="12" r="3"/></symbol>
+  <symbol id="i-cerca" viewBox="0 0 24 24"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></symbol>
+  <symbol id="i-torta" viewBox="0 0 24 24"><path d="M12 3v9h9a9 9 0 1 1-9-9z"/><path d="M15 3.5A9 9 0 0 1 20.5 9H15z"/></symbol>
+  <symbol id="i-campana" viewBox="0 0 24 24"><path d="M6 9a6 6 0 1 1 12 0c0 6 2.5 8 2.5 8h-17S6 15 6 9"/><path d="M10 20.5a2.2 2.2 0 0 0 4 0"/></symbol>
+  <symbol id="i-telefono" viewBox="0 0 24 24"><rect x="7" y="2.5" width="10" height="19" rx="2.5"/><path d="M11 18.5h2"/></symbol>
+  <symbol id="i-link" viewBox="0 0 24 24"><path d="M10 14a4.5 4.5 0 0 0 6.4 0l3-3a4.5 4.5 0 0 0-6.4-6.4l-1 1"/><path d="M14 10a4.5 4.5 0 0 0-6.4 0l-3 3a4.5 4.5 0 0 0 6.4 6.4l1-1"/></symbol>
+  <symbol id="i-calendario" viewBox="0 0 24 24"><rect x="3" y="5" width="18" height="16" rx="2"/><path d="M3 10h18M8 3v4M16 3v4"/></symbol>
+  <symbol id="i-ingranaggio" viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.7 1.7 0 0 0 .3 1.8l.1.1a2 2 0 1 1-2.8 2.8l-.1-.1a1.7 1.7 0 0 0-1.8-.3 1.7 1.7 0 0 0-1 1.5V21a2 2 0 1 1-4 0v-.1a1.7 1.7 0 0 0-1.1-1.5 1.7 1.7 0 0 0-1.8.3l-.1.1a2 2 0 1 1-2.8-2.8l.1-.1a1.7 1.7 0 0 0 .3-1.8 1.7 1.7 0 0 0-1.5-1H3a2 2 0 1 1 0-4h.1a1.7 1.7 0 0 0 1.5-1.1 1.7 1.7 0 0 0-.3-1.8l-.1-.1a2 2 0 1 1 2.8-2.8l.1.1a1.7 1.7 0 0 0 1.8.3H9a1.7 1.7 0 0 0 1-1.5V3a2 2 0 1 1 4 0v.1a1.7 1.7 0 0 0 1 1.5 1.7 1.7 0 0 0 1.8-.3l.1-.1a2 2 0 1 1 2.8 2.8l-.1.1a1.7 1.7 0 0 0-.3 1.8V9a1.7 1.7 0 0 0 1.5 1H21a2 2 0 1 1 0 4h-.1a1.7 1.7 0 0 0-1.5 1z"/></symbol>
+  <symbol id="i-euro" viewBox="0 0 24 24"><path d="M17 6.5A7 7 0 1 0 17 17.5M4 10h9M4 14h9"/></symbol>
+  <symbol id="i-bandiera" viewBox="0 0 24 24"><path d="M5 21V4M5 4h11l-2 4 2 4H5"/></symbol>
+  <symbol id="i-invito" viewBox="0 0 24 24"><circle cx="9" cy="8" r="3.5"/><path d="M2.5 20a6.5 6.5 0 0 1 13 0M19 8v6M16 11h6"/></symbol>
+  <symbol id="i-backup" viewBox="0 0 24 24"><path d="M3 12a9 9 0 1 0 3-6.7L3 8"/><path d="M3 3v5h5M12 7v5l3 2"/></symbol>
+  <symbol id="i-chiave" viewBox="0 0 24 24"><circle cx="8" cy="15" r="4"/><path d="m10.8 12.2 8.7-8.7M17 6l2.5 2.5M14.5 8.5 17 11"/></symbol>
+  <symbol id="i-x" viewBox="0 0 24 24"><path d="M6 6l12 12M18 6 6 18"/></symbol>
+  <symbol id="i-su" viewBox="0 0 24 24"><path d="M7 17 17 7M9 7h8v8"/></symbol>
+  <symbol id="i-immagine" viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="16" rx="2"/><circle cx="9" cy="10" r="2"/><path d="m21 16-5-5-9 9"/></symbol>
+  <symbol id="i-video" viewBox="0 0 24 24"><rect x="2.5" y="6" width="13" height="12" rx="2"/><path d="m15.5 10.5 6-3v9l-6-3"/></symbol>
+  <symbol id="i-audio" viewBox="0 0 24 24"><path d="M9 18V5l11-2v13"/><circle cx="6" cy="18" r="3"/><circle cx="17" cy="16" r="3"/></symbol>
+</svg>
 
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.4/dist/umd/supabase.js"></script>
 <script>
@@ -159,14 +262,17 @@ const INATTIVO = 30 * 60 * 1000;          // dopo 30 minuti fermo esce da solo
 const sb = window.supabase.createClient(SUPA_URL, SUPA_KEY, {auth:{storageKey:'foss-admin', persistSession:true, autoRefreshToken:true}});
 const $ = id => document.getElementById(id);
 const esc = s => String(s == null ? '' : s).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const ico = (n, cl) => '<svg class="i' + (cl ? ' ' + cl : '') + '"><use href="#i-' + n + '"/></svg>';
+const cerchio = (n, c) => '<span class="ic" style="--c:' + c + '">' + ico(n) + '</span>';
 const peso = b => { b = +b || 0; return b >= GB ? (b / GB).toFixed(2) + ' GB' : b >= MB ? (b / MB).toFixed(1) + ' MB' : b >= 1024 ? Math.round(b / 1024) + ' KB' : b + ' B'; };
+const pcTesto = p => p > 0 && p < 1 ? '<1%' : Math.round(p) + '%';
 const data = t => t ? new Date(t).toLocaleString('it-IT', {day:'2-digit', month:'short', year:'numeric', hour:'2-digit', minute:'2-digit'}) : '—';
 const giorni = t => t ? Math.floor((Date.now() - new Date(t)) / 864e5) : null;
 const fa = t => { const g = giorni(t); return g == null ? '—' : g === 0 ? 'oggi' : g === 1 ? 'ieri' : g + ' giorni fa'; };
-const st = {vista:'spazio', dati:{}, fileOrd:'vecchi', fileBucket:'', sel:new Set()};
+const st = {vista:'spazio', dati:{}, fileOrd:'vecchi', fileBucket:'', fileCerca:'', tabCerca:'', sel:new Set(), chiusi:{}};
 
 function toast(t){ const x = $('toast'); x.textContent = t; x.classList.add('on'); clearTimeout(x.__t); x.__t = setTimeout(()=>x.classList.remove('on'), 3500); }
-function modale(html){ $('modaleBox').innerHTML = html; $('modale').classList.add('on'); const f = $('modaleBox').querySelector('input,button.prim,button.rosso'); if(f) setTimeout(()=>f.focus(), 30); }
+function modale(html){ $('modaleBox').innerHTML = html; $('modale').classList.add('on'); const f = $('modaleBox').querySelector('input,button.rosso,button.prim'); if(f) setTimeout(()=>f.focus(), 30); }
 function chiudi(){ $('modale').classList.remove('on'); }
 
 /* ---------- chiamata al server ---------- */
@@ -243,7 +349,9 @@ async function schermoIscrivi(err){
 }
 function entra(sessione){
   $('entra').style.display = 'none'; $('app').classList.add('on');
-  $('chiSono').textContent = sessione.user.email || '';
+  const em = sessione.user.email || '';
+  $('chiSono').textContent = em;
+  $('chiAv').textContent = em.slice(0, 1).toUpperCase();
   vai(st.vista);
 }
 async function esci(){ await sb.auth.signOut(); st.dati = {}; schermoEntra(); }
@@ -256,118 +364,185 @@ setInterval(async ()=>{ if($('app').classList.contains('on') && Date.now() - ult
 /* ---------- viste ---------- */
 function vai(v){
   st.vista = v;
-  document.querySelectorAll('.nav').forEach(b=>b.classList.toggle('on', b.dataset.vai === v));
+  document.querySelectorAll('.nav[data-vai]').forEach(b=>b.classList.toggle('on', b.dataset.vai === v));
   $('main').innerHTML = '<div class="carica">Carico…</div>';
-  ({spazio:vistaSpazio, file:vistaFile, utenti:vistaUtenti, inviti:vistaInviti, segnalazioni:vistaSegn, email:vistaEmail, backup:vistaBackup}[v])()
-    .catch(e=>{ if(e.message !== '2fa' && e.message !== 'non-admin') $('main').innerHTML = '<div class="avviso ko">Non riesco a leggere i dati (' + esc(e.message) + '). Riprova tra poco.</div>'; });
+  ({spazio:vistaSpazio, file:vistaFile, utenti:vistaUtenti, inviti:vistaInviti, segnalazioni:vistaSegn, email:vistaEmail, backup:vistaBackup, errori:vistaErrori}[v])()
+    .catch(e=>{ if(e.message !== '2fa' && e.message !== 'non-admin') $('main').innerHTML = '<div class="avviso ko">' + ico('allerta') + 'Non riesco a leggere i dati (' + esc(e.message) + '). Riprova tra poco.</div>'; });
 }
-function misura(titolo, usato, limite, testo, nota){
-  const pc = limite ? Math.min(100, usato / limite * 100) : 0;
+function testa(titolo, sotto, destra){
+  return '<div class="testa"><div><h2>' + titolo + '</h2><p>' + sotto + '</p></div>' + (destra || '') + '</div>';
+}
+function avviso(tipo, icona, html, chiave){
+  if(chiave && st.chiusi[chiave]) return '';
+  return '<div class="avviso ' + tipo + '">' + ico(icona) + '<span>' + html + '</span>' +
+    (chiave ? '<button class="x" data-chiudi-avviso="' + chiave + '" aria-label="Chiudi">' + ico('x') + '</button>' : '') + '</div>';
+}
+function misura(o){
+  const pc = o.limite ? Math.min(100, o.usato / o.limite * 100) : 0;
   const cl = pc >= 85 ? 'rosso' : pc >= 60 ? 'giallo' : '';
-  return '<div class="card misura ' + cl + '"><h3>' + titolo + '<span class="pc">' + (pc < 1 && pc > 0 ? '<1' : Math.round(pc)) + '%</span></h3>' +
-    '<div class="val">' + testo + '</div><div class="barra"><i style="width:' + Math.max(pc, 0.6) + '%"></i></div><div class="nota">' + nota + '</div></div>';
+  return '<div class="card misura ' + cl + '"><div class="h">' + cerchio(o.ic, o.c) + '<b>' + o.titolo + '</b><span class="pc">' + pcTesto(pc) + '</span></div>' +
+    '<div class="val">' + o.testo + '</div>' +
+    '<div class="riga"><div class="barra"><i style="width:' + Math.max(pc, 1.2) + '%"></i></div><em>' + pcTesto(pc) + '</em></div>' +
+    '<div class="nota">' + o.nota + '</div></div>';
 }
 async function github(){
   try{ const r = await fetch('https://api.github.com/repos/' + REPO); if(!r.ok) return null; const j = await r.json(); return (j.size || 0) * 1024; }catch(e){ return null; }
 }
+const NOMI_BUCKET = {avatar:'foto profilo', allegati:'allegati'};
+const TAB = {
+  spazi:['Spazi (con le copertine)', 'cartella', 'var(--arancio)'], backup_giornalieri:['Backup', 'backup', 'var(--azzurro)'],
+  progetti:['Progetti', 'griglia', 'var(--rosso)'], elementi:['Task, voci, commenti, chat', 'file', 'var(--rosso)'],
+  spazio_lavoro:['Preferenze di ognuno', 'ingranaggio', 'var(--dim)'], notifiche:['Notifiche', 'campana', 'var(--rosso)'],
+  avvisi_email:['Email della bustina', 'mail', 'var(--rosso)'], push_iscrizioni:['Telefoni iscritti agli avvisi', 'telefono', 'var(--blu)'],
+  membri_progetto:['Persone nei progetti', 'users', 'var(--blu)'], membri_org:['Persone nei team', 'users', 'var(--blu)'],
+  link_cliente:['Link per i clienti', 'link', 'var(--blu)'], calendari:['Calendari', 'calendario', 'var(--dim)'],
+  segnalazioni:['Segnalazioni', 'bandiera', 'var(--arancio)'], inviti:['Inviti', 'invito', 'var(--verde)'], profili:['Profili', 'user', 'var(--blu)'],
+  organizzazioni:['Team', 'users', 'var(--viola)'], modelli:['Preset', 'griglia', 'var(--viola)'], conti:['Soldi', 'euro', 'var(--verde)'],
+  errori_app:['Errori', 'allerta', 'var(--arancio)'], inviti_codici:['Codici degli inviti', 'chiave', 'var(--dim)'], admin_foss:['Amministratori', 'chiave', 'var(--amber)']
+};
 async function vistaSpazio(){
   const [s, gh] = await Promise.all([chiedi('stato'), github()]);
-  st.dati.stato = s;
+  st.dati.stato = s; st.dati.gh = gh;
+  disegnaSpazio();
+}
+function disegnaSpazio(){
+  const s = st.dati.stato, gh = st.dati.gh;
   const file = (s.file || []).reduce((a, x)=>a + (+x.byte || 0), 0), nFile = (s.file || []).reduce((a, x)=>a + (+x.n || 0), 0);
   const allarmi = [];
-  const pcs = [[s.db_byte / LIMITI.db, 'il database'], [file / LIMITI.file, 'lo spazio file'], [gh != null ? gh / LIMITI.github : 0, 'il sito su GitHub'],
-               [s.email_oggi / LIMITI.emailGiorno, 'le email di oggi'], [s.email_mese / LIMITI.emailMese, 'le email del mese']];
-  pcs.forEach(([p, n])=>{ if(p >= .85) allarmi.push('<b>' + n + '</b> è oltre l’85% del limite'); else if(p >= .6) allarmi.push(n + ' ha superato il 60%'); });
-  let h = '<div class="testa"><div><h2>Spazio e limiti</h2><p>Quanto stai usando dei piani gratuiti, aggiornato adesso.</p></div>' +
-    '<button class="btn" data-az="ricarica">Aggiorna</button></div>';
-  h += allarmi.length ? '<div class="avviso">⚠ ' + allarmi.map((x, i)=>i ? x : x.replace(/^(<b>)?(\w)/, (m, b, c)=>(b || '') + c.toUpperCase())).join(' · ') + '.</div>' : '<div class="avviso ok">✓ Tutto sotto il 60% dei limiti gratuiti.</div>';
+  [[s.db_byte / LIMITI.db, 'il database'], [file / LIMITI.file, 'lo spazio file'], [gh != null ? gh / LIMITI.github : 0, 'il sito su GitHub'],
+   [s.email_oggi / LIMITI.emailGiorno, 'le email di oggi'], [s.email_mese / LIMITI.emailMese, 'le email del mese']]
+    .forEach(([p, n])=>{ if(p >= .85) allarmi.push('<b>' + n + '</b> è oltre l’85% del limite'); else if(p >= .6) allarmi.push(n + ' ha superato il 60%'); });
+  if(s.errori_7) allarmi.push(s.errori_7 + (s.errori_7 === 1 ? ' errore' : ' errori') + ' negli ultimi 7 giorni (vedi <b>Errori</b>)');
+  if(s.backup_ultimo_giro && s.backup_ultimo_giro.stato && s.backup_ultimo_giro.stato !== 'succeeded') allarmi.push('<b>l’ultimo backup notturno non è riuscito</b>');
+  $('nErr').hidden = !s.errori_7; $('nErr').textContent = s.errori_7;
+  let h = testa('Spazio e limiti', 'Quanto stai usando dei piani gratuiti, aggiornato adesso.', '<button class="btn" data-az="ricarica">' + ico('aggiorna') + 'Aggiorna</button>');
+  h += allarmi.length ? avviso('', 'allerta', allarmi.map((x, i)=>i ? x : x.replace(/^(<b>)?(\w)/, (m, b, c)=>(b || '') + c.toUpperCase())).join(' · ') + '.')
+                      : avviso('ok', 'fatto', 'Tutto sotto il 60% dei limiti gratuiti.', 'ok-spazio');
   h += '<div class="griglia">' +
-    misura('Database (Supabase)', s.db_byte, LIMITI.db, peso(s.db_byte) + ' <small>su 500 MB</small>', 'Progetti, spazi, commenti, copertine e backup.') +
-    misura('File caricati (Supabase)', file, LIMITI.file, peso(file) + ' <small>su 1 GB</small>', nFile + ' file · ' + (s.file || []).map(x=>esc(x.bucket) + ' ' + peso(x.byte)).join(' · ')) +
-    misura('Sito su GitHub', gh || 0, LIMITI.github, gh == null ? 'non disponibile' : peso(gh) + ' <small>su 1 GB</small>', 'Dimensione del repository. Traffico: 100 GB al mese, non misurabile da qui.') +
-    misura('Utenti attivi nel mese', s.attivi_30, LIMITI.mau, s.attivi_30 + ' <small>su 50.000</small>', s.utenti + ' account in tutto.') +
-    misura('Email di oggi (Resend)', s.email_oggi, LIMITI.emailGiorno, s.email_oggi + ' <small>su 100</small>', 'Inviti e avvisi della bustina. Si azzera a mezzanotte.') +
-    misura('Email del mese (Resend)', s.email_mese, LIMITI.emailMese, s.email_mese + ' <small>su 3.000</small>', 'Si azzera il primo del mese.') +
+    misura({titolo:'Database (Supabase)', ic:'db', c:'var(--blu)', usato:s.db_byte, limite:LIMITI.db, testo:peso(s.db_byte) + '<small>su 500 MB</small>', nota:'Progetti, spazi, commenti, copertine e backup.'}) +
+    misura({titolo:'File caricati (Supabase)', ic:'cartella', c:'var(--verde)', usato:file, limite:LIMITI.file, testo:peso(file) + '<small>su 1 GB</small>',
+      nota:nFile + ' file · ' + (s.file || []).map(x=>esc(NOMI_BUCKET[x.bucket] || x.bucket) + ' ' + peso(x.byte)).join(' · ')}) +
+    misura({titolo:'Sito su GitHub', ic:'codice', c:'var(--arancio)', usato:gh || 0, limite:LIMITI.github, testo:gh == null ? 'n.d.' : peso(gh) + '<small>su 1 GB</small>', nota:'Dimensione del repository. Traffico: 100 GB al mese, non misurabile da qui.'}) +
+    misura({titolo:'Utenti attivi nel mese', ic:'users', c:'var(--blu)', usato:s.attivi_30, limite:LIMITI.mau, testo:s.attivi_30 + '<small>su 50.000</small>', nota:s.utenti + ' account in tutto.'}) +
+    misura({titolo:'Email di oggi (Resend)', ic:'mail', c:'var(--rosso)', usato:s.email_oggi, limite:LIMITI.emailGiorno, testo:s.email_oggi + '<small>su 100</small>', nota:'Inviti e avvisi della bustina. Si azzera a mezzanotte.'}) +
+    misura({titolo:'Email del mese (Resend)', ic:'mail', c:'var(--rosso)', usato:s.email_mese, limite:LIMITI.emailMese, testo:s.email_mese + '<small>su 3.000</small>', nota:'Si azzera il primo del mese.'}) +
     '</div>';
-  h += '<div class="numeri">' + [[s.utenti, 'account'], [s.organizzazioni, 'team'], [s.spazi, 'spazi'], [s.progetti, 'progetti'], [s.progetti_fatti, 'completati'], [nFile, 'file']]
-    .map(x=>'<div class="card"><b>' + esc(x[0]) + '</b><span>' + x[1] + '</span></div>').join('') + '</div>';
-  h += '<div class="avviso" style="background:#0F1E35;color:var(--dim)">ℹ Il traffico scaricato (5 GB al mese su Supabase) e i progetti attivi (2 su 2: FOSS e Idratati) si vedono solo nel ' +
-    '<a href="https://supabase.com/dashboard/project/suqpteanvnvvmfujlevi" target="_blank" rel="noopener noreferrer">pannello di Supabase</a>.</div>';
-  h += '<div class="sez"><h3>Cosa occupa il database</h3><div class="tab-wrap"><table><thead><tr><th>Tabella</th><th class="dx">Righe</th><th class="dx">Spazio</th></tr></thead><tbody>' +
-    (s.tabelle || []).slice(0, 12).map(t=>'<tr><td>' + esc(NOMI_TAB[t.nome] || t.nome) + ' <span class="piccolo mono">' + esc(t.nome) + '</span></td><td class="dx">' + Math.max(0, +t.righe) + '</td><td class="dx">' + peso(t.byte) + '</td></tr>').join('') +
-    '</tbody></table></div></div>';
+  h += '<div class="numeri">' + [[s.utenti, 'account', 'user', 'var(--blu)'], [s.organizzazioni, 'team', 'users', 'var(--viola)'], [s.spazi, 'spazi', 'cartella', 'var(--arancio)'],
+    [s.progetti, 'progetti', 'griglia', 'var(--verde)'], [s.progetti_fatti, 'completati', 'fatto', 'var(--azzurro)'], [nFile, 'file', 'file', 'var(--dim)']]
+    .map(x=>'<div class="card">' + cerchio(x[2], x[3]) + '<div><b>' + esc(x[0]) + '</b><span>' + x[1] + '</span></div></div>').join('') + '</div>';
+  h += avviso('info', 'info', 'Il traffico scaricato (5 GB al mese su Supabase) e i progetti attivi (2 su 2: FOSS e Idratati) si vedono solo nel ' +
+    '<a href="https://supabase.com/dashboard/project/suqpteanvnvvmfujlevi" target="_blank" rel="noopener noreferrer">pannello di Supabase' + ico('esterno') + '</a>.');
+  h += '<div class="pannello"><div class="pannello-h">' + cerchio('torta', 'var(--amber)') +
+    '<div class="t"><h3>Cosa occupa il database</h3><p>Dettaglio delle tabelle e dello spazio usato.</p></div>' +
+    '<label class="cerca">' + ico('cerca') + '<input type="search" id="cercaTab" placeholder="Cerca tabella…" value="' + esc(st.tabCerca) + '"></label></div>' +
+    '<div class="tab-wrap"><table><thead><tr><th>Tabella</th><th class="dx">Righe</th><th class="dx">Spazio</th><th style="width:28%"></th></tr></thead><tbody id="righeTab"></tbody></table></div></div>';
   $('main').innerHTML = h;
+  righeTabelle();
 }
-const NOMI_TAB = {spazi:'Spazi (con le copertine)', progetti:'Progetti', elementi:'Task, voci, commenti, chat', spazio_lavoro:'Preferenze di ognuno', notifiche:'Notifiche',
-  backup_giornalieri:'Backup', avvisi_email:'Email della bustina', segnalazioni:'Segnalazioni', push_iscrizioni:'Telefoni iscritti agli avvisi', inviti:'Inviti', profili:'Profili',
-  membri_org:'Persone nei team', membri_progetto:'Persone nei progetti', organizzazioni:'Team', link_cliente:'Link per i clienti', calendari:'Calendari', modelli:'Preset', conti:'Soldi'};
+function righeTabelle(){
+  const s = st.dati.stato, q = st.tabCerca.toLowerCase();
+  const tot = (s.tabelle || []).reduce((a, t)=>a + (+t.byte || 0), 0) || 1;
+  const l = (s.tabelle || []).filter(t=>!q || t.nome.toLowerCase().includes(q) || ((TAB[t.nome] || [])[0] || '').toLowerCase().includes(q));
+  $('righeTab').innerHTML = l.length ? l.map(t=>{ const d = TAB[t.nome] || [t.nome, 'db', 'var(--dim)'], p = t.byte / tot * 100;
+    return '<tr><td><span class="tnome" style="--c:' + d[2] + '">' + ico(d[1]) + esc(d[0]) + ' <span class="mono">' + esc(t.nome) + '</span></span></td>' +
+      '<td class="dx">' + Math.max(0, +t.righe || 0).toLocaleString('it-IT') + '</td><td class="dx">' + peso(t.byte) + '</td>' +
+      '<td><div class="quota"><div class="barra"><i style="width:' + Math.max(p, .8) + '%"></i></div><em>' + pcTesto(p) + '</em></div></td></tr>'; }).join('')
+    : '<tr><td colspan="4" class="vuoto">Nessuna tabella con questo nome.</td></tr>';
+}
 
 /* ---------- file ---------- */
+const IMG = /^image\//;
+function tipoIcona(f){ const t = f.tipo || ''; return IMG.test(t) ? 'immagine' : /^video\//.test(t) ? 'video' : /^audio\//.test(t) ? 'audio' : 'file'; }
+const nomeFile = f => String(f.nome).split('/').pop().replace(/^[a-z0-9]{8,14}-/, '');
 async function vistaFile(){
   st.dati.file = await chiedi('file'); st.sel.clear(); disegnaFile();
 }
-function disegnaFile(){
-  let l = (st.dati.file || []).filter(f=>!st.fileBucket || f.bucket === st.fileBucket);
+function fileVisibili(){
+  const q = st.fileCerca.toLowerCase();
+  const l = (st.dati.file || []).filter(f=>(!st.fileBucket || f.bucket === st.fileBucket) &&
+    (!q || nomeFile(f).toLowerCase().includes(q) || String(f.progetto || '').toLowerCase().includes(q) || String(f.chi || '').toLowerCase().includes(q)));
   if(st.fileOrd === 'vecchi') l.sort((a, b)=>String(a.creato).localeCompare(String(b.creato)));
   if(st.fileOrd === 'nuovi') l.sort((a, b)=>String(b.creato).localeCompare(String(a.creato)));
   if(st.fileOrd === 'grandi') l.sort((a, b)=>(+b.byte || 0) - (+a.byte || 0));
-  const tot = l.reduce((a, f)=>a + (+f.byte || 0), 0), selB = l.filter(f=>st.sel.has(f.bucket + '|' + f.nome)).reduce((a, f)=>a + (+f.byte || 0), 0);
-  let h = '<div class="testa"><div><h2>File</h2><p>' + l.length + ' file · ' + peso(tot) + '. Ordina per data per trovare quelli vecchi da togliere.</p></div></div>';
+  return l;
+}
+function disegnaFile(){
+  const l = fileVisibili(), tutti = st.dati.file || [];
+  const tot = tutti.reduce((a, f)=>a + (+f.byte || 0), 0);
+  const scelti = tutti.filter(f=>st.sel.has(f.bucket + '|' + f.nome)), selB = scelti.reduce((a, f)=>a + (+f.byte || 0), 0);
+  const tuttiSel = l.length && l.every(f=>st.sel.has(f.bucket + '|' + f.nome));
+  let h = testa('File', tutti.length + ' file · ' + peso(tot) + ' su 1 GB. Spunta quelli che non servono più ed eliminali, oppure usa il cestino sulla riga.',
+    '<button class="btn" data-az="ricarica">' + ico('aggiorna') + 'Aggiorna</button>');
+  if(scelti.length) h += '<div class="selbar">' + ico('cestino') + '<span><b>' + scelti.length + (scelti.length === 1 ? ' file scelto' : ' file scelti') + '</b> · liberi ' + peso(selB) + '</span><span class="sp"></span>' +
+    '<button class="btn sm" data-az="deseleziona">Annulla scelta</button><button class="btn rosso sm" data-az="togli-file">' + ico('cestino') + 'Elimina ' + (scelti.length === 1 ? 'il file' : 'i ' + scelti.length + ' file') + '</button></div>';
   h += '<div class="barra-az"><div class="seg">' + [['vecchi', 'Più vecchi'], ['nuovi', 'Più nuovi'], ['grandi', 'Più grandi']].map(x=>'<button data-ord="' + x[0] + '" class="' + (st.fileOrd === x[0] ? 'on' : '') + '">' + x[1] + '</button>').join('') + '</div>' +
     '<div class="seg">' + [['', 'Tutti'], ['allegati', 'Allegati'], ['avatar', 'Foto profilo']].map(x=>'<button data-buck="' + x[0] + '" class="' + (st.fileBucket === x[0] ? 'on' : '') + '">' + x[1] + '</button>').join('') + '</div>' +
-    '<span style="flex:1"></span>' + (st.sel.size ? '<span class="piccolo">' + st.sel.size + ' scelti · ' + peso(selB) + '</span><button class="btn rosso sm" data-az="togli-file">Elimina i file scelti</button>' : '') + '</div>';
-  if(!l.length){ $('main').innerHTML = h + '<div class="card vuoto">Nessun file.</div>'; return; }
-  h += '<div class="tab-wrap"><table><thead><tr><th></th><th>File</th><th>Progetto</th><th>Di</th><th>Caricato</th><th class="dx">Peso</th><th></th></tr></thead><tbody>' +
-    l.map(f=>{ const k = f.bucket + '|' + f.nome, nome = String(f.nome).split('/').pop().replace(/^[a-z0-9]{8,14}-/, '');
-      return '<tr><td><input type="checkbox" data-sel="' + esc(k) + '"' + (st.sel.has(k) ? ' checked' : '') + ' aria-label="Scegli"></td>' +
-        '<td><span class="nomefile" title="' + esc(f.nome) + '">' + esc(nome) + '</span><span class="chip">' + (f.bucket === 'avatar' ? 'foto profilo' : 'allegato') + '</span></td>' +
+    '<span style="flex:1"></span><label class="cerca">' + ico('cerca') + '<input type="search" id="cercaFile" placeholder="Cerca file, progetto, persona…" value="' + esc(st.fileCerca) + '"></label></div>';
+  if(!l.length){ $('main').innerHTML = h + '<div class="pannello vuoto">' + (tutti.length ? 'Nessun file con questo filtro.' : 'Nessun file caricato.') + '</div>'; return; }
+  h += '<div class="pannello"><div class="tab-wrap"><table><thead><tr>' +
+    '<th style="width:40px"><input type="checkbox" class="spunta" data-tutti="1"' + (tuttiSel ? ' checked' : '') + ' aria-label="Scegli tutti" title="Scegli tutti"></th>' +
+    '<th>File</th><th>Progetto</th><th>Di</th><th>Caricato</th><th class="dx">Peso</th><th class="dx">Azioni</th></tr></thead><tbody>' +
+    l.map(f=>{ const k = f.bucket + '|' + f.nome;
+      return '<tr><td><input type="checkbox" class="spunta" data-sel="' + esc(k) + '"' + (st.sel.has(k) ? ' checked' : '') + ' aria-label="Scegli"></td>' +
+        '<td><div class="tnome"><span class="anteprima"' + (f.anteprima ? ' style="background-image:url(\'' + esc(f.anteprima) + '\')"' : '') + '>' + (f.anteprima ? '' : ico(tipoIcona(f))) + '</span>' +
+          '<div style="min-width:0"><span class="nomefile" title="' + esc(f.nome) + '">' + esc(nomeFile(f)) + '</span><span class="chip">' + esc(NOMI_BUCKET[f.bucket] || f.bucket) + '</span></div></div></td>' +
         '<td>' + esc(f.progetto || '—') + '</td><td>' + esc(f.chi || '—') + '</td>' +
         '<td>' + data(f.creato) + '<div class="piccolo">' + fa(f.creato) + '</div></td><td class="dx">' + peso(f.byte) + '</td>' +
-        '<td class="dx"><button class="btn sm" data-apri="' + esc(k) + '">Apri</button></td></tr>'; }).join('') + '</tbody></table></div>';
+        '<td><div class="azr"><button class="btn sm icona" data-apri="' + esc(k) + '" title="Apri" aria-label="Apri">' + ico('occhio') + '</button>' +
+        '<button class="btn sm icona rosso" data-togli1="' + esc(k) + '" title="Elimina" aria-label="Elimina">' + ico('cestino') + '</button></div></td></tr>'; }).join('') +
+    '</tbody></table></div></div>';
   $('main').innerHTML = h;
+  const c = $('cercaFile'); if(c && st.focusCerca){ c.focus(); c.setSelectionRange(c.value.length, c.value.length); st.focusCerca = false; }
 }
-function chiediTogliFile(){
-  const l = (st.dati.file || []).filter(f=>st.sel.has(f.bucket + '|' + f.nome));
-  const b = l.reduce((a, f)=>a + (+f.byte || 0), 0);
-  modale('<h3>Eliminare ' + l.length + ' file?</h3><p style="color:var(--dim)">Liberi ' + peso(b) + '. Cosa succede:</p><ul>' +
-    '<li>I file spariscono per sempre: non sono nei backup.</li>' +
+function chiediTogliFile(chiavi){
+  const l = (st.dati.file || []).filter(f=>chiavi.includes(f.bucket + '|' + f.nome));
+  if(!l.length) return;
+  st.daTogliere = chiavi;
+  const b = l.reduce((a, f)=>a + (+f.byte || 0), 0), uno = l.length === 1;
+  modale('<h3>' + cerchio('cestino', 'var(--rosso)') + (uno ? 'Eliminare questo file?' : 'Eliminare ' + l.length + ' file?') + '</h3>' +
+    '<div class="elenco">' + l.slice(0, 12).map(f=>esc(nomeFile(f)) + ' · ' + peso(f.byte)).join('<br>') + (l.length > 12 ? '<br>… e altri ' + (l.length - 12) : '') + '</div>' +
+    '<p style="color:var(--dim);margin:12px 0 0">Liberi ' + peso(b) + '. Cosa succede:</p><ul>' +
+    '<li>' + (uno ? 'Il file sparisce' : 'I file spariscono') + ' per sempre: non sono nei backup.</li>' +
     '<li>Nei commenti resta il nome del file, ma non si apre più.</li>' +
     '<li>Una foto profilo tolta torna alle iniziali.</li></ul>' +
-    '<div class="az"><button class="btn" data-az="chiudi">Annulla</button><button class="btn rosso" data-az="togli-file-ok">Elimina</button></div>');
+    '<div class="az"><button class="btn" data-az="chiudi">Annulla</button><button class="btn rosso" data-az="togli-file-ok">' + ico('cestino') + 'Elimina</button></div>');
 }
 async function togliFile(){
-  chiudi();
+  const chiavi = st.daTogliere || []; chiudi();
   const per = {};
-  [...st.sel].forEach(k=>{ const i = k.indexOf('|'); (per[k.slice(0, i)] = per[k.slice(0, i)] || []).push(k.slice(i + 1)); });
+  chiavi.forEach(k=>{ const i = k.indexOf('|'); (per[k.slice(0, i)] = per[k.slice(0, i)] || []).push(k.slice(i + 1)); });
   let n = 0;
-  try{ for(const bucket in per){ const r = await chiedi('togli-file', {bucket, nomi:per[bucket]}); n += r.tolti || 0; } toast(n + ' file eliminati.'); }
-  catch(e){ toast('Non tutti i file sono stati eliminati: ' + e.message); }
+  try{
+    for(const bucket in per){ const r = await chiedi('togli-file', {bucket, nomi:per[bucket]}); n += r.tolti || 0; }
+    toast(n === chiavi.length ? (n === 1 ? 'File eliminato.' : n + ' file eliminati.') : 'Eliminati ' + n + ' file su ' + chiavi.length + '.');
+  }catch(e){ toast('Non riuscito: ' + e.message); }
+  chiavi.forEach(k=>st.sel.delete(k));
   vai('file');
 }
 
 /* ---------- utenti ---------- */
 async function vistaUtenti(){
   const l = st.dati.utenti = await chiedi('utenti');
-  let h = '<div class="testa"><div><h2>Utenti</h2><p>' + l.length + ' account. Bloccare toglie l’accesso senza cancellare niente.</p></div></div>';
-  h += '<div class="tab-wrap"><table><thead><tr><th>Persona</th><th>Team</th><th>Iscritto</th><th>Ultimo accesso</th><th class="dx">Progetti</th><th class="dx">File</th><th>Stato</th><th></th></tr></thead><tbody>' +
-    l.map(u=>'<tr><td><b>' + esc(u.nome || '—') + '</b>' + (u.admin ? ' <span class="chip am">admin</span>' : '') + '<div class="piccolo">' + esc(u.email) + '</div></td>' +
+  let h = testa('Utenti', l.length + ' account. Bloccare toglie l’accesso senza cancellare niente.');
+  h += '<div class="pannello"><div class="tab-wrap"><table><thead><tr><th>Persona</th><th>Team</th><th>Iscritto</th><th>Ultimo accesso</th><th class="dx">Progetti</th><th class="dx">File</th><th>Stato</th><th class="dx">Azioni</th></tr></thead><tbody>' +
+    l.map(u=>'<tr><td><div class="tnome"><span class="av">' + esc((u.nome || u.email || '?').slice(0, 1).toUpperCase()) + '</span><div><b>' + esc(u.nome || '—') + '</b>' + (u.admin ? ' <span class="chip am">admin</span>' : '') + '<div class="piccolo">' + esc(u.email) + '</div></div></div></td>' +
       '<td>' + ((u.team || []).map(t=>esc(t.org) + ' <span class="piccolo">' + esc(t.ruolo) + '</span>').join('<br>') || '—') + '</td>' +
       '<td>' + data(u.creato) + '</td><td>' + (u.ultimo ? fa(u.ultimo) : 'mai') + '</td>' +
       '<td class="dx">' + esc(u.progetti) + '</td><td class="dx">' + peso(u.file_byte) + '</td>' +
       '<td>' + (u.bloccato ? '<span class="chip ko">bloccato</span>' : !u.confermato ? '<span class="chip">da confermare</span>' : '<span class="chip ok">attivo</span>') + '</td>' +
-      '<td class="dx" style="white-space:nowrap">' + (u.admin ? '' :
+      '<td><div class="azr">' + (u.admin ? '' :
         (u.bloccato ? '<button class="btn sm" data-ut="sblocca" data-id="' + esc(u.id) + '">Sblocca</button>' : '<button class="btn sm" data-ut="blocca" data-id="' + esc(u.id) + '">Blocca</button>') +
-        ' <button class="btn sm rosso" data-ut="elimina" data-id="' + esc(u.id) + '">Elimina</button>') + '</td></tr>').join('') +
-    '</tbody></table></div>';
+        '<button class="btn sm rosso" data-ut="elimina" data-id="' + esc(u.id) + '">Elimina</button>') + '</div></td></tr>').join('') +
+    '</tbody></table></div></div>';
   $('main').innerHTML = h;
 }
 function azioneUtente(az, id){
   const u = (st.dati.utenti || []).find(x=>x.id === id); if(!u) return;
   const nm = esc(u.nome || u.email);
-  if(az === 'blocca') modale('<h3>Bloccare ' + nm + '?</h3><ul><li>Non può più entrare in FOSS, da nessun dispositivo.</li><li>I suoi progetti, commenti e file restano.</li><li>Puoi sbloccarlo quando vuoi.</li></ul>' +
+  if(az === 'blocca') modale('<h3>' + cerchio('user', 'var(--rosso)') + 'Bloccare ' + nm + '?</h3><ul><li>Non può più entrare in FOSS, da nessun dispositivo.</li><li>I suoi progetti, commenti e file restano.</li><li>Puoi sbloccarlo quando vuoi.</li></ul>' +
     '<div class="az"><button class="btn" data-az="chiudi">Annulla</button><button class="btn rosso" data-ok="blocca" data-id="' + esc(id) + '">Blocca</button></div>');
   if(az === 'sblocca') faiUtente('sblocca', id);
-  if(az === 'elimina') modale('<h3>Eliminare l’account di ' + nm + '?</h3><ul><li>L’account sparisce e non si recupera.</li><li>Il suo archivio personale e i progetti di cui è titolare possono andare persi.</li>' +
+  if(az === 'elimina') modale('<h3>' + cerchio('cestino', 'var(--rosso)') + 'Eliminare l’account di ' + nm + '?</h3><ul><li>L’account sparisce e non si recupera.</li><li>Il suo archivio personale e i progetti di cui è titolare possono andare persi.</li>' +
     '<li>Se vuoi solo fermarlo, usa <b>Blocca</b>.</li></ul><label class="piccolo" for="confEl">Scrivi ELIMINA per confermare</label><input type="text" id="confEl" autocomplete="off">' +
     '<div class="az"><button class="btn" data-az="chiudi">Annulla</button><button class="btn rosso" data-ok="elimina-utente" data-id="' + esc(id) + '">Elimina</button></div>');
 }
@@ -383,13 +558,13 @@ async function faiUtente(az, id){
 /* ---------- inviti ---------- */
 async function vistaInviti(){
   const l = await chiedi('inviti');
-  let h = '<div class="testa"><div><h2>Inviti</h2><p>Gli inviti mandati da tutti i team. Uno non ancora usato si può annullare.</p></div></div>';
-  if(!l.length){ $('main').innerHTML = h + '<div class="card vuoto">Nessun invito.</div>'; return; }
-  h += '<div class="tab-wrap"><table><thead><tr><th>Per</th><th>Team</th><th>Creato</th><th>Mandato</th><th>Stato</th><th></th></tr></thead><tbody>' +
+  let h = testa('Inviti', 'Gli inviti mandati da tutti i team. Uno non ancora usato si può annullare.');
+  if(!l.length){ $('main').innerHTML = h + '<div class="pannello vuoto">Nessun invito.</div>'; return; }
+  h += '<div class="pannello"><div class="tab-wrap"><table><thead><tr><th>Per</th><th>Team</th><th>Creato</th><th>Mandato</th><th>Stato</th><th class="dx">Azioni</th></tr></thead><tbody>' +
     l.map(i=>'<tr><td><b>' + esc([i.nome, i.cognome].filter(Boolean).join(' ') || '—') + '</b><div class="piccolo">' + esc(i.email) + (i.ruolo ? ' · ' + esc(i.ruolo) : '') + '</div></td>' +
       '<td>' + esc(i.team) + '</td><td>' + data(i.creato_il) + '</td><td>' + (i.inviato_il ? data(i.inviato_il) + (i.invii > 1 ? ' <span class="piccolo">(' + i.invii + ' volte)</span>' : '') : '—') + '</td>' +
       '<td>' + (i.usato ? '<span class="chip ok">registrato</span>' : i.esito ? '<span class="chip' + (/bounce|complain/.test(i.esito) ? ' ko' : '') + '">' + esc(i.esito) + '</span>' : '<span class="chip">non mandato</span>') + '</td>' +
-      '<td class="dx">' + (i.usato ? '' : '<button class="btn sm" data-annulla="' + esc(i.id) + '">Annulla</button>') + '</td></tr>').join('') + '</tbody></table></div>';
+      '<td><div class="azr">' + (i.usato ? '' : '<button class="btn sm" data-annulla="' + esc(i.id) + '">Annulla</button>') + '</div></td></tr>').join('') + '</tbody></table></div></div>';
   $('main').innerHTML = h;
 }
 
@@ -399,25 +574,38 @@ async function vistaSegn(){
   const l = await chiedi('segnalazioni');
   const aperte = l.filter(s=>s.stato !== 'risolta').length;
   $('nSegn').hidden = !aperte; $('nSegn').textContent = aperte;
-  let h = '<div class="testa"><div><h2>Segnalazioni</h2><p>' + aperte + ' da guardare su ' + l.length + '. Arrivano dal tasto «Segnala» nella Guida.</p></div></div>';
-  if(!l.length){ $('main').innerHTML = h + '<div class="card vuoto">Nessuna segnalazione.</div>'; return; }
-  h += '<div class="tab-wrap"><table><thead><tr><th>Quando</th><th>Chi</th><th>Cosa</th><th>Dove</th><th>Stato</th></tr></thead><tbody>' +
+  let h = testa('Segnalazioni', aperte + ' da guardare su ' + l.length + '. Arrivano dal tasto «Segnala» nella Guida.');
+  if(!l.length){ $('main').innerHTML = h + '<div class="pannello vuoto">Nessuna segnalazione.</div>'; return; }
+  h += '<div class="pannello"><div class="tab-wrap"><table><thead><tr><th>Quando</th><th>Chi</th><th>Cosa</th><th>Dove</th><th>Stato</th></tr></thead><tbody>' +
     l.map(s=>'<tr><td>' + data(s.creata_il) + '</td><td>' + esc(s.chi || '—') + '</td>' +
       '<td><span class="chip">' + esc(TIPO_SEGN[s.tipo] || s.tipo) + '</span><div style="margin-top:6px;white-space:pre-wrap">' + esc(s.testo) + '</div></td>' +
       '<td class="piccolo">' + esc(s.dove || '') + '<br>' + esc(s.dispositivo || '') + ' · ' + esc(s.versione || '') + '</td>' +
-      '<td><div class="seg">' + [['aperta', 'Da fare'], ['vista', 'Vista'], ['risolta', 'Risolta']].map(x=>'<button data-segn="' + esc(s.id) + '" data-stato="' + x[0] + '" class="' + ((s.stato || 'aperta') === x[0] ? 'on' : '') + '">' + x[1] + '</button>').join('') + '</div></td></tr>').join('') +
-    '</tbody></table></div>';
+      '<td><div class="seg">' + [['aperta', 'Da fare'], ['risolta', 'Risolta']].map(x=>'<button data-segn="' + esc(s.id) + '" data-stato="' + x[0] + '" class="' + ((s.stato || 'aperta') === x[0] ? 'on' : '') + '">' + x[1] + '</button>').join('') + '</div></td></tr>').join('') +
+    '</tbody></table></div></div>';
   $('main').innerHTML = h;
 }
 
 /* ---------- email ---------- */
 async function vistaEmail(){
   const l = await chiedi('email');
-  let h = '<div class="testa"><div><h2>Email inviate</h2><p>Inviti e avvisi della bustina, le più recenti prima. Limite gratuito: 100 al giorno, 3.000 al mese.</p></div></div>';
-  if(!l.length){ $('main').innerHTML = h + '<div class="card vuoto">Ancora nessuna email.</div>'; return; }
-  h += '<div class="tab-wrap"><table><thead><tr><th>Quando</th><th>Tipo</th><th>Da</th><th>A</th><th>Progetto / esito</th></tr></thead><tbody>' +
+  let h = testa('Email inviate', 'Inviti e avvisi della bustina, le più recenti prima. Limite gratuito: 100 al giorno, 3.000 al mese.');
+  if(!l.length){ $('main').innerHTML = h + '<div class="pannello vuoto">Ancora nessuna email.</div>'; return; }
+  h += '<div class="pannello"><div class="tab-wrap"><table><thead><tr><th>Quando</th><th>Tipo</th><th>Da</th><th>A</th><th>Progetto / esito</th></tr></thead><tbody>' +
     l.map(x=>'<tr><td>' + data(x.quando) + '</td><td><span class="chip' + (x.tipo === 'tag' ? ' am' : '') + '">' + (x.tipo === 'tag' ? 'bustina' : 'invito') + '</span></td>' +
-      '<td>' + esc(x.da || '—') + '</td><td>' + esc(x.a) + '</td><td>' + esc(x.su || '') + '</td></tr>').join('') + '</tbody></table></div>';
+      '<td>' + esc(x.da || '—') + '</td><td>' + esc(x.a) + '</td><td>' + esc(x.su || '') + '</td></tr>').join('') + '</tbody></table></div></div>';
+  $('main').innerHTML = h;
+}
+
+/* ---------- errori ---------- */
+async function vistaErrori(){
+  const l = await chiedi('errori');
+  let h = testa('Errori', 'Quello che è andato storto a qualcuno mentre usava FOSS: salvataggi, email, errori della pagina. Lo stesso errore si scrive una volta ogni 10 minuti.');
+  if(!l.length){ $('main').innerHTML = h + avviso('ok', 'fatto', 'Nessun errore registrato.'); return; }
+  h += '<div class="pannello"><div class="tab-wrap"><table><thead><tr><th>Quando</th><th>Chi</th><th>Dove</th><th>Cosa</th><th>Versione</th></tr></thead><tbody>' +
+    l.map(e=>'<tr><td>' + data(e.quando) + '<div class="piccolo">' + fa(e.quando) + '</div></td><td>' + esc(e.chi || '—') + '</td><td><span class="chip">' + esc(e.dove || '') + '</span></td>' +
+      '<td><div style="max-width:520px;word-break:break-word">' + esc(e.messaggio) + '</div>' + (e.dettaglio ? '<details><summary class="piccolo" style="cursor:pointer">dettagli</summary><div class="mono piccolo" style="white-space:pre-wrap;max-width:520px;word-break:break-all">' + esc(e.dettaglio) + '</div></details>' : '') +
+      '<div class="piccolo">' + esc((e.dispositivo || '').replace(/Mozilla\/5\.0 /, '').slice(0, 90)) + '</div></td><td>' + esc(e.versione || '') + '</td></tr>').join('') + '</tbody></table></div></div>';
+  h += '<p class="piccolo" style="margin-top:14px">Se un errore si ripete, copialo e mandalo a Claude: con la versione e il punto si trova in fretta.</p>';
   $('main').innerHTML = h;
 }
 
@@ -425,21 +613,21 @@ async function vistaEmail(){
 async function vistaBackup(){
   const s = st.dati.stato = await chiedi('stato');
   const l = s.backup || [], g = s.backup_ultimo_giro;
-  let h = '<div class="testa"><div><h2>Backup</h2><p>Ogni notte alle 3:30 si salva una copia di tutti i dati. Restano le ultime 7, più 5 fatte a mano.</p></div>' +
-    '<button class="btn prim" data-az="backup-ora">Fai un backup adesso</button></div>';
-  if(g) h += g.stato === 'succeeded' ? '<div class="avviso ok">✓ Ultimo backup automatico riuscito: ' + data(g.quando) + '.</div>'
-                                     : '<div class="avviso ko">✕ L’ultimo backup automatico (' + data(g.quando) + ') non è riuscito: ' + esc(g.msg || g.stato) + '</div>';
-  h += '<div class="avviso" style="background:#0F1E35;color:var(--dim)">ℹ La copia sta sul database stesso: ti salva da un errore (un progetto cancellato per sbaglio). ' +
-    'Per averne una anche fuori, ogni tanto premi <b>Scarica</b> e tieni il file sul computer. I file caricati (allegati, foto) non sono nel backup: c’è solo il loro elenco.</div>';
-  h += '<div class="tab-wrap"><table><thead><tr><th>Quando</th><th>Tipo</th><th class="dx">Righe</th><th class="dx">Peso</th><th></th></tr></thead><tbody>' +
+  let h = testa('Backup', 'Ogni notte alle 3:30 si salva una copia di tutti i dati. Restano le ultime 7, più 5 fatte a mano.',
+    '<button class="btn prim" data-az="backup-ora">' + ico('backup') + 'Fai un backup adesso</button>');
+  if(g) h += g.stato === 'succeeded' ? avviso('ok', 'fatto', 'Ultimo backup automatico riuscito: ' + data(g.quando) + '.')
+                                     : avviso('ko', 'allerta', 'L’ultimo backup automatico (' + data(g.quando) + ') non è riuscito: ' + esc(g.msg || g.stato));
+  h += avviso('info', 'info', 'La copia sta sul database stesso: ti salva da un errore (un progetto cancellato per sbaglio). ' +
+    'Per averne una anche fuori, ogni tanto premi <b>Scarica</b> e tieni il file sul computer. I file caricati (allegati, foto) non sono nel backup: c’è solo il loro elenco.');
+  h += '<div class="pannello"><div class="tab-wrap"><table><thead><tr><th>Quando</th><th>Tipo</th><th class="dx">Righe</th><th class="dx">Peso</th><th class="dx">Azioni</th></tr></thead><tbody>' +
     (l.length ? l.map(b=>'<tr><td>' + data(b.creato) + '<div class="piccolo">' + fa(b.creato) + '</div></td><td><span class="chip' + (b.tipo === 'manuale' ? ' am' : '') + '">' + (b.tipo === 'manuale' ? 'a mano' : 'notturno') + '</span></td>' +
-      '<td class="dx">' + esc(b.righe) + '</td><td class="dx">' + peso(b.byte) + '</td><td class="dx"><button class="btn sm" data-scarica="' + esc(b.posto) + '">Scarica</button></td></tr>').join('')
-      : '<tr><td colspan="5" class="vuoto">Ancora nessun backup.</td></tr>') + '</tbody></table></div>';
+      '<td class="dx">' + esc(b.righe) + '</td><td class="dx">' + peso(b.byte) + '</td><td><div class="azr"><button class="btn sm" data-scarica="' + esc(b.posto) + '">' + ico('scarica') + 'Scarica</button></div></td></tr>').join('')
+      : '<tr><td colspan="5" class="vuoto">Ancora nessun backup.</td></tr>') + '</tbody></table></div></div>';
   h += '<p class="piccolo" style="margin-top:14px">Per ripristinare un backup chiedi a Claude: si fa un pezzo alla volta, senza toccare il resto.</p>';
   $('main').innerHTML = h;
 }
 async function scaricaBackup(posto, b){
-  b.disabled = true; b.textContent = '…';
+  b.disabled = true;
   try{
     const r = await chiedi('scarica-backup', {posto});
     const blob = new Blob([JSON.stringify(r.dati)], {type:'application/json'});
@@ -448,17 +636,24 @@ async function scaricaBackup(posto, b){
     document.body.appendChild(a); a.click(); a.remove(); setTimeout(()=>URL.revokeObjectURL(a.href), 5000);
     toast('Backup scaricato: tienilo in un posto sicuro, contiene tutti i dati.');
   }catch(e){ toast('Download non riuscito: ' + e.message); }
-  b.disabled = false; b.textContent = 'Scarica';
+  b.disabled = false;
 }
 
 /* ---------- tocchi ---------- */
+document.addEventListener('input', e=>{
+  if(e.target.id === 'cercaTab'){ st.tabCerca = e.target.value; righeTabelle(); }
+  if(e.target.id === 'cercaFile'){ st.fileCerca = e.target.value; st.focusCerca = true; disegnaFile(); }
+});
 document.addEventListener('click', async e=>{
-  const t = e.target.closest('button, [data-sel]'); if(!t) return;
+  const t = e.target.closest('button, input[type=checkbox]'); if(!t) return;
   const d = t.dataset;
   if(d.vai) return vai(d.vai);
+  if(d.chiudiAvviso){ st.chiusi[d.chiudiAvviso] = true; const a = t.closest('.avviso'); if(a) a.remove(); return; }
   if(d.ord){ st.fileOrd = d.ord; return disegnaFile(); }
   if(d.buck !== undefined){ st.fileBucket = d.buck; return disegnaFile(); }
+  if(d.tutti){ const l = fileVisibili(); if(t.checked) l.forEach(f=>st.sel.add(f.bucket + '|' + f.nome)); else l.forEach(f=>st.sel.delete(f.bucket + '|' + f.nome)); return disegnaFile(); }
   if(d.sel){ t.checked ? st.sel.add(d.sel) : st.sel.delete(d.sel); return disegnaFile(); }
+  if(d.togli1) return chiediTogliFile([d.togli1]);
   if(d.apri){ const i = d.apri.indexOf('|'); const w = window.open('about:blank', '_blank'); if(w) w.opener = null;
     try{ const r = await chiedi('link-file', {bucket:d.apri.slice(0, i), nome:d.apri.slice(i + 1)}); if(w) w.location.href = r.url; }catch(x){ if(w) w.close(); toast('Il file non si apre.'); } return; }
   if(d.ut) return azioneUtente(d.ut, d.id);
@@ -470,9 +665,10 @@ document.addEventListener('click', async e=>{
     case 'esci': return esci();
     case 'chiudi': return chiudi();
     case 'ricarica': return vai(st.vista);
-    case 'togli-file': return chiediTogliFile();
+    case 'deseleziona': st.sel.clear(); return disegnaFile();
+    case 'togli-file': return chiediTogliFile([...st.sel]);
     case 'togli-file-ok': return togliFile();
-    case 'backup-ora': t.disabled = true; t.textContent = 'Salvo…';
+    case 'backup-ora': t.disabled = true; t.lastChild.textContent = 'Salvo…';
       try{ await chiedi('backup-ora'); toast('Backup fatto.'); }catch(x){ toast('Backup non riuscito: ' + x.message); } return vai('backup');
   }
 });
