@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <meta name="robots" content="noindex,nofollow,noarchive">
 <meta name="referrer" content="no-referrer">
-<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline' https://cdn.jsdelivr.net; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src https://fonts.gstatic.com; img-src 'self' data: blob: https://suqpteanvnvvmfujlevi.supabase.co; connect-src https://suqpteanvnvvmfujlevi.supabase.co https://api.github.com; frame-src 'none'; object-src 'none'; base-uri 'none'; form-action 'none'">
+<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline' https://cdn.jsdelivr.net; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src https://fonts.gstatic.com; img-src 'self' data: blob: https://suqpteanvnvvmfujlevi.supabase.co https://foss.team; connect-src https://suqpteanvnvvmfujlevi.supabase.co https://api.github.com; frame-src 'self'; object-src 'none'; base-uri 'none'; form-action 'none'">
 <title>FOSS · Amministrazione</title>
 <link rel="icon" href="icone/favicon.svg?v=45" type="image/svg+xml">
 <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -150,6 +150,22 @@ tbody tr:hover td{background:#0E1E35}
 .selbar .sp{flex:1}
 .azr{display:flex;gap:6px;justify-content:flex-end}
 
+/* comunicazioni */
+.com-lay{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,620px);gap:16px;align-items:start}
+.com-ed{display:flex;flex-direction:column;gap:12px}
+.com-ed label{display:block;font-size:12px;font-weight:600;color:var(--dim);margin-bottom:6px}
+.com-ed textarea{width:100%;min-height:290px;background:#091526;border:1px solid var(--line-2);border-radius:11px;padding:12px 13px;outline:none;resize:vertical;font:400 14px/1.55 var(--font);color:var(--text)}
+.com-ed textarea:focus{border-color:var(--amber)}
+.com-due{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.com-az{display:flex;gap:8px;flex-wrap:wrap;align-items:center;padding-top:4px}
+.com-prev{position:sticky;top:12px;padding:0;overflow:hidden}
+.com-prev .h{display:flex;align-items:center;gap:10px;padding:12px 16px;border-bottom:1px solid var(--line);font-size:12.5px;color:var(--dim)}
+.com-prev .h b{color:var(--text);font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.com-prev iframe{display:block;width:100%;height:760px;border:0;background:#07111F}
+.aiuto{font-size:12px;color:var(--mute);line-height:1.5}
+.aiuto code{font-family:"JetBrains Mono",monospace;font-size:11.5px;background:#0A1628;padding:1px 5px;border-radius:5px;color:var(--dim)}
+@media (max-width:1200px){ .com-lay{grid-template-columns:1fr} .com-prev{position:static} }
+
 /* finestre */
 #modale{position:fixed;inset:0;background:rgba(3,8,16,.72);display:none;place-items:center;padding:16px;z-index:50;backdrop-filter:blur(3px)}
 #modale.on{display:grid}
@@ -195,6 +211,7 @@ tbody tr:hover td{background:#0E1E35}
     <button class="nav" data-vai="utenti"><svg class="i"><use href="#i-users"/></svg>Utenti</button>
     <button class="nav" data-vai="inviti"><svg class="i"><use href="#i-invito"/></svg>Inviti</button>
     <button class="nav" data-vai="segnalazioni"><svg class="i"><use href="#i-bandiera"/></svg>Segnalazioni<span class="n" id="nSegn" hidden></span></button>
+    <button class="nav" data-vai="comunica"><svg class="i"><use href="#i-megafono"/></svg>Comunicazioni</button>
     <button class="nav" data-vai="email"><svg class="i"><use href="#i-mail"/></svg>Email inviate</button>
     <button class="nav" data-vai="errori"><svg class="i"><use href="#i-allerta"/></svg>Errori<span class="n" id="nErr" hidden></span></button>
     <button class="nav" data-vai="backup"><svg class="i"><use href="#i-backup"/></svg>Backup</button>
@@ -239,6 +256,8 @@ tbody tr:hover td{background:#0E1E35}
   <symbol id="i-invito" viewBox="0 0 24 24"><circle cx="9" cy="8" r="3.5"/><path d="M2.5 20a6.5 6.5 0 0 1 13 0M19 8v6M16 11h6"/></symbol>
   <symbol id="i-backup" viewBox="0 0 24 24"><path d="M3 12a9 9 0 1 0 3-6.7L3 8"/><path d="M3 3v5h5M12 7v5l3 2"/></symbol>
   <symbol id="i-chiave" viewBox="0 0 24 24"><circle cx="8" cy="15" r="4"/><path d="m10.8 12.2 8.7-8.7M17 6l2.5 2.5M14.5 8.5 17 11"/></symbol>
+  <symbol id="i-megafono" viewBox="0 0 24 24"><path d="M3 11v2a1 1 0 0 0 1 1h2l5 4V6L6 10H4a1 1 0 0 0-1 1z"/><path d="M15 8.5a5 5 0 0 1 0 7M18 6a8.5 8.5 0 0 1 0 12"/></symbol>
+  <symbol id="i-invia" viewBox="0 0 24 24"><path d="m3 11 18-8-8 18-2-7z"/></symbol>
   <symbol id="i-x" viewBox="0 0 24 24"><path d="M6 6l12 12M18 6 6 18"/></symbol>
   <symbol id="i-su" viewBox="0 0 24 24"><path d="M7 17 17 7M9 7h8v8"/></symbol>
   <symbol id="i-immagine" viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="16" rx="2"/><circle cx="9" cy="10" r="2"/><path d="m21 16-5-5-9 9"/></symbol>
@@ -366,7 +385,7 @@ function vai(v){
   st.vista = v;
   document.querySelectorAll('.nav[data-vai]').forEach(b=>b.classList.toggle('on', b.dataset.vai === v));
   $('main').innerHTML = '<div class="carica">Carico…</div>';
-  ({spazio:vistaSpazio, file:vistaFile, utenti:vistaUtenti, inviti:vistaInviti, segnalazioni:vistaSegn, email:vistaEmail, backup:vistaBackup, errori:vistaErrori}[v])()
+  ({spazio:vistaSpazio, file:vistaFile, utenti:vistaUtenti, inviti:vistaInviti, segnalazioni:vistaSegn, email:vistaEmail, backup:vistaBackup, errori:vistaErrori, comunica:vistaComunica}[v])()
     .catch(e=>{ if(e.message !== '2fa' && e.message !== 'non-admin') $('main').innerHTML = '<div class="avviso ko">' + ico('allerta') + 'Non riesco a leggere i dati (' + esc(e.message) + '). Riprova tra poco.</div>'; });
 }
 function testa(titolo, sotto, destra){
@@ -609,6 +628,88 @@ async function vistaErrori(){
   $('main').innerHTML = h;
 }
 
+/* ---------- comunicazioni a tutti ---------- */
+const ESEMPIO = {
+  oggetto: 'FOSS ora è su foss.team',
+  etichetta: 'Novità',
+  titolo: 'FOSS è diventato indipendente',
+  testo: 'Ciao {nome},\n\nda oggi FOSS ha un indirizzo tutto suo: **foss.team**.\n\n' +
+    'Il vecchio link funziona ancora e ti porta lì da solo, ma da adesso conviene usare quello nuovo: è più facile da ricordare, ' +
+    'il sito si apre più velocemente ed è ancora più protetto.\n\n' +
+    'La prima volta che apri foss.team ti chiederà di **accedere di nuovo** con la tua email e la tua password di sempre. ' +
+    'Non serve registrarsi: il tuo account e i tuoi lavori sono già lì.\n\n' +
+    'Se usavi FOSS dalla schermata Home del telefono, aggiungi di nuovo l’icona da foss.team e riattiva gli avvisi dal tuo profilo.',
+  tasto: 'Apri foss.team',
+  url: 'https://foss.team',
+  firma: 'Davide'
+};
+const CAMPI_COM = ['oggetto', 'etichetta', 'titolo', 'testo', 'tasto', 'url', 'firma'];
+function bozzaCom(){
+  if(st.bozza) return st.bozza;
+  let b = null; try{ b = JSON.parse(localStorage.getItem('foss-admin-bozza') || 'null'); }catch(e){}
+  return st.bozza = Object.assign({}, ESEMPIO, b || {});
+}
+function salvaBozza(){ try{ localStorage.setItem('foss-admin-bozza', JSON.stringify(st.bozza)); }catch(e){} }
+async function vistaComunica(){
+  const r = await chiedi('comunicazioni');
+  st.dati.com = r;
+  const b = bozzaCom(), campo = (k, l, ph) => '<div><label for="c_' + k + '">' + l + '</label><input type="text" id="c_' + k + '" data-com="' + k + '" value="' + esc(b[k]) + '" placeholder="' + esc(ph || '') + '"></div>';
+  let h = testa('Comunicazioni', 'Un’email a tutte le persone iscritte a FOSS: ' + r.destinatari + (r.destinatari === 1 ? ' persona' : ' persone') + ' con l’account confermato.');
+  h += '<div class="com-lay"><div class="card com-ed">' +
+    campo('oggetto', 'Oggetto', 'Quello che si legge nella casella di posta') +
+    '<div class="com-due">' + campo('etichetta', 'Etichetta (piccola, sopra al titolo)', 'Novità') + campo('titolo', 'Titolo', '') + '</div>' +
+    '<div><label for="c_testo">Testo</label><textarea id="c_testo" data-com="testo">' + esc(b.testo) + '</textarea>' +
+    '<div class="aiuto" style="margin-top:6px">Riga vuota = nuovo paragrafo · <code>**parola**</code> = grassetto · <code>{nome}</code> = il nome di chi la riceve · i link https:// si possono toccare.</div></div>' +
+    '<div class="com-due">' + campo('tasto', 'Tasto (testo)', 'Apri foss.team') + campo('url', 'Tasto (link)', 'https://foss.team') + '</div>' +
+    campo('firma', 'Firma', 'Davide') +
+    '<div class="com-az"><button class="btn" data-az="com-prova">' + ico('mail') + 'Manda una prova a me</button>' +
+    '<button class="btn prim" data-az="com-tutti">' + ico('invia') + 'Manda a tutti (' + r.destinatari + ')</button>' +
+    '<span style="flex:1"></span><button class="btn sm" data-az="com-esempio">Ripristina l’esempio</button></div></div>' +
+    '<div class="card com-prev"><div class="h">' + ico('occhio') + '<span>Anteprima ·</span><b id="comOgg">' + esc(b.oggetto) + '</b></div><iframe id="comPrev" title="Anteprima" sandbox></iframe></div></div>';
+  const l = r.storico || [];
+  h += '<div class="sez"><h3>Già inviate</h3>' + (l.length ? '<div class="pannello"><div class="tab-wrap"><table><thead><tr><th>Quando</th><th>Oggetto</th><th class="dx">Persone</th><th>Esito</th></tr></thead><tbody>' +
+    l.map(c=>'<tr><td>' + data(c.creata_il) + '</td><td>' + esc(c.oggetto) + (c.prova ? ' <span class="chip">prova</span>' : '') + '</td><td class="dx">' + esc(c.destinatari) + '</td>' +
+      '<td>' + (c.errori ? '<span class="chip ko">' + c.errori + ' non partite</span>' : '<span class="chip ok">' + c.inviate + ' partite</span>') + '</td></tr>').join('') +
+    '</tbody></table></div></div>' : '<div class="pannello vuoto">Ancora nessuna comunicazione.</div>') + '</div>';
+  $('main').innerHTML = h;
+  anteprimaCom();
+}
+let timerCom = null;
+function anteprimaCom(){
+  clearTimeout(timerCom);
+  timerCom = setTimeout(async ()=>{
+    try{ const r = await chiedi('comunicazione-anteprima', {mail:st.bozza}); const f = $('comPrev'); if(f) f.srcdoc = r.html; }catch(e){}
+  }, 450);
+}
+async function mandaCom(prova, t){
+  const b = st.bozza;
+  if(!String(b.oggetto || '').trim() || !String(b.testo || '').trim()){ toast('Servono almeno oggetto e testo.'); return; }
+  const n = st.dati.com ? st.dati.com.destinatari : 0;
+  if(!prova){
+    modale('<h3>' + cerchio('invia', 'var(--amber)') + 'Mandare a ' + n + (n === 1 ? ' persona?' : ' persone?') + '</h3>' +
+      '<p style="color:var(--dim);margin:4px 0 0">«' + esc(b.oggetto) + '» parte adesso a tutte le persone iscritte con l’account confermato. Ognuna la riceve da sola: nessuno vede gli indirizzi degli altri.</p>' +
+      '<ul><li>Una volta partita non si può ritirare.</li><li>Conviene prima mandarne una prova a te.</li></ul>' +
+      '<div class="az"><button class="btn" data-az="chiudi">Annulla</button><button class="btn prim" data-az="com-tutti-ok">' + ico('invia') + 'Manda a ' + n + '</button></div>');
+    return;
+  }
+  t.disabled = true;
+  try{ const r = await chiedi('comunicazione-prova', {mail:b}); toast(r.inviate ? 'Prova mandata alla tua email.' : 'La prova non è partita.'); }
+  catch(e){ toast(e.message === 'chiave' ? 'Manca la chiave di Resend.' : 'La prova non è partita: ' + e.message); }
+  t.disabled = false;
+  vai('comunica');
+}
+async function mandaComTutti(){
+  chiudi();
+  const n = st.dati.com ? st.dati.com.destinatari : 0;
+  try{
+    const r = await chiedi('comunicazione-invia', {mail:st.bozza, quanti:n});
+    toast(r.errori ? 'Partite ' + r.inviate + ' su ' + r.destinatari + '.' : 'Comunicazione mandata a ' + r.inviate + (r.inviate === 1 ? ' persona.' : ' persone.'));
+  }catch(e){
+    toast({limite:'Oggi superi il limite gratuito di 100 email: mandala domani.', conferma:'Nel frattempo è cambiato il numero di iscritti: riprova.', vuota:'Servono oggetto e testo.'}[e.message] || 'Non partita: ' + e.message);
+  }
+  vai('comunica');
+}
+
 /* ---------- backup ---------- */
 async function vistaBackup(){
   const s = st.dati.stato = await chiedi('stato');
@@ -642,6 +743,11 @@ async function scaricaBackup(posto, b){
 /* ---------- tocchi ---------- */
 document.addEventListener('input', e=>{
   if(e.target.id === 'cercaTab'){ st.tabCerca = e.target.value; righeTabelle(); }
+  if(e.target.dataset && e.target.dataset.com){
+    bozzaCom()[e.target.dataset.com] = e.target.value; salvaBozza();
+    if(e.target.dataset.com === 'oggetto' && $('comOgg')) $('comOgg').textContent = e.target.value;
+    anteprimaCom(); return;
+  }
   if(e.target.id === 'cercaFile'){ st.fileCerca = e.target.value; st.focusCerca = true; disegnaFile(); }
 });
 document.addEventListener('click', async e=>{
@@ -666,6 +772,10 @@ document.addEventListener('click', async e=>{
     case 'chiudi': return chiudi();
     case 'ricarica': return vai(st.vista);
     case 'deseleziona': st.sel.clear(); return disegnaFile();
+    case 'com-prova': return mandaCom(true, t);
+    case 'com-tutti': return mandaCom(false, t);
+    case 'com-tutti-ok': return mandaComTutti();
+    case 'com-esempio': st.bozza = Object.assign({}, ESEMPIO); salvaBozza(); return vai('comunica');
     case 'togli-file': return chiediTogliFile([...st.sel]);
     case 'togli-file-ok': return togliFile();
     case 'backup-ora': t.disabled = true; t.lastChild.textContent = 'Salvo…';
