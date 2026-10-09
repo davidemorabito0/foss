@@ -8371,9 +8371,9 @@ function renderInvito(){
 /* ============ NOTIFICHE ============ */
 /* Quelle degli altri arrivano dal database (una riga per chi le riceve);
    quelle delle mie azioni restano qui, come promemoria, e non accendono niente. */
-const IC_NOTIFICA = {assegnata:'user', taggato:'users', menzione:'tag', commento:'chat', chat:'chat', fase:'spark',
+const IC_NOTIFICA = {assegnata:'user', taggato:'users', menzione:'tag', commento:'chat', risposta:'chat', chat:'chat', fase:'spark',
   consegnato:'check', aperto:'users', cliente:'review', segnalazione:'bandiera', richiesta_team:'users', richiesta_esito:'users'};
-const NOTIFICA_FORTE = {assegnata:1, taggato:1, menzione:1, aperto:1, cliente:1};
+const NOTIFICA_FORTE = {assegnata:1, taggato:1, menzione:1, risposta:1, aperto:1, cliente:1};
 function testoNotifica(tipo, d){
   d = d || {};
   const chi = '<b>'+esc(d.chi || 'Qualcuno')+'</b>', pr = d.progetto ? ' \u00b7 '+esc(d.progetto) : '';
@@ -8383,6 +8383,7 @@ function testoNotifica(tipo, d){
                                  : chi+' ti ha assegnato '+cit(d.titolo)+(d.in? ' in '+cit(d.in) : '')+pr;
     case 'taggato':   return chi+' ti ha aggiunto a '+cit(d.titolo)+pr;
     case 'menzione':  return chi+' ti ha menzionato'+(d.titolo? ' su '+cit(d.titolo) : '')+': '+cit(d.testo)+pr;
+    case 'risposta':  return chi+' ha risposto'+(d.titolo? ' su '+cit(d.titolo) : '')+': '+cit(d.testo)+pr;
     case 'commento':  return (n>1 ? n+' commenti nuovi, l\u2019ultimo di '+chi : chi+' ha commentato')+(d.titolo? ' '+cit(d.titolo) : '')+': '+cit(d.testo)+pr;
     case 'chat':      return (n>1 ? n+' messaggi in chat, l\u2019ultimo di '+chi : chi+' in chat')+': '+cit(d.testo)+pr;
     case 'fase':      return '<b>'+esc(d.progetto || 'Un lavoro')+'</b> \u00e8 passato a '+(d.fase_nome? cit(d.fase_nome) : 'la fase successiva');
@@ -8400,7 +8401,7 @@ function testoNotifica(tipo, d){
 function titoloNotifica(tipo, d){
   if(tipo==='cliente') return (d && d.esito==='ok') ? 'Il cliente ha approvato' : 'Il cliente chiede modifiche';
   if(tipo==='segnalazione') return 'Nuova segnalazione';
-  return {assegnata:'Ti hanno assegnato una cosa', taggato:'Ti hanno aggiunto a una task', menzione:'Ti hanno menzionato',
+  return {assegnata:'Ti hanno assegnato una cosa', taggato:'Ti hanno aggiunto a una task', menzione:'Ti hanno menzionato', risposta:'Ti hanno risposto',
           aperto:'Hai un lavoro nuovo'}[tipo] || 'Nuova notifica';
 }
 function notificaDaRiga(r){
@@ -8428,7 +8429,8 @@ function arrivaNotifica(r, appenaNata){
   if(b && n.nuova){ b.classList.remove('pop'); void b.offsetWidth; b.classList.add('pop'); }
   if(state.drawer) renderDrawer();
   if(appenaNata && n.nuova && NOTIFICA_FORTE[r.tipo] && state.cfg.boxFull && Date.now() >= (state.snoozeFino||0)
-     && document.visibilityState === 'visible' && !alertCorrente && state.schermo !== 'gate'){
+     && document.visibilityState === 'visible' && !alertCorrente && state.schermo !== 'gate'
+     && !(cm && n.dati.task && cm.task === n.dati.task && (cm.voce || '') === (n.dati.voce || '') && cm.pid === r.progetto_id)){   // la discussione e' gia' aperta davanti
     const pr = state.progetti.find(x=>x.id===r.progetto_id);
     alertGrande({ic:n.ic, tit:esc(titoloNotifica(r.tipo, n.dati)), tx:n.tx, n,
                  prog: pr ? (pr.cliente? pr.cliente+' \u00b7 ' : '')+pr.nome : (n.dati.progetto||'')});
@@ -8451,7 +8453,7 @@ function apriNotifica(n){
   if(s2) s2.aperto = true;
   apriProgetto(pr.id, false);
   /* un commento dentro una task: apro la sua discussione */
-  if((n.tipo==='commento' || (n.tipo==='menzione' && d.dove!=='chat')) && d.task && pr.subs.some(x=>x.id===d.task)){
+  if((n.tipo==='commento' || n.tipo==='risposta' || (n.tipo==='menzione' && d.dove!=='chat')) && d.task && pr.subs.some(x=>x.id===d.task)){
     apriCommenti(pr.id, d.task, d.voce || null);
     return true;
   }
@@ -9572,7 +9574,7 @@ function cartaModelli(){
    Come si fa tutto, capitolo per capitolo: dai primi passi alle cose per chi
    organizza un team. Si cerca per parola (anche senza accenti); in fondo c'e'
    il tasto per segnalare quello che manca o non funziona. */
-const VERSIONE = 'v53';
+const VERSIONE = 'v54';
 const LIVELLI_GUIDA = {base:'Per cominciare', medio:'Tutti i giorni', esperto:'Per chi organizza', aiuto:'Se qualcosa non va'};
 const GUIDA = [
 {id:'primi-passi', liv:'base', ic:'spark', t:'Primi passi', s:'Cos’è FOSS e come ci si muove', v:[
