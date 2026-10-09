@@ -758,6 +758,8 @@ input,textarea,select{font:inherit;color:inherit}
 .busta{width:34px;height:34px;border-radius:var(--r-m);border:1px solid var(--line);color:var(--mute);background:transparent;display:grid;place-items:center;flex:none;cursor:pointer}
 .busta svg{width:16px;height:16px}
 .busta.on{background:var(--amber-soft);border-color:var(--amber);color:var(--amber-ink)}
+.busta.spenta{opacity:.55}
+.busta.spenta:hover{opacity:1;color:var(--text)}
 .busta[hidden]{display:none!important}
 .cm-riga .busta{width:38px;height:38px}
 #bustaEsito{position:fixed;left:50%;bottom:calc(22px + env(safe-area-inset-bottom));transform:translateX(-50%);z-index:9999;display:flex;gap:8px;align-items:center;
@@ -2008,6 +2010,12 @@ a.btn.primary{color:var(--on-amber)}
 .cm-msg .tx{font-size:13.5px;line-height:1.5;color:var(--text);margin-top:3px;white-space:pre-wrap;overflow-wrap:anywhere}
 .cm-msg .tx a{color:var(--amber-ink);text-decoration:underline;text-underline-offset:2px;word-break:break-all}
 .cm-msg.mio .hd b{color:var(--amber-ink)}
+.cm-ok{display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin-top:6px}
+.cm-ok-b{display:inline-flex;align-items:center;gap:5px;height:26px;padding:0 10px;border-radius:13px;border:1px solid var(--line);background:var(--surface-2);color:var(--dim);font-size:12px;font-weight:600}
+.cm-ok-b:hover{border-color:var(--amber);color:var(--text)}
+.cm-ok-b.on{background:var(--amber-soft);border-color:color-mix(in srgb,var(--amber) 55%,transparent);color:var(--amber-ink)}
+.cm-ok-chi{font-size:11.5px;color:var(--mute)}
+@media (hover:none){ .cm-ok-b{height:32px;padding:0 12px;border-radius:16px} }
 .cm-sep{display:flex;align-items:center;gap:10px;color:var(--alert);font-size:10.5px;font-weight:700;letter-spacing:.12em;text-transform:uppercase;font-family:Sora}
 .cm-sep::before,.cm-sep::after{content:"";flex:1;height:1px;background:var(--alert);opacity:.4}
 .cm-file{display:flex;flex-direction:column;gap:6px;margin-top:7px;max-width:340px;padding:8px;border-radius:var(--r-m);border:1px solid var(--line);background:var(--surface-2);text-align:left;width:100%}
@@ -2381,6 +2389,8 @@ a.btn.primary{color:var(--on-amber)}
 .pf-avanzate[open] summary svg:last-child{transform:rotate(180deg)}
 .pf-avanzate[open] summary{margin-bottom:10px}
 .mt-r[role="button"]{cursor:pointer}
+.rich-cosa{margin:4px 0 0;padding-left:18px;color:var(--dim);font-size:13.5px;line-height:1.55}
+.tm-cerca-r.attesa .av-vuoto{color:var(--amber-ink)}
 .mt-r .mt-piu{display:grid;place-items:center;color:var(--mute)}
 .mt-r .mt-piu svg{width:16px;height:16px}
 /* v48: meno rumore sulle righe delle subtask (su computer i controlli vuoti compaiono passandoci sopra) */
@@ -5719,7 +5729,7 @@ const SOLO_ADMIN = ['ruolo-team','iv-aggiungi','tm-cerca','tm-aggiungi','tm-cerc
 const PERM_AZIONE = {
   'nuovo':'crea_lavori','nl-crea':'crea_lavori','duplica':'crea_lavori',
   'salva-modello-apri':'crea_lavori','salva-modello':'crea_lavori','togli-modello':'crea_lavori','togli-modello-ok':'crea_lavori',
-  'cm-invia':'modifica',
+  'cm-invia':'modifica', 'cm-letto':'spunta',
   'pe-nuovo':'crea_lavori','pe-importa':'crea_lavori','pe-salva':'crea_lavori','pe-elimina':'crea_lavori','pe-usa':'crea_lavori',
   'conti':'soldi','conti-prev':'soldi-scrive','conti-add':'soldi-scrive','conti-togli':'soldi-scrive',
   'data-nuova':'modifica','data-salva':'modifica',
@@ -7655,10 +7665,10 @@ function esitoInvitoHTML(es){
   if(es.tipo === 'iscritto'){
     const u = es.u || {};
     return '<div class="iv-esito info"><span class="av-vuoto">'+svg('user',2)+'</span><span><b>'+esc(u.nome||es.email)+' è già su FOSS</b><br>'+
-      (u.gia ? 'Ed è già nel tuo team.' : 'Non serve l’invito: puoi aggiungerla subito ai collaboratori.')+'</span>'+
-      (u.gia ? '' : '<button class="btn primary sm" data-action="iv-aggiungi">'+svg('plus',2.4)+'Aggiungi al team</button>')+'</div>';
+      (u.gia ? 'Ed è già nel tuo team.' : 'Non serve l’invito: le mandi una richiesta ed entra nel tuo team quando accetta.')+'</span>'+
+      (u.gia ? '' : '<button class="btn primary sm" data-action="iv-aggiungi">'+svg('send',2.2)+'Chiedi di entrare</button>')+'</div>';
   }
-  if(es.tipo === 'aggiunto') return '<div class="iv-esito ok">'+svg('check',2.6)+'<span><b>'+esc((es.u||{}).nome||es.email)+' ora è nel tuo team.</b><br>Aprigli i lavori dalla scheda del progetto.</span></div>';
+  if(es.tipo === 'aggiunto') return '<div class="iv-esito ok">'+svg('check',2.6)+'<span><b>Richiesta inviata a '+esc((es.u||{}).nome||es.email)+'.</b><br>Entra nel tuo team quando accetta: te lo dice la campanella.</span></div>';
   return '<div class="iv-esito ko">'+svg('x',2.6)+'<span><b>Invito non partito</b><br>'+esc(es.testo||'')+'</span></div>';
 }
 const ERR_INVITO = {
@@ -7891,18 +7901,25 @@ function renderTeam(){
   /* chi e' gia' su FOSS: lo cerco per email e lo aggiungo */
   if(admin){
     const c = state.tmCerca || {};
-    h += '<section class="tm-cerca"><div class="tx"><b>' + svg('cerca', 2) + 'È già su FOSS?</b><span>Scrivi la sua email: se ha già un account lo aggiungi subito al tuo team.</span></div>' +
+    h += '<section class="tm-cerca"><div class="tx"><b>' + svg('cerca', 2) + 'È già su FOSS?</b><span>Scrivi la sua email: se ha già un account gli mandi una richiesta, ed entra nel tuo team quando accetta.</span></div>' +
       '<div class="tm-cerca-f"><input id="tm_cerca" type="email" inputmode="email" autocomplete="off" placeholder="nome@studio.it" maxlength="120" value="' + esc(c.q || '') + '">' +
       '<button class="btn" data-action="tm-cerca">' + svg('cerca') + 'Cerca</button></div>';
     if(c.esito === 'trovato' && c.u){
       h += '<div class="tm-cerca-r"><span class="av-vuoto">' + svg('user', 2) + '</span><span class="tx2"><b>' + esc(c.u.nome) + '</b><span>' + esc(c.q) + (c.u.ruolo ? ' · ' + esc(c.u.ruolo) : '') + '</span></span>' +
         (c.u.gia ? '<span class="chip ok">' + svg('check', 2.6) + 'È già nel tuo team</span>'
-                 : '<button class="btn primary sm" data-action="tm-aggiungi">' + svg('plus', 2.4) + 'Aggiungi ai collaboratori</button>') + '</div>';
+                 : '<button class="btn primary sm" data-action="tm-aggiungi">' + svg('send', 2.2) + 'Chiedi di entrare nel team</button>') + '</div>';
     } else if(c.esito === 'aggiunto' && c.u){
-      h += '<div class="tm-cerca-r ok">' + svg('check', 2.6) + '<span><b>' + esc(c.u.nome) + '</b> ora è nel tuo team. Aprigli i lavori dalla scheda del progetto.</span></div>';
+      h += '<div class="tm-cerca-r ok">' + svg('check', 2.6) + '<span>Richiesta inviata a <b>' + esc(c.u.nome) + '</b>: entra nel tuo team quando accetta. Te lo dice la campanella.</span></div>';
     } else if(c.esito === 'nessuno'){
       h += '<div class="tm-cerca-r no">' + svg('x', 2.4) + '<span><b>' + esc(c.q) + '</b> non è ancora su FOSS.</span>' +
         '<button class="btn sm" data-action="tm-cerca-invita">' + svg('send') + 'Invitalo</button></div>';
+    }
+    if(typeof richiesteInviate !== 'undefined'){
+      if(richiesteInviate === null && typeof caricaRichiesteInviate === 'function'){ richiesteInviate = []; caricaRichiesteInviate(); }
+      (richiesteInviate || []).forEach(r=>{
+        h += '<div class="tm-cerca-r attesa"><span class="av-vuoto">' + svg('clock', 2) + '</span><span class="tx2"><b>' + esc(r.nome) + '</b><span>Richiesta di entrare nel team · in attesa di risposta</span></span>' +
+          '<button class="btn sm ghost" data-action="tm-annulla-rich" data-id="' + esc(r.id) + '">Annulla</button></div>';
+      });
     }
     h += '</section>';
   }
@@ -8355,7 +8372,7 @@ function renderInvito(){
 /* Quelle degli altri arrivano dal database (una riga per chi le riceve);
    quelle delle mie azioni restano qui, come promemoria, e non accendono niente. */
 const IC_NOTIFICA = {assegnata:'user', taggato:'users', menzione:'tag', commento:'chat', chat:'chat', fase:'spark',
-  consegnato:'check', aperto:'users', cliente:'review', segnalazione:'bandiera'};
+  consegnato:'check', aperto:'users', cliente:'review', segnalazione:'bandiera', richiesta_team:'users', richiesta_esito:'users'};
 const NOTIFICA_FORTE = {assegnata:1, taggato:1, menzione:1, aperto:1, cliente:1};
 function testoNotifica(tipo, d){
   d = d || {};
@@ -8374,6 +8391,8 @@ function testoNotifica(tipo, d){
     case 'cliente':   return '<b>'+esc(d.nome || 'Il cliente')+'</b> '+(d.esito==='ok'
                         ? 'ha approvato'+(d.fase_nome? ' '+cit(d.fase_nome) : '')
                         : 'chiede delle modifiche'+(d.testo? ': '+cit(d.testo) : ''))+pr;
+    case 'richiesta_team': return chi+' ti chiede di entrare nel suo team'+(d.team? ' '+cit(d.team) : '')+'. Tocca per rispondere.';
+    case 'richiesta_esito': return chi+(d.esito==='ok' ? ' è entrato nel tuo team' : ' non ha accettato di entrare nel tuo team');
     case 'segnalazione': return chi+' ha mandato una segnalazione ('+esc(((TIPI_SEGN[d.esito]||{}).corto || 'nuova').toLowerCase())+'): '+cit(d.testo);
   }
   return chi+pr;
@@ -8398,6 +8417,8 @@ function unisciNotifiche(dalDb, locali){
 function arrivaNotifica(r, appenaNata){
   if(!r || r.tipo === 'prova') return;           // l'avviso di prova vive solo sul telefono
   if(r.tipo === 'segnalazione' && appenaNata && Array.isArray(segnRicevute)) caricaSegnalazioni();
+  if(r.tipo === 'richiesta_team' && appenaNata && typeof controllaRichieste === 'function') setTimeout(controllaRichieste, 300);
+  if(r.tipo === 'richiesta_esito' && appenaNata && typeof caricaRichiesteInviate === 'function'){ caricaRichiesteInviate(); if(r.dati && r.dati.esito === 'ok' && typeof aggiornaDaCloud === 'function') setTimeout(aggiornaDaCloud, 600); }
   const n = notificaDaRiga(r);
   const i = state.notifiche.findIndex(x=>x.db===r.id);
   if(i >= 0) state.notifiche.splice(i, 1);
@@ -8419,6 +8440,8 @@ function apriNotifica(n){
   n.nuova = false; state.drawer = false;
   if(n.db && typeof segnaLetteCloud === 'function') segnaLetteCloud([n.db]);
   if(n.tipo === 'segnalazione'){ apriGuida('segnalazioni'); return true; }    // non sta in un lavoro: va nella guida
+  if(n.tipo === 'richiesta_team'){ render(); if(typeof controllaRichieste === 'function'){ richiesteMostrate = {}; controllaRichieste(); } return true; }
+  if(n.tipo === 'richiesta_esito'){ state.schermo = 'team'; render(); return true; }
   const pr = state.progetti.find(x=>x.id===n.p);
   if(!pr){ render(); return false; }
   const d = n.dati || {};
@@ -8765,6 +8788,18 @@ function renderGateConferma(){
     '<span class="chip">'+(sb?'connesso al database':'modalità locale')+'</span>';
 }
 
+/* v52: qualcuno mi chiede di entrare nel suo team: decido io */
+function modaleRichiesta(r){
+  modale('<h3>Entrare nel team di '+esc(r.chi)+'?</h3>'+
+    '<div class="sub-t"><b>'+esc(r.chi)+'</b> ti ha chiesto di entrare nel suo team'+(r.team ? ' «'+esc(r.team)+'»' : '')+' su FOSS.</div>'+
+    '<div class="modal-b"><ul class="rich-cosa">'+
+      '<li>Se accetti, vedi i lavori che ti apre e ricevi le sue notifiche.</li>'+
+      '<li>Lui vede il tuo nome, la tua foto e la tua email.</li>'+
+      '<li>Il tuo archivio resta tuo: nei tuoi lavori non entra.</li>'+
+      '<li>Puoi uscire dal team quando vuoi chiedendolo a lui.</li></ul></div>'+
+    '<div class="modal-f"><button class="btn ghost" data-action="rich-rispondi" data-si="0" data-id="'+esc(r.id)+'">Rifiuta</button>'+
+    '<button class="btn primary" data-action="rich-rispondi" data-si="1" data-id="'+esc(r.id)+'" data-chi="'+esc(r.chi)+'">Accetta</button></div>');
+}
 function modale(html, classe){
   el('modalSlot').innerHTML = '<div class="modal'+(classe?' '+classe:'')+'" id="modal">'+html+'</div>';
   el('scrim').classList.add('on');
@@ -9537,7 +9572,7 @@ function cartaModelli(){
    Come si fa tutto, capitolo per capitolo: dai primi passi alle cose per chi
    organizza un team. Si cerca per parola (anche senza accenti); in fondo c'e'
    il tasto per segnalare quello che manca o non funziona. */
-const VERSIONE = 'v51';
+const VERSIONE = 'v53';
 const LIVELLI_GUIDA = {base:'Per cominciare', medio:'Tutti i giorni', esperto:'Per chi organizza', aiuto:'Se qualcosa non va'};
 const GUIDA = [
 {id:'primi-passi', liv:'base', ic:'spark', t:'Primi passi', s:'Cos’è FOSS e come ci si muove', v:[
@@ -9969,6 +10004,7 @@ function scegliMenz(id){
   chiudiMenz();
   ta.focus(); try{ ta.setSelectionRange(c, c); }catch(e){}
   ta.dispatchEvent(new Event('input', {bubbles:true}));
+  if(busta['_' + ta.id]){ busta['_' + ta.id] = false; aggiornaBusta(ta); }
 }
 document.addEventListener('keydown', function(e){
   if(!menz || e.target !== menz.ta) return;
@@ -9997,11 +10033,13 @@ function aggiornaBusta(ta){
   if(!ta) return;
   const b = document.querySelector('.busta[data-per="' + ta.id + '"]'); if(!b) return;
   const chi = cloudAttivo() ? taggatiNelTesto(ta.value) : [];
-  if(!chi.length) busta[ta.id] = false;
-  b.hidden = !chi.length;
-  const on = !!busta[ta.id];
-  b.classList.toggle('on', on); b.setAttribute('aria-pressed', on);
-  b.title = on ? 'Riceverà anche una email: ' + chi.map(primoNome).join(', ') : 'Avvisa anche via email';
+  /* sempre visibile: senza un @nome nel testo e' spenta, e toccandola si sceglie chi avvisare */
+  b.hidden = !cloudAttivo();
+  if(!chi.length && !busta['_' + ta.id]) busta[ta.id] = false;
+  const on = !!busta[ta.id] && chi.length > 0;
+  b.classList.toggle('on', on); b.classList.toggle('spenta', !chi.length); b.setAttribute('aria-pressed', on);
+  b.title = on ? 'Riceverà anche una email: ' + chi.map(primoNome).join(', ')
+       : chi.length ? 'Avvisa anche via email' : 'Avvisa qualcuno anche via email: tocca e scegli chi';
 }
 function esitoBusta(html, tipo, ms){
   let b = el('bustaEsito');
@@ -10148,7 +10186,35 @@ function msgCommento(m, primoNuovo){
     '<div class="cm-msg' + (mio ? ' mio' : '') + '" data-mid="' + esc(m.id || '') + '">' + av(u) +
     '<div class="bd"><div class="hd"><b>' + esc(u.nome) + '</b>' + (u.ruolo ? '<span class="ru">' + esc(u.ruolo) + '</span>' : '') +
       '<span class="ts" title="' + esc(new Date(tempoMsg(m)).toLocaleString('it-IT')) + '">' + esc(quandoBreve({t:tempoMsg(m)})) + '</span></div>' +
-      (m.tx ? '<div class="tx">' + menzioni(linkifica(sicuro(m.tx))) + '</div>' : '') + fileHTML(m) + '</div></div>';
+      (m.tx ? '<div class="tx">' + menzioni(linkifica(sicuro(m.tx))) + '</div>' : '') + fileHTML(m) + rigaLetto(m, mio) + '</div></div>';
+}
+/* «Letto 👍🏻»: chi riceve il commento lascia traccia di averlo letto; chi l'ha scritto vede chi l'ha letto */
+function chiHaLetto(m){
+  const l = m && m.letti && typeof m.letti === 'object' ? m.letti : {};
+  return Object.keys(l).filter(id=>id !== m.u).sort((a, b)=>(+l[a] || 0) - (+l[b] || 0));
+}
+function puoSegnareLetto(){ return !state.ospite && (puo('modifica') || puo('spunta')); }
+function rigaLetto(m, mio){
+  if(!m.id) return '';
+  const chi = chiHaLetto(m), io = state.utente, ioLetto = chi.indexOf(io) >= 0;
+  const altri = chi.filter(id=>id !== io).map(id=>esc(autoreCommento(id).nome.split(' ')[0]));
+  let h = '';
+  if(!mio && puoSegnareLetto())
+    h += '<button class="cm-ok-b' + (ioLetto ? ' on' : '') + '" data-action="cm-letto" data-mid="' + esc(m.id) + '" aria-pressed="' + ioLetto + '" ' +
+      'title="' + (ioLetto ? 'Hai segnato che l’hai letto: tocca per togliere' : 'Segna che l’hai letto: chi l’ha scritto lo vede') + '">' +
+      (ioLetto ? '👍🏻 Letto' : 'Letto 👍🏻') + '</button>';
+  if(altri.length)
+    h += '<span class="cm-ok-chi">' + (mio ? '👍🏻 Letto da ' : (ioLetto ? 'Anche ' : '👍🏻 ')) + altri.join(', ') + (mio || ioLetto ? '' : (altri.length === 1 ? ' l’ha letto' : ' l’hanno letto')) + '</span>';
+  return h ? '<div class="cm-ok">' + h + '</div>' : '';
+}
+function segnaLettoCommento(mid){
+  const x = thrCorrente(); if(!x || !mid || !puoSegnareLetto()) return;
+  const m = x.lista.find(y=>y.id === mid); if(!m || m.u === state.utente) return;
+  const l = Object.assign({}, m.letti && typeof m.letti === 'object' ? m.letti : {});
+  if(l[state.utente]) delete l[state.utente]; else l[state.utente] = Date.now();
+  if(Object.keys(l).length) m.letti = l; else delete m.letti;
+  disegnaCommenti(false);
+  save();
 }
 function corpoCommenti(x){
   if(cm.tab === 'file'){
@@ -10212,12 +10278,13 @@ function disegnaCommenti(tutto){
       '</div>';
     document.body.appendChild(n);
     document.documentElement.classList.add('cm-aperto');
+    if(el('cm_tx')) aggiornaBusta(el('cm_tx'));
   }
   el('cmDove').textContent = p.nome + ' · ' + (F.nome || '') + (i ? ' · ' + s.titolo : '');
   el('cmTit').textContent = i ? i.t : s.titolo;
   el('cmTabs').innerHTML = tabs;
   const corpo = el('cmCorpo'), inFondo = corpo.scrollHeight - corpo.scrollTop - corpo.clientHeight < 60;
-  const firma = cm.tab + '|' + cm.letto0 + '|' + x.lista.map(m=>(m.id||'') + ':' + tempoMsg(m) + ':' + String(m.tx||'').length + ':' + m.u).join(',');
+  const firma = cm.tab + '|' + cm.letto0 + '|' + x.lista.map(m=>(m.id||'') + ':' + tempoMsg(m) + ':' + String(m.tx||'').length + ':' + m.u + ':' + chiHaLetto(m).join('.')).join(',');
   if(tutto || firma !== cm.firma){
     const prima = corpo.scrollTop;
     corpo.innerHTML = corpoCommenti(x);
@@ -10290,7 +10357,7 @@ async function inviaCommento(tasto){
   if(cm === mio){
     cm.file = null; cm.letto0 = m.t;
     if(t){ t.value = ''; t.style.height = ''; t.focus(); }
-    busta.cm_tx = false; aggiornaBusta(t);
+    busta.cm_tx = false; busta._cm_tx = false; aggiornaBusta(t);
     if(cm.tab !== 'commenti') cm.tab = 'commenti';
     disegnaCommenti(false);
     const c = el('cmCorpo'); if(c) c.scrollTop = c.scrollHeight;
@@ -11859,7 +11926,19 @@ document.addEventListener('click', function(e){
       render(); break; }
 
     case 'invia': inviaMessaggio(); break;
-    case 'busta':{ const k = t.dataset.per; busta[k] = !busta[k]; const ta = el(k); if(ta){ aggiornaBusta(ta); ta.focus(); } break; }
+    case 'busta':{
+      const k = t.dataset.per, ta = el(k); if(!ta) break;
+      if(!taggatiNelTesto(ta.value).length){
+        /* nessun @nome: scrivo @ e apro l'elenco; scelta la persona, la bustina e' gia' accesa */
+        const i = ta.selectionStart != null ? ta.selectionStart : ta.value.length, prima = ta.value.slice(0, i);
+        const ins = (prima && !/\s$/.test(prima) ? ' ' : '') + '@';
+        ta.value = prima + ins + ta.value.slice(i);
+        ta.focus(); try{ ta.setSelectionRange(i + ins.length, i + ins.length); }catch(e){}
+        busta[k] = true; busta['_' + k] = true;
+        aggiornaMenz(ta); aggiornaBusta(ta);
+        break;
+      }
+      busta[k] = !busta[k]; aggiornaBusta(ta); ta.focus(); break; }
 
     case 'notifiche':
       state.drawer = !state.drawer; render(); break;
@@ -11918,8 +11997,8 @@ document.addEventListener('click', function(e){
       const es = state.ivEsito; if(!es || !es.u || !es.u.id || typeof aggiungiCollaboratoreCloud !== 'function') break;
       t.disabled = true;
       aggiungiCollaboratoreCloud(es.u.id).then(ok=>{
-        if(ok){ state.ivEsito = {tipo:'aggiunto', email:es.email, u:es.u}; state.ivBozza = null; azione('<b>'+esc(es.u.nome||es.email)+'</b> aggiunto ai collaboratori'); }
-        else state.ivEsito = {tipo:'errore', email:es.email, testo:'Non sono riuscito ad aggiungerla. Riprova.'};
+        if(ok){ state.ivEsito = {tipo:'aggiunto', email:es.email, u:es.u}; state.ivBozza = null; azione('Richiesta di entrare nel team inviata a <b>'+esc(es.u.nome||es.email)+'</b>'); }
+        else state.ivEsito = {tipo:'errore', email:es.email, testo:'Non sono riuscito a mandare la richiesta. Riprova.'};
         render();
       });
       break; }
@@ -11996,6 +12075,7 @@ document.addEventListener('click', function(e){
     case 'cm-tab': if(cm){ cm.tab = t.dataset.t==='file' ? 'file' : 'commenti'; disegnaCommenti(false); } break;
     case 'cm-invia': inviaCommento(t); break;
     case 'cm-file': apriFileCommento(t); break;
+    case 'cm-letto': segnaLettoCommento(t.dataset.mid); break;
     case 'cm-togli-file': if(cm){ cm.file = null; mostraFilePronto(); } break;
     case 'cm-elimina':{
       apriCtx(ultimoPunto.x, ultimoPunto.y, 'Eliminare il commento?', [
@@ -12432,8 +12512,26 @@ document.addEventListener('click', function(e){
       const c = state.tmCerca; if(!c || !c.u || typeof aggiungiCollaboratoreCloud !== 'function') break;
       t.disabled = true;
       aggiungiCollaboratoreCloud(c.u.id).then(ok=>{
-        if(ok){ state.tmCerca = {q:c.q, esito:'aggiunto', u:c.u}; azione('<b>'+esc(c.u.nome)+'</b> aggiunto ai collaboratori'); }
+        if(ok){ state.tmCerca = {q:c.q, esito:'aggiunto', u:c.u}; azione('Richiesta di entrare nel team inviata a <b>'+esc(c.u.nome)+'</b>'); }
         render();
+      });
+      break; }
+    case 'tm-annulla-rich':{
+      if(typeof annullaRichiestaCloud !== 'function') break;
+      t.disabled = true;
+      annullaRichiestaCloud(t.dataset.id).then(ok=>{ if(!ok) toast('Richiesta non annullata. Riprova.','warn','Team'); render(); });
+      break; }
+    case 'rich-rispondi':{
+      if(typeof rispondiRichiestaCloud !== 'function') break;
+      const si = t.dataset.si === '1', box = t.closest('.modal');
+      if(box) box.querySelectorAll('button').forEach(b=>{ b.disabled = true; });
+      t.textContent = si ? 'Entro…' : '…';
+      rispondiRichiestaCloud(t.dataset.id, si).then(ok=>{
+        chiudiModale();
+        if(!ok){ toast('La richiesta non è più valida: forse è stata annullata.','warn','Team'); render(); return; }
+        if(si) azione('Sei entrato nel team di <b>'+esc(t.dataset.chi||'')+'</b>');
+        render();
+        if(typeof controllaRichieste === 'function') setTimeout(controllaRichieste, 400);
       });
       break; }
     case 'tm-cerca-invita':{
@@ -12546,7 +12644,7 @@ function inviaMessaggio(){
   const tx = c.value.trim(); if(!tx){ toast('Scrivi qualcosa prima di inviare.','warn'); return; }
   const m = {u:state.utente, tx:esc(tx).replace(/\b(\d{2}:\d{2}:\d{2}:\d{2})\b/g,'<code>$1</code>'), t:Date.now()};
   const avvisa = busta.composer ? taggatiNelTesto(tx).map(u=>u.id) : [];
-  busta.composer = false;
+  busta.composer = false; busta._composer = false;
   p.chat.push(m);
   p.visti.chat = p.chat.length;
   p.draft=''; c.value='';
@@ -14553,6 +14651,7 @@ async function caricaNotifiche(){
   if(error){ console.warn('notifiche:', error.message); return; }
   /* l'avviso di prova serve solo al telefono: nella campanella non entra */
   state.notifiche = unisciNotifiche((data||[]).filter(r=>r.tipo!=='prova').map(notificaDaRiga), state.notifiche || []);
+  setTimeout(controllaRichieste, 800);
 }
 function segnaLetteCloud(ids){
   if(!sb || !utenteCloud) return;
@@ -14986,17 +15085,46 @@ async function cercaUtenteCloud(email){
   if(error) return {errore:error.message};
   return {trovato:(data||[])[0] || null};
 }
+/* v52: chi e' gia' su FOSS non entra piu' da solo nel team: riceve una richiesta e la accetta */
 async function aggiungiCollaboratoreCloud(id){
   if(!sb || !utenteCloud || !orgMia) return false;
   const {data, error} = await sb.rpc('aggiungi_collaboratore', {p_utente:id});
-  if(error || !data){ toast((error && error.message) || 'Non aggiunto.','warn','Collaboratore'); return false; }
-  const {data:u} = await sb.from('profili').select('*').eq('id', id).maybeSingle();
-  if(u && !state.utenti.some(x=>x.id===u.id)){
-    state.utenti.push({id:u.id, nome:(u.nickname||((u.nome||'')+' '+(u.cognome||'')).trim()||u.email),
-      ini:((u.nome||u.email||'?')[0]+(u.cognome?u.cognome[0]:'')).toUpperCase(),
-      ruolo:u.ruolo||'Collaboratore', col:COL(state.utenti.length), foto:u.foto_url||null, email:u.email||''});
-  }
-  state.permessi[id] = state.permessi[id] || {};
+  if(error || !data){ toast(/troppe/.test((error && error.message) || '') ? 'Oggi hai mandato troppe richieste: riprova domani.' : 'Richiesta non inviata. Riprova.','warn','Collaboratore'); return false; }
+  richiesteInviate = null; caricaRichiesteInviate();
+  return true;
+}
+let richiesteInviate = null;
+async function caricaRichiesteInviate(){
+  if(!sb || !utenteCloud) return;
+  const {data, error} = await sb.rpc('richieste_inviate');
+  if(error) return;
+  richiesteInviate = data || [];
+  if(state.schermo === 'team') render();
+}
+async function annullaRichiestaCloud(id){
+  if(!sb || !utenteCloud) return false;
+  const {data, error} = await sb.rpc('annulla_richiesta', {p_id:id});
+  if(error || !data) return false;
+  richiesteInviate = (richiesteInviate || []).filter(r=>r.id !== id);
+  return true;
+}
+/* le richieste per me: compaiono in una finestra appena entro (e quando ne arriva una) */
+let richiesteMostrate = {};
+async function controllaRichieste(){
+  if(!sb || !utenteCloud || state.schermo === 'gate' || state.schermo === 'cliente') return;
+  const {data, error} = await sb.rpc('richieste_mie');
+  if(error || !Array.isArray(data)) return;
+  const r = data.find(x=>!richiesteMostrate[x.id]);
+  if(!r || el('modal')) return;
+  richiesteMostrate[r.id] = true;
+  modaleRichiesta(r);
+}
+async function rispondiRichiestaCloud(id, si){
+  if(!sb || !utenteCloud) return false;
+  const {data, error} = await sb.rpc('rispondi_richiesta', {p_id:id, p_accetta:!!si});
+  if(error || !data) return false;
+  if(si){ cloudPronto = false; await caricaCloud(); }
+  await caricaNotifiche();
   return true;
 }
 async function salvaPermessiCloud(uid, pm){
