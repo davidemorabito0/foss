@@ -5,6 +5,17 @@
 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover">
 <meta name="description" content="FOSS — gestionale di produzione: dal brief alla consegna.">
 <meta name="theme-color" content="#0D1926">
+<script>
+/* FOSS ora sta su foss.team. Dal vecchio indirizzo (GitHub Pages) si passa li',
+   tenendo il resto del link (inviti, notifiche, link del calendario). Si passa
+   solo se foss.team risponde: finche' non e' pronto, si resta qui. */
+(function(){
+  if(!/\.github\.io$/i.test(location.hostname)) return;
+  var dove = 'https://foss.team/' + location.search + location.hash;
+  fetch('https://foss.team/manifest.json', {mode:'no-cors', cache:'no-store'})
+    .then(function(){ location.replace(dove); }, function(){});
+})();
+</script>
 <title>FOSS</title>
 <link rel="manifest" href="manifest.json">
 <link rel="icon" href="favicon.ico?v=45" sizes="48x48">
@@ -7706,6 +7717,7 @@ async function mandaInvito(inv){
     state.ivEsito = {tipo:'iscritto', email:inv.email, u:r.utente || {}};
   } else {
     state.ivEsito = {tipo:'errore', email:inv.email, testo:testoErrInvito((r && r.errore) || 'rete')};
+    if(typeof segnalaErrore === 'function' && ['invio', 'chiave', 'stato'].indexOf(r && r.errore) >= 0) segnalaErrore('invito', r.errore, '');
   }
   render();
 }
@@ -8312,7 +8324,7 @@ function renderInvito(){
       ? '<div class="field" style="margin-bottom:11px"><label>La tua email</label>'+
           '<input id="in_mail" type="email" placeholder="nome@email.it" autocomplete="username"></div>'+
         '<div class="field" style="margin-bottom:11px"><label>Scegli una password</label>'+
-          '<input id="in_pw" type="password" placeholder="Almeno 6 caratteri" autocomplete="new-password"></div>'+
+          '<input id="in_pw" type="password" placeholder="Almeno 8 caratteri" autocomplete="new-password"></div>'+
         '<div class="field" style="margin-bottom:16px"><label>Ripeti la password</label>'+
           '<input id="in_pw2" type="password" autocomplete="new-password"></div>'+
         '<button class="btn primary" data-action="crea-invito" id="gateBtn">Entra e salva la password</button>'+
@@ -8723,7 +8735,7 @@ function renderGate(){
         '<datalist id="gRuoli">'+RUOLI_SUGGERITI.map(r=>'<option value="'+esc(r)+'">').join('')+'</datalist></div>'
       : '')+
     '<div class="field" style="margin-bottom:11px"><label>Email</label><input id="g_mail" type="email" autocomplete="username" placeholder="nome@studio.it" value="'+esc(reg ? (state.regMail||'') : (state.loginMail||''))+'"></div>'+
-    '<div class="field" style="margin-bottom:16px"><label>Password</label><input id="g_pw" type="password" autocomplete="'+(reg?'new-password':'current-password')+'" placeholder="'+(reg?'Almeno 6 caratteri':'')+'"></div>'+
+    '<div class="field" style="margin-bottom:16px"><label>Password</label><input id="g_pw" type="password" autocomplete="'+(reg?'new-password':'current-password')+'" placeholder="'+(reg?'Almeno 8 caratteri':'')+'"></div>'+
     '<button class="btn primary" data-action="'+(reg?'crea-account':'login')+'" id="gateBtn">'+(reg?'Crea il profilo':'Entra')+'</button>'+
     '<div class="switch">'+(reg
       ? 'Hai gi\u00e0 un account? <button data-action="modo-login">Accedi</button>'
@@ -9525,7 +9537,7 @@ function cartaModelli(){
    Come si fa tutto, capitolo per capitolo: dai primi passi alle cose per chi
    organizza un team. Si cerca per parola (anche senza accenti); in fondo c'e'
    il tasto per segnalare quello che manca o non funziona. */
-const VERSIONE = 'v49';
+const VERSIONE = 'v51';
 const LIVELLI_GUIDA = {base:'Per cominciare', medio:'Tutti i giorni', esperto:'Per chi organizza', aiuto:'Se qualcosa non va'};
 const GUIDA = [
 {id:'primi-passi', liv:'base', ic:'spark', t:'Primi passi', s:'Cos’è FOSS e come ci si muove', v:[
@@ -10009,7 +10021,10 @@ async function mandaBusta(pid, ids){
   if(Array.isArray(r.inviate) && r.inviate.length)
     esitoBusta(svg('check', 3) + '<span>Email inviata a <b>' + esc(nomi(r.inviate)) + '</b>' +
       (r.saltate && r.saltate.length ? ' · a ' + esc(nomi(r.saltate)) + ' no' : '') + '</span>', 'ok', 4500);
-  else esitoBusta(svg('x', 2.6) + '<span>' + esc(ERR_BUSTA[r.errore] || 'Email non partita: la notifica è arrivata comunque.') + '</span>', 'ko', 7000);
+  else {
+    esitoBusta(svg('x', 2.6) + '<span>' + esc(ERR_BUSTA[r.errore] || 'Email non partita: la notifica è arrivata comunque.') + '</span>', 'ko', 7000);
+    if(typeof segnalaErrore === 'function' && ['troppi', 'offline', 'rete'].indexOf(r.errore) < 0) segnalaErrore('email bustina', r.errore || 'nessuna email inviata', JSON.stringify(r).slice(0, 300));
+  }
 }
 /* la bozza dell'invito sopravvive ai ridisegni (anteprima, altre azioni) */
 document.addEventListener('input', function(e){ const k = {iv_mail:'email', iv_nome:'nome', iv_ruolo:'ruolo', iv_msg:'messaggio'}[e.target.id]; if(k){ state.ivBozza = state.ivBozza || {}; state.ivBozza[k] = e.target.value; aggiornaAnteprimaLive(); } }, true);
@@ -12325,7 +12340,7 @@ document.addEventListener('click', function(e){
       const mail = (el('in_mail').value||'').trim();
       const pw = el('in_pw').value, pw2 = el('in_pw2').value;
       if(!mail){ toast('Serve la tua email.','warn','Campo mancante'); break; }
-      if(pw.length<6){ toast('Almeno 6 caratteri.','warn','Password corta'); break; }
+      if(pw.length<8){ toast('Almeno 8 caratteri.','warn','Password corta'); break; }
       if(pw!==pw2){ toast('Le due password non coincidono.','warn','Controlla'); break; }
       const b = el('gateBtn'); b.disabled = true; b.textContent = 'Creo il profilo…';
       const invito = state.invitoScelto;
@@ -12347,7 +12362,7 @@ document.addEventListener('click', function(e){
         codice: state.regInvito ? (state.regCodice||'') : ''
       };
       if(!nuovo.email){ toast('Scrivi la tua email.','warn','Manca l’email'); b.disabled = false; b.textContent = 'Crea il profilo'; break; }
-      if((nuovo.pw||'').length < 6){ toast('La password deve avere almeno 6 caratteri.','warn','Password corta'); b.disabled = false; b.textContent = 'Crea il profilo'; break; }
+      if((nuovo.pw||'').length < 8){ toast('La password deve avere almeno 8 caratteri.','warn','Password corta'); b.disabled = false; b.textContent = 'Crea il profilo'; break; }
       (uscita || Promise.resolve()).then(()=>registraCloud(nuovo)).then(ok=>{
         if(ok === true){ state.schermo='spazi'; state.regInvito = false;
                 try{ if(/^#\/registrati/.test(location.hash)) history.replaceState(null, '', location.pathname + location.search); }catch(e){}
@@ -13609,7 +13624,7 @@ function erroreAccesso(error){
   if(/not confirmed/.test(m)) return 'conferma';
   if(/invalid login|invalid credentials/.test(m)) return 'Email o password sbagliate. Controlla e riprova.';
   if(/already registered|already been registered|already exists/.test(m)) return 'esiste';
-  if(/password.*(at least|characters|short|weak)/.test(m)) return 'La password \u00e8 troppo corta o debole: almeno 6 caratteri.';
+  if(/password.*(at least|characters|short|weak)/.test(m)) return 'La password \u00e8 troppo corta o debole: almeno 8 caratteri.';
   if(/rate limit|too many|security purposes/.test(m)) return 'Troppi tentativi ravvicinati. Aspetta un minuto e riprova.';
   if(/invalid.*email|email.*invalid|unable to validate email/.test(m)) return 'Questa email non sembra scritta bene.';
   if(/fetch|network|failed to/.test(m)) return 'Non riesco a collegarmi. Controlla la connessione e riprova.';
@@ -13632,7 +13647,33 @@ async function entraCloud(email, pw){
   }
   utenteCloud = data.user; await caricaCloud(); return true;
 }
+/* v50: password sicure. Almeno 8 caratteri, non l'email, non banali, e non una di quelle
+   gia' finite in furti di dati (controllo anonimo: al servizio arrivano solo 5 lettere
+   dell'impronta della password, mai la password). Se il controllo non risponde, si va avanti. */
+function passwordDebole(pw, email){
+  pw = String(pw || '');
+  if(pw.length < 8) return 'La password deve avere almeno 8 caratteri.';
+  const nome = String(email || '').split('@')[0].toLowerCase();
+  if(nome.length >= 4 && pw.toLowerCase().indexOf(nome) >= 0) return 'La password non deve contenere la tua email.';
+  if(/^(.)\1+$/.test(pw) || /^(0?12345678|password|qwertyui|abcdefgh)/i.test(pw)) return 'Questa password è troppo facile da indovinare.';
+  return '';
+}
+async function passwordRubata(pw){
+  try{
+    const h = new Uint8Array(await crypto.subtle.digest('SHA-1', new TextEncoder().encode(pw)));
+    const hex = Array.from(h).map(b=>b.toString(16).padStart(2, '0')).join('').toUpperCase();
+    const ctrl = new AbortController(), t = setTimeout(()=>ctrl.abort(), 4000);
+    const r = await fetch('https://api.pwnedpasswords.com/range/' + hex.slice(0, 5), {headers:{'Add-Padding':'true'}, signal:ctrl.signal});
+    clearTimeout(t);
+    if(!r.ok) return false;
+    const resto = hex.slice(5);
+    return (await r.text()).split('\n').some(l=>{ const x = l.trim().split(':'); return x[0] === resto && +x[1] > 0; });
+  }catch(e){ return false; }
+}
 async function registraCloud(dati){
+  const debole = passwordDebole(dati.pw, dati.email);
+  if(debole){ toast(debole, 'warn', 'Password da cambiare'); return 'resta'; }
+  if(await passwordRubata(dati.pw)){ toast('Questa password è già comparsa in furti di dati su altri siti: scegline un’altra.', 'warn', 'Password non sicura'); return 'resta'; }
   /* dal link dell'invito: l'account nasce gia' confermato, si entra subito */
   if(dati.codice){
     const {data, error} = await sb.functions.invoke('registra-invitato', {body:{codice:dati.codice, email:dati.email, password:dati.pw,
@@ -13642,7 +13683,7 @@ async function registraCloud(dati){
       try{ if(error.context && typeof error.context.json === 'function'){ const j = await error.context.json(); if(j && j.errore) err = j.errore; } }catch(x){} }
     if(!err) return entraCloud(dati.email, dati.pw);
     if(err === 'esiste'){ giaIscritto(dati.email); return false; }
-    if(err === 'password'){ toast('La password \u00e8 troppo corta o debole: almeno 6 caratteri.','warn','Registrazione non riuscita'); return 'resta'; }
+    if(err === 'password'){ toast('La password \u00e8 troppo corta o debole: almeno 8 caratteri.','warn','Registrazione non riuscita'); return 'resta'; }
     /* codice scaduto o gia' usato, o email diversa: registrazione normale con la mail di conferma */
   }
   const {data, error} = await sb.auth.signUp({
@@ -14168,7 +14209,7 @@ async function sincronizza(){
     }
   }catch(e){ errori.push(e.message||'errore'); }
   inCorso = false;
-  if(errori.length) console.warn('sincronizzazione:', errori.join(' / '));
+  if(errori.length){ console.warn('sincronizzazione:', errori.join(' / ')); if(!errori.every(x=>/Failed to fetch|NetworkError|Load failed/i.test(x))) segnalaErrore('salvataggio', errori[0], errori.join(' / ')); }
   if(daRifare){ daRifare = false; sincronizza(); }
 }
 function salvaCloud(subito){
@@ -14899,6 +14940,30 @@ async function inviaInvitoCloud(corpo){
     return {errore:e};
   }catch(x){ return {errore:'rete'}; }
 }
+/* v50: REGISTRO DEGLI ERRORI. Quando qualcosa va storto a qualcuno resta una riga
+   nel pannello admin (dove, cosa, versione, dispositivo). Niente dati dei lavori. */
+const erroriMandati = {};
+function segnalaErrore(dove, messaggio, dettaglio){
+  try{
+    if(!sb || !utenteCloud) return;
+    const m = String(messaggio || '').slice(0, 300); if(!m) return;
+    const k = dove + '|' + m, ora = Date.now();
+    if(erroriMandati[k] && ora - erroriMandati[k] < 10 * 60000) return;
+    erroriMandati[k] = ora;
+    sb.rpc('segnala_errore', {p_dove:String(dove || '').slice(0, 120), p_messaggio:m, p_dettaglio:String(dettaglio || '').slice(0, 2000),
+      p_versione:(typeof VERSIONE !== 'undefined' ? VERSIONE : ''), p_dispositivo:(navigator.userAgent || '').slice(0, 200)}).then(()=>{}, ()=>{});
+  }catch(e){}
+}
+window.addEventListener('error', e=>{
+  if(!e || !e.message || /ResizeObserver|Script error/i.test(e.message)) return;
+  segnalaErrore('pagina', e.message, (e.filename || '').split('/').pop() + ':' + (e.lineno || '') + ' ' + ((e.error && e.error.stack) || '').slice(0, 1500));
+});
+window.addEventListener('unhandledrejection', e=>{
+  const r = e && e.reason; const m = (r && (r.message || String(r))) || '';
+  if(!m || /AbortError|Failed to fetch|NetworkError|Load failed/i.test(m)) return;
+  segnalaErrore('pagina (promessa)', m, ((r && r.stack) || '').slice(0, 1500));
+});
+
 /* v49: la bustina accesa. Prima il messaggio arriva al database (che crea la notifica
    «menzione»), poi il server la manda anche per email. Gli indirizzi li conosce solo lui. */
 async function avvisaEmailCloud(pid, ids){
@@ -14952,12 +15017,27 @@ async function togliProfiloCloud(id){
   if(error){ toast(error.message,'warn','Non eliminato'); return false; }
   return true;
 }
+/* v50: la foto profilo si rimpicciolisce prima di partire (512 px, JPEG): pesa ~50 KB invece di MB */
+async function fotoPiccola(file){
+  try{
+    if(!/^image\/(jpeg|png|webp|heic|heif)$/.test(file.type)) return null;
+    const img = await createImageBitmap(file);
+    const k = Math.min(1, 512 / Math.max(img.width, img.height));
+    const c = document.createElement('canvas'); c.width = Math.round(img.width * k); c.height = Math.round(img.height * k);
+    c.getContext('2d').drawImage(img, 0, 0, c.width, c.height);
+    const b = await new Promise(ok=>c.toBlob(ok, 'image/jpeg', 0.86));
+    return b && b.size < file.size ? b : null;
+  }catch(e){ return null; }
+}
 async function caricaAvatar(file){
   if(!sb || !utenteCloud) return null;
-  let est = (file.name.split('.').pop()||'jpg').toLowerCase();
-  if(!/^[a-z0-9]{1,5}$/.test(est)) est = 'jpg';
+  if(!/^image\//.test(file.type || '')){ toast('Scegli una foto (JPG, PNG o WebP).','warn','Foto non caricata'); return null; }
+  const piccola = await fotoPiccola(file);
+  let est = piccola ? 'jpg' : (file.name.split('.').pop()||'jpg').toLowerCase();
+  if(!/^(jpe?g|png|webp|gif|heic|heif)$/.test(est)) est = 'jpg';
+  if(!piccola && file.size > 5 * 1024 * 1024){ toast('La foto supera 5 MB: scegline una più leggera.','warn','Foto non caricata'); return null; }
   const percorso = utenteCloud.id+'/avatar.'+est;
-  const {error} = await sb.storage.from('avatar').upload(percorso, file, {upsert:true});
+  const {error} = await sb.storage.from('avatar').upload(percorso, piccola || file, {upsert:true, contentType: piccola ? 'image/jpeg' : file.type});
   if(error){ toast(error.message,'warn','Foto non caricata'); return null; }
   const {data} = sb.storage.from('avatar').getPublicUrl(percorso);
   return data.publicUrl + '?v=' + Date.now();
