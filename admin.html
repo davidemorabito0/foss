@@ -630,15 +630,15 @@ async function vistaErrori(){
 
 /* ---------- comunicazioni a tutti ---------- */
 const ESEMPIO = {
-  oggetto: 'FOSS ora è su foss.team',
+  oggetto: 'FOSS ha un nuovo indirizzo',
   etichetta: 'Novità',
   titolo: 'FOSS è diventato indipendente',
-  testo: 'Ciao {nome},\n\nda oggi FOSS ha un indirizzo tutto suo: **foss.team**.\n\n' +
-    'Il vecchio link funziona ancora e ti porta lì da solo, ma da adesso conviene usare quello nuovo: è più facile da ricordare, ' +
-    'il sito si apre più velocemente ed è ancora più protetto.\n\n' +
-    'La prima volta che apri foss.team ti chiederà di **accedere di nuovo** con la tua email e la tua password di sempre. ' +
-    'Non serve registrarsi: il tuo account e i tuoi lavori sono già lì.\n\n' +
-    'Se usavi FOSS dalla schermata Home del telefono, aggiungi di nuovo l’icona da foss.team e riattiva gli avvisi dal tuo profilo.',
+  testo: 'Ciao {nome},\n\nFOSS ora ha un indirizzo tutto suo: **foss.team**.\n\n' +
+    'Il vecchio link continua a funzionare e ti porta lì in automatico. Il nuovo è più corto, più facile da ricordare, ' +
+    'e il sito si apre più velocemente.\n\n' +
+    'La prima volta che apri foss.team dovrai rientrare nel tuo account, come quando cambi telefono. ' +
+    'Non serve una nuova registrazione: progetti e impostazioni sono già al loro posto.\n\n' +
+    'Se avevi FOSS sulla schermata Home del telefono, aggiungilo di nuovo da foss.team e riattiva gli avvisi dal tuo profilo.',
   tasto: 'Apri foss.team',
   url: 'https://foss.team',
   firma: 'Davide'
@@ -646,10 +646,10 @@ const ESEMPIO = {
 const CAMPI_COM = ['oggetto', 'etichetta', 'titolo', 'testo', 'tasto', 'url', 'firma'];
 function bozzaCom(){
   if(st.bozza) return st.bozza;
-  let b = null; try{ b = JSON.parse(localStorage.getItem('foss-admin-bozza') || 'null'); }catch(e){}
+  let b = null; try{ b = JSON.parse(localStorage.getItem('foss-admin-bozza2') || 'null'); }catch(e){}
   return st.bozza = Object.assign({}, ESEMPIO, b || {});
 }
-function salvaBozza(){ try{ localStorage.setItem('foss-admin-bozza', JSON.stringify(st.bozza)); }catch(e){} }
+function salvaBozza(){ try{ localStorage.setItem('foss-admin-bozza2', JSON.stringify(st.bozza)); }catch(e){} }
 async function vistaComunica(){
   const r = await chiedi('comunicazioni');
   st.dati.com = r;
