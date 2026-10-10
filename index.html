@@ -2421,6 +2421,14 @@ a.btn.primary{color:var(--on-amber)}
   .sub-h .cm-btn:not(.ha):not(.nuovi){opacity:0}
   .sub-h:hover .cm-btn{opacity:1}
 }
+.all-az{display:flex;flex-wrap:wrap;gap:8px}
+.all-az .agg-dato{margin-top:4px}
+.all-riga{gap:4px;padding-right:4px}
+.all-apri{display:flex;align-items:center;gap:8px;flex:1;min-width:0;background:none;border:0;padding:0;color:inherit;font:inherit;text-align:left;cursor:pointer}
+button.all-apri:hover .nm{color:var(--amber-ink);text-decoration:underline}
+.all-x{width:26px;height:26px;flex:none;opacity:.6}
+.all-x:hover{opacity:1}
+.all-err{font-size:12px;color:var(--alert);margin:0 0 8px}
 .agg-dato{display:inline-flex;align-items:center;gap:6px;margin-top:10px;padding:6px 10px;border-radius:9px;border:1px dashed var(--line);background:none;color:var(--dim);font:600 12.5px/1 inherit;cursor:pointer}
 .agg-dato svg{width:13px;height:13px}
 .agg-dato:hover{border-color:var(--amber);color:var(--text)}
@@ -4654,6 +4662,39 @@ function scadenza(p){
   if(g<=13) return {t:'Tra una settimana', c:'now'};
   return {t: d.getDate()+' '+MESI_BREVI[d.getMonth()] + (d.getFullYear()!==OGGI.getFullYear()? ' '+d.getFullYear():''), c:''};
 }
+/* allegati del lavoro (Note e allegati): stessi file e stesso archivio dei commenti */
+const allegaStato = {};       // pid -> {carico} mentre sale, {errore} se non e' partito: non si salva
+function puoAllegare(p){ return !!p && cloudAttivo() && typeof caricaAllegato === 'function' && !state.ospite && puo('modifica') && !isLock(p) && !p.completato; }
+async function allegaAlLavoro(pid, f){
+  const p = state.progetti.find(x=>x.id === pid); if(!p || !f || !puoAllegare(p)) return;
+  allegaStato[pid] = {carico:f.name || 'file'}; render();
+  try{
+    const a = await caricaAllegato(pid, f);
+    const q = state.progetti.find(x=>x.id === pid) || p;
+    q.allegati = (q.allegati || []).concat([{path:a.path, nome:a.nome, size:a.dim, tipo:a.tipo, u:state.utente, t:Date.now()}]);
+    delete allegaStato[pid];
+    if(typeof logEv === 'function') try{ logEv(q, 'Ha allegato «'+a.nome+'»'); }catch(e){}
+    save(); render();
+  } catch(e){
+    const m = String((e && e.message) || '');
+    allegaStato[pid] = {errore: /grand|size|413/i.test(m) ? 'Il file è troppo grande: il limite è 25 MB.' : 'Il file non è partito: controlla la connessione e riprova.'};
+    render();
+  }
+}
+function togliAllegatoLavoro(pid, i){
+  const p = state.progetti.find(x=>x.id === pid); if(!p || !puoAllegare(p)) return;
+  const a = (p.allegati || [])[+i]; if(!a || !(a.u === state.utente || adminQui(p) || !a.u)) return;
+  p.allegati = p.allegati.filter((_, j)=>j !== +i);
+  if(a.path && typeof togliAllegato === 'function') togliAllegato(a.path, p.id);
+  save(); render();
+}
+async function apriAllegatoLavoro(path){
+  if(!path || !cloudAttivo() || typeof linkAllegato !== 'function') return;
+  const w = window.open('about:blank', '_blank');
+  if(w) try{ w.opener = null; }catch(e){}
+  try{ const u = await linkAllegato(path); if(w && !w.closed) w.location.href = u; else location.assign(u); }
+  catch(e){ if(w && !w.closed) w.close(); const p = PROJ(); if(p){ allegaStato[p.id] = {errore:'Il file non si apre: forse è stato tolto, o non hai più accesso al lavoro.'}; render(); } }
+}
 function fmtSize(b){ return b>=1048576 ? (b/1048576).toFixed(1)+' MB' : Math.max(1,Math.round(b/1024))+' KB'; }
 function passaFiltro(p, f){
   if(!f) return true;
@@ -5326,10 +5367,22 @@ function renderProgetto(){
     '</div>';
   {
     h += '<div class="rail-sec editabile"><div class="lbl" style="display:flex;align-items:center;gap:4px">Note e allegati'+pen('proj','nota')+'</div>'+
-      (p.nota? '<div class="nota-box" style="margin-bottom:9px">'+sicuro(p.nota)+'</div>'
-             : '<button class="agg-dato" data-action="edit" data-t="proj" data-k="nota" data-pid="'+p.id+'">'+svg('plus',2.2)+'Scrivi una nota</button>')+
-      (p.allegati||[]).map(a=>'<div class="file" style="margin-bottom:6px"><span class="ic">'+svg('file')+'</span>'+
-        '<span class="nm">'+esc(a.nome)+'</span><span class="sz">'+fmtSize(a.size)+'</span></div>').join('')+
+      (p.nota? '<div class="nota-box" style="margin-bottom:9px">'+sicuro(p.nota)+'</div>' : '')+
+      (p.allegati||[]).map((a, i)=>{
+        const apri = a.path && cloudAttivo(), togli = a.path && puoAllegare(p) && (a.u === state.utente || adminQui(p) || !a.u);
+        return '<div class="file all-riga" style="margin-bottom:6px">'+
+          (apri ? '<button class="all-apri" data-action="all-apri" data-path="'+esc(a.path)+'" title="Apri '+esc(a.nome)+'">' : '<span class="all-apri">')+
+          '<span class="ic">'+svg(icFile(a.tipo))+'</span><span class="nm">'+esc(a.nome)+'</span><span class="sz">'+fmtSize(a.size || a.dim || 0)+'</span>'+
+          (apri ? '</button>' : '</span>')+
+          (togli ? '<button class="iconbtn all-x" data-action="all-togli" data-pid="'+esc(p.id)+'" data-i="'+i+'" title="Togli il file" aria-label="Togli il file">'+svg('x',2.4)+'</button>' : '')+
+        '</div>'; }).join('')+
+      (allegaStato[p.id] && allegaStato[p.id].carico ? '<div class="file all-riga" style="margin-bottom:6px;opacity:.7"><span class="ic">'+svg('clip')+'</span><span class="nm">Carico '+esc(allegaStato[p.id].carico)+'…</span></div>' : '')+
+      (allegaStato[p.id] && allegaStato[p.id].errore ? '<div class="all-err">'+esc(allegaStato[p.id].errore)+'</div>' : '')+
+      '<div class="all-az">'+
+        (p.nota ? '' : '<button class="agg-dato" data-action="edit" data-t="proj" data-k="nota" data-pid="'+p.id+'">'+svg('plus',2.2)+'Scrivi una nota</button>')+
+        (puoAllegare(p) ? '<label class="agg-dato" for="all_file_'+esc(p.id)+'" title="Allega un file (fino a 25 MB)">'+svg('clip',2.2)+'Allega un file</label>'+
+          '<input type="file" id="all_file_'+esc(p.id)+'" data-allega="'+esc(p.id)+'" hidden>' : '')+
+      '</div>'+
       '</div>';
   }
   const capoP = titolareDiProgetto(p) || adminId() || state.utente;
@@ -5747,7 +5800,7 @@ const SOLO_ADMIN = ['ruolo-team','iv-aggiungi','tm-cerca','tm-aggiungi','tm-cerc
 const PERM_AZIONE = {
   'nuovo':'crea_lavori','nl-crea':'crea_lavori','duplica':'crea_lavori',
   'salva-modello-apri':'crea_lavori','salva-modello':'crea_lavori','togli-modello':'crea_lavori','togli-modello-ok':'crea_lavori',
-  'cm-invia':'modifica', 'cm-letto':'spunta',
+  'cm-invia':'modifica', 'cm-letto':'spunta', 'all-togli':'modifica', 'all-togli-ok':'modifica',
   'pe-nuovo':'crea_lavori','pe-importa':'crea_lavori','pe-salva':'crea_lavori','pe-elimina':'crea_lavori','pe-usa':'crea_lavori',
   'conti':'soldi','conti-prev':'soldi-scrive','conti-add':'soldi-scrive','conti-togli':'soldi-scrive',
   'data-nuova':'modifica','data-salva':'modifica',
@@ -9595,7 +9648,7 @@ function cartaModelli(){
    Come si fa tutto, capitolo per capitolo: dai primi passi alle cose per chi
    organizza un team. Si cerca per parola (anche senza accenti); in fondo c'e'
    il tasto per segnalare quello che manca o non funziona. */
-const VERSIONE = 'v55';
+const VERSIONE = 'v56';
 const LIVELLI_GUIDA = {base:'Per cominciare', medio:'Tutti i giorni', esperto:'Per chi organizza', aiuto:'Se qualcosa non va'};
 const GUIDA = [
 {id:'primi-passi', liv:'base', ic:'spark', t:'Primi passi', s:'Cos’è FOSS e come ci si muove', v:[
@@ -12098,6 +12151,12 @@ document.addEventListener('click', function(e){
     case 'cm-tab': if(cm){ cm.tab = t.dataset.t==='file' ? 'file' : 'commenti'; disegnaCommenti(false); } break;
     case 'cm-invia': inviaCommento(t); break;
     case 'cm-file': apriFileCommento(t); break;
+    case 'all-apri': apriAllegatoLavoro(t.dataset.path); break;
+    case 'all-togli':{
+      apriCtx(ultimoPunto.x, ultimoPunto.y, 'Togliere il file?', [
+        {a:'all-togli-ok', l:'S\u00ec, toglilo', ic:'x', danger:1, d:D({pid:t.dataset.pid, i:t.dataset.i})}], null);
+      break; }
+    case 'all-togli-ok': togliAllegatoLavoro(t.dataset.pid, t.dataset.i); break;
     case 'cm-letto': segnaLettoCommento(t.dataset.mid); break;
     case 'cm-togli-file': if(cm){ cm.file = null; mostraFilePronto(); } break;
     case 'cm-elimina':{
@@ -13069,6 +13128,7 @@ document.addEventListener('keydown', function(e){
 }, true);
 document.addEventListener('change', function(e){
   if(e.target.id==='cm_file'){ const f = e.target.files && e.target.files[0]; e.target.value = ''; sceltoFileCommento(f); }
+  if(e.target.dataset && e.target.dataset.allega){ const f = e.target.files && e.target.files[0]; e.target.value = ''; if(f) allegaAlLavoro(e.target.dataset.allega, f); }
 });
 document.addEventListener('keydown', function(e){
   const c = e.target && e.target.dataset && e.target.dataset.cl;
