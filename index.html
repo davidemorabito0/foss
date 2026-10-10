@@ -3,7 +3,20 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover">
-<meta name="description" content="FOSS — gestionale di produzione: dal brief alla consegna.">
+<meta name="description" content="FOSS è il gestionale dei tuoi progetti, dal brief alla consegna: lavori, task, commenti, file e calendario del team in un unico posto.">
+<link rel="canonical" href="https://foss.team/">
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="FOSS">
+<meta property="og:locale" content="it_IT">
+<meta property="og:url" content="https://foss.team/">
+<meta property="og:title" content="FOSS — il gestionale dei tuoi progetti">
+<meta property="og:description" content="Dal brief alla consegna: lavori, task, commenti, file e calendario del team in un unico posto.">
+<meta property="og:image" content="https://foss.team/og.png">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta property="og:image:alt" content="FOSS — Il gestionale dei tuoi progetti, dal brief alla consegna.">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:image" content="https://foss.team/og.png">
 <meta name="theme-color" content="#0D1926">
 <script>
 /* FOSS ora sta su foss.team. Dal vecchio indirizzo (GitHub Pages) si passa li',
@@ -905,6 +918,11 @@ input,textarea,select{font:inherit;color:inherit}
   border-radius:var(--r-l);padding:26px 24px;box-shadow:var(--shadow)}
 .gate-card .mark{width:42px;height:42px}
 .gate-card h1{font-size:23px;margin:14px 0 4px;letter-spacing:-.03em}
+.gate-legal{margin-top:16px;padding-top:12px;border-top:1px solid var(--line-soft);font-size:11.5px;line-height:1.5;color:var(--mute);text-align:center}
+.gate-legal a{color:var(--dim);text-decoration:underline;text-underline-offset:2px}
+.gate-legal a:hover{color:var(--amber-ink)}
+.pf-legal{margin:14px 0 4px;text-align:center;font-size:12px;color:var(--mute)}
+.pf-legal a{color:var(--dim);text-decoration:underline;text-underline-offset:2px}
 .gate-card p{color:var(--dim);font-size:12.5px;margin:0 0 20px}
 .gate-card .btn{width:100%;justify-content:center;padding:10px}
 .switch{text-align:center;margin-top:14px;font-size:12px;color:var(--dim)}
@@ -7613,6 +7631,7 @@ function renderProfilo(){
   '</details>';
 
   h += '<button class="btn esci-rosso" data-action="esci">'+svg('out')+'Esci da FOSS</button>';
+  h += '<div class="pf-legal"><a href="privacy.html" target="_blank" rel="noopener">Privacy</a> \u00b7 <a href="termini.html" target="_blank" rel="noopener">Termini</a> \u00b7 <a href="mailto:info@davidemorabito.com">info@davidemorabito.com</a></div>';
   h += '</div></div></div></div></div>';
   el('stage').innerHTML = h;
   if(el('ivLive')) aggiornaAnteprimaLive(true);
@@ -8766,6 +8785,8 @@ function renderGate(){
       ? 'Hai gi\u00e0 un account? <button data-action="modo-login">Accedi</button>'
       : 'Non hai un account? <button data-action="modo-registra">Registrati</button>')+
       (reg ? '' : '<div style="margin-top:7px">Ti hanno invitato? <button data-action="modo-invito">Registrati con la tua email</button></div>')+'</div>'+
+    '<div class="gate-legal">'+(reg ? 'Creando il profilo accetti i <a href="termini.html" target="_blank" rel="noopener">Termini</a> e confermi di aver letto l’<a href="privacy.html" target="_blank" rel="noopener">informativa privacy</a>.'
+      : '<a href="privacy.html" target="_blank" rel="noopener">Privacy</a> · <a href="termini.html" target="_blank" rel="noopener">Termini</a>')+'</div>'+
   '</div></div>';
   el('phasebar').classList.toggle('vuota', suTelefono());
   el('phasebar').innerHTML = '<span class="chip">FOSS \u00b7 '+(reg?'registrazione':'accesso')+'</span>'+
@@ -9574,7 +9595,7 @@ function cartaModelli(){
    Come si fa tutto, capitolo per capitolo: dai primi passi alle cose per chi
    organizza un team. Si cerca per parola (anche senza accenti); in fondo c'e'
    il tasto per segnalare quello che manca o non funziona. */
-const VERSIONE = 'v54';
+const VERSIONE = 'v55';
 const LIVELLI_GUIDA = {base:'Per cominciare', medio:'Tutti i giorni', esperto:'Per chi organizza', aiuto:'Se qualcosa non va'};
 const GUIDA = [
 {id:'primi-passi', liv:'base', ic:'spark', t:'Primi passi', s:'Cos’è FOSS e come ci si muove', v:[

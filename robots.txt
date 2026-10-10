@@ -1,0 +1,3 @@
+# FOSS — foss.team
+User-agent: *
+Allow: /
