@@ -257,6 +257,107 @@
   --ok:#1C9C78;--ok-soft:#D8F1E9;--alert:#D63E67;--alert-soft:#FBE0E7;--ring:rgba(91,75,214,.35);
 }
 
+/* Idea — poster: crema, blu stampa, rosa */
+:root[data-tema="idea"]{
+  --bg:#E4E1D2;--surface:#F0EEE3;--surface-2:#E9E6DA;--surface-3:#DCD8C8;--line:#CCC7B4;--line-soft:#DFDBCC;
+  --text:#223D7C;--dim:#465C91;--mute:#7A86A6;--navy:#A7B1C8;
+  --amber:#C2437A;--amber-ink:#9A2B56;--amber-soft:#E7CCCE;--on-amber:#FFFFFF;
+  --ok:#2C7A55;--ok-soft:#D1DBCC;--alert:#C0442E;--alert-soft:#E8D3C6;--ring:rgba(194,67,122,.4);
+  --shadow:0 8px 24px rgba(34,61,124,.14);
+  color-scheme:light;
+}
+@media (prefers-color-scheme:dark){:root[data-tema="idea"]:not([data-theme="light"]){
+  --bg:#152548;--surface:#1C2E57;--surface-2:#223562;--surface-3:#2B416F;--line:#34497E;--line-soft:#213358;
+  --text:#EDEBDE;--dim:#B3B9CC;--mute:#8089A6;--navy:#3A4F86;
+  --amber:#E0588F;--amber-ink:#F48DB3;--amber-soft:#473763;--on-amber:#1D0713;
+  --ok:#4FBF8E;--ok-soft:#264B62;--alert:#F0694C;--alert-soft:#4B3B55;--ring:rgba(224,88,143,.4);
+  --shadow:0 8px 24px rgba(0,0,0,.42);
+  color-scheme:dark;
+}}
+:root[data-tema="idea"][data-theme="dark"]{
+  --bg:#152548;--surface:#1C2E57;--surface-2:#223562;--surface-3:#2B416F;--line:#34497E;--line-soft:#213358;
+  --text:#EDEBDE;--dim:#B3B9CC;--mute:#8089A6;--navy:#3A4F86;
+  --amber:#E0588F;--amber-ink:#F48DB3;--amber-soft:#473763;--on-amber:#1D0713;
+  --ok:#4FBF8E;--ok-soft:#264B62;--alert:#F0694C;--alert-soft:#4B3B55;--ring:rgba(224,88,143,.4);
+  --shadow:0 8px 24px rgba(0,0,0,.42);
+  color-scheme:dark;
+}
+/* Limoni — poster: blu intenso, giallo pallido, rosso */
+:root[data-tema="limoni"]{
+  --bg:#132571;--surface:#192E80;--surface-2:#1F3489;--surface-3:#283F97;--line:#3149A0;--line-soft:#1D3184;
+  --text:#FAEFAF;--dim:#D6CFA6;--mute:#9F9EA0;--navy:#3A50A8;
+  --amber:#C83934;--amber-ink:#FF9D8E;--amber-soft:#40306F;--on-amber:#FFF6CF;
+  --ok:#6CD49B;--ok-soft:#2A4F85;--alert:#E5672A;--alert-soft:#463B6D;--ring:rgba(200,57,52,.4);
+  --shadow:0 8px 24px rgba(0,0,0,.42);
+  color-scheme:dark;
+}
+@media (prefers-color-scheme:light){:root[data-tema="limoni"]:not([data-theme="dark"]){
+  --bg:#F6ECC1;--surface:#FFF8DF;--surface-2:#FBF2D1;--surface-3:#EFE2B3;--line:#E0D29C;--line-soft:#EFE5BD;
+  --text:#152A79;--dim:#3F4D8A;--mute:#7A80A2;--navy:#B4B6C9;
+  --amber:#C73D3A;--amber-ink:#A72E2B;--amber-soft:#F4D3BE;--on-amber:#FFF8DF;
+  --ok:#2C7A50;--ok-soft:#DDE4C8;--alert:#BF5410;--alert-soft:#F5DEBE;--ring:rgba(199,61,58,.4);
+  --shadow:0 8px 24px rgba(21,42,121,.14);
+  color-scheme:light;
+}}
+:root[data-tema="limoni"][data-theme="light"]{
+  --bg:#F6ECC1;--surface:#FFF8DF;--surface-2:#FBF2D1;--surface-3:#EFE2B3;--line:#E0D29C;--line-soft:#EFE5BD;
+  --text:#152A79;--dim:#3F4D8A;--mute:#7A80A2;--navy:#B4B6C9;
+  --amber:#C73D3A;--amber-ink:#A72E2B;--amber-soft:#F4D3BE;--on-amber:#FFF8DF;
+  --ok:#2C7A50;--ok-soft:#DDE4C8;--alert:#BF5410;--alert-soft:#F5DEBE;--ring:rgba(199,61,58,.4);
+  --shadow:0 8px 24px rgba(21,42,121,.14);
+  color-scheme:light;
+}
+/* Autunno — poster: mattone, crema, arancio */
+:root[data-tema="autunno"]{
+  --bg:#743832;--surface:#81413A;--surface-2:#8A4840;--surface-3:#945047;--line:#A25E53;--line-soft:#8A4943;
+  --text:#F8EBD7;--dim:#ECD2BD;--mute:#D3AC97;--navy:#A9685C;
+  --amber:#EDA95C;--amber-ink:#FAC788;--amber-soft:#62301F;--on-amber:#3A1510;
+  --ok:#A6DD9E;--ok-soft:#88604E;--alert:#FF5E4D;--alert-soft:#5A1E19;--ring:rgba(237,169,92,.4);
+  --shadow:0 8px 24px rgba(0,0,0,.42);
+  color-scheme:dark;
+}
+@media (prefers-color-scheme:light){:root[data-tema="autunno"]:not([data-theme="dark"]){
+  --bg:#F0E1CA;--surface:#FAF2E4;--surface-2:#F5EAD8;--surface-3:#E8D6BC;--line:#DAC4A4;--line-soft:#EADBC4;
+  --text:#6E2F28;--dim:#875246;--mute:#A5806F;--navy:#C8A88F;
+  --amber:#DD964B;--amber-ink:#91500F;--amber-soft:#F4E0C5;--on-amber:#4A1C14;
+  --ok:#3D7A45;--ok-soft:#DCDFCB;--alert:#B5372A;--alert-soft:#EFD4C6;--ring:rgba(221,150,75,.4);
+  --shadow:0 8px 24px rgba(110,47,40,.14);
+  color-scheme:light;
+}}
+:root[data-tema="autunno"][data-theme="light"]{
+  --bg:#F0E1CA;--surface:#FAF2E4;--surface-2:#F5EAD8;--surface-3:#E8D6BC;--line:#DAC4A4;--line-soft:#EADBC4;
+  --text:#6E2F28;--dim:#875246;--mute:#A5806F;--navy:#C8A88F;
+  --amber:#DD964B;--amber-ink:#91500F;--amber-soft:#F4E0C5;--on-amber:#4A1C14;
+  --ok:#3D7A45;--ok-soft:#DCDFCB;--alert:#B5372A;--alert-soft:#EFD4C6;--ring:rgba(221,150,75,.4);
+  --shadow:0 8px 24px rgba(110,47,40,.14);
+  color-scheme:light;
+}
+/* Bloom — poster: beige, prugna, arancio */
+:root[data-tema="bloom"]{
+  --bg:#EBD3AF;--surface:#F6E8CF;--surface-2:#F1DEC0;--surface-3:#E3C8A0;--line:#D5B98F;--line-soft:#E6CFAB;
+  --text:#3B1F45;--dim:#614766;--mute:#8C7480;--navy:#BEA383;
+  --amber:#D1733D;--amber-ink:#94441A;--amber-soft:#EFD1B2;--on-amber:#2A1030;
+  --ok:#3E7A3E;--ok-soft:#D9D6B8;--alert:#B02A45;--alert-soft:#EBCAB9;--ring:rgba(209,115,61,.4);
+  --shadow:0 8px 24px rgba(59,31,69,.14);
+  color-scheme:light;
+}
+@media (prefers-color-scheme:dark){:root[data-tema="bloom"]:not([data-theme="light"]){
+  --bg:#22102A;--surface:#2C1635;--surface-2:#361C40;--surface-3:#43254E;--line:#4E2D59;--line-soft:#341B3E;
+  --text:#EDD8B4;--dim:#C3AB9E;--mute:#8F7787;--navy:#4E3158;
+  --amber:#E07E46;--amber-ink:#F3A676;--amber-soft:#542D39;--on-amber:#22102A;
+  --ok:#6CC08A;--ok-soft:#393846;--alert:#E8506E;--alert-soft:#552342;--ring:rgba(224,126,70,.4);
+  --shadow:0 8px 24px rgba(0,0,0,.42);
+  color-scheme:dark;
+}}
+:root[data-tema="bloom"][data-theme="dark"]{
+  --bg:#22102A;--surface:#2C1635;--surface-2:#361C40;--surface-3:#43254E;--line:#4E2D59;--line-soft:#341B3E;
+  --text:#EDD8B4;--dim:#C3AB9E;--mute:#8F7787;--navy:#4E3158;
+  --amber:#E07E46;--amber-ink:#F3A676;--amber-soft:#542D39;--on-amber:#22102A;
+  --ok:#6CC08A;--ok-soft:#393846;--alert:#E8506E;--alert-soft:#552342;--ring:rgba(224,126,70,.4);
+  --shadow:0 8px 24px rgba(0,0,0,.42);
+  color-scheme:dark;
+}
+
 *{box-sizing:border-box}
 /* il telefono non deve gonfiare i testi per conto suo: la pagina e' gia' disegnata per lo schermo piccolo */
 html{-webkit-text-size-adjust:100%;text-size-adjust:100%}
@@ -4314,7 +4415,11 @@ const TEMI = [
   {id:'grafite', nome:'Grafite', ds:'Monocromo, arancio secco',                  c:['#141312','#232120','#E2723B'], breve:'Scuro e deciso'},
   {id:'notte',   nome:'Notte',   ds:'Indaco e lilla, riposante',                 c:['#101223','#1E2239','#7C6CF0'], breve:'Viola e blu profondo'},
   {id:'crema',   nome:'Crema arancia', ds:'Arancione da ufficio su fondo crema',  c:['#F1E7D8','#F8F1E5','#C2622A'], breve:'Energico e creativo'},
-  {id:'bordeaux',nome:'Bordeaux',ds:'Vinaccia profondo e rosa acceso',            c:['#170410','#2E0F1A','#DD5170'], breve:'Elegante e profondo'}
+  {id:'bordeaux',nome:'Bordeaux',ds:'Vinaccia profondo e rosa acceso',            c:['#170410','#2E0F1A','#DD5170'], breve:'Elegante e profondo'},
+  {id:'idea',    nome:'Idea',    ds:'Crema, blu stampa e rosa',                  c:['#E4E1D2','#223D7C','#C2437A'], breve:'Carta e inchiostro'},
+  {id:'limoni',  nome:'Limoni',  ds:'Blu intenso, giallo pallido e rosso',        c:['#132571','#FAEFAF','#C83934'], breve:'Vivace e solare'},
+  {id:'autunno', nome:'Autunno', ds:'Mattone, crema e arancio',                   c:['#743832','#F8EBD7','#EDA95C'], breve:'Caldo e accogliente'},
+  {id:'bloom',   nome:'Bloom',   ds:'Beige, prugna e arancio',                    c:['#EBD3AF','#3B1F45','#D1733D'], breve:'Morbido e grafico'}
 ];
 const PESO = {alta:0, media:1, bassa:2};
 
@@ -7659,7 +7764,7 @@ function renderProfilo(){
 
   /* tema */
   h += '<div class="card">'+pfTesta('palette','Tema dell’interfaccia','Scegli i colori che preferisci. Puoi cambiarli quando vuoi.')+
-    '<div class="pf-temi">'+TEMI.filter(t=>['brand','ardesia','nebbia','sabbia'].indexOf(t.id)>=0 || t.id===c.tema).map(t=>'<button class="pf-tema'+(c.tema===t.id?' on':'')+'" data-action="tema-set" data-t="'+t.id+'" title="'+esc(t.ds)+'">'+
+    '<div class="pf-temi">'+TEMI.filter(t=>['brand','ardesia','nebbia','sabbia','idea','limoni','autunno','bloom'].indexOf(t.id)>=0 || t.id===c.tema).map(t=>'<button class="pf-tema'+(c.tema===t.id?' on':'')+'" data-action="tema-set" data-t="'+t.id+'" title="'+esc(t.ds)+'">'+
       '<span class="sw3">'+t.c.map(x=>'<i style="background:'+x+'"></i>').join('')+'</span>'+
       '<b>'+t.nome+'</b><span>'+esc(t.breve||t.ds)+'</span></button>').join('')+'</div>'+
     '<div class="riga pf-r"><span class="pf-ri">'+svg('sun',2)+'</span><div class="tx"><b>Modalità chiara</b><span>Una versione più luminosa, vale su tutti i temi</span></div>'+
@@ -9648,7 +9753,7 @@ function cartaModelli(){
    Come si fa tutto, capitolo per capitolo: dai primi passi alle cose per chi
    organizza un team. Si cerca per parola (anche senza accenti); in fondo c'e'
    il tasto per segnalare quello che manca o non funziona. */
-const VERSIONE = 'v56';
+const VERSIONE = 'v57';
 const LIVELLI_GUIDA = {base:'Per cominciare', medio:'Tutti i giorni', esperto:'Per chi organizza', aiuto:'Se qualcosa non va'};
 const GUIDA = [
 {id:'primi-passi', liv:'base', ic:'spark', t:'Primi passi', s:'Cos’è FOSS e come ci si muove', v:[
