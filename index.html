@@ -1205,6 +1205,19 @@ button.adm-r{width:100%;text-align:left;background:none}
 .chk-ass{width:22px;height:22px;border-radius:50%;display:grid;place-items:center;flex:none;
   margin-left:4px;transition:opacity .14s,color .14s}
 .chk-ass .av{width:20px;height:20px;font-size:8.5px}
+.chk-ass.multi{width:auto;border-radius:999px;display:flex;align-items:center;flex-wrap:nowrap}
+.chk-ass.multi .av{box-shadow:0 0 0 2px var(--surface)}
+.chk-ass.multi .av+.av{margin-left:-5px}
+.ass-m{display:flex;flex-direction:column;gap:6px}
+.ass-r.on{border-color:var(--amber);background:var(--amber-soft)}
+.ass-r.pieno{opacity:.45}
+.ass-n{width:22px;height:22px;border-radius:50%;display:grid;place-items:center;font:700 11px Sora;flex:none}
+.ass-r.on .ass-n{background:var(--amber);color:var(--on-amber)}
+.ass-mail{display:flex;align-items:center;gap:10px;margin-top:8px;padding:10px 4px 2px;border-top:1px solid var(--line-soft)}
+.ass-mail .tx{flex:1;min-width:0;display:flex;flex-direction:column}
+.ass-mail .tx b{font-size:13px}
+.ass-mail .tx span{font-size:11.5px;color:var(--mute)}
+.nl-mail{margin-top:12px}
 .chk-ass.vuoto{color:var(--mute);opacity:0;border:1px dashed var(--line);border-radius:50%}
 .chk-ass.vuoto svg{width:11px;height:11px}
 .chk:hover .chk-ass.vuoto,.chk-ass.vuoto:focus-visible{opacity:.7}
@@ -2670,9 +2683,11 @@ button.all-apri:hover .nm{color:var(--amber-ink);text-decoration:underline}
 .chk.v2 .tx{flex:0 1 auto;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 .chk.v2 .cl-badge{flex:none}
 .chk.v2 .pen{margin-left:0}
-.v-chi{width:56px;flex:none;display:flex;justify-content:flex-start}
+.v-chi{width:80px;flex:none;display:flex;justify-content:flex-start}
 .chk.v2 .chk-ass{width:30px;height:30px;margin-left:0}
 .chk.v2 .chk-ass .av{width:28px;height:28px;font-size:10px}
+.chk.v2 .chk-ass.multi{width:auto}
+.chk.v2 .chk-ass.multi .av+.av{margin-left:-6px}
 .chk.v2 .chk-ass.vuoto svg{width:13px;height:13px}
 .v-data{position:relative;width:112px;flex:none;display:inline-flex;align-items:center;gap:10px;font-size:14px;font-weight:600;color:var(--text);border-radius:8px;padding:4px 6px;cursor:pointer}
 .v-data svg{width:17px;height:17px;color:var(--hm-2,var(--dim));flex:none}
@@ -4672,6 +4687,41 @@ function taggabili(){
   return visti.concat(fuori).map(id=>U(id));
 }
 function taggatiOk(s){ if(!Array.isArray(s.taggati)) s.taggati = []; return s.taggati; }
+function modaleAssegna(){
+  const b = state.assBozza; if(!b) return;
+  const pp = state.progetti.find(x=>x.id===b.pid), s2 = pp && pp.subs.find(x=>x.id===b.sid), it2 = s2 && s2.items[b.ix];
+  if(!it2){ state.assBozza = null; chiudiModale(); return; }
+  const pieno = b.sel.length >= MAX_ASS;
+  const persone = taggabili();
+  b.sel.forEach(id=>{ if(!persone.some(u=>u.id===id)) persone.unshift(U(id)); });
+  const nuovi = b.sel.filter(x=>x!==state.utente && assDi(it2).indexOf(x)<0);
+  modale('<h3>Chi fa «'+esc(it2.t)+'»</h3><div class="sub-t">Fino a '+MAX_ASS+' persone · '+esc(s2.titolo)+'</div><div class="modal-b ass-m">'+
+    persone.map(u=>{
+      const on = b.sel.indexOf(u.id) >= 0, k = b.sel.indexOf(u.id);
+      return '<button class="pickrow ass-r'+(on?' on':'')+(!on && pieno?' pieno':'')+'" data-action="ass-tocca" data-u="'+u.id+'" aria-pressed="'+on+'">'+
+        av(u)+'<span class="nm">'+esc(u.nome)+(u.id===state.utente?' (tu)':'')+'<div style="font-weight:400;color:var(--mute);font-size:11px">'+esc(u.ruolo||'Guest')+'</div></span>'+
+        '<span class="ass-n">'+(on? (k+1) : '')+'</span></button>';
+    }).join('')+
+    (cloudAttivo()? '<div class="riga ass-mail"><span class="pf-ri">'+svg('posta',2)+'</span><div class="tx"><b>Avvisa anche via email</b><span>'+
+        (nuovi.length? 'Mando una email a '+esc(nuovi.map(id=>primoNome(U(id))).join(', ')) : 'Parte solo per chi aggiungi adesso')+'</span></div>'+
+        '<button class="sw'+(b.mail?' on':'')+'" data-action="ass-mail" aria-pressed="'+(!!b.mail)+'" aria-label="Avvisa anche via email"></button></div>' : '')+
+    '</div><div class="modal-f"><button class="btn ghost" data-action="ass-annulla">Annulla</button>'+
+    '<button class="btn" data-action="ass-salva">'+(b.sel.length? 'Assegna ('+b.sel.length+')' : 'Nessuno')+'</button></div>');
+}
+/* v59: una subtask si assegna fino a tre persone. i.ass resta la prima (cosi' le versioni
+   vecchie continuano a vederla), le altre due stanno in i.assAltri. */
+const MAX_ASS = 3;
+function assDi(i){
+  if(!i) return [];
+  const l = [i.ass].concat(Array.isArray(i.assAltri)? i.assAltri : []).filter(x=>x && typeof x==='string');
+  return l.filter((x,k)=>l.indexOf(x)===k).slice(0, MAX_ASS);
+}
+function assHa(i, id){ return assDi(i).indexOf(id) >= 0; }
+function assMetti(i, l){
+  l = (l||[]).filter((x,k,a)=>x && a.indexOf(x)===k).slice(0, MAX_ASS);
+  i.ass = l[0] || null;
+  if(l.length > 1) i.assAltri = l.slice(1); else delete i.assAltri;
+}
 
 function taggatiHTML(s){
   const t = taggatiOk(s);
@@ -5554,7 +5604,7 @@ function renderProgetto(){
       '</div>'+
       '<div class="sub-b"><div><div class="sub-in">'+
         s.items.map((i,ix)=>{
-          const ua = i.ass? U(i.ass) : null;
+          const ul = assDi(i).map(U), ua = ul[0] || null;
           const q = dataVoce(i), stv = statoVoce(i), fisso = state.ospite || isLock(p) || p.completato;
           return '<div class="chk v2'+(i.done?' done':'')+'" role="button" tabindex="0" data-action="check-riga" data-id="'+s.id+'" data-i="'+ix+'">'+
           '<span class="box" role="button" tabindex="-1" data-action="check" data-id="'+s.id+'" data-i="'+ix+'" '+
@@ -5564,8 +5614,8 @@ function renderProgetto(){
             return '<button class="cl-badge'+(i.lista.length && fl===i.lista.length?' ok':'')+(listeAperte.has(s.id+'|'+ix)?' aperta':'')+'" '+
               'data-action="apri-lista" data-id="'+s.id+'" data-i="'+ix+'" title="Checklist: '+fl+' su '+i.lista.length+'">'+
               svg('list',2.2)+fl+'/'+i.lista.length+'</button>'; })() : '')+'</span>'+
-          '<span class="v-chi">'+(ua? '<span class="chk-ass" data-action="assegna-sub" data-id="'+s.id+'" data-i="'+ix+'" role="button" tabindex="0" '+
-               'title="'+esc(ua.nome)+' — '+esc(ua.ruolo)+'. Tocca per cambiare.">'+av(ua,'sm')+'</span>'
+          '<span class="v-chi">'+(ua? '<span class="chk-ass'+(ul.length>1?' multi':'')+'" data-action="assegna-sub" data-id="'+s.id+'" data-i="'+ix+'" role="button" tabindex="0" '+
+               'title="'+esc(ul.length>1? ul.map(u=>u.nome).join(', ') : ua.nome+' — '+ua.ruolo)+'. Tocca per cambiare.">'+ul.map(u=>av(u,'sm')).join('')+'</span>'
              : (state.ospite?'' : '<span class="chk-ass vuoto" data-action="assegna-sub" data-id="'+s.id+'" data-i="'+ix+'" role="button" tabindex="0" '+
                'title="Assegna questa subtask a qualcuno">'+svg('user',2.2)+'</span>'))+'</span>'+
           '<span class="v-data'+(q.t?'':' vuota')+' '+q.c+'"'+(fisso? '' : ' role="button" tabindex="0" data-action="voce-data" data-id="'+s.id+'" data-i="'+ix+'"')+
@@ -5910,7 +5960,7 @@ const PERM_AZIONE = {
   'conti':'soldi','conti-prev':'soldi-scrive','conti-add':'soldi-scrive','conti-togli':'soldi-scrive',
   'data-nuova':'modifica','data-salva':'modifica',
   'edit':'modifica','personale-toggle':'modifica','cop-progetto':'modifica','rit-progetto':'modifica','togli-cop-progetto':'modifica','salva-campo':'modifica','nuova-task':'modifica','add-compito':'modifica',
-  'tagga':'modifica','tagga-chi':'modifica','stagga':'modifica','assegna-sub':'modifica','assegna-sub-chi':'modifica',
+  'tagga':'modifica','tagga-chi':'modifica','stagga':'modifica','assegna-sub':'modifica','assegna-sub-chi':'modifica','ass-tocca':'modifica','ass-salva':'modifica','ass-mail':'modifica',
   'fase':'modifica','indietro':'modifica','torna-a-fase':'modifica','riprendi':'modifica','completa':'modifica',
   'riapri-progetto':'modifica','menu-sposta':'modifica','lock':'modifica','attiva-lock':'modifica','invia':'modifica',
   'nuova-lista':'modifica','add-lista':'modifica','togli-voce':'modifica',
@@ -6024,7 +6074,7 @@ function taggatoSu(){
     if(p.completato || !vedeProgetto(p)) return;
     (p.subs||[]).forEach(s=>{
       if((s.taggati||[]).some(x=>x && x.u===state.utente)) out.push({p, s, tipo:'tag'});
-      (s.items||[]).forEach(i=>{ if(i && i.ass===state.utente && !i.done) out.push({p, s, i, tipo:'sub'}); });
+      (s.items||[]).forEach(i=>{ if(i && assHa(i, state.utente) && !i.done) out.push({p, s, i, tipo:'sub'}); });
     });
   });
   return out;
@@ -6046,7 +6096,7 @@ function mieCose(){
       const taggato = (s.taggati||[]).some(x=>x && x.u===state.utente);
       (s.items||[]).forEach((i,ix)=>{
         if(i.done && !(state.schermo==='mie' && mieAppena.has(p.id+'|'+s.id+'|'+ix))) return;
-        const mia = i.ass===state.utente || (!i.ass && s.assegnato===state.utente);
+        const mia = assHa(i, state.utente) || (!assDi(i).length && s.assegnato===state.utente);
         if(mia || taggato) voci.push({s, i, ix, taggato: taggato && !mia});
       });
     });
@@ -6066,7 +6116,7 @@ function mieTutte(){
     (p.subs||[]).forEach(s=>{
       const taggato = (s.taggati||[]).some(x=>x && x.u===state.utente);
       (s.items||[]).forEach((i,ix)=>{
-        const mia = i.ass===state.utente || (!i.ass && s.assegnato===state.utente);
+        const mia = assHa(i, state.utente) || (!assDi(i).length && s.assegnato===state.utente);
         if(mia || taggato) voci.push({s, i, ix, taggato: taggato && !mia});
       });
     });
@@ -6117,7 +6167,7 @@ function renderMie(){
       h += '<div class="mt-righe">';
       g.vis.forEach(v=>{
         const i = v.i, d = dataVoce(i), st = statoVoce(i), fi = Math.min(v.s.fase||0, fasi.length-1), fase = fasi[fi];
-        const chi = U(i.ass || v.s.assegnato || state.utente);
+        const chi = U(assHa(i, state.utente)? state.utente : (i.ass || v.s.assegnato || state.utente));
         h += '<div class="mt-r'+(i.done?' fatta':'')+'" role="button" tabindex="0" data-action="vai-primo" data-pid="'+p.id+'" data-sid="'+v.s.id+'">'+
           '<span class="box'+(i.done?' fatto':'')+'" role="button" tabindex="0" data-action="check-mia" data-pid="'+p.id+'" data-sid="'+v.s.id+'" data-i="'+v.ix+'" aria-label="'+(i.done?'Togli la spunta':'Segna come fatto')+'">'+svg('check',3.2)+'</span>'+
           '<button class="mt-t" data-action="vai-primo" data-pid="'+p.id+'" data-sid="'+v.s.id+'"><b>'+esc(i.t)+'</b>'+(v.taggato?'<em>taggato</em>':'')+'</button>'+
@@ -6207,19 +6257,19 @@ function renderTabbar(){
   if(n.hidden){ n.innerHTML = ''; return; }
   const mie = contaMie();
   const T = [
+    {k:'casa',     l:'Home',    ic:'casa'},
     {k:'progetti', l:'Lavori',  ic:'grid'},
     {k:'mie',      l:'Per te',  ic:'check', n:mie},
     {k:'note',     l:'Note',    ic:'pen'},
-    {k:'cerca',    l:'Cerca',   ic:'cerca'},
     {k:'profilo',  l:'Profilo', ic:'user'}
   ];
   const attivo =
     (state.schermo==='profilo' || state.schermo==='guida' || state.schermo==='team') ? 'profilo' :
     state.schermo==='calendario' ? 'lavori' :
     state.schermo==='mie'     ? 'mie' :
-    state.schermo==='cerca'   ? 'cerca' :
+    state.schermo==='spazi'   ? 'casa' :
     (state.schermo==='home' && state.vista==='note') ? 'note' :
-    (state.schermo==='home' || state.schermo==='spazi') ? 'progetti' : '';
+    state.schermo==='home' ? 'progetti' : '';
   n.innerHTML = T.map(t=>
     '<button class="tb'+(attivo===t.k?' on':'')+'" data-action="tab-tel" data-k="'+t.k+'">'+
       '<span class="ic">'+svg(t.ic)+(t.n? '<span class="n">'+(t.n>9?'9+':t.n)+'</span>':'')+'</span>'+
@@ -6356,7 +6406,7 @@ function vociInScadenza(){
     const g = giorniA(p.consegna);
     (p.subs||[]).forEach(s=>(s.items||[]).forEach((i, ix)=>{
       if(i.done) return;
-      const mia = i.ass===io || (!i.ass && s.assegnato===io);
+      const mia = assHa(i, io) || (!assDi(i).length && s.assegnato===io);
       if(mia) out.push({p, s, i, ix, g: g==null ? 9999 : g});
     }));
   });
@@ -6559,7 +6609,7 @@ function renderSpazi(){
   h += '<div class="hm-tre" id="hmTre">';
   h += '<section class="hm-box"><div class="hm-box-h"><button class="tit" data-action="hm-mie"><h3>Task in scadenza</h3>'+svg('right',2.6)+'</button></div>';
   h += mie.length ? mie.slice(0,5).map(x=>{ const q = quandoScade(x.g), tono = toniScadenza(x.g);
-    const chi = [x.i.ass || x.s.assegnato].filter(Boolean);
+    const chi = assDi(x.i).length? assDi(x.i) : [x.s.assegnato].filter(Boolean);
     const quando = x.g===9999 ? 'senza data' : x.g<0 ? 'In ritardo' : x.g<=1 ? q.t : (()=>{ const d = new Date(OGGI); d.setDate(d.getDate()+x.g); return d.getDate()+' '+meseCap(d.getMonth()); })();
     return '<div class="hm-t t-'+tono+'" role="button" tabindex="0" data-action="vai-primo" data-pid="'+esc(x.p.id)+'" data-sid="'+esc(x.s.id)+'">'+
       '<span class="box" role="button" tabindex="0" data-action="check-mia" data-pid="'+esc(x.p.id)+'" data-sid="'+esc(x.s.id)+'" data-i="'+x.ix+'" aria-label="Segna come fatto">'+svg('check',3.2)+'</span>'+
@@ -8557,7 +8607,8 @@ function testoNotifica(tipo, d){
   const n = +d.n || 1, cit = x => '\u00ab'+esc(x || '')+'\u00bb';
   switch(tipo){
     case 'assegnata': return n>1 ? chi+' ti ha assegnato '+n+' cose'+pr
-                                 : chi+' ti ha assegnato '+cit(d.titolo)+(d.in? ' in '+cit(d.in) : '')+pr;
+                                 : chi+' ti ha assegnato '+cit(d.titolo)+(d.in? ' in '+cit(d.in) : '')+
+                                   (+d.insieme>0? (+d.insieme===1? ' insieme a un’altra persona' : ' insieme ad altre '+(+d.insieme)+' persone') : '')+pr;
     case 'taggato':   return chi+' ti ha aggiunto a '+cit(d.titolo)+pr;
     case 'menzione':  return chi+' ti ha menzionato'+(d.titolo? ' su '+cit(d.titolo) : '')+': '+cit(d.testo)+pr;
     case 'risposta':  return chi+' ha risposto'+(d.titolo? ' su '+cit(d.titolo) : '')+': '+cit(d.testo)+pr;
@@ -9026,6 +9077,9 @@ function modaleTeam(){
         (dentro?'<span class="chip ok">lo vede</span>':'<span class="chip">non lo vede</span>')+'</button>';
     }).join('')+
     (altri.length? '' : '<div class="empty" style="padding:14px">Non ci sono ancora altre persone: creale dal tuo Profilo, in Amministrazione.</div>')+
+    (altri.length && cloudAttivo()? '<div class="riga ass-mail"><span class="pf-ri">'+svg('posta',2)+'</span><div class="tx"><b>Avvisa anche via email</b>'+
+      '<span>Chi aggiungi adesso riceve una email: «ti hanno aggiunto a un progetto»</span></div>'+
+      '<button class="sw'+(state.mailTeam?' on':'')+'" data-action="team-mail" aria-pressed="'+(!!state.mailTeam)+'" aria-label="Avvisa anche via email"></button></div>' : '')+
     '</div><div class="modal-f">'+(sonoAdmin? '<button class="btn ghost" data-action="nuovo-profilo">Nuovo profilo</button>' : '')+
     '<button class="btn" data-action="chiudi-modale">Fatto</button></div>');
 }
@@ -9038,7 +9092,7 @@ function impegniIn(p, id){
   (p.subs||[]).forEach(s=>{
     if(s.assegnato===id) n++;
     if((s.taggati||[]).some(t=>t && t.u===id)) n++;
-    (s.items||[]).forEach(i=>{ if(i && i.ass===id) n++; });
+    (s.items||[]).forEach(i=>{ if(i && assHa(i, id)) n++; });
   });
   return n;
 }
@@ -9753,7 +9807,7 @@ function cartaModelli(){
    Come si fa tutto, capitolo per capitolo: dai primi passi alle cose per chi
    organizza un team. Si cerca per parola (anche senza accenti); in fondo c'e'
    il tasto per segnalare quello che manca o non funziona. */
-const VERSIONE = 'v57';
+const VERSIONE = 'v59';
 const LIVELLI_GUIDA = {base:'Per cominciare', medio:'Tutti i giorni', esperto:'Per chi organizza', aiuto:'Se qualcosa non va'};
 const GUIDA = [
 {id:'primi-passi', liv:'base', ic:'spark', t:'Primi passi', s:'Cos’è FOSS e come ci si muove', v:[
@@ -9765,7 +9819,7 @@ const GUIDA = [
   ['Il riquadro «Scopri FOSS»', 'In basso a sinistra, una volta ogni cinque aperture, compare il riquadro che porta alla guida. La <b>×</b> lo chiude; per non vederlo più spegnilo in <b>Profilo → Guida e aiuto</b>.'],
   ['Il saluto', 'Dietro al saluto c’è una scena disegnata che segue la giornata: mattino, pomeriggio, sera e notte, con tre scene ciascuno (mongolfiere, spiaggia, tramonto, cielo stellato…). Ogni volta che apri FOSS ne esce una a caso; il tasto '+svg('spark',2.2).replace('<svg','<svg style="width:13px;height:13px;vertical-align:-2px"')+' passa alla successiva. Se sul dispositivo hai chiesto di ridurre il movimento, la scena sta ferma.'],
   ['Sul computer e sull’iPad', 'Dalla Home entri in uno spazio: a sinistra resta il menu con i tuoi spazi, in alto il nome dello spazio con <b>Modifica spazio</b> e <b>Nuovo progetto</b>, sotto le viste (Bacheca, Lista, Calendario, Mappa, Note). La <b>Bacheca</b> mette i progetti in colonne: per stato, per priorità o per scadenza, a scelta con <b>Dividi per</b>. Sugli schermi larghi a destra trovi la scheda dello spazio: copertina, avanzamento, persone e ultime attività. In alto a destra restano Annulla, il tema, la <b>Guida</b>, la campanella e la tua foto, che apre il profilo.'],
-  ['Sul telefono', 'In basso ci sono cinque sezioni: <b>Lavori</b>, <b>Per te</b>, <b>Note</b>, <b>Cerca</b> e <b>Profilo</b>. In alto a sinistra il <b>+</b> per creare, al centro il nome di dove sei, a destra la campanella. Dentro a un lavoro la freccia in alto a sinistra ti riporta ai lavori.'],
+  ['Sul telefono', 'In basso ci sono cinque sezioni: <b>Home</b>, <b>Lavori</b>, <b>Per te</b>, <b>Note</b> e <b>Profilo</b>. In alto a sinistra il <b>+</b> per creare, al centro il nome di dove sei, a destra la campanella. Dentro a un lavoro la freccia in alto a sinistra ti riporta ai lavori.'],
   ['I lavori che fai', 'Al primo accesso FOSS ti chiede che lavori fai (videomaker, fotografo, social media manager…): quando crei spazi, progetti e preset ti propone solo quelli. Li aggiungi o togli quando vuoi da <b>Profilo → I lavori che fai</b>.'],
   ['Metterlo sulla schermata Home', 'Sull’iPhone apri FOSS con Safari, tocca <b>Condividi</b> e poi <b>Aggiungi alla schermata Home</b>. Su Android, dal menu di Chrome, <b>Installa app</b> o <b>Aggiungi a schermata Home</b>. Si apre a tutto schermo come un’app; sull’iPhone è anche l’unico modo per ricevere gli avvisi.']
 ]},
@@ -9800,7 +9854,7 @@ const GUIDA = [
   ['Aggiungere una task', 'Nella fase in cui sei premi <b>Nuova task</b>, in alto a destra dell’elenco.'],
   ['Aggiungere una subtask', 'Tasto destro sulla task (sul telefono tienila premuta) → <b>Aggiungi subtask</b>. Su una subtask che c’è già, <b>Aggiungi subtask sotto</b> la mette subito dopo.'],
   ['Le checklist', 'Una subtask può avere una lista di voci: l’attrezzatura, i documenti da chiedere… Tasto destro sulla subtask → <b>Aggiungi una checklist</b>, poi scrivi le voci. Quando le spunti tutte, la subtask si chiude da sola.'],
-  ['Assegnare a qualcuno', 'Tocca l’omino a destra di una subtask e scegli la persona: le arriva una notifica e la trova nella sua sezione <b>Per te</b>. Il responsabile di tutta la task si cambia toccando «Assegnato a».'],
+  ['Assegnare a qualcuno', 'Tocca l’omino a destra di una subtask e scegli fino a <b>tre persone</b>: a ognuna arriva una notifica e la trova nella sua sezione <b>Per te</b>. Se accendi <b>Avvisa anche via email</b>, chi aggiungi riceve anche una email. Lo stesso interruttore c’è quando apri un lavoro a qualcuno (Chi vede questo lavoro) e quando crei un progetto. Il responsabile di tutta la task si cambia toccando «Assegnato a».'],
   ['Taggare le persone', 'Sotto la task, <b>Tagga</b> aggiunge chi deve seguirla senza esserne il responsabile: riceve un avviso. Anche nella nota della task puoi taggare chi ci lavora.'],
   ['La descrizione della task', 'Tocca <b>Aggiungi una descrizione</b> dentro la task: cosa va fatto, riferimenti, link (diventano cliccabili). Sotto si vede chi l’ha scritta e quando. Per discutere, invece, usa il fumetto dei commenti.'],
   ['Cambiare o eliminare', 'Tasto destro sulla subtask (o tienila premuta): <b>Rinomina la subtask</b>, i suoi commenti, la checklist, <b>Elimina subtask</b>. Lo stesso sulla task.'],
@@ -9813,7 +9867,7 @@ const GUIDA = [
   ['Mappa', 'I lavori che hanno un indirizzo, sulla mappa. L’indirizzo si mette nella scheda del lavoro.'],
   ['La bacheca delle note', 'Post-it dello spazio, al massimo 150 caratteri l’uno: <b>Nuova nota</b>, oppure doppio tocco sulla bacheca. Si trascinano col dito o col mouse; dal menu ne cambi il colore o la elimini.'],
   ['Filtri e ordine', 'Nella barra in basso: <b>Tutti</b> e i tuoi filtri salvati. <b>Nuovo filtro</b> li crea per tipo di progetto, tag e priorità. Accanto, <b>Ordina</b> per priorità, scadenza, cliente, fase o nel tuo ordine.'],
-  ['Cercare', 'Sul computer usa il campo <b>Cerca</b> in alto: filtra i progetti dello spazio mentre scrivi. Sul telefono la sezione <b>Cerca</b> trova progetti, task, subtask e voci delle checklist in tutti gli spazi. Se non vedi più niente, controlla di non aver lasciato una parola nella ricerca.']
+  ['Cercare', 'Sul computer usa il campo <b>Cerca</b> in alto: filtra i progetti dello spazio mentre scrivi. Se non vedi più niente, controlla di non aver lasciato una parola nella ricerca.']
 ]},
 {id:'commenti', liv:'medio', ic:'chat', t:'Commenti, chat e attività', s:'Una sola conversazione per lavoro, anche coi commenti delle task', v:[
   ['Commenti dentro task e subtask', 'Ogni task e ogni subtask ha il suo tasto <b>Commenta o allega</b>, il fumetto con la graffetta '+svg('chat',2.2).replace('<svg','<svg style="width:13px;height:13px;vertical-align:-2px"')+svg('clip',2.2).replace('<svg','<svg style="width:13px;height:13px;vertical-align:-2px"')+'. Toccalo e si apre, al centro dello schermo, la sua discussione: tutti i commenti e i file su quella cosa, dal primo all’ultimo, anche se arrivano a giorni di distanza. Il numero sul tasto dice quanti sono.'],
@@ -10232,10 +10286,10 @@ const ERR_BUSTA = {troppi:'Oggi hai già mandato molte email: la notifica è arr
   chiave:'Le email non sono ancora attive: la notifica è arrivata comunque.',
   rete:'Email non partita: controlla la connessione. La notifica è arrivata.',
   offline:'Le email partono solo con il database del team.'};
-async function mandaBusta(pid, ids){
+async function mandaBusta(pid, ids, tipo){
   if(!ids.length || typeof avvisaEmailCloud !== 'function') return;
   esitoBusta(svg('posta', 2) + '<span>Mando l’email…</span>', 'va');
-  const r = await avvisaEmailCloud(pid, ids) || {};
+  const r = await avvisaEmailCloud(pid, ids, tipo) || {};
   const nomi = l => l.map(id=>primoNome(U(id))).join(', ');
   if(Array.isArray(r.inviate) && r.inviate.length)
     esitoBusta(svg('check', 3) + '<span>Email inviata a <b>' + esc(nomi(r.inviate)) + '</b>' +
@@ -10828,7 +10882,11 @@ function nlPaginaChi(){
       ' Tocca le persone che devono vederlo: gli altri non sapranno nemmeno che esiste.</div>'+
       '<div class="vis-chips" id="np_vis">'+persone.map(u=>{ const on = nl.vis.indexOf(u.id)>=0;
         return '<button type="button" class="vis-chip'+(on?' on':'')+'" data-action="vis-toggle" data-id="'+u.id+'" aria-pressed="'+on+'">'+
-          av(u,'sm')+'<span>'+esc(u.nome)+'</span><i>'+svg('check',3)+'</i></button>'; }).join('')+'</div></div>';
+          av(u,'sm')+'<span>'+esc(u.nome)+'</span><i>'+svg('check',3)+'</i></button>'; }).join('')+'</div>'+
+      (cloudAttivo()? '<div class="riga ass-mail nl-mail"><span class="pf-ri">'+svg('posta',2)+'</span><div class="tx"><b>Avvisa anche via email</b>'+
+        '<span>Chi hai scelto riceve una email: «ti hanno aggiunto a un progetto»</span></div>'+
+        '<button type="button" class="sw'+(nl.mail?' on':'')+'" data-action="nl-mail" aria-pressed="'+(!!nl.mail)+'" aria-label="Avvisa anche via email"></button></div>' : '')+
+      '</div>';
   }
   h += '<div class="field"><label>Note</label>'+
       '<div class="rte-bar"><button class="rte-b b" data-action="rte" data-c="bold" title="Grassetto">B</button>'+
@@ -10922,9 +10980,11 @@ function nlCrea(){
     const gia = (state.modelli||[]).find(x=>String(x.nome).toLowerCase()===nm.toLowerCase() && mioModello(x));
     registraModello(modelloDa(np, nm, gia && gia.id));
   }
+  const daAvvisare = nl.mail ? team.filter(x=>x!==state.utente) : [];
   chiudiNuovoLavoro();
   notifica('Nuovo progetto <b>'+esc(nome)+'</b>'+(cli? ' per '+esc(cli) : ''), np.id, 0, 'plus');
   apriProgetto(np.id, true);
+  if(daAvvisare.length) mandaBusta(np.id, daAvvisare, 'aperto');
 }
 
 /* ============ TUTTO EDITABILE ============ */
@@ -11173,7 +11233,7 @@ function modaleFiltro(){
 const PROTETTE = ['check-lista','add-lista','togli-voce','nuova-lista','edit','salva-campo','check','fase','indietro','riprendi','add-user','assegna',
                   'elimina-progetto','conferma-elimina','sposta-ev','rinomina-ev','elimina-ev',
                   'add-compito','elimina-compito','elimina-task','tagga','tagga-chi','stagga',
-                  'assegna-sub','assegna-sub-chi',
+                  'assegna-sub','assegna-sub-chi','ass-salva',
                   'sub-tutto','sub-azzera','annulla',
                   'nuova-task','sposta-spazio','completa','data-nuova','data-salva','voce-stato','voce-data','togli-data-voce'];
 
@@ -11981,7 +12041,9 @@ document.addEventListener('click', function(e){
     case 'tab-tel':{
       const k = t.dataset.k;
       chiudiCtx(); state.drawer = false;
-      if(k==='progetti'){ state.schermo = state.spazioId? 'home':'spazi'; if(state.vista==='note') state.vista='tessere'; }
+      if(k==='casa'){ state.schermo='spazi'; state.progettoId=null; state.showFeed=false; }
+      else if(k==='progetti'){ if(!state.spazioId){ const s0 = spaziVisibili()[0]; if(s0) state.spazioId = s0.id; }
+        state.schermo = state.spazioId? 'home':'spazi'; if(state.vista==='note') state.vista='tessere'; }
       else if(k==='note'){ state.schermo='home'; state.vista='note'; }
       else if(k==='mie'){ state.schermo='mie'; mieAppena.clear(); }
       else if(k==='cerca'){ state.schermo='cerca'; state.mettiFuoco = true; }
@@ -12028,33 +12090,56 @@ document.addEventListener('click', function(e){
     case 'assegna-sub':{
       const s2 = p.subs.find(x=>x.id===t.dataset.id); if(!s2) break;
       const ix = Number(t.dataset.i); const it2 = s2.items[ix]; if(!it2) break;
-      const r2 = t.getBoundingClientRect();
-      const voci = taggabili().map(u=>({a:'assegna-sub-chi',
-        d:'data-id="'+s2.id+'" data-i="'+ix+'" data-u="'+u.id+'"',
-        l:esc(u.nome)+(it2.ass===u.id? ' ✓':''), ic:'user'}));
-      if(it2.ass) voci.push({sep:1}, {a:'assegna-sub-chi',
-        d:'data-id="'+s2.id+'" data-i="'+ix+'" data-u=""', l:'Nessuno', ic:'x'});
-      const px = r2.width? r2.left : ultimoPunto.x, py = r2.width? r2.bottom+6 : ultimoPunto.y;
-      apriCtx(px, py, 'Chi fa «'+esc(it2.t)+'»', voci, null);
+      if(state.ospite) break;
+      state.assBozza = {pid:p.id, sid:s2.id, ix, sel:assDi(it2), mail:false};
+      modaleAssegna(); break; }
+
+    case 'ass-tocca':{
+      const b = state.assBozza; if(!b) break;
+      const id = t.dataset.u, k = b.sel.indexOf(id);
+      if(k >= 0) b.sel.splice(k, 1);
+      else if(b.sel.length >= MAX_ASS){ toast('Al massimo '+MAX_ASS+' persone per subtask: togline una prima.','warn','Già tre'); break; }
+      else b.sel.push(id);
+      modaleAssegna(); break; }
+
+    case 'ass-annulla': state.assBozza = null; chiudiModale(); break;
+
+    case 'ass-mail':{
+      const b = state.assBozza; if(!b) break;
+      b.mail = !b.mail; modaleAssegna(); break; }
+
+    case 'ass-salva':{
+      const b = state.assBozza; state.assBozza = null; chiudiModale();
+      if(!b) break;
+      const pp = state.progetti.find(x=>x.id===b.pid), s2 = pp && pp.subs.find(x=>x.id===b.sid), it2 = s2 && s2.items[b.ix];
+      if(!it2) break;
+      const prima = assDi(it2);
+      if(prima.join()===b.sel.join()) break;
+      snap('Assegnazione di «'+it2.t+'»');
+      assMetti(it2, b.sel);
+      const nuovi = assDi(it2).filter(x=>prima.indexOf(x)<0);
+      nuovi.forEach(uid=>{ if(pp.team.indexOf(uid)<0) pp.team.push(uid); });
+      const nomi = l => l.map(id=>'<b>'+esc(U(id).nome)+'</b>').join(', ');
+      if(assDi(it2).length){
+        azione('<b>'+esc(it2.t)+'</b> assegnata a '+nomi(assDi(it2))+' — '+esc(pp.nome));
+        logga(pp,'<b>'+esc(it2.t)+'</b> assegnata a '+nomi(assDi(it2)));
+        if(nuovi.length) notifica('Ti è stata assegnata <b>'+esc(it2.t)+'</b> in '+esc(s2.titolo), pp.id, s2.fase, 'user');
+      } else {
+        azione('<b>'+esc(it2.t)+'</b> non è più assegnata a nessuno — '+esc(pp.nome));
+        logga(pp,'<b>'+esc(it2.t)+'</b> lasciata senza assegnatario');
+      }
+      render();
+      const via = nuovi.filter(x=>x!==state.utente);
+      if(b.mail && via.length) mandaBusta(pp.id, via, 'assegnata');
       break; }
 
+    /* compatibilita': assegna una sola persona (vecchi tasti, prove) */
     case 'assegna-sub-chi':{
       const s2 = p.subs.find(x=>x.id===t.dataset.id); if(!s2) break;
       const ix = Number(t.dataset.i); const it2 = s2.items[ix]; if(!it2) break;
-      const uid = t.dataset.u || '';
-      snap('Assegnazione di «'+it2.t+'»');
-      it2.ass = uid || null;
-      if(uid){
-        const u = U(uid);
-        if(p.team.indexOf(uid)<0) p.team.push(uid);
-        azione('<b>'+esc(it2.t)+'</b> assegnata a <b>'+esc(u.nome)+'</b> — '+esc(p.nome));
-        logga(p,'<b>'+esc(it2.t)+'</b> assegnata a <b>'+esc(u.nome)+'</b>');
-        notifica('Ti è stata assegnata <b>'+esc(it2.t)+'</b> in '+esc(s2.titolo), p.id, s2.fase, 'user');
-      } else {
-        azione('<b>'+esc(it2.t)+'</b> non è più assegnata a nessuno — '+esc(p.nome));
-        logga(p,'<b>'+esc(it2.t)+'</b> lasciata senza assegnatario');
-      }
-      render(); break; }
+      state.assBozza = {pid:p.id, sid:s2.id, ix, sel:t.dataset.u? [t.dataset.u] : [], mail:false};
+      const b = document.createElement('button'); b.dataset.action = 'ass-salva'; document.body.appendChild(b); b.click(); b.remove();
+      break; }
 
     case 'tagga':{
       const s2 = p.subs.find(x=>x.id===t.dataset.id); if(!s2) break;
@@ -12295,6 +12380,14 @@ document.addEventListener('click', function(e){
 
     case 'add-user': modaleTeam(); break;
 
+    case 'nl-mail':{
+      if(!nl) break;
+      nl.mail = !nl.mail; t.classList.toggle('on', nl.mail); t.setAttribute('aria-pressed', nl.mail);
+      break; }
+
+    case 'team-mail':{
+      state.mailTeam = !state.mailTeam; modaleTeam(); break; }
+
     case 'vis-toggle':{
       const on = !t.classList.contains('on');
       t.classList.toggle('on', on); t.setAttribute('aria-pressed', on);
@@ -12414,7 +12507,8 @@ document.addEventListener('click', function(e){
       p.team.push(u.id);
       logga(p, esc(u.nome)+' è stato aggiunto al progetto', true);
       notifica('<b>'+esc(u.nome)+'</b> è stato assegnato a <b>'+esc(p.nome)+'</b>', p.id, p.fase, 'users');
-      toast(u.nome+' ora fa parte del team.','ok','Utente assegnato');
+      if(state.mailTeam && u.id!==state.utente) mandaBusta(p.id, [u.id], 'aperto');
+      else toast(u.nome+' ora fa parte del team.','ok','Utente assegnato');
       modaleTeam(); render(); break; }
 
     case 'nuovo': apriNuovoLavoro(t.dataset.d); break;
@@ -14014,7 +14108,7 @@ function membriDi(p){
   (p.subs||[]).forEach(s=>{
     add(s.assegnato);
     (s.taggati||[]).forEach(t=>add(t && t.u));
-    (s.items||[]).forEach(i=>add(i && i.ass));
+    (s.items||[]).forEach(i=>{ add(i && i.ass); ((i && Array.isArray(i.assAltri))? i.assAltri : []).forEach(add); });
   });
   return v;
 }
@@ -14314,7 +14408,7 @@ async function caricaCloud(){
       Object.keys(p.faseAss||{}).forEach(k=>cita(p.faseAss[k]));
       (p.subs||[]).forEach(s=>{ cita(s.assegnato);
         (s.taggati||[]).forEach(t=>cita(t && t.u));
-        (s.items||[]).forEach(i=>cita(i && i.ass)); });
+        (s.items||[]).forEach(i=>{ cita(i && i.ass); ((i && Array.isArray(i.assAltri))? i.assAltri : []).forEach(cita); }); });
     });
     state.spazi.forEach(sp=>(sp.membri||[]).forEach(cita));
     Object.keys(citati).forEach((id,i)=>{
@@ -15010,6 +15104,7 @@ document.addEventListener('visibilitychange', ()=>{
 /* Stanno nell'archivio «allegati» del database, in una cartella per lavoro:
    li vede solo chi ci lavora. Si aprono con un link che dura un'ora. */
 const TIPI_ALLEGATO = ['image/jpeg','image/png','image/webp','image/gif','image/heic','image/heif','video/mp4','video/quicktime','video/webm',
+  'video/mpeg','audio/x-m4a','audio/ogg','audio/flac','audio/webm',
   'audio/mpeg','audio/mp4','audio/aac','audio/wav','audio/x-wav','application/pdf','application/zip','application/x-zip-compressed',
   'text/plain','text/csv','application/msword','application/vnd.openxmlformats-officedocument.wordprocessingml.document',
   'application/vnd.ms-excel','application/vnd.openxmlformats-officedocument.spreadsheetml.sheet','application/vnd.ms-powerpoint',
@@ -15024,7 +15119,10 @@ async function caricaAllegato(pid, file){
   const percorso = org + '/' + pid + '/' + Date.now().toString(36) + Math.random().toString(36).slice(2, 8) + '-' + pulito;
   /* un tipo che l'archivio non conosce (un progetto di Premiere, un .drp...) parte come file generico: si scarica e basta */
   const tipo = TIPI_ALLEGATO.indexOf(file.type) >= 0 ? file.type : 'application/octet-stream';
-  const {error} = await sb.storage.from('allegati').upload(percorso, file, {contentType:tipo, upsert:false});
+  /* storage-js manda il File cosi' com'e': conta il SUO tipo, non contentType. Un .mpeg o un .m4a strano
+     sarebbe rifiutato (400): lo rimpacchetto col tipo giusto. */
+  const corpo = file.type === tipo ? file : new Blob([file], {type:tipo});
+  const {error} = await sb.storage.from('allegati').upload(percorso, corpo, {contentType:tipo, upsert:false});
   if(error) throw error;
   return {path:percorso, nome:String(file.name || pulito).slice(0, 120), dim:file.size, tipo};
 }
@@ -15253,13 +15351,13 @@ window.addEventListener('unhandledrejection', e=>{
 
 /* v49: la bustina accesa. Prima il messaggio arriva al database (che crea la notifica
    «menzione»), poi il server la manda anche per email. Gli indirizzi li conosce solo lui. */
-async function avvisaEmailCloud(pid, ids){
+async function avvisaEmailCloud(pid, ids, tipo){
   if(!sb || !utenteCloud) return {errore:'offline'};
   const p = state.progetti.find(x=>x.id===pid);
   const org = orgProg[pid] || (p && orgSpazio[p.spazio]) || orgMia;
   try{ await salvaCloud(true); }catch(e){}
   try{
-    const {data, error} = await sb.functions.invoke('avvisa-email', {body:{org, progetto:pid, a:ids}});
+    const {data, error} = await sb.functions.invoke('avvisa-email', {body:{org, progetto:pid, a:ids, tipo:tipo||'menzione'}});
     if(!error) return data || {};
     let e = error.message || 'invio';
     try{ if(error.context && typeof error.context.json === 'function'){ const j = await error.context.json(); if(j && j.errore) e = j.errore; } }catch(x){}
