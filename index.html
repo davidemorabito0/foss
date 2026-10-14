@@ -2171,6 +2171,11 @@ a.btn.primary{color:var(--on-amber)}
 .cm-link .url{font-size:11px;color:var(--mute);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;min-width:0}
 .cm-scrivi{border-top:1px solid var(--line-soft);padding:10px 12px 12px;display:flex;flex-direction:column;gap:8px}
 .cm-pronto{display:flex;align-items:center;gap:8px;padding:6px 6px 6px 8px;border-radius:var(--r-m);background:var(--surface-2);border:1px solid var(--line)}
+.up-bar{flex:0 0 34%;max-width:180px;height:6px;border-radius:99px;background:var(--surface-3);overflow:hidden}
+.up-bar i{display:block;height:100%;width:0;background:var(--amber);border-radius:inherit;transition:width .2s ease}
+.up-pc{font:700 11.5px "JetBrains Mono",monospace;color:var(--dim);min-width:52px;text-align:right;flex:none}
+.up-riga.fatto .up-bar i{background:var(--ok)}
+.up-riga.fatto .up-pc{color:var(--ok)}
 .cm-pronto[hidden],.cm-err[hidden]{display:none!important}
 .cm-pronto .iconbtn{width:28px;height:28px}
 .cm-err{font-size:12.5px;color:var(--alert);background:var(--alert-soft);border-radius:var(--r-m);padding:7px 10px;line-height:1.4}
@@ -4818,21 +4823,41 @@ function scadenza(p){
   return {t: d.getDate()+' '+MESI_BREVI[d.getMonth()] + (d.getFullYear()!==OGGI.getFullYear()? ' '+d.getFullYear():''), c:''};
 }
 /* allegati del lavoro (Note e allegati): stessi file e stesso archivio dei commenti */
-const allegaStato = {};       // pid -> {carico} mentre sale, {errore} se non e' partito: non si salva
+const allegaStato = {};       // pid -> {carico, pc} mentre sale, {errore} se non e' partito: non si salva
+/* v60: perche' un file non e' partito, detto chiaro */
+function erroreFile(e){
+  const m = String((e && (e.codice || e.message)) || '');
+  if(/vietato|security policy|403/i.test(m)) return 'Questo tipo di file non si può caricare: programmi, script e pagine web sono bloccati per sicurezza.';
+  if(/vuoto/i.test(m)) return 'Il file è vuoto.';
+  if(/grand|size|413/i.test(m)) return 'Il file è troppo grande: il limite è 25 MB.';
+  if(/mime|415/i.test(m)) return 'Questo tipo di file non è accettato.';
+  return 'Il file non è partito: controlla la connessione e riprova.';
+}
+/* la barra di avanzamento: si aggiorna da sola, senza ridisegnare la pagina */
+function barraFile(pc){ return '<span class="up-bar" role="progressbar" aria-valuemin="0" aria-valuemax="100" aria-valuenow="'+pc+'"><i style="width:'+pc+'%"></i></span><b class="up-pc">'+pc+'%</b>'; }
+function passoFile(box, pc){
+  if(!box) return;
+  const i = box.querySelector('.up-bar i'), b = box.querySelector('.up-pc'), r = box.querySelector('.up-bar');
+  if(i) i.style.width = pc + '%';
+  if(b) b.textContent = pc === 100 ? '100% ✓' : pc + '%';
+  if(r) r.setAttribute('aria-valuenow', pc);
+  box.classList.toggle('fatto', pc === 100);
+}
 function puoAllegare(p){ return !!p && cloudAttivo() && typeof caricaAllegato === 'function' && !state.ospite && puo('modifica') && !isLock(p) && !p.completato; }
 async function allegaAlLavoro(pid, f){
   const p = state.progetti.find(x=>x.id === pid); if(!p || !f || !puoAllegare(p)) return;
-  allegaStato[pid] = {carico:f.name || 'file'}; render();
+  if(typeof ALLEGATO_VIETATO !== 'undefined' && ALLEGATO_VIETATO.test(String(f.name || '').trim())){ allegaStato[pid] = {errore: erroreFile({codice:'vietato'})}; render(); return; }
+  allegaStato[pid] = {carico:f.name || 'file', pc:0}; render();
   try{
-    const a = await caricaAllegato(pid, f);
+    const a = await caricaAllegato(pid, f, pc=>{ if(allegaStato[pid]) allegaStato[pid].pc = pc; passoFile(document.getElementById('all_up_'+pid), pc); });
+    await new Promise(r=>setTimeout(r, 450));       // il 100% si vede: e' andato tutto bene
     const q = state.progetti.find(x=>x.id === pid) || p;
     q.allegati = (q.allegati || []).concat([{path:a.path, nome:a.nome, size:a.dim, tipo:a.tipo, u:state.utente, t:Date.now()}]);
     delete allegaStato[pid];
     if(typeof logEv === 'function') try{ logEv(q, 'Ha allegato «'+a.nome+'»'); }catch(e){}
     save(); render();
   } catch(e){
-    const m = String((e && e.message) || '');
-    allegaStato[pid] = {errore: /grand|size|413/i.test(m) ? 'Il file è troppo grande: il limite è 25 MB.' : 'Il file non è partito: controlla la connessione e riprova.'};
+    allegaStato[pid] = {errore: erroreFile(e)};
     render();
   }
 }
@@ -5531,7 +5556,7 @@ function renderProgetto(){
           (apri ? '</button>' : '</span>')+
           (togli ? '<button class="iconbtn all-x" data-action="all-togli" data-pid="'+esc(p.id)+'" data-i="'+i+'" title="Togli il file" aria-label="Togli il file">'+svg('x',2.4)+'</button>' : '')+
         '</div>'; }).join('')+
-      (allegaStato[p.id] && allegaStato[p.id].carico ? '<div class="file all-riga" style="margin-bottom:6px;opacity:.7"><span class="ic">'+svg('clip')+'</span><span class="nm">Carico '+esc(allegaStato[p.id].carico)+'…</span></div>' : '')+
+      (allegaStato[p.id] && allegaStato[p.id].carico ? '<div class="file all-riga up-riga'+(allegaStato[p.id].pc===100?' fatto':'')+'" id="all_up_'+esc(p.id)+'" style="margin-bottom:6px"><span class="ic">'+svg('clip')+'</span><span class="nm">'+esc(allegaStato[p.id].carico)+'</span>'+barraFile(allegaStato[p.id].pc||0)+'</div>' : '')+
       (allegaStato[p.id] && allegaStato[p.id].errore ? '<div class="all-err">'+esc(allegaStato[p.id].errore)+'</div>' : '')+
       '<div class="all-az">'+
         (p.nota ? '' : '<button class="agg-dato" data-action="edit" data-t="proj" data-k="nota" data-pid="'+p.id+'">'+svg('plus',2.2)+'Scrivi una nota</button>')+
@@ -9807,7 +9832,7 @@ function cartaModelli(){
    Come si fa tutto, capitolo per capitolo: dai primi passi alle cose per chi
    organizza un team. Si cerca per parola (anche senza accenti); in fondo c'e'
    il tasto per segnalare quello che manca o non funziona. */
-const VERSIONE = 'v59';
+const VERSIONE = 'v60';
 const LIVELLI_GUIDA = {base:'Per cominciare', medio:'Tutti i giorni', esperto:'Per chi organizza', aiuto:'Se qualcosa non va'};
 const GUIDA = [
 {id:'primi-passi', liv:'base', ic:'spark', t:'Primi passi', s:'Cos’è FOSS e come ci si muove', v:[
@@ -10554,6 +10579,7 @@ function sceltoFileCommento(f){
   if(!cm || !f) return;
   if(!cloudAttivo() || typeof caricaAllegato !== 'function'){ erroreCommenti('I file si allegano con il database del team. Qui puoi incollare un link.'); return; }
   if(f.size > 25 * 1024 * 1024){ erroreCommenti('«' + f.name + '» supera 25 MB: caricalo su WeTransfer, Drive o Frame.io e incolla qui il link.'); return; }
+  if(typeof ALLEGATO_VIETATO !== 'undefined' && ALLEGATO_VIETATO.test(String(f.name || '').trim())){ erroreCommenti(erroreFile({codice:'vietato'})); return; }
   erroreCommenti(''); cm.file = f; mostraFilePronto();
 }
 let inviaCommentoInCorso = false;
@@ -10573,11 +10599,15 @@ async function inviaCommento(tasto){
   if(f){
     if(t) t.disabled = true;                    // mentre il file sale non si scrive: niente va perso
     if(typeof tastoDice === 'function') tastoDice(tasto, '…', 60000);
-    try{ file = await caricaAllegato(x.p.id, f); }
+    const box = el('cmPronto');
+    if(box && !box.querySelector('.up-bar')){ const d = box.querySelector('.dim'); if(d) d.outerHTML = barraFile(0); box.classList.add('up-riga'); }
+    try{
+      file = await caricaAllegato(x.p.id, f, pc=>passoFile(el('cmPronto'), pc));
+      await new Promise(r=>setTimeout(r, 450));     // il 100% si vede: e' andato tutto bene
+    }
     catch(e){
       inviaCommentoInCorso = false; rimetti();
-      const m = String((e && e.message) || '');
-      if(cm === mio) erroreCommenti(/grand|size|413/i.test(m) ? 'Il file è troppo grande: il limite è 25 MB.' : 'Il file non è partito: controlla la connessione e riprova.');
+      if(cm === mio){ mostraFilePronto(); erroreCommenti(erroreFile(e)); }
       return;
     }
   }
@@ -15110,20 +15140,77 @@ const TIPI_ALLEGATO = ['image/jpeg','image/png','image/webp','image/gif','image/
   'application/vnd.ms-excel','application/vnd.openxmlformats-officedocument.spreadsheetml.sheet','application/vnd.ms-powerpoint',
   'application/vnd.openxmlformats-officedocument.presentationml.presentation'];
 const MAX_ALLEGATO = 25 * 1024 * 1024;
-async function caricaAllegato(pid, file){
+/* v60: SICUREZZA DEI FILE. Programmi, script e pagine web non si caricano mai: chi apre un allegato
+   deve poter stare tranquillo. Lo stesso blocco c'e' anche sul server (politica dell'archivio). */
+const ALLEGATO_VIETATO = /\.(exe|com|bat|cmd|msi|msp|msc|scr|pif|cpl|gadget|vb|vbs|vbe|js|jse|mjs|cjs|ws|wsf|wsc|wsh|ps1|ps1xml|ps2|psc1|psm1|hta|jar|apk|aab|app|ipa|dll|sys|drv|ocx|lnk|url|reg|inf|sh|bash|zsh|csh|ksh|command|tool|scpt|applescript|workflow|php\d?|phtml|phar|py|pyc|pl|rb|cgi|asp|aspx|jsp|html?|xhtml|shtml|mht|mhtml|svgz?|xml|xsl|xslt|swf|iso|img|vhd|vhdx|dmg|pkg|mpkg|deb|rpm|appimage|docm|dotm|xlsm|xltm|xlam|pptm|potm|ppam|sldm)$/i;
+async function controllaAllegato(file){
+  const nome = String(file && file.name || '');
+  if(!file || !file.size) return {errore:'vuoto'};
+  if(file.size > MAX_ALLEGATO) return {errore:'grande'};
+  if(ALLEGATO_VIETATO.test(nome.trim().replace(/[.\s]+$/, ''))) return {errore:'vietato'};
+  let b = new Uint8Array(0);
+  try{ b = new Uint8Array(await file.slice(0, 16).arrayBuffer()); }catch(e){}
+  const inizia = (...x) => x.every((v, i) => b[i] === v);
+  const testo = String.fromCharCode.apply(null, Array.from(b));
+  /* un programma travestito (un .exe rinominato in .pdf, uno script con #!) resta fuori */
+  if(inizia(0x4D, 0x5A) || inizia(0x7F, 0x45, 0x4C, 0x46) || inizia(0xCA, 0xFE, 0xBA, 0xBE) || inizia(0xFE, 0xED, 0xFA, 0xCE) ||
+     inizia(0xFE, 0xED, 0xFA, 0xCF) || inizia(0xCE, 0xFA, 0xED, 0xFE) || inizia(0xCF, 0xFA, 0xED, 0xFE) || inizia(0x23, 0x21))
+    return {errore:'vietato'};
+  /* un tipo che l'archivio non conosce (un progetto di Premiere, un .drp...) parte come file generico: si scarica e basta */
+  let tipo = TIPI_ALLEGATO.indexOf(file.type) >= 0 ? file.type : 'application/octet-stream';
+  /* se dice di essere un'immagine o un PDF ma dentro non lo e', diventa un file generico: non si apre nel browser */
+  const firme = {'image/jpeg':()=>inizia(0xFF, 0xD8, 0xFF), 'image/png':()=>inizia(0x89, 0x50, 0x4E, 0x47), 'image/gif':()=>testo.slice(0, 4) === 'GIF8',
+    'image/webp':()=>testo.slice(0, 4) === 'RIFF' && testo.slice(8, 12) === 'WEBP', 'application/pdf':()=>testo.indexOf('%PDF') === 0,
+    'application/zip':()=>inizia(0x50, 0x4B), 'application/x-zip-compressed':()=>inizia(0x50, 0x4B)};
+  ['application/vnd.openxmlformats-officedocument.wordprocessingml.document','application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
+   'application/vnd.openxmlformats-officedocument.presentationml.presentation'].forEach(t => { firme[t] = () => inizia(0x50, 0x4B); });
+  if(firme[tipo] && !firme[tipo]()) tipo = 'application/octet-stream';
+  return {tipo};
+}
+/* il caricamento passa da qui per sapere a che punto e' (la libreria non lo dice) */
+function caricaConAvanzamento(percorso, corpo, tipo, alPasso){
+  return new Promise(async (ok, ko) => {
+    let tok = '';
+    try{ const {data} = await sb.auth.getSession(); tok = (data && data.session && data.session.access_token) || ''; }catch(e){}
+    const base = window.__FINTO_ARCHIVIO || (SUPA_URL + '/storage/v1');
+    const x = new XMLHttpRequest();
+    x.open('POST', base + '/object/allegati/' + percorso.split('/').map(encodeURIComponent).join('/'));
+    x.setRequestHeader('Authorization', 'Bearer ' + (tok || SUPA_KEY));
+    x.setRequestHeader('apikey', SUPA_KEY);
+    x.setRequestHeader('x-upsert', 'false');
+    x.setRequestHeader('cache-control', 'max-age=3600');
+    x.setRequestHeader('Content-Type', tipo);
+    x.upload.onprogress = e => { if(e.lengthComputable && alPasso) alPasso(Math.min(99, Math.floor(e.loaded / e.total * 100))); };
+    x.onload = () => {
+      if(x.status >= 200 && x.status < 300){ if(alPasso) alPasso(100); ok(); return; }
+      let m = 'caricamento ' + x.status;
+      try{ const j = JSON.parse(x.responseText); m = j.message || j.error || m; }catch(e){}
+      const err = new Error(m); err.status = x.status; ko(err);
+    };
+    x.onerror = () => ko(new Error('rete'));
+    x.onabort = () => ko(new Error('annullato'));
+    x.send(corpo);
+  });
+}
+async function caricaAllegato(pid, file, alPasso){
   if(!sb || !utenteCloud) throw new Error("serve l'accesso");
-  if(file.size > MAX_ALLEGATO) throw new Error('troppo grande');
+  const ctl = await controllaAllegato(file);
+  if(ctl.errore){ const e = new Error(ctl.errore === 'grande' ? 'troppo grande' : ctl.errore); e.codice = ctl.errore; throw e; }
   const org = orgProg[pid] || orgMia;
-  const pulito = String(file.name || 'file').normalize('NFKD').replace(/[\u0300-\u036f]/g, '')
+  const pulito = String(file.name || 'file').normalize('NFKD').replace(/[̀-ͯ]/g, '')
     .replace(/[^A-Za-z0-9._-]+/g, '-').replace(/-+/g, '-').replace(/^[-.]+/, '').slice(-80) || 'file';
   const percorso = org + '/' + pid + '/' + Date.now().toString(36) + Math.random().toString(36).slice(2, 8) + '-' + pulito;
-  /* un tipo che l'archivio non conosce (un progetto di Premiere, un .drp...) parte come file generico: si scarica e basta */
-  const tipo = TIPI_ALLEGATO.indexOf(file.type) >= 0 ? file.type : 'application/octet-stream';
-  /* storage-js manda il File cosi' com'e': conta il SUO tipo, non contentType. Un .mpeg o un .m4a strano
-     sarebbe rifiutato (400): lo rimpacchetto col tipo giusto. */
+  const tipo = ctl.tipo;
+  /* il corpo porta il tipo giusto: un .mpeg o un .m4a strano non viene rifiutato */
   const corpo = file.type === tipo ? file : new Blob([file], {type:tipo});
-  const {error} = await sb.storage.from('allegati').upload(percorso, corpo, {contentType:tipo, upsert:false});
-  if(error) throw error;
+  try{ await caricaConAvanzamento(percorso, corpo, tipo, alPasso); }
+  catch(e){
+    /* se la strada con l'avanzamento non risponde proprio (rete strana, proxy), riprovo con la libreria, senza percentuale */
+    if(e && e.status) throw e;
+    const {error} = await sb.storage.from('allegati').upload(percorso, corpo, {contentType:tipo, upsert:false});
+    if(error) throw error;
+    if(alPasso) alPasso(100);
+  }
   return {path:percorso, nome:String(file.name || pulito).slice(0, 120), dim:file.size, tipo};
 }
 const linkAllegati = {};
