@@ -3529,6 +3529,83 @@ button.pf-p:hover{background:var(--surface-2);border-radius:10px}
 }
 @media (max-width:420px){ .pf .prof-scelte{gap:8px} .pf .prof-b{padding:10px;gap:9px;min-height:54px} .pf .prof-b .ic{width:32px;height:32px} .pf .prof-b .nm{font-size:12.5px} .pf .prof-b .sp{display:none} }
 
+
+/* ---------- v61: LA HOME DEL TELEFONO ---------- */
+@media (max-width:620px){
+  .home-tel .topbar{display:none!important}
+  .ht{padding:0 0 24px;background:var(--bg)}
+  .ht-hero{position:relative;overflow:hidden;padding:calc(20px + env(safe-area-inset-top,0px)) 12px 20px 16px;color:#fff;background:var(--cielo)}
+  .ht-hero .hm-pae{position:absolute!important;inset:0!important;top:0!important;left:0!important;width:100%!important;height:100%!important;z-index:0!important}
+  .ht-velo{z-index:0}
+  .ht-velo{position:absolute;inset:0;pointer-events:none;
+    background:linear-gradient(180deg,transparent 0%,transparent 70%,color-mix(in srgb,var(--bg) 70%,transparent) 100%)}
+  .ht-testa{position:relative;z-index:1;display:flex;align-items:center;gap:8px;min-height:48px}
+  .ht-ciao{flex:1;min-width:0;margin:0;font:800 19px/1.2 Sora;letter-spacing:-.015em;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+  .ht-ciao .mano{display:none}
+  .ht-hero.tono-chiaro .ht-ciao{text-shadow:0 1px 10px rgba(0,0,0,.45)}
+  .ht-hero.tono-scuro .ht-ciao{color:#13203a;text-shadow:0 1px 10px rgba(255,255,255,.7)}
+  .ht-tondo{position:relative;width:40px;height:40px;border-radius:50%;display:grid;place-items:center;flex:none;
+    background:color-mix(in srgb,var(--surface) 78%,transparent);border:1px solid var(--line);color:var(--text);
+    -webkit-backdrop-filter:blur(10px);backdrop-filter:blur(10px)}
+  .ht-tondo svg{width:20px;height:20px}
+  .ht-me{padding:0;overflow:hidden}
+  .ht-me .av{width:38px;height:38px;font-size:13px}
+  .ht-n{position:absolute;top:-3px;right:-3px;min-width:18px;height:18px;padding:0 4px;border-radius:9px;background:var(--alert);
+    color:#fff;font:700 10px/18px Sora;font-style:normal;text-align:center;border:2px solid var(--bg)}
+  .ht-stats{display:grid;grid-template-columns:repeat(4,1fr);margin:12px 14px 0;padding:10px 4px;border-radius:14px;
+    border:1px solid var(--line);background:var(--surface)}
+  .ht-stat{--c:#4F7BFF;display:flex;flex-direction:column;align-items:center;gap:3px;min-width:0;padding:0 4px;text-align:center}
+  .ht-stat+.ht-stat{border-left:1px solid var(--line-soft)}
+  .ht-stat.verde{--c:#2FBF8A}.ht-stat.rosso{--c:#F0505A}.ht-stat.viola{--c:#8B5CF6}
+  .ht-stat .r{display:flex;align-items:center;gap:6px}
+  .ht-stat .ic{width:20px;height:20px;border-radius:6px;display:grid;place-items:center;background:var(--c);color:#fff;flex:none}
+  .ht-stat .ic svg{width:12px;height:12px}
+  .ht-stat b{font:800 17px/1 Sora;color:var(--text)}
+  .ht-stat .l{font-size:10.5px;line-height:1.2;color:var(--dim);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:100%}
+  .ht-sez{display:flex;align-items:center;gap:8px;padding:24px 16px 10px}
+  .ht-sez h2{margin:0;flex:1;font:700 21px/1.2 Sora;letter-spacing:-.01em}
+  .ht-tutti{display:inline-flex;align-items:center;gap:4px;background:none;border:none;color:var(--dim);font-size:14px;font-weight:500;padding:6px 0}
+  .ht-tutti svg{width:15px;height:15px}
+  .ht-spazi{display:grid;grid-template-columns:1fr 1fr;gap:12px;padding:0 14px}
+  .ht-spc{display:flex;flex-direction:column;border-radius:16px;overflow:hidden;border:1px solid var(--line);background:var(--surface);cursor:pointer;min-width:0}
+  .ht-spc .cop{position:relative;display:block;height:92px;overflow:hidden;
+    background:linear-gradient(135deg,color-mix(in srgb,var(--acc) 70%,var(--surface)),color-mix(in srgb,var(--acc) 25%,var(--surface-2)))}
+  .ht-spc .cop img{width:100%;height:100%;object-fit:cover;display:block}
+  .ht-spc .cop-ic{position:absolute;inset:0;display:grid;place-items:center;color:#fff;opacity:.9}
+  .ht-spc .cop-ic svg{width:34px;height:34px}
+  .ht-piu{position:absolute;top:8px;right:8px;width:32px;height:32px;border-radius:50%;display:grid;place-items:center;
+    background:rgba(10,14,24,.55);color:#fff;-webkit-backdrop-filter:blur(6px);backdrop-filter:blur(6px)}
+  .ht-piu svg{width:16px;height:16px}
+  .ht-spc .ht-cp{display:flex;flex-direction:column;gap:3px;padding:10px 12px 12px;min-width:0}
+  .ht-spc .ht-cp b{font:700 15px/1.25 Sora;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+  .ht-spc .ht-ds{font-size:12.5px;color:var(--dim);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+  .ht-spc .ht-rg{display:flex;align-items:center;gap:8px;margin-top:9px}
+  .ht-spc .ht-pb{flex:1;height:5px;border-radius:9px;background:var(--surface-3);overflow:hidden}
+  .ht-spc .ht-pb i{display:block;height:100%;background:var(--acc);border-radius:inherit}
+  .ht-spc .ht-nt{font-size:11.5px;color:var(--dim);flex:none}
+  .ht-task{margin:0 14px;border-radius:16px;border:1px solid var(--line);background:var(--surface);overflow:hidden}
+  .ht-task .hm-vuoto{padding:18px}
+  .ht-t{display:flex;align-items:center;gap:12px;padding:13px 14px;cursor:pointer}
+  .ht-t+.ht-t{border-top:1px solid var(--line-soft)}
+  .ht-t .box{width:26px;height:26px;border-radius:8px;border:2px solid var(--line);display:grid;place-items:center;flex:none;color:transparent}
+  .ht-t.urg .box{border-color:var(--alert)}
+  .ht-t .box svg{width:14px;height:14px}
+  .ht-t .tx{flex:1;min-width:0;display:flex;flex-direction:column;gap:2px}
+  .ht-t .tx b{font-size:15px;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+  .ht-t .tx span{font-size:12.5px;color:var(--dim);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+  .ht-t .q{font-size:13.5px;font-weight:600;color:var(--amber-ink);flex:none}
+  .ht-t.urg .q{color:var(--alert)}
+  .ht-t .chi .av{width:30px;height:30px;font-size:11px}
+  /* la barra in basso: quattro posti, staccata e arrotondata */
+  .tabbar{left:8px;right:8px;bottom:calc(6px + env(safe-area-inset-bottom,0px));border:1px solid var(--line);border-radius:26px;
+    padding:6px 6px;box-shadow:0 10px 30px rgba(0,0,0,.28);background:color-mix(in srgb,var(--surface) 92%,transparent);
+    -webkit-backdrop-filter:blur(14px);backdrop-filter:blur(14px)}
+  .tabbar .tb{padding:7px 2px 6px}
+  .tabbar .tb svg{width:24px;height:24px}
+  .tabbar .tb .lb{font-size:11px}
+  .tabbar .tb.on{color:var(--text)}
+  .tabbar .tb.on .ic{color:var(--amber)}
+}
 </style>
 
 </head>
@@ -3650,6 +3727,8 @@ const I = {
   calc:'<rect x="5" y="3" width="14" height="18" rx="2"/><path d="M8.5 7h7v3h-7zM8.5 14h.01M12 14h.01M15.5 14h.01M8.5 17.5h.01M12 17.5h.01M15.5 17.5h.01"/>',
   shirt:'<path d="M8 3 4 5.5 2 10l3.5 1.5L7 9v12h10V9l1.5 2.5L22 10l-2-4.5L16 3c-.5 1.5-2 2.5-4 2.5S8.5 4.5 8 3z"/>',
   casa:'<path d="M3 11 12 4l9 7"/><path d="M5 10v10h14V10"/><path d="M10 20v-6h4v6"/>',
+  cartella:'<path d="M3 7.5A2.5 2.5 0 0 1 5.5 5H10l2 2.5h6.5A2.5 2.5 0 0 1 21 10v7.5a2.5 2.5 0 0 1-2.5 2.5h-13A2.5 2.5 0 0 1 3 17.5z"/>',
+  spunta:'<rect x="4" y="4" width="16" height="16" rx="3.5"/><path d="m8.5 12.2 2.4 2.4 4.6-5"/>',
   briefcase:'<rect x="3" y="7" width="18" height="13" rx="2"/><path d="M9 7V5a2 2 0 0 1 2-2h2a2 2 0 0 1 2 2v2M3 12h18"/>',
   type:'<path d="M5 7V4h14v3M12 4v16M9 20h6"/>',
   euro:'<path d="M17.5 6.5a7 7 0 1 0 0 11"/><path d="M4 10h9M4 14h9"/>',
@@ -5112,9 +5191,9 @@ function intestazioneSpazio(lista){
     (state.ospite? '' : '<div class="azioni">'+
       (puo('spazi')? '<button class="btn sm ghost" data-action="modifica-spazio" data-id="'+sp.id+'">'+svg('ingranaggio')+'Modifica spazio</button>' : '')+
       '<button class="btn primary no-tel" data-action="nuovo">'+svg('plus')+'Nuovo progetto</button>'+
-      (suTelefono() && state.vista!=='note' ? '<div class="viste-tel">'+
-        ['tessere','lista'].map(k=>'<button class="vt'+(state.vista===k?' on':'')+'" data-action="vista" data-v="'+k+'" '+
-          'title="'+(k==='tessere'?'Tessere':'Lista')+'">'+svg(k==='tessere'?'grid':'list')+'</button>').join('')+
+      (suTelefono() ? '<div class="viste-tel">'+
+        ['tessere','lista','note'].map(k=>'<button class="vt'+(state.vista===k?' on':'')+'" data-action="vista" data-v="'+k+'" '+
+          'title="'+({tessere:'Tessere',lista:'Lista',note:'Note'})[k]+'">'+svg(({tessere:'grid',lista:'list',note:'pen'})[k])+'</button>').join('')+
         '</div>' : '')+
     '</div>')+'</div>';
 }
@@ -6282,18 +6361,16 @@ function renderTabbar(){
   if(n.hidden){ n.innerHTML = ''; return; }
   const mie = contaMie();
   const T = [
-    {k:'casa',     l:'Home',    ic:'casa'},
-    {k:'progetti', l:'Lavori',  ic:'grid'},
-    {k:'mie',      l:'Per te',  ic:'check', n:mie},
-    {k:'note',     l:'Note',    ic:'pen'},
-    {k:'profilo',  l:'Profilo', ic:'user'}
+    {k:'casa',     l:'Home',     ic:'casa'},
+    {k:'progetti', l:'Progetti', ic:'cartella'},
+    {k:'mie',      l:'Task',     ic:'spunta', n:mie},
+    {k:'profilo',  l:'Profilo',  ic:'user'}
   ];
   const attivo =
     (state.schermo==='profilo' || state.schermo==='guida' || state.schermo==='team') ? 'profilo' :
     state.schermo==='calendario' ? 'lavori' :
     state.schermo==='mie'     ? 'mie' :
     state.schermo==='spazi'   ? 'casa' :
-    (state.schermo==='home' && state.vista==='note') ? 'note' :
     state.schermo==='home' ? 'progetti' : '';
   n.innerHTML = T.map(t=>
     '<button class="tb'+(attivo===t.k?' on':'')+'" data-action="tab-tel" data-k="'+t.k+'">'+
@@ -6561,6 +6638,7 @@ function cartaInvitoGuida(cls){
 }
 
 function renderSpazi(){
+  if(suTelefono()) return renderHomeTelefono();
   const o = oraHome(), elenco = spaziVisibili();
   const attivi = state.progetti.filter(p=>!p.completato && vedeProgetto(p));
   const taskAperte = attivi.reduce((n,p)=>n+(p.subs||[]).filter(s=>(s.items||[]).some(i=>!i.done)).length, 0);
@@ -6662,6 +6740,66 @@ function renderSpazi(){
   h += '</div></div></div>';
   el('stage').innerHTML = h;
 }
+/* ============ LA HOME DEL TELEFONO (v61) ============
+   Pulita, in quest'ordine: chi sei e che giorno e', quattro numeri, i tuoi spazi
+   in due colonne, le task che scadono. Niente altro: il resto e' nelle sezioni. */
+function renderHomeTelefono(){
+  const o = oraHome(), elenco = spaziVisibili();
+  const attivi = state.progetti.filter(p=>!p.completato && vedeProgetto(p));
+  const taskAperte = attivi.reduce((n,p)=>n+(p.subs||[]).filter(s=>(s.items||[]).some(i=>!i.done)).length, 0);
+  const scad = attivi.filter(p=>{ const g = giorniA(p.consegna); return g!=null && g<=7; });
+  const persone = personeOrg();
+  const mie = vociInScadenza();
+  const nuove = (state.notifiche||[]).filter(n=>n.nuova).length;
+  const scena = paesaggioHome();
+  const me = U(state.utente);
+  let h = '<div class="pane"><div class="scroller ht">';
+  h += '<section class="ht-hero tono-'+scena.tono+'" style="--cielo:'+scena.cielo+'">'+scena.svg+'<span class="ht-velo"></span>'+
+    '<div class="ht-testa"><h1 class="ht-ciao">'+saluto()+', '+esc(String((state.me && state.me.nome) || nomeVisibile()).trim().split(' ')[0])+' <span class="mano">👋</span></h1>'+
+      '<button class="ht-tondo" data-action="nuovo-da-tel" aria-label="Crea">'+svg('plus',2.2)+'</button>'+
+      '<button class="ht-tondo" data-action="notifiche" aria-label="Notifiche">'+svg('bell',2)+(nuove? '<i class="ht-n">'+(nuove>9?'9+':nuove)+'</i>' : '')+'</button>'+
+      '<button class="ht-tondo ht-me" data-action="tab-tel" data-k="profilo" aria-label="Profilo">'+av(me)+'</button></div></section>';
+
+  /* v63: una barretta sola, solo da leggere */
+  const voce = (cls, ic, n, l) => '<div class="ht-stat '+cls+'"><span class="r"><span class="ic">'+svg(ic,2.4)+'</span><b>'+n+'</b></span><span class="l">'+l+'</span></div>';
+  h += '<div class="ht-stats" role="group" aria-label="Riepilogo">'+
+    voce('blu', 'cartella', attivi.length, attivi.length===1?'progetto':'progetti')+
+    voce('verde', 'check', taskAperte, taskAperte===1?'task aperta':'task aperte')+
+    voce('rosso', 'clock', scad.length, 'in scadenza')+
+    voce('viola', 'users', persone.length, persone.length===1?'persona':'persone')+
+  '</div>';
+
+  const tutti = !!state.hmSpaziTutti, vis = tutti ? elenco : elenco.slice(0, 4);
+  h += '<div class="ht-sez"><h2>I tuoi spazi</h2>'+(elenco.length > 4 ? '<button class="ht-tutti" data-action="hm-spazi-tutti">'+(tutti?'Mostra meno':'Vedi tutti')+svg('right',2.4)+'</button>' : '')+'</div>';
+  h += '<input type="file" id="hmCopFile" accept="image/*" hidden>';
+  h += '<div class="ht-spazi">'+vis.map(sp=>{
+    let tot = 0, fatte = 0;
+    progettiDi(sp.id).forEach(p=>(p.subs||[]).forEach(s=>{ const it = s.items||[]; if(!it.length) return; tot++; if(p.completato || it.every(i=>i.done)) fatte++; }));
+    const pct = tot ? Math.round(fatte/tot*100) : 0;
+    const col = coloreOk(sp.col, '#FFAD01'), bg = sfondoSicuro(sp.sfondo);
+    const ds = sp.desc || TIPO(sp.tipo).prof || '';
+    return '<div class="ht-spc" style="--acc:'+col+'" role="button" tabindex="0" data-action="apri-spazio" data-id="'+esc(sp.id)+'">'+
+      '<span class="cop'+(bg?' con-foto':'')+'">'+(bg? imgRit(bg, ritDi(sp,'home')) : '<span class="cop-ic">'+svg(sp.icona,1.6)+'</span>')+
+        (puo('spazi') && !state.ospite ? '<span class="ht-piu" role="button" tabindex="0" data-action="ht-spazio-menu" data-id="'+esc(sp.id)+'" aria-label="Altro">'+svg('altro',2)+'</span>' : '')+'</span>'+
+      '<span class="ht-cp"><b>'+esc(sp.nome)+'</b><span class="ht-ds">'+esc(ds)+'</span>'+
+      '<span class="ht-rg"><span class="ht-pb"><i style="width:'+pct+'%"></i></span><span class="ht-nt">'+(tot? fatte+'/'+tot+' task' : 'nessuna task')+'</span></span></span></div>';
+  }).join('')+(!elenco.length ? '<div class="hm-vuoto">'+svg('grid',2)+'<span>Ancora nessuno spazio: tocca + per crearne uno.</span></div>' : '')+'</div>';
+
+  h += '<div class="ht-sez"><h2>Task in scadenza</h2><button class="ht-tutti" data-action="tab-tel" data-k="mie">Vedi tutti'+svg('right',2.4)+'</button></div>';
+  h += '<div class="ht-task">'+(mie.length ? mie.slice(0,4).map(x=>{
+    const q = quandoScade(x.g), urg = x.g!==9999 && x.g<=2;
+    const chi = assDi(x.i).length? assDi(x.i) : [x.s.assegnato].filter(Boolean);
+    const quando = x.g===9999 ? '' : x.g<0 ? 'In ritardo' : q.t;
+    return '<div class="ht-t'+(urg?' urg':'')+'" role="button" tabindex="0" data-action="vai-primo" data-pid="'+esc(x.p.id)+'" data-sid="'+esc(x.s.id)+'">'+
+      '<span class="box" role="button" tabindex="0" data-action="check-mia" data-pid="'+esc(x.p.id)+'" data-sid="'+esc(x.s.id)+'" data-i="'+x.ix+'" aria-label="Segna come fatto">'+svg('check',3.2)+'</span>'+
+      '<span class="tx"><b>'+esc(x.i.t)+'</b><span>'+esc(x.p.nome)+'</span></span>'+
+      (quando? '<span class="q">'+esc(quando)+'</span>' : '')+
+      (chi.length? '<span class="chi">'+av(U(chi[0]),'sm')+'</span>' : '')+'</div>';
+  }).join('') : '<div class="hm-vuoto">'+svg('check',2)+'<span>Niente in scadenza per te.</span></div>')+'</div>';
+  h += '</div></div>';
+  el('stage').innerHTML = h;
+}
+
 /* ============ LE SCENE DEL SALUTO ============
    Il primo impatto della Home: una scena disegnata (niente foto da scaricare)
    che cambia col momento della giornata. Tre scene per momento, scelte a caso
@@ -8916,7 +9054,7 @@ function misuraNav(){
   if(!suTelefono()){ document.documentElement.style.setProperty('--nav-h','0px'); return; }
   const tb = el('tabbar'), vs = el('viewswitch');
   const n = (tb && !tb.hidden) ? tb : ((vs && !vs.hidden) ? vs : null);
-  document.documentElement.style.setProperty('--nav-h', (n? n.offsetHeight : 0)+'px');
+  document.documentElement.style.setProperty('--nav-h', (n? n.offsetHeight + (n===tb? 12 : 0) : 0)+'px');
 }
 let timerNav = null;
 window.addEventListener('resize', ()=>{
@@ -8964,6 +9102,7 @@ function render(){
   else if(state.schermo==='guida'){ renderGuida(); }
   else { renderProgetto(); }
   renderTop(); renderPhasebar(); renderTabbar(); renderDrawer();
+  el('app').classList.toggle('home-tel', state.schermo==='spazi' && suTelefono());
   el('app').classList.toggle('con-nav', state.schermo==='home' || !el('tabbar').hidden);
   misuraNav();
   el('drawer').classList.toggle('on', state.drawer);
@@ -9832,7 +9971,7 @@ function cartaModelli(){
    Come si fa tutto, capitolo per capitolo: dai primi passi alle cose per chi
    organizza un team. Si cerca per parola (anche senza accenti); in fondo c'e'
    il tasto per segnalare quello che manca o non funziona. */
-const VERSIONE = 'v60';
+const VERSIONE = 'v63';
 const LIVELLI_GUIDA = {base:'Per cominciare', medio:'Tutti i giorni', esperto:'Per chi organizza', aiuto:'Se qualcosa non va'};
 const GUIDA = [
 {id:'primi-passi', liv:'base', ic:'spark', t:'Primi passi', s:'Cos’è FOSS e come ci si muove', v:[
@@ -9844,7 +9983,7 @@ const GUIDA = [
   ['Il riquadro «Scopri FOSS»', 'In basso a sinistra, una volta ogni cinque aperture, compare il riquadro che porta alla guida. La <b>×</b> lo chiude; per non vederlo più spegnilo in <b>Profilo → Guida e aiuto</b>.'],
   ['Il saluto', 'Dietro al saluto c’è una scena disegnata che segue la giornata: mattino, pomeriggio, sera e notte, con tre scene ciascuno (mongolfiere, spiaggia, tramonto, cielo stellato…). Ogni volta che apri FOSS ne esce una a caso; il tasto '+svg('spark',2.2).replace('<svg','<svg style="width:13px;height:13px;vertical-align:-2px"')+' passa alla successiva. Se sul dispositivo hai chiesto di ridurre il movimento, la scena sta ferma.'],
   ['Sul computer e sull’iPad', 'Dalla Home entri in uno spazio: a sinistra resta il menu con i tuoi spazi, in alto il nome dello spazio con <b>Modifica spazio</b> e <b>Nuovo progetto</b>, sotto le viste (Bacheca, Lista, Calendario, Mappa, Note). La <b>Bacheca</b> mette i progetti in colonne: per stato, per priorità o per scadenza, a scelta con <b>Dividi per</b>. Sugli schermi larghi a destra trovi la scheda dello spazio: copertina, avanzamento, persone e ultime attività. In alto a destra restano Annulla, il tema, la <b>Guida</b>, la campanella e la tua foto, che apre il profilo.'],
-  ['Sul telefono', 'In basso ci sono cinque sezioni: <b>Home</b>, <b>Lavori</b>, <b>Per te</b>, <b>Note</b> e <b>Profilo</b>. In alto a sinistra il <b>+</b> per creare, al centro il nome di dove sei, a destra la campanella. Dentro a un lavoro la freccia in alto a sinistra ti riporta ai lavori.'],
+  ['Sul telefono', 'In basso ci sono quattro sezioni: <b>Home</b>, <b>Progetti</b>, <b>Task</b> (quello che tocca a te) e <b>Profilo</b>. Le <b>Note</b> sono dentro a ogni spazio, accanto a tessere ed elenco. In alto a sinistra il <b>+</b> per creare, al centro il nome di dove sei, a destra la campanella. Dentro a un lavoro la freccia in alto a sinistra ti riporta ai lavori.'],
   ['I lavori che fai', 'Al primo accesso FOSS ti chiede che lavori fai (videomaker, fotografo, social media manager…): quando crei spazi, progetti e preset ti propone solo quelli. Li aggiungi o togli quando vuoi da <b>Profilo → I lavori che fai</b>.'],
   ['Metterlo sulla schermata Home', 'Sull’iPhone apri FOSS con Safari, tocca <b>Condividi</b> e poi <b>Aggiungi alla schermata Home</b>. Su Android, dal menu di Chrome, <b>Installa app</b> o <b>Aggiungi a schermata Home</b>. Si apre a tutto schermo come un’app; sull’iPhone è anche l’unico modo per ricevere gli avvisi.']
 ]},
@@ -9883,7 +10022,7 @@ const GUIDA = [
   ['Taggare le persone', 'Sotto la task, <b>Tagga</b> aggiunge chi deve seguirla senza esserne il responsabile: riceve un avviso. Anche nella nota della task puoi taggare chi ci lavora.'],
   ['La descrizione della task', 'Tocca <b>Aggiungi una descrizione</b> dentro la task: cosa va fatto, riferimenti, link (diventano cliccabili). Sotto si vede chi l’ha scritta e quando. Per discutere, invece, usa il fumetto dei commenti.'],
   ['Cambiare o eliminare', 'Tasto destro sulla subtask (o tienila premuta): <b>Rinomina la subtask</b>, i suoi commenti, la checklist, <b>Elimina subtask</b>. Lo stesso sulla task.'],
-  ['Per te', 'Sul telefono la sezione <b>Per te</b> raccoglie tutto quello che è assegnato a te, lavoro per lavoro: puoi spuntare da lì senza aprire i progetti.']
+  ['Le tue task', 'Sul telefono la sezione <b>Task</b> raccoglie tutto quello che è assegnato a te, lavoro per lavoro: puoi spuntare da lì senza aprire i progetti.']
 ]},
 {id:'viste', liv:'medio', ic:'eye', t:'Viste, filtri e ricerca', s:'Guardare i lavori nel modo che ti serve', v:[
   ['Le viste', 'In alto scegli come vedere i progetti dello spazio: <b>Tessere</b>, <b>Lista</b>, <b>Calendario</b>, <b>Mappa</b> e <b>Note</b>. Sul telefono ci sono Tessere, Lista e Note: calendario e mappa stanno sugli schermi più grandi. Puoi trascinare i tasti delle viste per metterli nell’ordine che preferisci.'],
@@ -12343,6 +12482,16 @@ document.addEventListener('click', function(e){
       snap('Copertina tolta da «'+pr.nome+'»');
       delete pr.copertina; delete pr.copRit; logga(pr, 'Copertina tolta'); render(); break; }
     case 'hm-spazi-tutti': state.hmSpaziTutti = !state.hmSpaziTutti; render(); break;
+    case 'ht-spazio-menu':{
+      const sp = state.spazi.find(x=>x.id===t.dataset.id); if(!sp) break;
+      const r = t.getBoundingClientRect(), d = 'data-id="'+esc(sp.id)+'"';
+      apriCtx(Math.max(8, r.right - 250), r.bottom + 6, esc(sp.nome), [
+        {a:'apri-spazio', d, l:'Apri', ic:'right'},
+        {a:'hm-copertina', d, l:sfondoSicuro(sp.sfondo)? 'Cambia la copertina' : 'Aggiungi una copertina', ic:'foto'},
+        sfondoSicuro(sp.sfondo)? {a:'rit-spazio', d, l:'Scegli cosa si vede', ic:'grid'} : null,
+        {a:'modifica-spazio', d, l:'Modifica spazio', ic:'ingranaggio'}
+      ], null);
+      break; }
     case 'box-guida-chiudi': state.boxGuidaChiuso = true; render(); break;
     case 'hm-spazi-apri': state.hmSpaziChiusi = !state.hmSpaziChiusi; render(); break;
     case 'hm-copertina':{
