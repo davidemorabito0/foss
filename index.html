@@ -893,6 +893,11 @@ input,textarea,select{font:inherit;color:inherit}
 }
 .rewind:hover:not(:disabled){border-color:var(--amber);color:var(--amber-ink);background:var(--amber-soft)}
 .rewind:disabled{opacity:.3;cursor:default}
+.rewind.libere{border-color:color-mix(in srgb,var(--ok) 55%,var(--line));color:var(--ok);background:var(--ok-soft)}
+.nl-seq{display:flex;align-items:center;gap:12px;padding:12px 14px;margin-bottom:12px;border-radius:12px;border:1px solid var(--line);background:var(--surface-2)}
+.nl-seq .tx{flex:1;min-width:0;display:flex;flex-direction:column;gap:2px}
+.nl-seq .tx b{font-size:13.5px}
+.nl-seq .tx span{font-size:12px;color:var(--mute);line-height:1.35}
 .rewind svg{width:19px;height:19px}
 .rewind .rw-l{font-size:12px;font-weight:600;white-space:nowrap}
 @media (min-width:1000px){ .rewind{width:auto!important;padding:0 14px;gap:7px;display:inline-flex;align-items:center} }
@@ -5920,6 +5925,16 @@ function tastoFeed(p){
 }
 
 /* ============ BARRA FASI ============ */
+/* v66: FASI LIBERE. Di base un lavoro va una fase alla volta e quelle passate si chiudono
+   (si riaprono col cronometro). Con p.fasiLibere si va avanti e indietro quando si vuole,
+   senza blocchi: utile per i lavori che rimbalzano tra brief, riprese, montaggio, export. */
+const fasiLibere = p => !!(p && p.fasiLibere);
+function faseVisibile(p, f){ return fasiLibere(p) ? f : Math.min(f, p.avanz); }
+function vaiAFase(p, i){
+  p.fase = i;
+  if(fasiLibere(p)){ p.avanz = Math.max(p.avanz||0, i); p.revisione = false; }
+  else p.revisione = p.fase < p.avanz;
+}
 function renderPhasebar(){
   const bar = el('phasebar'), slot = el('bannerSlot');
   slot.innerHTML = ''; bar.classList.remove('vuota');
@@ -5981,16 +5996,22 @@ function renderPhasebar(){
       (snoozeOn? '<span class="snoozed">'+svg('clock').replace('<svg','<svg style="width:12px;height:12px"')+'silenziate</span>':'');
     return;
   }
-  const p = PROJ();
-  let h = '<button class="rewind'+(p.revisione?' armed':'')+'" data-action="indietro" '+
-    'title="Torna indietro su una fase gi\u00e0 chiusa"'+
-    (p.avanz===0 ?' disabled':'')+'>'+svg('rewind',1.9)+'<span class="rw-l">Riapri fase</span></button><div class="steps">';
+  const p = PROJ(), lib = fasiLibere(p);
+  let h = lib
+    ? '<button class="rewind libere" data-action="fasi-modo" title="Fasi libere: vai su qualunque fase. Tocca per rimetterle in sequenza">'+svg('unlock',1.9)+'<span class="rw-l">Fasi libere</span></button><div class="steps">'
+    : '<button class="rewind'+(p.revisione?' armed':'')+'" data-action="indietro" '+
+      'title="Torna indietro su una fase gi\u00e0 chiusa, o togli il blocco delle fasi">'+svg('rewind',1.9)+'<span class="rw-l">Riapri fase</span></button><div class="steps">';
   /* le fasi dove ci sono commenti nuovi nelle task hanno il pallino */
   const stThr = statoThr(p), nuoviFase = {};
   p.subs.forEach(s=>{ const n = nuoviInTask(stThr, s); if(n) nuoviFase[s.fase] = (nuoviFase[s.fase]||0) + n; });
   FZ(p).forEach((f,i)=>{
     let cls='', st='';
-    if(i < p.fase){ cls='off'; st='Chiusa'; }
+    if(lib){
+      const it = p.subs.filter(s=>s.fase===i).reduce((a,s)=>{ (s.items||[]).forEach(v=>{ a[1]++; if(v.done) a[0]++; }); return a; }, [0,0]);
+      cls = i===p.fase ? 'active' : 'ready';
+      st = it[1] ? it[0]+'/'+it[1]+' fatte' : (i===p.fase ? 'Qui' : 'Aperta');
+    }
+    else if(i < p.fase){ cls='off'; st='Chiusa'; }
     else if(i === p.fase){ cls = p.revisione?'editing active':'active'; st = p.revisione?'In modifica':'In corso'; }
     else if(i <= p.avanz){ cls='ready paused'; st='In pausa'; }
     else { cls='ready'; st='Disponibile'; }
@@ -6065,7 +6086,7 @@ const PERM_AZIONE = {
   'edit':'modifica','personale-toggle':'modifica','cop-progetto':'modifica','rit-progetto':'modifica','togli-cop-progetto':'modifica','salva-campo':'modifica','nuova-task':'modifica','add-compito':'modifica',
   'tagga':'modifica','tagga-chi':'modifica','stagga':'modifica','assegna-sub':'modifica','assegna-sub-chi':'modifica','ass-tocca':'modifica','ass-salva':'modifica','ass-mail':'modifica',
   'fase':'modifica','indietro':'modifica','torna-a-fase':'modifica','riprendi':'modifica','completa':'modifica',
-  'riapri-progetto':'modifica','menu-sposta':'modifica','lock':'modifica','attiva-lock':'modifica','invia':'modifica',
+  'riapri-progetto':'modifica','fasi-libere-si':'modifica','fasi-libere-no':'modifica','menu-sposta':'modifica','lock':'modifica','attiva-lock':'modifica','invia':'modifica',
   'nuova-lista':'modifica','add-lista':'modifica','togli-voce':'modifica',
   'check':'spunta','voce-stato':'spunta','voce-data':'modifica','togli-data-voce':'modifica','check-riga':'spunta','check-mia':'spunta','mie-stato':'spunta','check-lista':'spunta',
   'elimina-progetto':'elimina','conferma-elimina':'elimina','rimuovi-fatti':'elimina','rimuovi-fatti-ok':'elimina','togli-fatto':'elimina','togli-fatto-ok':'elimina','elimina-task':'elimina','elimina-compito':'elimina',
@@ -7590,7 +7611,7 @@ function applicaIndirizzo(){
   state.progettoId = p.id; state.schermo = 'progetto';
   if(a.sid){
     const s = p.subs.find(x=>x.id===a.sid);
-    if(s){ p.fase = Math.min(s.fase, p.avanz); s.aperto = true; state.taskEvidenziata = s.id; }
+    if(s){ vaiAFase(p, faseVisibile(p, s.fase)); s.aperto = true; state.taskEvidenziata = s.id; }
   }
   render(); introProgetto();
   if(state.taskEvidenziata) setTimeout(()=>flash('#sub_'+state.taskEvidenziata), 200);
@@ -8839,7 +8860,7 @@ function apriNotifica(n){
   const d = n.dati || {};
   const s2 = d.task ? pr.subs.find(x=>x.id===d.task) : null;
   const f = s2 ? s2.fase : n.f;
-  if(f!=null){ pr.fase = Math.min(f, pr.avanz); pr.revisione = pr.fase<pr.avanz; }
+  if(f!=null) vaiAFase(pr, faseVisibile(pr, f));
   if(s2) s2.aperto = true;
   apriProgetto(pr.id, false);
   /* un commento dentro una task: apro la sua discussione */
@@ -9592,7 +9613,7 @@ function modelloDa(p, nome, id){
     fasi:FZ(p).map(f=>({nome:f.nome, icon:f.icon, desc:f.desc||'', campi:(f.campi||[]).map(c=>c.slice())})),
     task:(p.subs||[]).map(s=>({fase:s.fase, titolo:s.titolo, items:(s.items||[]).map(v=>{
       const x = {t:v.t}; if(Array.isArray(v.lista)) x.lista = v.lista.map(c=>c.t); return x; })})),
-    tags:(p.tags||[]).slice(), creato_da:state.utente, t:Date.now()};
+    tags:(p.tags||[]).slice(), fasiLibere:!!p.fasiLibere, creato_da:state.utente, t:Date.now()};
 }
 function modaleSalvaModello(pid){
   const p = state.progetti.find(x=>x.id===pid); if(!p) return;
@@ -9970,7 +9991,7 @@ function cartaModelli(){
    Come si fa tutto, capitolo per capitolo: dai primi passi alle cose per chi
    organizza un team. Si cerca per parola (anche senza accenti); in fondo c'e'
    il tasto per segnalare quello che manca o non funziona. */
-const VERSIONE = 'v65';
+const VERSIONE = 'v66';
 const LIVELLI_GUIDA = {base:'Per cominciare', medio:'Tutti i giorni', esperto:'Per chi organizza', aiuto:'Se qualcosa non va'};
 const GUIDA = [
 {id:'primi-passi', liv:'base', ic:'spark', t:'Primi passi', s:'Cos’è FOSS e come ci si muove', v:[
@@ -10005,6 +10026,7 @@ const GUIDA = [
   ['Video YouTube', 'Tra i tipi di lavoro del videomaker c’è <b>Video YouTube</b>: fasi Idea, Preparazione, Riprese, Montaggio e Pubblicazione, con le task del canale (scaletta, foto per la thumbnail sul set, Short di lancio, thumbnail, titolo e descrizione con i capitoli, caricamento, controllo dopo l’uscita). Nella pubblicazione segni titolo, visibilità e link del video.'],
   ['Partire da un tuo preset', 'Nella prima pagina, sotto i tipi di lavoro, c’è <b>Oppure parti da un tuo preset</b>: fasi e task arrivano come le hai salvate. Se lo spazio ha un preset predefinito, è già scelto. Vedi il capitolo <b>Preset</b>.'],
   ['Le fasi', 'Ogni progetto avanza per fasi (per un video: preproduzione, riprese, montaggio, consegna…). Vedi le task della fase in cui sei; quando sono tutte spuntate compare il tasto <b>COMPLETATO</b>, che passa alla fase dopo. All’ultima fase il progetto si chiude; <b>Riapri il progetto</b> lo rimette in corsa.'],
+  ['Fasi libere', 'Se un lavoro rimbalza tra brief, produzione, montaggio ed export, toglici il blocco: tocca il cronometro in basso e scegli <b>Togli il blocco delle fasi</b> (o dal menu ⋮ del progetto). Così apri qualunque fase quando vuoi, senza riaprirla. Per tornare come prima tocca <b>Fasi libere</b> → <b>Rimetti le fasi in sequenza</b>. Quando crei un progetto lo scegli con l’interruttore <b>Fasi in sequenza</b>, nella pagina Fasi e task.'],
   ['Andare avanti o tornare indietro', 'Nella barra delle fasi tocca una fase più avanti: FOSS chiede conferma e ti dice cosa resta aperto. Il tasto con la freccia all’indietro, a sinistra delle fasi, riapre una fase già chiusa per rivederla o correggerla; da lì <b>Torna avanti</b> ti riporta dov’eri.'],
   ['Cambiare nome, cliente e campi', 'Non ci sono matite: fai tasto destro sul campo (sul tablet e sul telefono tienilo premuto) e in cima al menu trovi <b>Modifica</b>. Sul titolo del progetto trovi Rinomina, Modifica note, Cambia indirizzo e Aggiungi una data.'],
   ['La scheda del lavoro', 'Sul computer è la colonna a lato; sul telefono tocca il nome del lavoro in alto. Dentro ci sono team, indirizzo, date, soldi, note e i dettagli del mestiere.'],
@@ -10851,6 +10873,7 @@ function nlCambia(tipo, lavoro, modello){
   Object.keys(nl.dett).forEach(k=>{ if(!nl.dett[k] || (L0 && L0.dett && L0.dett[k]===nl.dett[k])) delete nl.dett[k]; });
   if(tipo!==nl.tipo){ const tieni = nl.dett.referente; nl.dett = {}; if(tieni) nl.dett.referente = tieni; }
   nl.tipo = tipo; nl.lavoro = lavoro || null; nl.modello = modello || null;
+  { const M = modello && typeof presetDi === 'function' ? presetDi(modello) : null; nl.fasiLibere = !!(M && M.fasiLibere); }
   if(JSON.stringify(giorniNL().map(g=>g[0])) !== g0) nl.giorni = [];
   nl.piano = null;
 }
@@ -11006,7 +11029,11 @@ function nlPaginaDati(T, L){
 function nlPaginaFasi(){
   const piano = pianoNL();
   const accese = piano.some(f=>f.on && f.task.some(t=>t.on));
-  let h = '<div class="nl-fasi-az"><span class="nota-box">'+piano.filter(f=>f.on).length+' fasi · '+
+  let h = '<div class="riga nl-seq"><span class="pf-ri">'+svg(nl.fasiLibere?'unlock':'lock',2)+'</span><div class="tx"><b>Fasi in sequenza</b><span>'+
+      (nl.fasiLibere ? 'Spento: vai avanti e indietro tra le fasi quando vuoi. Puoi cambiarlo anche dopo.'
+                     : 'Si avanza una fase alla volta e quelle passate si chiudono. Spegnilo se il lavoro rimbalza tra le fasi.')+'</span></div>'+
+      '<button class="sw'+(nl.fasiLibere?'':' on')+'" data-action="nl-seq" aria-pressed="'+(!nl.fasiLibere)+'" aria-label="Fasi in sequenza"></button></div>';
+  h += '<div class="nl-fasi-az"><span class="nota-box">'+piano.filter(f=>f.on).length+' fasi · '+
     piano.reduce((n,f)=>n+(f.on? f.task.filter(t=>t.on).length : 0),0)+' task</span>'+
     '<button class="btn sm ghost" data-action="nl-tutte" data-on="'+(accese?0:1)+'">'+(accese? 'Spegni tutte le task' : 'Riaccendi tutte le task')+'</button></div>';
   piano.forEach((f,fi)=>{
@@ -11125,6 +11152,7 @@ function nlCrea(){
     consegna: q ? q[2]+'/'+q[1]+'/'+q[0] : '', fattura: nl.personale ? '' : 'Da emettere'
   }));
   if(nl.personale) np.personale = true;
+  if(nl.fasiLibere) np.fasiLibere = true;
   if(nl.lavoro) np.lavoro = nl.lavoro;
   else if(M && M.lavoro && T.lavori && T.lavori[M.lavoro]) np.lavoro = M.lavoro;
   np.icona = T.ic;
@@ -11740,7 +11768,7 @@ document.addEventListener('click', function(e){
 
     case 'mostra-task':{
       const sb2 = p.subs.find(x=>x.id===t.dataset.id);
-      if(sb2){ if(sb2.fase!==p.fase){ p.fase = sb2.fase; p.revisione = p.fase<p.avanz; }
+      if(sb2){ if(sb2.fase!==p.fase) vaiAFase(p, sb2.fase);
                sb2.aperto = true; render(); flash('#sub_'+sb2.id);
                const n = el('sub_'+sb2.id); if(n) n.scrollIntoView({block:'center', behavior:'smooth'}); }
       break; }
@@ -12017,6 +12045,13 @@ document.addEventListener('click', function(e){
 
     case 'fase':{
       const i = Number(t.dataset.i);
+      if(fasiLibere(p)){
+        if(i === p.fase) break;
+        p.fase = i; p.avanz = Math.max(p.avanz||0, i); p.revisione = false;
+        render();
+        const n = el('step'+i); if(n){ n.classList.add('burn'); setTimeout(()=>n.classList.remove('burn'),520); }
+        break;
+      }
       if(i < p.fase){
         const n = el('step'+i); n.classList.remove('shake'); void n.offsetWidth; n.classList.add('shake');
         toast('Fase chiusa. Usa il tasto ⟲ per riaprirla.','warn','Bloccata'); break;
@@ -12059,13 +12094,40 @@ document.addEventListener('click', function(e){
         voci.push({a:'torna-a-fase', d:'data-i="'+i+'"', ic:FZ(p)[i].icon,
                    l:'Riapri <b>'+esc(FZ(p)[i].nome)+'</b>', k:'0'+(i+1)});
       }
-      if(!voci.length){ toast('Sei ancora sulla prima fase: non c\'è niente dietro.','info','Nessuna fase chiusa'); break; }
       if(p.revisione){
         voci.unshift({sep:1});
         voci.unshift({a:'riprendi', ic:'chev', l:'Torna avanti su <b>'+esc(FZ(p)[Math.min(p.avanz,FZ(p).length-1)].nome)+'</b>'});
       }
-      apriCtx(r.left, r.bottom + 6, 'Torna indietro', voci, t);
+      if(!bloccato(p) && puo('modifica')){
+        if(voci.length) voci.push({sep:1});
+        voci.push({a:'fasi-libere-si', ic:'unlock', l:'Togli il blocco delle fasi', k:'⇄'});
+      }
+      if(!voci.length){ toast('Sei ancora sulla prima fase: non c\'è niente dietro.','info','Nessuna fase chiusa'); break; }
+      apriCtx(r.left, r.bottom + 6, voci.length>2 ? 'Torna indietro' : 'Fasi', voci, t);
       break; }
+
+    /* fasi libere <-> in sequenza, su questo lavoro */
+    case 'fasi-modo':{
+      const r = t.getBoundingClientRect();
+      apriCtx(r.left, r.bottom + 6, 'Fasi libere', [
+        {a:'fasi-libere-no', ic:'lock', l:'Rimetti le fasi in sequenza'},
+        {a:'noop', ic:'list', l:'Si avanza una fase alla volta e quelle passate si chiudono', off:1}
+      ], t);
+      break; }
+    case 'fasi-libere-si':
+    case 'fasi-libere-no':{
+      const pr = t.dataset.pid ? state.progetti.find(x=>x.id===t.dataset.pid) : p;
+      if(!pr || bloccato(pr)) { chiudiCtx(); break; }
+      const libere = a === 'fasi-libere-si';
+      chiudiCtx();
+      if(fasiLibere(pr) === libere) break;
+      snap(libere ? 'Fasi libere su «'+pr.nome+'»' : 'Fasi in sequenza su «'+pr.nome+'»');
+      if(libere){ pr.fasiLibere = true; pr.avanz = Math.max(pr.avanz||0, pr.fase||0); pr.revisione = false; }
+      else { delete pr.fasiLibere; pr.revisione = (pr.fase||0) < (pr.avanz||0); }
+      logga(pr, libere ? 'Fasi libere: si può andare avanti e indietro' : 'Fasi rimesse in sequenza', true);
+      azione((libere ? 'Fasi libere' : 'Fasi in sequenza')+' su <b>'+esc(pr.nome)+'</b>');
+      toast(libere ? 'Puoi aprire qualunque fase, quando vuoi.' : 'Si avanza una fase alla volta; quelle passate si riaprono col cronometro.', 'ok', libere ? 'Fasi libere' : 'Fasi in sequenza');
+      render(); break; }
 
     case 'torna-a-fase':{
       const i = Number(t.dataset.i);
@@ -12562,6 +12624,10 @@ document.addEventListener('click', function(e){
       break; }
 
     case 'add-user': modaleTeam(); break;
+
+    case 'nl-seq':{
+      if(!nl) break;
+      nl.fasiLibere = !nl.fasiLibere; renderNuovoLavoro(); break; }
 
     case 'nl-mail':{
       if(!nl) break;
@@ -13256,6 +13322,8 @@ function vociMenuProgetto(pr){
     (pr.copertina? {a:'rit-progetto', l:'Ritaglia la copertina', ic:'foto', d:dd, off:isLock(pr)} : null),
     (pr.copertina? {a:'togli-cop-progetto', l:'Togli la copertina', ic:'x', d:dd, off:isLock(pr)} : null),
     {a:'lock', l:(pr.lock&&pr.lock.on)?'Sblocca con la password':'Blocca con una password', ic:(pr.lock&&pr.lock.on)?'unlock':'lock', d:dd},
+    (fasiLibere(pr) ? {a:'fasi-libere-no', l:'Rimetti le fasi in sequenza', ic:'lock', d:dd, off:isLock(pr)}
+                    : {a:'fasi-libere-si', l:'Fasi libere (senza blocchi)', ic:'unlock', d:dd, off:isLock(pr)}),
     {a:'duplica', l:'Duplica progetto', ic:'grid', d:dd},
     {a:'salva-modello-apri', l:'Salva come preset', ic:'salva', d:dd},
     (cloudAttivo() && !pr.personale? {a:'cliente-pagina', l:'Pagina del cliente\u2026', ic:'review', d:dd} : null),
