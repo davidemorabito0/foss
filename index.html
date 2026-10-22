@@ -1858,10 +1858,11 @@ body.sto-spostando *{user-select:none!important}
   .topbar #themeBtn,
   .topbar #guidaBtn,
   .topbar #meBtn{display:none!important}
-  .topbar #piuBtn,.topbar #indietroBtn{order:1}
+  .topbar #indietroBtn{order:1}
+  .topbar #piuBtn{order:5}
+  .topbar #bellBtn{display:none!important}
   .topbar .crumb{order:2;flex:1;min-width:0;justify-content:center;text-align:center}
   .topbar #shareBtn{display:none!important}
-  .topbar #bellBtn{order:4}
   /* dentro a un lavoro il nome sta in alto: qui sotto non serve ripeterlo,
      ne' dire il tipo, il cliente, la priorita' o riaprire i commenti,
      che stanno gia' nella barra in basso */
@@ -3619,7 +3620,7 @@ button.pf-p:hover{background:var(--surface-2);border-radius:10px}
     <button class="iconbtn solo-tel" data-action="nuovo-da-tel" id="piuBtn" title="Nuovo progetto">
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M12 5v14M5 12h14"/></svg>
     </button>
-    <button class="iconbtn solo-tel" data-action="home" id="indietroBtn" title="Torna ai progetti" hidden>
+    <button class="iconbtn solo-tel" data-action="indietro-tel" id="indietroBtn" title="Indietro" aria-label="Indietro" hidden>
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4"><path d="m15 5-7 7 7 7"/></svg>
     </button>
     <div class="crumb" id="crumb"></div>
@@ -5126,9 +5127,10 @@ function renderTop(){
     c.innerHTML = '<b>Guida</b>';
   } else c.innerHTML = '';
   const pb = el('piuBtn');
-  if(pb) pb.hidden = !(state.schermo==='home' || state.schermo==='spazi');
+  /* v64 telefono: a sinistra la freccia per tornare indietro, a destra il + (al posto della campanella) */
+  if(pb) pb.hidden = state.schermo==='progetto' || state.schermo==='gate';
   const ib = el('indietroBtn');
-  if(ib) ib.hidden = state.schermo!=='progetto';
+  if(ib) ib.hidden = state.schermo==='spazi' || state.schermo==='gate';
   el('searchWrap').hidden = state.schermo!=='home';
   const gate = state.schermo==='gate';
   ['undoBtn','bellBtn','meBtn','themeBtn','guidaBtn'].forEach(id=>{ const n = el(id); if(n) n.hidden = gate; });
@@ -5173,7 +5175,6 @@ function intestazioneSpazio(lista){
   const urg = lista.filter(p=>{ const g = giorniA(p.consegna); return !p.completato && g!=null && g<=7; }).length;
   const membri = (sp.membri||[]).filter(id=>state.utenti.some(u=>u.id===id));
   return '<div class="sp-head" style="--acc:'+sp.col+'">'+
-    tastoIndietro('spazi','Spazi')+
     '<span class="ic">'+svg(sp.icona)+'</span>'+
     '<div style="min-width:0">'+
       '<h1>'+esc(sp.nome)+'</h1>'+
@@ -5243,12 +5244,10 @@ function schedeViste(){
   Object.keys(VISTE).forEach(k=>{ if(ordine.indexOf(k)<0) ordine.push(k); });
   const conGruppi = state.vista==='tessere' || state.vista==='lista';
   const V = [['compiti','Stato'],['priorita','Priorità'],['scadenza','Scadenza']];
-  const PRINC = ['tessere','lista','calendario'], extra = state.vista==='mappa' || state.vista==='note';
-  return '<div class="sp2-viste"><div class="sp2-tabs">'+ordine.filter(k=>PRINC.indexOf(k)>=0).map(k=>
+  /* v65: tutte le viste in vista, niente «Altro» */
+  return '<div class="sp2-viste"><div class="sp2-tabs">'+ordine.map(k=>
       '<button class="vs sp2-tab'+(state.vista===k?' on':'')+'" data-vs="'+k+'" data-action="vista" data-v="'+k+'" title="'+VISTE[k].n+' — trascina per spostarlo">'+
       svg(VISTE[k].ic,2)+'<span>'+VISTE[k].n+'</span></button>').join('')+
-      '<button class="sp2-tab'+(extra?' on':'')+'" data-action="viste-altro" title="Mappa e Note">'+
-        (extra ? svg(VISTE[state.vista].ic,2)+'<span>'+VISTE[state.vista].n+'</span>' : svg('altro',2)+'<span>Altro</span>')+svg('chev',2.4)+'</button>'+
     '</div><span class="spacer"></span>'+
     (conGruppi ? '<span class="sp2-per">Dividi per</span><div class="seg sp2-seg">'+V.map(v=>'<button class="'+(state.raggruppa===v[0]?'on':'')+'" data-action="raggruppa" data-k="'+v[0]+'">'+v[1]+'</button>').join('')+'</div>' : '')+
   '</div>';
@@ -9971,7 +9970,7 @@ function cartaModelli(){
    Come si fa tutto, capitolo per capitolo: dai primi passi alle cose per chi
    organizza un team. Si cerca per parola (anche senza accenti); in fondo c'e'
    il tasto per segnalare quello che manca o non funziona. */
-const VERSIONE = 'v63';
+const VERSIONE = 'v65';
 const LIVELLI_GUIDA = {base:'Per cominciare', medio:'Tutti i giorni', esperto:'Per chi organizza', aiuto:'Se qualcosa non va'};
 const GUIDA = [
 {id:'primi-passi', liv:'base', ic:'spark', t:'Primi passi', s:'Cos’è FOSS e come ci si muove', v:[
@@ -12218,6 +12217,11 @@ document.addEventListener('click', function(e){
       else if(k==='cerca'){ state.schermo='cerca'; state.mettiFuoco = true; }
       else if(k==='profilo'){ if(state.schermo!=='profilo') state.push = null; state.schermo='profilo'; }
       render(); break; }
+
+    case 'indietro-tel':{
+      if(state.schermo==='progetto'){ state.schermo='home'; state.showFeed=false; }
+      else { state.schermo='spazi'; state.progettoId=null; state.showFeed=false; }
+      chiudiCtx(); state.drawer=false; render(); break; }
 
     case 'nuovo-da-tel':{
       const r = t.getBoundingClientRect(), voci = [];
