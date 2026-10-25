@@ -6384,6 +6384,7 @@ function renderTabbar(){
     {k:'casa',     l:'Home',     ic:'casa'},
     {k:'progetti', l:'Progetti', ic:'cartella'},
     {k:'mie',      l:'Task',     ic:'spunta', n:mie},
+    {k:'note',     l:'Note',     ic:'pen'},
     {k:'profilo',  l:'Profilo',  ic:'user'}
   ];
   const attivo =
@@ -6391,6 +6392,7 @@ function renderTabbar(){
     state.schermo==='calendario' ? 'lavori' :
     state.schermo==='mie'     ? 'mie' :
     state.schermo==='spazi'   ? 'casa' :
+    (state.schermo==='home' && state.vista==='note') ? 'note' :
     state.schermo==='home' ? 'progetti' : '';
   n.innerHTML = T.map(t=>
     '<button class="tb'+(attivo===t.k?' on':'')+'" data-action="tab-tel" data-k="'+t.k+'">'+
@@ -9991,7 +9993,7 @@ function cartaModelli(){
    Come si fa tutto, capitolo per capitolo: dai primi passi alle cose per chi
    organizza un team. Si cerca per parola (anche senza accenti); in fondo c'e'
    il tasto per segnalare quello che manca o non funziona. */
-const VERSIONE = 'v66';
+const VERSIONE = 'v67';
 const LIVELLI_GUIDA = {base:'Per cominciare', medio:'Tutti i giorni', esperto:'Per chi organizza', aiuto:'Se qualcosa non va'};
 const GUIDA = [
 {id:'primi-passi', liv:'base', ic:'spark', t:'Primi passi', s:'Cos’è FOSS e come ci si muove', v:[
@@ -10003,7 +10005,7 @@ const GUIDA = [
   ['Il riquadro «Scopri FOSS»', 'In basso a sinistra, una volta ogni cinque aperture, compare il riquadro che porta alla guida. La <b>×</b> lo chiude; per non vederlo più spegnilo in <b>Profilo → Guida e aiuto</b>.'],
   ['Il saluto', 'Dietro al saluto c’è una scena disegnata che segue la giornata: mattino, pomeriggio, sera e notte, con tre scene ciascuno (mongolfiere, spiaggia, tramonto, cielo stellato…). Ogni volta che apri FOSS ne esce una a caso; il tasto '+svg('spark',2.2).replace('<svg','<svg style="width:13px;height:13px;vertical-align:-2px"')+' passa alla successiva. Se sul dispositivo hai chiesto di ridurre il movimento, la scena sta ferma.'],
   ['Sul computer e sull’iPad', 'Dalla Home entri in uno spazio: a sinistra resta il menu con i tuoi spazi, in alto il nome dello spazio con <b>Modifica spazio</b> e <b>Nuovo progetto</b>, sotto le viste (Bacheca, Lista, Calendario, Mappa, Note). La <b>Bacheca</b> mette i progetti in colonne: per stato, per priorità o per scadenza, a scelta con <b>Dividi per</b>. Sugli schermi larghi a destra trovi la scheda dello spazio: copertina, avanzamento, persone e ultime attività. In alto a destra restano Annulla, il tema, la <b>Guida</b>, la campanella e la tua foto, che apre il profilo.'],
-  ['Sul telefono', 'In basso ci sono quattro sezioni: <b>Home</b>, <b>Progetti</b>, <b>Task</b> (quello che tocca a te) e <b>Profilo</b>. Le <b>Note</b> sono dentro a ogni spazio, accanto a tessere ed elenco. In alto a sinistra il <b>+</b> per creare, al centro il nome di dove sei, a destra la campanella. Dentro a un lavoro la freccia in alto a sinistra ti riporta ai lavori.'],
+  ['Sul telefono', 'In basso ci sono cinque sezioni: <b>Home</b>, <b>Progetti</b>, <b>Task</b> (quello che tocca a te), <b>Note</b> (la bacheca dello spazio in cui sei) e <b>Profilo</b>. In alto a sinistra il <b>+</b> per creare, al centro il nome di dove sei, a destra la campanella. Dentro a un lavoro la freccia in alto a sinistra ti riporta ai lavori.'],
   ['I lavori che fai', 'Al primo accesso FOSS ti chiede che lavori fai (videomaker, fotografo, social media manager…): quando crei spazi, progetti e preset ti propone solo quelli. Li aggiungi o togli quando vuoi da <b>Profilo → I lavori che fai</b>.'],
   ['Metterlo sulla schermata Home', 'Sull’iPhone apri FOSS con Safari, tocca <b>Condividi</b> e poi <b>Aggiungi alla schermata Home</b>. Su Android, dal menu di Chrome, <b>Installa app</b> o <b>Aggiungi a schermata Home</b>. Si apre a tutto schermo come un’app; sull’iPhone è anche l’unico modo per ricevere gli avvisi.']
 ]},
@@ -12274,7 +12276,8 @@ document.addEventListener('click', function(e){
       if(k==='casa'){ state.schermo='spazi'; state.progettoId=null; state.showFeed=false; }
       else if(k==='progetti'){ if(!state.spazioId){ const s0 = spaziVisibili()[0]; if(s0) state.spazioId = s0.id; }
         state.schermo = state.spazioId? 'home':'spazi'; if(state.vista==='note') state.vista='tessere'; }
-      else if(k==='note'){ state.schermo='home'; state.vista='note'; }
+      else if(k==='note'){ if(!state.spazioId){ const s0 = spaziVisibili()[0]; if(s0) state.spazioId = s0.id; }
+        state.schermo = state.spazioId ? 'home' : 'spazi'; if(state.spazioId) state.vista='note'; }
       else if(k==='mie'){ state.schermo='mie'; mieAppena.clear(); }
       else if(k==='cerca'){ state.schermo='cerca'; state.mettiFuoco = true; }
       else if(k==='profilo'){ if(state.schermo!=='profilo') state.push = null; state.schermo='profilo'; }
