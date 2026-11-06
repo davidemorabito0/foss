@@ -3367,7 +3367,7 @@ em.capo{font-style:normal;font-weight:700;color:var(--amber-ink)}
 .mt-d svg{width:14px;height:14px}
 .mt-d.rosso{color:var(--alert);font-weight:700}
 .mt-d.giallo{color:var(--amber-ink);font-weight:700}
-.mt-st{justify-self:start;font-size:11.5px;font-weight:700;padding:4px 10px;border-radius:7px;background:var(--surface-2);color:var(--dim);cursor:pointer;white-space:nowrap}
+.mt-st{justify-self:start;font-size:11.5px;font-weight:700;padding:4px 10px;border-radius:7px;background:var(--surface-2);color:var(--dim);white-space:nowrap}
 .mt-st.corso{background:color-mix(in srgb,#5B8DEF 22%,transparent);color:#7FA6F5}
 .mt-st.fatta{background:color-mix(in srgb,#22A565 22%,transparent);color:#3DC07E;cursor:default}
 .mt-fase{justify-self:start;font-size:11.5px;font-weight:700;padding:4px 10px;border-radius:7px;background:color-mix(in srgb,var(--fc) 22%,transparent);color:var(--fc);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:100%}
@@ -5729,7 +5729,6 @@ function renderProgetto(){
           '<span class="v-data'+(q.t?'':' vuota')+' '+q.c+'"'+(fisso? '' : ' role="button" tabindex="0" data-action="voce-data" data-id="'+s.id+'" data-i="'+ix+'"')+
             ' title="'+(q.t? 'Scadenza della subtask' : 'Aggiungi una scadenza')+'">'+svg('calendar',2)+'<span>'+(q.t || 'Data')+'</span>'+
             (fisso? '' : '<input type="date" class="vd-in" tabindex="-1" aria-hidden="true" data-id="'+s.id+'" data-i="'+ix+'" value="'+esc(i.d||'')+'">')+'</span>'+
-          '<span class="v-st '+stv.c+(stv.c==='corso'?'':' muto')+'"'+(fisso? '' : ' role="button" tabindex="0" data-action="voce-stato" data-id="'+s.id+'" data-i="'+ix+'" title="Tocca per cambiare lo stato"')+'>'+(stv.c==='corso'? stv.t : '')+'</span>'+
           tastoCommenti(p, stThr, s, i)+
           (fisso? '' : '<button class="v-menu" data-action="menu-voce" title="Altre azioni" aria-label="Altre azioni">'+svg('altro',2)+'</button>')+
           pen('item','',s.id,ix)+'</div>'+
@@ -5799,9 +5798,8 @@ function dataVoce(i){
   return {t, c:''};
 }
 function statoVoce(i){
-  if(i.done) return {t:'Completata', c:'fatta'};
-  if(i.st==='corso') return {t:'In corso', c:'corso'};
-  return {t:'Da iniziare', c:''};
+  /* v68: lo stato «In corso» delle subtask non c'e' piu': fatta o da fare, basta la casella */
+  return i.done ? {t:'Completata', c:'fatta'} : {t:'Da fare', c:''};
 }
 /* ---------- CHECKLIST ----------
    Una subtask puo' avere la sua lista di controllo (batterie, schede,
@@ -6251,9 +6249,9 @@ function mieTutte(){
 const COL_FASI = ['#5B8DEF','#8B6CF0','#E0A030','#E2723B','#22A565','#D94F70','#2FB3A4'];
 function renderMie(){
   const tutte = mieTutte();
-  const f = state.mieFiltro || 'tutte', pf = state.mieProg || '', ord = state.mieOrd || 'scadenza';
-  const statoDi = v => v.i.done ? 'fatte' : v.i.st==='corso' ? 'corso' : 'dafare';
-  const conta = {tutte:0, dafare:0, corso:0, fatte:0};
+  const f = (state.mieFiltro==='corso' ? 'tutte' : state.mieFiltro) || 'tutte', pf = state.mieProg || '', ord = state.mieOrd || 'scadenza';
+  const statoDi = v => v.i.done ? 'fatte' : 'dafare';
+  const conta = {tutte:0, dafare:0, fatte:0};
   tutte.forEach(g=>{ if(pf && g.p.id!==pf) return; g.voci.forEach(v=>{ conta.tutte++; conta[statoDi(v)]++; }); });
   const passa = v => f==='tutte' || statoDi(v)===f || (f==='fatte' && false);
   const gq = p => { const q = giorniA(p.consegna); return q==null ? 9999 : q; };
@@ -6265,7 +6263,7 @@ function renderMie(){
   let h = '<div class="pane"><div class="hm mt-lay">'+barraSinistra('mie')+'<div class="hm-main scroller mt">';
   h += '<div class="mt-head"><div class="tx"><h1>Le mie task</h1><p><b>'+aperte+'</b> '+(aperte===1?'cosa aperta':'cose aperte')+' assegnate a te in '+
     tutte.length+(tutte.length===1?' progetto':' progetti')+'</p></div></div>';
-  h += '<div class="mt-barra"><div class="mt-filtri">'+[['tutte','Tutte','list'],['dafare','Da fare','check'],['corso','In corso','clock'],['fatte','Completate','salva']].map(x=>
+  h += '<div class="mt-barra"><div class="mt-filtri">'+[['tutte','Tutte','list'],['dafare','Da fare','check'],['fatte','Completate','salva']].map(x=>
       '<button class="mt-f'+(f===x[0]?' on':'')+'" data-action="mie-filtro" data-k="'+x[0]+'">'+svg(x[2],2)+x[1]+'<i>'+conta[x[0]]+'</i></button>').join('')+'</div>'+
     '<div class="mt-sel"><label>'+svg('grid',2)+'<select id="mie_prog" aria-label="Progetto"><option value="">Tutti i progetti</option>'+
       tutte.map(g=>'<option value="'+esc(g.p.id)+'"'+(pf===g.p.id?' selected':'')+'>'+esc(g.p.nome)+'</option>').join('')+'</select></label>'+
@@ -6298,7 +6296,7 @@ function renderMie(){
           '<span class="mt-task">'+esc(v.s.titolo)+'</span>'+
           '<span class="mt-chi">'+(chi ? av(chi,'sm') : '')+'</span>'+
           '<span class="mt-d '+d.c+(d.t?'':' vuota')+'">'+svg('calendar',2)+(d.t || '—')+'</span>'+
-          '<span class="mt-st '+st.c+'"'+(i.done? '' : ' role="button" tabindex="0" data-action="mie-stato" data-pid="'+p.id+'" data-sid="'+v.s.id+'" data-i="'+v.ix+'" title="Tocca per cambiare lo stato"')+'>'+st.t+'</span>'+
+          '<span class="mt-st '+st.c+'">'+st.t+'</span>'+
           '<span class="mt-fase" style="--fc:'+COL_FASI[fi % COL_FASI.length]+'">'+esc(fase ? fase.nome : '')+'</span>'+
           '<span class="mt-piu">'+svg('right',2.2)+'</span>'+
         '</div>';
@@ -8841,14 +8839,37 @@ function arrivaNotifica(r, appenaNata){
   const b = el('bellBtn') && el('bellBtn').querySelector('.bell-dot');
   if(b && n.nuova){ b.classList.remove('pop'); void b.offsetWidth; b.classList.add('pop'); }
   if(state.drawer) renderDrawer();
-  if(appenaNata && n.nuova && NOTIFICA_FORTE[r.tipo] && state.cfg.boxFull && Date.now() >= (state.snoozeFino||0)
-     && document.visibilityState === 'visible' && !alertCorrente && state.schermo !== 'gate'
-     && !(cm && n.dati.task && cm.task === n.dati.task && (cm.voce || '') === (n.dati.voce || '') && cm.pid === r.progetto_id)){   // la discussione e' gia' aperta davanti
-    const pr = state.progetti.find(x=>x.id===r.progetto_id);
-    alertGrande({ic:n.ic, tit:esc(titoloNotifica(r.tipo, n.dati)), tx:n.tx, n,
-                 prog: pr ? (pr.cliente? pr.cliente+' \u00b7 ' : '')+pr.nome : (n.dati.progetto||'')});
-  }
+  if(appenaNata && n.nuova && NOTIFICA_FORTE[r.tipo]) accodaForte(n);
 }
+/* v68: il box a schermo intero non si perde piu'. Se arriva mentre l'app e' chiusa o in
+   secondo piano, o mentre c'e' gia' un altro box, aspetta il suo turno; i tag passano anche
+   quando le notifiche sono silenziate. Ogni notifica compare una volta sola. */
+const TAG_FORTI = {taggato:1, menzione:1};
+let codaForti = [];
+function forteGiaVista(id){ try{ return JSON.parse(localStorage.getItem('foss.forti.'+(state.utente||'')) || '[]').indexOf(id) >= 0; }catch(e){ return false; } }
+function segnaForteVista(id){
+  try{ const k = 'foss.forti.'+(state.utente||''), l = JSON.parse(localStorage.getItem(k) || '[]');
+       if(l.indexOf(id) < 0){ l.push(id); localStorage.setItem(k, JSON.stringify(l.slice(-200))); } }catch(e){}
+}
+function accodaForte(n){
+  if(!n || !n.db || !NOTIFICA_FORTE[n.tipo] || !state.cfg.boxFull || forteGiaVista(n.db)) return;
+  if(!codaForti.some(x=>x.db===n.db)) codaForti.push(n);
+  mostraForte();
+}
+function mostraForte(){
+  if(alertCorrente || document.visibilityState !== 'visible' || state.schermo === 'gate' || !state.cfg.boxFull) return;
+  codaForti = codaForti.filter(n=>{ const x = state.notifiche.find(y=>y.db===n.db); return x && x.nuova && !forteGiaVista(n.db); });
+  const i = codaForti.findIndex(n=> TAG_FORTI[n.tipo] || Date.now() >= (state.snoozeFino||0));
+  if(i < 0) return;
+  const n = codaForti.splice(i, 1)[0];
+  /* la discussione e' gia' aperta davanti: non serve il box */
+  if(cm && n.dati.task && cm.task === n.dati.task && (cm.voce || '') === (n.dati.voce || '') && cm.pid === n.p){ segnaForteVista(n.db); mostraForte(); return; }
+  segnaForteVista(n.db);
+  const pr = state.progetti.find(x=>x.id===n.p);
+  alertGrande({ic:n.ic, tit:esc(titoloNotifica(n.tipo, n.dati)), tx:n.tx, n,
+               prog: pr ? (pr.cliente? pr.cliente+' \u00b7 ' : '')+pr.nome : (n.dati.progetto||'')});
+}
+document.addEventListener('visibilitychange', ()=>{ if(!document.hidden) setTimeout(mostraForte, 600); });
 /* tocco su una notifica (nella campanella o sul telefono): segno letta e
    porto dove e' successo: la task, la fase, i commenti o la chat */
 function apriNotifica(n){
@@ -8974,7 +8995,8 @@ function alertGrande(a){
     '</div></div>';
   layer.classList.add('on');
 }
-function chiudiAlert(){ el('alertLayer').classList.remove('on'); el('alertLayer').innerHTML=''; alertCorrente=null; }
+function chiudiAlert(){ el('alertLayer').classList.remove('on'); el('alertLayer').innerHTML=''; alertCorrente=null;
+  if(typeof mostraForte === 'function' && codaForti.length) setTimeout(mostraForte, 450); }
 
 /* usata dagli eventi reali quando il team sarà collegato al database */
 function scattaEvento(manuale){
@@ -9993,7 +10015,7 @@ function cartaModelli(){
    Come si fa tutto, capitolo per capitolo: dai primi passi alle cose per chi
    organizza un team. Si cerca per parola (anche senza accenti); in fondo c'e'
    il tasto per segnalare quello che manca o non funziona. */
-const VERSIONE = 'v67';
+const VERSIONE = 'v68';
 const LIVELLI_GUIDA = {base:'Per cominciare', medio:'Tutti i giorni', esperto:'Per chi organizza', aiuto:'Se qualcosa non va'};
 const GUIDA = [
 {id:'primi-passi', liv:'base', ic:'spark', t:'Primi passi', s:'Cos’è FOSS e come ci si muove', v:[
@@ -10036,7 +10058,7 @@ const GUIDA = [
   ['Bloccare un progetto', 'Il lucchetto in alto lo blocca con una password di almeno 4 caratteri. Restano liberi lettura, commenti e chat; si bloccano modifiche, spunte, avanzamento delle fasi e spostamento delle date. Si sblocca con la stessa password.']
 ]},
 {id:'task', liv:'base', ic:'check', t:'Task, subtask e checklist', s:'Le cose da fare, spuntate una a una', v:[
-  ['Le righe delle subtask', 'Ogni subtask è una riga: la casella per spuntarla, chi la fa, la scadenza, lo stato e i tre puntini con tutte le azioni. Tocca la <b>data</b> per sceglierla dal calendario (in rosso se è oggi o già passata, in giallo se è domani). Tocca lo <b>stato</b> per farlo avanzare: Da iniziare → In corso → Completata. Per aggiungerne una scrivi nel campo <b>Aggiungi una subtask…</b> in fondo alla task e premi Invio.'],
+  ['Le righe delle subtask', 'Ogni subtask è una riga: la casella per spuntarla, chi la fa, la scadenza e i tre puntini con tutte le azioni. Tocca la <b>data</b> per sceglierla dal calendario (in rosso se è oggi o già passata, in giallo se è domani). Per aggiungerne una scrivi nel campo <b>Aggiungi una subtask…</b> in fondo alla task e premi Invio.'],
   ['Task e subtask', 'Le <b>task</b> sono i blocchi di lavoro di una fase (per esempio «Sopralluogo»). Dentro ci sono le <b>subtask</b>, le singole cose da fare: le spunti toccando il quadratino. La barra accanto alla task mostra a che punto sei.'],
   ['Aggiungere una task', 'Nella fase in cui sei premi <b>Nuova task</b>, in alto a destra dell’elenco.'],
   ['Aggiungere una subtask', 'Tasto destro sulla task (sul telefono tienila premuta) → <b>Aggiungi subtask</b>. Su una subtask che c’è già, <b>Aggiungi subtask sotto</b> la mette subito dopo.'],
@@ -12034,6 +12056,7 @@ document.addEventListener('click', function(e){
       break; }
 
     case 'visualizzato':
+      if(alertCorrente && alertCorrente.n && alertCorrente.n.db){ alertCorrente.n.nuova = false; if(typeof segnaLetteCloud === 'function') segnaLetteCloud([alertCorrente.n.db]); }
       chiudiAlert(); renderTop();
       toast('Notifica confermata. Resta nella campanella.','ok','Visualizzato'); break;
 
@@ -12041,7 +12064,7 @@ document.addEventListener('click', function(e){
       const min = state.cfg.snoozeMin || 10;
       state.snoozeFino = Date.now() + min*60*1000;
       chiudiAlert(); render();
-      toast('Niente più box a schermo intero per '+min+' minuti.','info','Notifiche silenziate'); break; }
+      toast('Niente più box a schermo intero per '+min+' minuti (tranne quando ti taggano).','info','Notifiche silenziate'); break; }
 
     case 'noop': break;
 
@@ -13493,7 +13516,6 @@ document.addEventListener('contextmenu', function(e){
     const s = p.subs.find(z=>z.id===chk.dataset.id), i = Number(chk.dataset.i), dd = D({id:s.id, i:i});
     apriCtx(x,y, esc(s.items[i].t), [
       {a:'check', l:s.items[i].done?'Segna da fare':'Segna come fatto', ic:'check', d:dd, off:isLock(p)},
-      (s.items[i].done? null : {a:'voce-stato', l:s.items[i].st==='corso'? 'Non pi\u00f9 in corso' : 'Segna in corso', ic:'clock', d:dd, off:isLock(p)}),
       {a:'edit', l:'Rinomina la subtask', ic:'pen', d:dd+' data-t="item"', off:isLock(p)},
       {a:'cm-apri', l:'Commenti, link e file', ic:'chat', d:D({pid:p.id, task:s.id, voce:idVoce(s.items[i])})},
       {a:'add-compito', l:'Aggiungi subtask sotto', ic:'plus', d:dd, off:isLock(p)},
@@ -15188,6 +15210,12 @@ async function caricaNotifiche(){
   /* l'avviso di prova serve solo al telefono: nella campanella non entra */
   state.notifiche = unisciNotifiche((data||[]).filter(r=>r.tipo!=='prova').map(notificaDaRiga), state.notifiche || []);
   setTimeout(controllaRichieste, 800);
+  /* v68: i box a schermo intero arrivati mentre FOSS era chiuso (ultime 12 ore, al massimo 3) */
+  if(typeof accodaForte === 'function'){
+    const da = Date.now() - 12*3600*1000;
+    state.notifiche.filter(n=>n.db && n.nuova && NOTIFICA_FORTE[n.tipo] && n.t >= da).slice(0, 3).reverse()
+      .forEach(n=>setTimeout(()=>accodaForte(n), 1500));
+  }
 }
 function segnaLetteCloud(ids){
   if(!sb || !utenteCloud) return;
