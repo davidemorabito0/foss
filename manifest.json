@@ -34,5 +34,40 @@
       "type": "image/png",
       "purpose": "any"
     }
+  ],
+  "share_target": {
+    "action": "./chat.html?condividi=1",
+    "method": "POST",
+    "enctype": "multipart/form-data",
+    "params": {
+      "title": "title",
+      "text": "text",
+      "url": "url",
+      "files": [
+        {
+          "name": "file",
+          "accept": [
+            "image/*",
+            "video/*",
+            "audio/*",
+            "application/pdf"
+          ]
+        }
+      ]
+    }
+  },
+  "shortcuts": [
+    {
+      "name": "FOSS.chat",
+      "short_name": "Chat",
+      "description": "Apri la chat del team",
+      "url": "./chat.html",
+      "icons": [
+        {
+          "src": "foss-icona-192.png",
+          "sizes": "192x192"
+        }
+      ]
+    }
   ]
 }

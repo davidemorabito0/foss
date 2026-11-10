@@ -3,7 +3,7 @@
    la copia in cache serve solo quando sei offline. I DATI non stanno qui:
    vivono nel database e nella memoria del browser, quindi un aggiornamento
    dell'app non può cancellarli. */
-const CACHE = 'foss-guscio-v68';
+const CACHE = 'foss-guscio-v69';
 const GUSCIO = ['./', './index.html', './manifest.json',
                 './icone/icona-192-v2.png', './icone/icona-512-v2.png'];
 
@@ -15,8 +15,26 @@ self.addEventListener('activate', e=>{
     k.filter(n=>n!==CACHE).map(n=>caches.delete(n))
   )).then(()=>self.clients.claim()));
 });
+/* FOSS.chat riceve foto, video e GIF condivisi da altre app (Android: Condividi → FOSS).
+   Li tengo un attimo in una cache a parte e apro la chat, che chiede a chi mandarli. */
+async function riceviCondivisi(req){
+  try{
+    const dati = await req.formData();
+    const files = dati.getAll('file').filter(f => f && typeof f !== 'string').slice(0, 30);
+    const c = await caches.open('fosschat-condivisi');
+    await Promise.all(files.map((f, i) => c.put('./condivisi/' + i, new Response(f, {headers: {'Content-Type': f.type || 'application/octet-stream'}}))));
+    await c.put('./condivisi/meta', new Response(JSON.stringify({n: files.length, nomi: files.map(f => f.name || 'file'),
+      title: dati.get('title') || '', text: dati.get('text') || '', url: dati.get('url') || ''}), {headers: {'Content-Type': 'application/json'}}));
+  }catch(_){}
+  return Response.redirect('./chat.html?condivisi=1', 303);
+}
 self.addEventListener('fetch', e=>{
   const req = e.request;
+  if(req.method === 'POST'){
+    const u = new URL(req.url);
+    if(u.origin === location.origin && /\/chat\.html$/.test(u.pathname) && u.searchParams.has('condividi')) e.respondWith(riceviCondivisi(req));
+    return;
+  }
   if(req.method !== 'GET') return;
   const url = new URL(req.url);
   if(url.origin !== location.origin) return;         /* database e font passano diretti */
@@ -64,6 +82,15 @@ self.addEventListener('notificationclick', e=>{
       url = u.href;
     }
   } catch(_){ url = scope; }
+  /* un messaggio di FOSS.chat: apro (o porto davanti) la finestra della chat */
+  if(/\/chat\.html/.test(url)){
+    e.waitUntil(self.clients.matchAll({type:'window', includeUncontrolled:true}).then(lista=>{
+      const chat = lista.find(c=>{ try{ return new URL(c.url).pathname.endsWith('/chat.html'); }catch(_){ return false; } });
+      if(chat){ chat.postMessage({tipo:'apri', url}); return chat.focus ? chat.focus().catch(()=>{}) : null; }
+      return self.clients.openWindow ? self.clients.openWindow(url) : null;
+    }));
+    return;
+  }
   e.waitUntil(self.clients.matchAll({type:'window', includeUncontrolled:true}).then(lista=>{
     /* solo una finestra di FOSS (non un altro sito sullo stesso dominio, non la pagina di un cliente) */
     const di = lista.filter(c=>{ try { return c.url.indexOf(scope) === 0 && new URL(c.url).hash.indexOf('#/c/') !== 0; } catch(_){ return false; } });
