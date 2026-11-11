@@ -77,10 +77,6 @@ svg{display:block}
 ::-webkit-scrollbar-track{background:transparent}
 
 #app{display:flex;height:100vh;height:var(--alto,100dvh);width:100%;position:relative;overflow:hidden;background:var(--pannello)}
-@media (min-width:1441px){
-  body{background:var(--app)}
-  #app{max-width:1600px;margin:0 auto;height:calc(100dvh - 38px);top:19px;box-shadow:0 6px 18px rgba(11,20,26,.18)}
-}
 
 /* ---------- colonna sottile (desktop) ---------- */
 .rail{width:64px;flex:none;background:var(--testa);border-right:1px solid var(--linea);display:flex;flex-direction:column;align-items:center;
@@ -1282,6 +1278,40 @@ input,textarea,[contenteditable="true"]{-webkit-user-select:text;user-select:tex
   .cl-foglio .foglio-f{flex-wrap:wrap}
   .cl-nota{flex-basis:100%;margin:0 0 2px;text-align:center}
 }
+
+/* ---------- l'ora sull'ultima riga del testo (come WhatsApp) ---------- */
+.bolla.meta-in > .meta{position:absolute;right:7px;bottom:4px;float:none;margin:0;top:auto}
+.meta.spazio{visibility:hidden;float:none;display:inline-flex;height:0;overflow:hidden;margin:0 0 0 12px;top:0;pointer-events:none;vertical-align:baseline}
+.bolla.meta-in{padding-bottom:7px}
+
+/* ---------- computer: a tutto schermo e con le proporzioni di WhatsApp ---------- */
+@media (min-width:900px){
+  #app{--t:14.6px}
+  .lato{width:32%;min-width:360px;max-width:520px}
+  .lato-testa{height:64px;padding:0 12px 0 20px}
+  .lato-testa h1{font-size:23px}
+  .cerca{padding:4px 14px 10px}
+  .cerca label{height:40px;border-radius:20px;padding:0 16px}
+  .conv-testa{height:64px;padding:0 16px 0 10px}
+  .conv-testa .av{width:42px;height:42px}
+  .conv-testa .tt b{font-size:16.5px}
+  .messaggi{background-size:360px}
+  .msg{padding:0 clamp(24px,7%,140px)}
+  .msg.primo{margin-top:12px}
+  .bolla{max-width:min(62%,640px);padding:6px 8px 7px 10px;border-radius:8px}
+  .bolla .testo{line-height:1.42}
+  .meta{font-size:11.2px}
+  /* la barra per scrivere: una pillola che galleggia sullo sfondo della chat */
+  .scrivi{background:var(--sfondo-chat);padding:0 clamp(16px,4%,80px) 14px}
+  .barra-scrivi{background:var(--campo);border-radius:28px;min-height:54px;padding:5px 8px;gap:2px;align-items:center;
+    box-shadow:0 1px 3px rgba(11,20,26,.18)}
+  :root[data-tema="scuro"] .barra-scrivi{background:#242f36}
+  .campo{background:transparent;margin:0;min-height:44px;align-items:center}
+  .testo-in{font-size:15.5px;padding:12px 6px 12px 4px}
+  .barra-scrivi > .ib, .barra-scrivi .allega-wrap > .ib{width:44px;height:44px}
+  .rispondi-a{background:var(--campo);border-radius:18px 18px 0 0;margin:0 0 -8px;padding:8px 10px 14px 16px}
+  :root[data-tema="scuro"] .rispondi-a{background:#242f36}
+}
 </style>
 </head>
 <body>
@@ -2460,13 +2490,19 @@ function bollaHTML(m, c, primo, mio, gr){
   if(m.tipo === 'testo'){
     const em = soloEmoji(m.testo);
     if(em && !cit && !md.anim){ bcls += ' solo-emoji'; corpo = '<div class="testo grande-emoji">'+esc(m.testo.trim())+'</div>'; }
-    else corpo = '<div class="testo'+(md.anim && nuovoEff ? ' anim-' + md.anim : '')+'"'+(md.anim ? ' data-anim="'+esc(md.anim)+'" data-a="rianima"' : '')+'>'+
-      (md.anim ? testoAnimato(m.testo, md.anim) : formatta(m.testo, md))+'</div>' + (md.lavori && md.lavori.length && !md.anim ? schedeInTesto(md) : '');
+    else {
+      /* l'ora sta sull'ultima riga del testo, come su WhatsApp: le lascio il posto con una copia invisibile */
+      const accanto = !md.anim && !(md.lavori && md.lavori.length);
+      if(accanto) bcls += ' meta-in';
+      corpo = '<div class="testo'+(md.anim && nuovoEff ? ' anim-' + md.anim : '')+'"'+(md.anim ? ' data-anim="'+esc(md.anim)+'" data-a="rianima"' : '')+'>'+
+        (md.anim ? testoAnimato(m.testo, md.anim) : formatta(m.testo, md))+(accanto ? metaSpazio(m, c, mio) : '')+'</div>' + (md.lavori && md.lavori.length && !md.anim ? schedeInTesto(md) : '');
+    }
     if(md.lavori && md.lavori.length) bcls += ' con-scheda';
   } else if(m.tipo === 'foto' || m.tipo === 'video'){
     const solo = !md.did && !cit;
     if(solo) bcls += ' solo-media';
-    corpo = mediaBoxHTML(m) + (md.did ? '<div class="testo didascalia">'+formatta(md.did)+'</div>' : '');
+    if(md.did) bcls += ' meta-in';
+    corpo = mediaBoxHTML(m) + (md.did ? '<div class="testo didascalia">'+formatta(md.did)+metaSpazio(m, c, mio)+'</div>' : '');
   } else if(m.tipo === 'sticker'){
     bcls += ' sticker';
     corpo = '<img class="stk" data-mid="'+m.id+'" data-a="vedi" data-id="'+m.id+'" alt="Sticker"'+(md.path && /^foss:/.test(md.path) ? ' src="'+stickerFoss(md.path.slice(5))+'"' : '')+'>';
@@ -2497,6 +2533,7 @@ function meta(m, c, mio){
     (m.modificato_il ? '<button class="mod" data-a="info-modifica" data-id="'+m.id+'" title="Modificato '+esc(quando(m.modificato_il))+'">modificato</button>' : '')+
     ora(m.creato_il)+(mio ? spunteHTML(statoSpunte(m, c)) : '')+'</span>';
 }
+function metaSpazio(m, c, mio){ return meta(m, c, mio).replace('<span class="meta">', '<span class="meta spazio" aria-hidden="true">'); }
 function reazioniHTML(id){
   const r = S.reazioni.get(id); if(!r || !r.size) return '';
   const cont = new Map(); r.forEach(e => cont.set(e, (cont.get(e) || 0) + 1));
