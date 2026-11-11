@@ -170,7 +170,7 @@ function richiudi(){
 function benvenuto(){
   return new Promise(fine => {
     const v = document.createElement('div'); v.className = 'velo scuro';
-    const p = (ic, t, d) => '<div style="display:flex;gap:14px;align-items:flex-start;margin:12px 0"><span style="width:38px;height:38px;border-radius:50%;background:rgba(0,168,132,.14);color:var(--verde);display:grid;place-items:center;flex:none">'+
+    const p = (ic, t, d) => '<div style="display:flex;gap:14px;align-items:flex-start;margin:12px 0"><span style="width:38px;height:38px;border-radius:50%;background:color-mix(in srgb,var(--verde) 14%,transparent);color:var(--verde);display:grid;place-items:center;flex:none">'+
       '<span style="width:20px;height:20px;display:block">'+svg(ic, 1.9)+'</span></span><span><b style="color:var(--testo);font-weight:500;display:block">'+t+'</b>'+d+'</span></div>';
     v.innerHTML = '<div class="foglio" style="max-width:520px"><div class="foglio-c" style="padding-top:26px">'+
       '<div style="display:flex;align-items:center;gap:14px;margin-bottom:8px"><div style="width:56px;height:56px;border-radius:16px;overflow:hidden;flex:none">'+LOGO+'</div>'+

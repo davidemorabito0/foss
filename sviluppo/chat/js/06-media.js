@@ -153,8 +153,17 @@ async function disegnaVisore(){
       (visoreDati.i < visoreDati.lista.length - 1 ? '<button class="ib" data-v="dopo" style="position:absolute;right:12px;background:rgba(134,150,160,.2);transform:scaleX(-1)">'+svg('indietro')+'</button>' : '')+
     '</div>'+(md.did ? '<div class="visore-did">'+formatta(md.did)+'</div>' : '<div style="height:20px"></div>');
   visoreDati.zoom = 1; visoreDati.x = visoreDati.y = 0;
+  /* un tocco fuori dalla foto o dal video chiude il visore (non solo la X) */
+  let giu = null;
+  v.onpointerdown = e => { giu = {t: e.target, x: e.clientX, y: e.clientY}; };
   v.onclick = e => {
-    const b = e.target.closest('[data-v]'); if(!b) return;
+    const b = e.target.closest('[data-v]');
+    if(!b){
+      const t0 = giu && giu.t, mosso = giu ? Math.hypot(e.clientX - giu.x, e.clientY - giu.y) > 10 : false;
+      if(!t0 || mosso || (visoreDati && visoreDati.zoom > 1)) return;
+      if(t0.closest('img, video, .media-offline, .visore-did, button, a')) return;
+      chiudiVisore(); return;
+    }
     const a = b.dataset.v;
     if(a === 'chiudi') chiudiVisore();
     if(a === 'prima'){ visoreDati.i--; disegnaVisore(); }

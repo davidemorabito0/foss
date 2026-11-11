@@ -10,7 +10,18 @@ const SUPA_KEY = 'sb_publishable_f5Kjp6NHT9yTxr1bhWJjhg_4y72V-Kj';
 const VAPID_PUBBLICA = 'BNlGbW4nZrXmx8DioKxnl7ubULVOr5_6CAKvpuQYoiXeObmxYAzGU6UrkExx2zu1hACmtRNDcpoMh_ARQ0GSmlw';
 /* il server dei file sul NAS (es. 'https://media.foss.team'). Vuoto = si usa Supabase. */
 const MEDIA_NAS = 'https://media.foss.team';
-const VERSIONE = 'chat-2.0';
+const VERSIONE = 'chat-2.1';
+/* i temi colore: gli stessi di FOSS. Il predefinito per tutti è Brand (blu e giallo). */
+const TEMI_COLORE = [
+  {id:'brand',   nome:'Brand',    ds:'Navy e ambra, il predefinito', c:['#0D1926','#1A3149','#FFAD01']},
+  {id:'ardesia', nome:'Ardesia',  ds:'Blu-grigio, accento teal',     c:['#101619','#1D272D','#2FB3A4']},
+  {id:'nebbia',  nome:'Nebbia',   ds:'Chiaro e morbido',             c:['#DCE2E8','#EDF1F4','#2F7D8C']},
+  {id:'sabbia',  nome:'Sabbia',   ds:'Caldo e naturale',             c:['#E4DDD2','#F1ECE4','#B4632A']},
+  {id:'idea',    nome:'Idea',     ds:'Carta e inchiostro',           c:['#E4E1D2','#223D7C','#C2437A']},
+  {id:'limoni',  nome:'Limoni',   ds:'Vivace e solare',              c:['#132571','#FAEFAF','#C83934']},
+  {id:'autunno', nome:'Autunno',  ds:'Caldo e accogliente',          c:['#743832','#F8EBD7','#EDA95C']},
+  {id:'bloom',   nome:'Bloom',    ds:'Morbido e grafico',            c:['#EBD3AF','#3B1F45','#D1733D']}
+];
 const MAX_SUPA = 50 * 1024 * 1024;
 const MAX_FILE = MEDIA_NAS ? 2048 * 1024 * 1024 : MAX_SUPA;   // sul NAS anche i video lunghi
 
@@ -236,7 +247,7 @@ const S = {
   vista: 'chat',            // chat | archiviate
   risposta: null,
   bozze: memoria('bozze') || {},
-  cfg: Object.assign({tema:'sistema', invio:true, suoni:true, sfondo:'', doodle:true, testo:'medio'}, memoria('cfg') || {}),
+  cfg: Object.assign({tema:'sistema', colori:'brand', invio:true, suoni:true, sfondo:'', doodle:true, testo:'medio'}, memoria('cfg') || {}),
   sticker: [], gif: [],
   effettoScelto: null,      // {bolla, schermo, anim}
   visti: new Set(memoria('effetti_visti') || []),

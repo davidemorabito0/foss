@@ -273,7 +273,7 @@ function disegnaCerca(){
     const l = (data || []).filter(m => !S.nascosti.has(m.id));
     R.innerHTML = l.length ? l.map(m => '<button class="voce" data-a="vai-msg" data-id="'+m.id+'" style="align-items:flex-start"><span class="vc" style="border-bottom:1px solid var(--linea)">'+
       '<span style="font-size:12.5px">'+dataBreve(m.creato_il)+' · '+esc(m.autore === S.io ? 'Tu' : nomeMsg(m))+'</span>'+
-      '<b style="white-space:normal;font-size:14.5px">'+esc(testoSemplice(m.testo)).replace(re, '<mark style="background:rgba(0,168,132,.3);color:inherit;border-radius:3px">$1</mark>')+'</b></span></button>').join('')
+      '<b style="white-space:normal;font-size:14.5px">'+esc(testoSemplice(m.testo)).replace(re, '<mark style="background:color-mix(in srgb,var(--verde) 30%,transparent);color:inherit;border-radius:3px">$1</mark>')+'</b></span></button>').join('')
       : '<div class="vuoto-lista">Nessun messaggio con «'+esc(q)+'».</div>';
   }, 300);
   i.oninput = vai;
@@ -338,7 +338,10 @@ function disegnaImpostazioni(){
       voce('attiva-push', 'campana', 'Avvisi su questo dispositivo', 'Anche quando FOSS.chat è chiusa', '<span id="statoPush" style="font-size:13px;color:var(--testo-2)"></span>')+
       voce('cfg-suoni', 'nuova', 'Suoni nella chat', 'Un suono quando arriva un messaggio', interr(S.cfg.suoni))+'</div>'+
     '<div class="blocco"><div class="sez-t">Chat</div>'+
-      '<div class="sez-t grigio" style="padding:4px 20px 8px">Tema</div>'+opz('tema', [['sistema','Come il dispositivo'],['chiaro','Chiaro'],['scuro','Scuro']])+
+      '<div class="sez-t grigio" style="padding:4px 20px 8px">Colori</div>'+
+      '<div class="colori-griglia">'+TEMI_COLORE.map(x => '<button class="colore-tema'+((S.cfg.colori || 'brand') === x.id ? ' on' : '')+'" data-a="cfg" data-k="colori" data-v="'+x.id+'">'+
+        '<span class="pall3">'+x.c.map(c => '<i style="background:'+c+'"></i>').join('')+'</span><b>'+esc(x.nome)+'</b><span>'+esc(x.ds)+'</span></button>').join('')+'</div>'+
+      '<div class="sez-t grigio" style="padding:4px 20px 8px">Chiaro o scuro</div>'+opz('tema', [['sistema','Come il dispositivo'],['chiaro','Chiaro'],['scuro','Scuro']])+
       '<div class="sez-t grigio" style="padding:4px 20px 8px">Dimensione del testo</div>'+opz('testo', [['piccolo','Piccolo'],['medio','Medio'],['grande','Grande']])+
       '<div class="sez-t grigio" style="padding:4px 20px 8px">Sfondo delle chat</div>'+anteprimaSfondoHTML()+
       '<div class="opz"><button data-a="sfondo-foto">'+svg('foto', 1.8).replace('<svg', '<svg style="width:16px;height:16px;display:inline;vertical-align:-3px;margin-right:6px"')+'Scegli una foto</button>'+

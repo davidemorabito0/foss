@@ -3,12 +3,14 @@ function applicaTema(){
   let t = S.cfg.tema || 'sistema';
   if(t === 'sistema') t = matchMedia('(prefers-color-scheme: light)').matches ? 'chiaro' : 'scuro';
   document.documentElement.setAttribute('data-tema', t);
+  const col = TEMI_COLORE.some(x => x.id === S.cfg.colori) ? S.cfg.colori : 'brand';
+  document.documentElement.setAttribute('data-colori', col);
   document.documentElement.setAttribute('data-testo', S.cfg.testo || 'medio');
   const scuro = t === 'scuro';
   document.documentElement.style.setProperty('--doodle-img', S.cfg.doodle === false ? 'none' : doodle(scuro));
   if(S.cfg.sfondo) document.documentElement.style.setProperty('--sfondo-chat', S.cfg.sfondo);
   else document.documentElement.style.removeProperty('--sfondo-chat');
-  const m = document.querySelector('meta[name="theme-color"]'); if(m) m.content = scuro ? '#111b21' : '#f0f2f5';
+  const m = document.querySelector('meta[name="theme-color"]'); if(m){ const v = getComputedStyle(document.documentElement).getPropertyValue('--testa').trim(); m.content = v || (scuro ? '#111b21' : '#f0f2f5'); }
 }
 try{ matchMedia('(prefers-color-scheme: light)').addEventListener('change', () => { if(S.cfg.tema === 'sistema') applicaTema(); }); }catch(e){}
 

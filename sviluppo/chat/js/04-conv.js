@@ -231,7 +231,7 @@ function reazioniHTML(id){
 function citazioneHTML(rid, c){
   const q = trovaMsg(c.id, rid);
   if(!q) return '<div class="citazione" data-a="vai-msg" data-id="'+rid+'"><span class="barra"></span><span class="cc"><span>Messaggio non disponibile</span></span></div>';
-  const col = q.autore === S.io ? '#06cf9c' : colore(chiaveAutore(q));
+  const col = q.autore === S.io ? 'var(--cit-mio)' : colore(chiaveAutore(q));
   const md = q.media || {};
   let t = q.eliminato ? 'Messaggio eliminato' : '';
   let ic = '';
