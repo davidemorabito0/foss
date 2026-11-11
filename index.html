@@ -683,6 +683,13 @@ input,textarea,select{font:inherit;color:inherit}
 .proj-head .cli{font-size:10.5px;letter-spacing:.14em;text-transform:uppercase;color:var(--mute);font-family:Sora;font-weight:600}
 .proj-head h1{font-size:24px;letter-spacing:-.025em;line-height:1.15;margin-top:1px}
 .proj-head .side{display:flex;align-items:center;gap:8px;margin-left:auto;flex-wrap:wrap}
+.btn.cl-luce{background:var(--amber);color:var(--on-amber);border-color:transparent;font-weight:700;padding:8px 14px;
+  box-shadow:0 0 0 0 color-mix(in srgb,var(--amber) 70%,transparent),0 0 18px color-mix(in srgb,var(--amber) 55%,transparent);animation:clLuce 1.6s ease-in-out infinite}
+.btn.cl-luce svg{stroke:currentColor}
+.iconbtn.cl-luce{color:var(--amber);animation:clLuce 1.6s ease-in-out infinite;border-radius:10px}
+@keyframes clLuce{0%,100%{box-shadow:0 0 0 0 color-mix(in srgb,var(--amber) 65%,transparent),0 0 14px color-mix(in srgb,var(--amber) 45%,transparent);filter:brightness(1)}
+  50%{box-shadow:0 0 0 7px color-mix(in srgb,var(--amber) 0%,transparent),0 0 28px color-mix(in srgb,var(--amber) 85%,transparent);filter:brightness(1.25)}}
+@media (prefers-reduced-motion:reduce){.cl-luce{animation:none}}
 .proj{display:grid;grid-template-columns:232px minmax(0,1fr);flex:1;min-height:0;position:relative;overflow:hidden}
 /* Commenti, chat e attivita' stanno in un cassetto: si aprono quando servono
    e per il resto del tempo lasciano respirare il lavoro. */
@@ -5609,6 +5616,7 @@ function renderProgetto(){
     '<div style="min-width:0" class="editabile">'+
       '<div class="cli">'+esc(nomeLavoro(p))+(p.personale? ' · Personale' : p.cliente? ' · '+esc(p.cliente) : '')+(p.personale? '' : pen('proj','cliente',null,null,1))+'</div>'+
       '<h1 style="display:flex;align-items:center;gap:8px">'+esc(p.nome)+pen('proj','nome',null,null,1)+'</h1></div>'+
+    (cloudAttivo() && !state.ospite ? tastoChatLavoro(p) : '')+
     '<div class="side">'+
       '<button class="btn sm ghost solo-stretto no-tel" data-action="toggle-rail" title="Scheda progetto, team e blocco">'+svg('file')+'Scheda</button>'+
       '<button class="btn sm no-tel" data-action="condividi" data-pid="'+p.id+'">'+svg('share')+'Condividi</button>'+
@@ -5683,6 +5691,7 @@ function renderProgetto(){
       '<span class="chip editabile tocca" style="gap:6px" data-action="edit" data-t="fase" data-i="'+f+'" role="button" tabindex="0" title="Cambia il responsabile della fase">'+
         '<span class="no-tel">Responsabile</span> '+av(U(p.faseAss[f]||p.team[0]),'sm')+
         '<span class="no-tel">'+esc(U(p.faseAss[f]||p.team[0]).nome.split(' ')[0])+'</span>'+pen('fase','',null,f,1)+'</span>'+
+      (state.ospite || !cloudAttivo() ? '' : '<button class="iconbtn solo-tel chat-lav cl-luce" data-action="chat-lavoro" data-pid="'+p.id+'" title="'+etichettaChatLavoro(p.id)+'" aria-label="'+etichettaChatLavoro(p.id)+'">'+svg('chat',2)+'</button>')+
       (state.ospite?'' : '<button class="iconbtn solo-tel" data-action="condividi" data-pid="'+p.id+'" '+
         'title="Condividi questo lavoro">'+svg('share',2)+'</button>')+
       ((p.lock&&p.lock.on)? '<button class="lockchip solo-tel" data-action="lock" data-pid="'+p.id+'" '+
@@ -6646,6 +6655,49 @@ function tastoChat(){
   return '<button class="hm-chat'+(nuova ? ' nuova' : '')+'" data-action="apri-chat" title="Apri FOSS.chat, la chat del tuo team">'+
     '<span class="ic">'+svg('chat',2)+'</span><span class="tx">FOSS.chat</span>'+
     (nuova ? '<b class="nuovo">NUOVO</b>' : chatNonLette ? '<b class="n">'+(chatNonLette > 99 ? '99+' : chatNonLette)+'</b>' : '')+'</button>';
+}
+/* v69: il gruppo del lavoro su FOSS.chat. La prima volta lo crea con lo stesso nome e tutta la squadra,
+   poi lo riapre. La finestra si apre subito (sennò il browser la blocca), l'indirizzo arriva dopo. */
+/* v70: il tasto dice «Crea chat» se il gruppo non c'è ancora, «Entra in chat» se c'è già */
+const chatLavoroC = {};
+function etichettaChatLavoro(pid){ return chatLavoroC[pid] === true ? 'Entra in chat' : chatLavoroC[pid] === false ? 'Crea chat' : 'Chat del lavoro'; }
+function tastoChatLavoro(p){
+  if(chatLavoroC[p.id] === undefined) verificaChatLavoro(p.id);
+  return '<button class="btn sm no-tel chat-lav cl-luce" data-action="chat-lavoro" data-pid="'+p.id+'" title="Il gruppo di questo lavoro su FOSS.chat">'+svg('chat')+'<span class="cl-t">'+etichettaChatLavoro(p.id)+'</span></button>';
+}
+function aggiornaTastiChatLavoro(pid){
+  const t = etichettaChatLavoro(pid);
+  document.querySelectorAll('.chat-lav[data-pid="'+pid+'"]').forEach(b => { const x = b.querySelector('.cl-t'); if(x) x.textContent = t; b.title = t; b.setAttribute('aria-label', t); });
+}
+const chatLavoroInCorso = {};
+async function verificaChatLavoro(pid){
+  if(chatLavoroInCorso[pid] || typeof sb === 'undefined' || !sb || !utenteCloud) return;
+  chatLavoroInCorso[pid] = 1;
+  try{
+    const {data, error} = await sb.rpc('chat_lavoro_c_e', {p_org: orgProg[pid] || orgMia, p_prog: pid});
+    if(!error){ chatLavoroC[pid] = !!data; aggiornaTastiChatLavoro(pid); }
+  }catch(e){}
+  setTimeout(() => { delete chatLavoroInCorso[pid]; }, 1500);
+}
+async function apriChatLavoro(pid){
+  const pr = state.progetti.find(x=>x.id===pid);
+  if(!pr || typeof sb === 'undefined' || !sb || !utenteCloud){ toast('La chat del lavoro funziona quando sei collegato.','info','FOSS.chat'); return; }
+  try{ localStorage.setItem('foss_chat_vista', '1'); }catch(e){}
+  const app = (window.matchMedia && matchMedia('(display-mode: standalone)').matches) || navigator.standalone === true;
+  let w = null;
+  if(!app){ try{ w = window.open('', 'fosschat'); }catch(e){} }
+  toast(chatLavoroC[pid] === false ? 'Creo il gruppo «'+pr.nome+'»…' : 'Apro il gruppo «'+pr.nome+'»…','info','FOSS.chat');
+  try{
+    const {data, error} = await sb.rpc('chat_gruppo_lavoro', {p_org: orgProg[pid] || orgMia, p_prog: pid});
+    if(error || !data) throw error || new Error('nessun gruppo');
+    const u = 'chat.html#c=' + data;
+    chatLavoroC[pid] = true; aggiornaTastiChatLavoro(pid);
+    if(w && !w.closed){ w.location.href = u; try{ w.focus(); }catch(e){} }
+    else location.href = u;
+  }catch(e){
+    if(w && !w.closed) try{ w.close(); }catch(_){}
+    toast(/non lavori/.test(String(e && e.message)) ? 'Per aprire la chat devi far parte di questo lavoro.' : 'Non riesco ad aprire la chat adesso: riprova tra poco.','warn','FOSS.chat');
+  }
 }
 function apriChat(dove){
   try{ localStorage.setItem('foss_chat_vista', '1'); }catch(e){}
@@ -10086,7 +10138,7 @@ function cartaModelli(){
    Come si fa tutto, capitolo per capitolo: dai primi passi alle cose per chi
    organizza un team. Si cerca per parola (anche senza accenti); in fondo c'e'
    il tasto per segnalare quello che manca o non funziona. */
-const VERSIONE = 'v68';
+const VERSIONE = 'v70';
 const LIVELLI_GUIDA = {base:'Per cominciare', medio:'Tutti i giorni', esperto:'Per chi organizza', aiuto:'Se qualcosa non va'};
 const GUIDA = [
 {id:'primi-passi', liv:'base', ic:'spark', t:'Primi passi', s:'Cos’è FOSS e come ci si muove', v:[
@@ -11758,6 +11810,7 @@ document.addEventListener('click', function(e){
 
     /* ---- condivisione ---- */
     case 'condividi': modaleLink(t.dataset.pid || state.progettoId, t.dataset.sid||null); break;
+    case 'chat-lavoro': chiudiCtx(); apriChatLavoro(t.dataset.pid || state.progettoId); break;
 
     case 'copia':{
       const l = t.dataset.l;
@@ -13411,6 +13464,7 @@ function vociMenuProgetto(pr){
   const dd = D({pid:pr.id});
   return [
     {a:'apri', l:'Apri il progetto', ic:'right', d:D({id:pr.id})},
+    (cloudAttivo() && !state.ospite ? {a:'chat-lavoro', l:etichettaChatLavoro(p.id), ic:'chat', d:dd} : null),
     {a:'edit', l:'Rinomina progetto', ic:'pen', d:dd+' data-t="proj" data-k="nome"', off:isLock(pr)},
     (pr.personale? null : {a:'edit', l:'Cambia cliente', ic:'user', d:dd+' data-t="proj" data-k="cliente"', off:isLock(pr)}),
     {a:'edit', l:'Cambia priorità', ic:'spark', d:dd+' data-t="proj" data-k="prio"', off:isLock(pr)},
