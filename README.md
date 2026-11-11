@@ -133,6 +133,11 @@ Usa lo stesso account di FOSS: nessuna registrazione in più.
 - **Colpetto**: doppio tocco sulla foto di qualcuno (gruppi) o dal menu della chat; fa vibrare la
   sua chat e arriva come avviso
 - **Seleziona**: più messaggi insieme da copiare, inoltrare o eliminare
+- **Importa da WhatsApp** (menu della chat, per chi la amministra): si sceglie il file esportato
+  da WhatsApp (.zip con foto, video e vocali, oppure .txt) e per ogni nome di WhatsApp si dice chi
+  è su FOSS (o si tiene il nome, o lo si salta). I messaggi entrano con la loro data, senza avvisi;
+  reimportando la stessa chat non si doppia nulla, e l'importazione si può annullare
+  (`chat_importa`, `chat_importa_annulla`; nel messaggio `media.importato`)
 
 ## Pubblicazione su GitHub Pages
 

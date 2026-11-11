@@ -1312,6 +1312,41 @@ input,textarea,[contenteditable="true"]{-webkit-user-select:text;user-select:tex
   .rispondi-a{background:var(--campo);border-radius:18px 18px 0 0;margin:0 0 -8px;padding:8px 10px 14px 16px}
   :root[data-tema="scuro"] .rispondi-a{background:#242f36}
 }
+.av.av-iniz{color:#fff;font-weight:600;font-size:13px;display:inline-flex;align-items:center;justify-content:center;letter-spacing:.3px}
+.vav .av.av-iniz{font-size:16px}
+/* importare da WhatsApp */
+.imp-foglio{max-width:520px}
+.imp-scegli{display:flex;align-items:center;gap:14px;width:100%;padding:14px 16px;border:1px dashed var(--linea);border-radius:12px;text-align:left;color:var(--testo);margin:6px 0 4px}
+.imp-scegli:hover{background:var(--hover)}
+.imp-scegli svg{width:26px;height:26px;color:var(--verde);flex:none}
+.imp-scegli span{display:flex;flex-direction:column}
+.imp-scegli i{font-style:normal;font-size:13px;color:var(--testo-2)}
+.imp-riass{margin:0 0 10px;color:var(--testo);font-weight:500}
+.imp-tit{font-size:13px;color:var(--verde);font-weight:500;margin-top:6px}
+.imp-nota{margin:2px 0 8px;font-size:13px}
+.imp-nomi{display:flex;flex-direction:column;border-top:1px solid var(--linea)}
+.imp-riga{display:flex;align-items:center;gap:12px;padding:10px 0;border-bottom:1px solid var(--linea)}
+.imp-riga .av{width:38px;height:38px;flex:none;border-radius:50%;color:#fff;font-weight:600;font-size:14px;display:inline-flex;align-items:center;justify-content:center}
+.imp-n{flex:1;min-width:0;display:flex;flex-direction:column}
+.imp-n b{color:var(--testo);font-weight:500;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.imp-n i{font-style:normal;font-size:12.5px}
+.imp-riga select{max-width:52%;min-width:0;flex:none;height:36px;border:1px solid var(--linea);border-radius:8px;background:var(--pannello);color:var(--testo);font-size:14px;padding:0 8px}
+.imp-media{display:flex;align-items:flex-start;gap:12px;margin-top:14px;cursor:pointer}
+.imp-media input{width:18px;height:18px;margin-top:2px;accent-color:var(--verde);flex:none}
+.imp-media span{display:flex;flex-direction:column}
+.imp-media b{color:var(--testo);font-weight:500}
+.imp-media i{font-style:normal;font-size:13px}
+.imp-attesa{display:flex;align-items:center;gap:12px;color:var(--testo);margin:8px 0 12px}
+.imp-attesa .giro{width:20px;height:20px;border-radius:50%;border:2.5px solid var(--linea);border-top-color:var(--verde);animation:imp-giro .8s linear infinite;flex:none}
+@keyframes imp-giro{to{transform:rotate(360deg)}}
+.imp-barra{height:6px;border-radius:3px;background:var(--linea);overflow:hidden}
+.imp-barra i{display:block;height:100%;background:var(--verde);transition:width .2s}
+.imp-errore{color:var(--rosso);margin-top:0}
+.imp-fatto{display:flex;flex-direction:column;align-items:center;text-align:center;gap:4px;padding:10px 0}
+.imp-fatto svg{width:44px;height:44px;color:#fff;background:var(--verde);border-radius:50%;padding:10px;margin-bottom:6px}
+.imp-fatto b{color:var(--testo);font-size:16px;font-weight:500}
+.imp-fatto i{font-style:normal;font-size:13px}
+@media(max-width:520px){.imp-riga{flex-wrap:wrap}.imp-riga select{max-width:none;width:100%;flex:1 1 100%}}
 </style>
 </head>
 <body>
@@ -1455,6 +1490,7 @@ const I = {
   esci:'<path d="M15 4h3a2 2 0 0 1 2 2v12a2 2 0 0 1-2 2h-3M10 17l5-5-5-5M15 12H3"/>',
   matita:'<path d="M4 20h4L19 9a2.8 2.8 0 0 0-4-4L4 16z"/><path d="m13.5 6.5 4 4"/>',
   scarica:'<path d="M12 4v11M7 10.5l5 5 5-5M5 20h14"/>',
+  importa:'<path d="M4 13v5a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-5"/><path d="M12 3v11M8 10l4 4 4-4"/>',
   play:'<path d="M7 4.5v15l12.5-7.5z" fill="currentColor" stroke="none"/>',
   pausa:'<rect x="6" y="4.5" width="4" height="15" rx="1" fill="currentColor" stroke="none"/><rect x="14" y="4.5" width="4" height="15" rx="1" fill="currentColor" stroke="none"/>',
   effetti:'<path d="M12 3l1.6 4.4L18 9l-4.4 1.6L12 15l-1.6-4.4L6 9l4.4-1.6z"/><path d="M18.5 14.5l.8 2.2 2.2.8-2.2.8-.8 2.2-.8-2.2-2.2-.8 2.2-.8zM5.5 15l.6 1.4 1.4.6-1.4.6-.6 1.4-.6-1.4L3.5 17l1.4-.6z"/>',
@@ -1582,6 +1618,11 @@ function nomeLungo(id){
   const n = (p.nome || '').trim(), k = (p.nick || '').trim();
   return k && n && k.toLowerCase() !== n.toLowerCase() ? k + ' (' + n + ')' : (k || n || 'Utente FOSS');
 }
+function inizialiNome(t){
+  /* solo lettere e numeri (niente emoji a meta') */
+  const p = String(t || '').trim().split(/\s+/).filter(x => /[\p{L}\p{N}]/u.test(x)).map(x => (x.match(/[\p{L}\p{N}]/u) || [''])[0]);
+  return ((p[0] || '?') + (p.length > 1 ? p[p.length - 1] : '')).toUpperCase();
+}
 function iniziali(t){
   const p = String(t || '').trim().split(/\s+/).filter(Boolean);
   return ((p[0] || '?')[0] + (p.length > 1 ? p[p.length - 1][0] : '')).toUpperCase();
@@ -1592,6 +1633,14 @@ function avatar(id, cls, conOnline, stile){
   return '<span class="av '+(cls||'')+'" style="background:'+(f ? 'transparent' : colore(id))+';'+(stile||'')+'">'+
     (f ? '<img src="'+esc(f)+'" alt="" loading="lazy" onerror="this.remove()">' : svg('persona', 1.6))+
     (conOnline && S.online.has(id) ? '<i class="online"></i>' : '')+'</span>';
+}
+/* i messaggi importati da WhatsApp di chi non e' su FOSS: hanno solo il nome */
+function importatoDa(m){ return !m.autore && m.media && m.media.importato ? m.media.importato : null; }
+function chiaveAutore(m){ const i = importatoDa(m); return i ? 'wa:' + (i.n || '') : m.autore; }
+function nomeMsg(m){ const i = m && importatoDa(m); return i ? (i.n || 'Utente WhatsApp') : nomeDi(m && m.autore); }
+function avatarMsg(m, cls){
+  const i = importatoDa(m); if(!i) return avatar(m.autore, cls);
+  return '<span class="av av-iniz '+(cls||'')+'" style="background:'+colore(chiaveAutore(m))+'" title="Importato da WhatsApp">'+esc(inizialiNome(i.n))+'</span>';
 }
 function avatarConv(c, cls){
   if(!c) return '<span class="av '+(cls||'')+'"></span>';
@@ -1960,6 +2009,7 @@ async function recupera(){
 function arrivaMessaggio(m){
   const c = S.convs.get(m.conv_id);
   if(!c){ recupera(); return; }
+  if(m.media && m.media.importato){ arrivaImportato(m); return; }
   const s = statoMsgs(m.conv_id);
   const gia = s.ids.has(m.id);
   if(s.caricato || m.conv_id === S.aperta){
@@ -2256,11 +2306,11 @@ function rigaHTML(c){
     ant = svg('lucchetto', 1.8) + '<span class="tx">Chat bloccata</span>';
   } else if(u){
     if(u.eliminato) ant = svg('vietato', 1.8) + '<span class="tx" style="font-style:italic">'+(u.autore === S.io ? 'Hai eliminato questo messaggio' : 'Questo messaggio è stato eliminato')+'</span>';
-    else if(u.tipo === 'sistema') ant = '<span class="tx">'+esc(u.media && u.media.fissato ? (u.autore === S.io ? 'Hai fissato un messaggio' : nomeDi(u.autore) + ' ha fissato un messaggio') : (u.testo || ''))+'</span>';
+    else if(u.tipo === 'sistema') ant = '<span class="tx">'+esc(u.media && u.media.fissato ? (u.autore === S.io ? 'Hai fissato un messaggio' : nomeMsg(u) + ' ha fissato un messaggio') : (u.testo || ''))+'</span>';
     else if(u.tipo === 'colpetto') ant = anteprimaTipo(u);
     else {
       if(u.autore === S.io){ const st = statoSpunte(u, c); ant += spunteHTML(st, true); }
-      else if(c.tipo === 'gruppo') ant += '<span class="chi">'+esc(nomeDi(u.autore))+':&nbsp;</span>';
+      else if(c.tipo === 'gruppo') ant += '<span class="chi">'+esc(nomeMsg(u))+':&nbsp;</span>';
       ant += anteprimaTipo(u);
     }
   } else if(c.tipo === 'gruppo') ant = '<span class="tx">Gruppo creato</span>';
@@ -2465,7 +2515,7 @@ function disegnaMessaggi(mantieni){
 }
 function stessoGruppo(a, b){
   if(!a || !b || a.tipo === 'sistema' || b.tipo === 'sistema' || a.tipo === 'colpetto' || b.tipo === 'colpetto') return false;
-  if(a.autore !== b.autore) return false;
+  if(chiaveAutore(a) !== chiaveAutore(b)) return false;
   const da = new Date(a.creato_il), db = new Date(b.creato_il);
   return stessoGiorno(da, db) && Math.abs(db - da) < 7 * 60000;
 }
@@ -2473,7 +2523,7 @@ function msgHTML(m, prev, next, c){
   if(m.tipo === 'sistema'){
     const md = m.media || {};
     if(md.fissato) return '<div class="sistema fissato" data-id="'+m.id+'"><span data-a="vai-msg" data-id="'+esc(md.fissato)+'" role="button">'+svg('spillo', 2)+
-      esc(m.autore === S.io ? 'Hai fissato un messaggio' : nomeDi(m.autore) + ' ha fissato un messaggio')+'</span></div>';
+      esc(m.autore === S.io ? 'Hai fissato un messaggio' : nomeMsg(m) + ' ha fissato un messaggio')+'</span></div>';
     return '<div class="sistema" data-id="'+m.id+'"><span>'+esc(m.testo || '')+'</span></div>';
   }
   if(m.tipo === 'colpetto') return colpettoHTML(m);
@@ -2483,14 +2533,14 @@ function msgHTML(m, prev, next, c){
   let cls = 'msg ' + (mio ? 'mio' : 'suo') + (primo ? ' primo' : '') + (ultimo ? ' ultimo' : '') + (gr ? ' gr' : '') + (haR ? ' con-reazioni' : '') +
     (S.selezione && S.selezione.has(m.id) ? ' scelto' : '') + (m.tipo === 'lavoro' || m.tipo === 'sondaggio' ? ' largo' : '');
   const conAv = suTelefono() ? ultimo : primo;   /* su iPhone la foto sta accanto all'ultimo messaggio del gruppo */
-  const pre = gr && !mio ? (conAv ? avatar(m.autore, 'av-g') : '<span class="vuoto-av"></span>') : '';
+  const pre = gr && !mio ? (conAv ? avatarMsg(m, 'av-g') : '<span class="vuoto-av"></span>') : '';
   return '<div class="'+cls+'" data-id="'+m.id+'">'+pre+bollaHTML(m, c, primo, mio, gr)+'</div>';
 }
 function bollaHTML(m, c, primo, mio, gr){
   const md = m.media || {};
   let corpo = '', bcls = 'bolla';
-  const autore = gr && !mio && primo && m.tipo !== 'sticker'
-    ? '<div class="autore" style="color:'+colore(m.autore)+'">'+esc(nomeDi(m.autore))+((S.persone.get(m.autore) || {}).ruolo ? '<i>'+esc(S.persone.get(m.autore).ruolo)+'</i>' : '')+'</div>' : '';
+  const autore = (gr || importatoDa(m)) && !mio && primo && m.tipo !== 'sticker'
+    ? '<div class="autore" style="color:'+colore(chiaveAutore(m))+'">'+esc(nomeMsg(m))+((S.persone.get(m.autore) || {}).ruolo ? '<i>'+esc(S.persone.get(m.autore).ruolo)+'</i>' : '')+'</div>' : '';
   const cit = m.risponde_a && !m.eliminato ? citazioneHTML(m.risponde_a, c) : '';
   if(m.eliminato){
     corpo = '<div class="eliminato">'+svg('vietato', 1.8)+(mio ? 'Hai eliminato questo messaggio' : 'Questo messaggio è stato eliminato')+meta(m, c, mio)+'</div>';
@@ -2554,7 +2604,7 @@ function reazioniHTML(id){
 function citazioneHTML(rid, c){
   const q = trovaMsg(c.id, rid);
   if(!q) return '<div class="citazione" data-a="vai-msg" data-id="'+rid+'"><span class="barra"></span><span class="cc"><span>Messaggio non disponibile</span></span></div>';
-  const col = q.autore === S.io ? '#06cf9c' : colore(q.autore);
+  const col = q.autore === S.io ? '#06cf9c' : colore(chiaveAutore(q));
   const md = q.media || {};
   let t = q.eliminato ? 'Messaggio eliminato' : '';
   let ic = '';
@@ -2568,7 +2618,7 @@ function citazioneHTML(rid, c){
   }
   const mini = (q.tipo === 'foto' || q.tipo === 'video' || q.tipo === 'sticker') && !q.eliminato
     ? '<img data-mini-di="'+q.id+'" alt=""'+(md.mini ? ' src="'+esc(md.mini)+'"' : '')+'>' : '';
-  return '<div class="citazione" style="--col:'+col+'" data-a="vai-msg" data-id="'+rid+'"><span class="barra"></span><span class="cc"><b>'+esc(q.autore === S.io ? 'Tu' : nomeDi(q.autore))+'</b>'+
+  return '<div class="citazione" style="--col:'+col+'" data-a="vai-msg" data-id="'+rid+'"><span class="barra"></span><span class="cc"><b>'+esc(q.autore === S.io ? 'Tu' : nomeMsg(q))+'</b>'+
     '<span>'+ic+esc(t)+'</span></span>'+mini+'</div>';
 }
 function soloEmoji(t){
@@ -2663,7 +2713,7 @@ function vocaleHTML(m, mio){
     '<div class="onda" data-a="cerca-voc" data-id="'+m.id+'"><span class="barre">'+onda.map(v => '<i style="height:'+Math.max(10, v * 100)+'%"></i>').join('')+'</span><span class="pallino"></span>'+
       '<span class="tempo">'+fmtDur(md.dur)+'</span></div>'+
     '<button class="vel" data-a="vel-voc">1×</button>'+
-    '<span class="vav">'+avatar(m.autore)+'<span class="mic '+(nuovo ? 'nuovo' : 'ascoltato')+'">'+svg('mic', 2.4)+'</span></span>'+
+    '<span class="vav">'+avatarMsg(m)+'<span class="mic '+(nuovo ? 'nuovo' : 'ascoltato')+'">'+svg('mic', 2.4)+'</span></span>'+
     '</div>'+meta(m, S.convs.get(m.conv_id) || {membri: []}, mio);
 }
 function ondaDa(s){
@@ -3429,7 +3479,7 @@ async function disegnaVisore(){
   if(!u) cont = '<div class="media-offline" style="max-width:340px">'+svg(md.url && !md.giphy ? 'server' : 'foto', 1.6)+'<b>'+(md.url && !md.giphy ? 'Il server dei media sembra offline' : 'File non disponibile')+'</b></div>';
   else if(m.tipo === 'video') cont = '<video src="'+esc(u)+'" controls autoplay playsinline'+(md.gif ? ' loop muted' : '')+'></video>';
   else cont = '<img src="'+esc(u)+'" alt="" id="visoreImg" draggable="false" style="'+(m.tipo === 'sticker' ? 'max-width:60vmin;max-height:60vmin' : '')+'">';
-  v.innerHTML = '<div class="visore-t">'+avatar(m.autore)+'<span class="tt"><b>'+esc(m.autore === S.io ? 'Tu' : nomeDi(m.autore))+'</b><span>'+quando+'</span></span>'+
+  v.innerHTML = '<div class="visore-t">'+avatarMsg(m)+'<span class="tt"><b>'+esc(m.autore === S.io ? 'Tu' : nomeMsg(m))+'</b><span>'+quando+'</span></span>'+
     (m.tipo === 'foto' && !md.gif ? '<button class="ib" data-v="sticker" title="Crea sticker">'+svg('sticker', 1.8)+'</button>' : '')+
     '<button class="ib" data-v="rispondi" title="Rispondi">'+svg('rispondi', 1.8)+'</button>'+
     '<button class="ib" data-v="inoltra" title="Inoltra">'+svg('inoltra', 1.8)+'</button>'+
@@ -4559,7 +4609,7 @@ function disegnaCerca(){
     const re = new RegExp('(' + q.replace(/[.*+?^${}()|[\]\\]/g, '\\$&') + ')', 'ig');
     const l = (data || []).filter(m => !S.nascosti.has(m.id));
     R.innerHTML = l.length ? l.map(m => '<button class="voce" data-a="vai-msg" data-id="'+m.id+'" style="align-items:flex-start"><span class="vc" style="border-bottom:1px solid var(--linea)">'+
-      '<span style="font-size:12.5px">'+dataBreve(m.creato_il)+' · '+esc(m.autore === S.io ? 'Tu' : nomeDi(m.autore))+'</span>'+
+      '<span style="font-size:12.5px">'+dataBreve(m.creato_il)+' · '+esc(m.autore === S.io ? 'Tu' : nomeMsg(m))+'</span>'+
       '<b style="white-space:normal;font-size:14.5px">'+esc(testoSemplice(m.testo)).replace(re, '<mark style="background:rgba(0,168,132,.3);color:inherit;border-radius:3px">$1</mark>')+'</b></span></button>').join('')
       : '<div class="vuoto-lista">Nessun messaggio con «'+esc(q)+'».</div>';
   }, 300);
@@ -5110,6 +5160,7 @@ document.addEventListener('click', async e => {
         ['Messaggi importanti', 'stella', () => apriInfo('importanti')]].concat(
         nFis ? [['Messaggi fissati', 'spillo', elencoFissati]] : [],
         [['Crea un lavoro di FOSS', 'lavoro', () => creaLavoro({})]],
+        c.ruolo === 'admin' ? [['Importa chat di WhatsApp', 'importa', importaWhatsApp]] : [],
         c.tipo === 'privata' && altro(c) !== S.io ? [['Dai un colpetto', 'mano', () => colpetto(altro(c))]] : [], [
         null,
         [c.silenziata ? 'Riattiva notifiche' : 'Silenzia notifiche', c.silenziata ? 'campana' : 'silenzia', () => impostaMembro(c, {silenziata: !c.silenziata})],
@@ -5417,7 +5468,7 @@ function vociMessaggio(m, c){
   if(m.tipo === 'foto' && !md.gif) a.push(['Crea sticker', 'sticker', () => stickerDaMessaggio(m)]);
   if(m.tipo === 'sticker' && !(md.path && /^sticker\/[^/]+/.test(md.path) && md.path.indexOf(S.io) === 8)) a.push(['Aggiungi ai miei sticker', 'stella', () => salvaInRaccolta(m, 'sticker')]);
   if(md.gif) a.push(['Aggiungi alle mie GIF', 'gif', () => salvaInRaccolta(m, 'gif')]);
-  if(c.tipo === 'gruppo' && !mio && m.autore) a.push(['Scrivi a ' + nomeDi(m.autore), 'nuova', () => scriviA(m.autore)]);
+  if(c.tipo === 'gruppo' && !mio && m.autore) a.push(['Scrivi a ' + nomeMsg(m), 'nuova', () => scriviA(m.autore)]);
   return {p, a};
 }
 
@@ -6013,7 +6064,7 @@ function disegnaFissati(){
   const mini = (m.tipo === 'foto' || m.tipo === 'video') && md.mini ? '<img class="fis-mini" src="'+esc(md.mini)+'" alt="">' : '';
   B.innerHTML = '<button class="fis-vai" data-a="fissato-vai">'+tacche+'<span class="fis-ic">'+svg('spillo', 2)+'</span>'+
     '<span class="fis-tx"><b>'+(l.length > 1 ? 'Messaggio fissato <i>'+(fissatoIdx + 1)+' di '+l.length+'</i>' : 'Messaggio fissato')+'</b>'+
-    '<span>'+esc((m.autore === S.io ? 'Tu: ' : (c.tipo === 'gruppo' ? nomeDi(m.autore) + ': ' : '')) + testoAnteprima(m))+'</span></span>'+mini+'</button>'+
+    '<span>'+esc((m.autore === S.io ? 'Tu: ' : (c.tipo === 'gruppo' ? nomeMsg(m) + ': ' : '')) + testoAnteprima(m))+'</span></span>'+mini+'</button>'+
     (l.length > 1 ? '<button class="ib fis-lista" data-a="fissati-lista" title="Tutti i fissati">'+svg('lista', 2)+'</button>'
                   : '<button class="ib fis-lista" data-a="fissato-togli" data-id="'+m.id+'" title="Togli dai fissati">'+svg('chiudi', 2)+'</button>');
 }
@@ -6045,7 +6096,7 @@ function elencoFissati(){
   const c = S.convs.get(S.aperta); if(!c) return;
   const l = fissatiDi(c.id); if(!l.length) return;
   const corpo = () => '<div class="fis-elenco">'+fissatiDi(c.id).map(m => '<div class="fis-riga">'+
-      '<button class="fis-r-vai" data-vai="'+m.id+'"><b>'+esc(m.autore === S.io ? 'Tu' : nomeDi(m.autore))+'<i>'+esc(dataBreve(m.creato_il))+'</i></b><span>'+esc(testoAnteprima(m))+'</span></button>'+
+      '<button class="fis-r-vai" data-vai="'+m.id+'"><b>'+esc(m.autore === S.io ? 'Tu' : nomeMsg(m))+'<i>'+esc(dataBreve(m.creato_il))+'</i></b><span>'+esc(testoAnteprima(m))+'</span></button>'+
       '<button class="ib" data-togli="'+m.id+'" title="Togli dai fissati">'+svg('spilloVia', 1.9)+'</button></div>').join('')+'</div>';
   const v = foglio(l.length + ' messaggi fissati', corpo(), [['Chiudi']]);
   v.querySelector('.foglio-c').onclick = e => {
@@ -6633,7 +6684,7 @@ async function scattaPromemoria(){
     if(!m || m.eliminato) continue;
     const c = S.convs.get(x.conv_id);
     suono('arrivo');
-    const chi = m.autore === S.io ? 'Tu' : nomeDi(m.autore);
+    const chi = m.autore === S.io ? 'Tu' : nomeMsg(m);
     toast('⏰ ' + chi + ': ' + testoAnteprima(m).slice(0, 80), 'Apri', async () => { if(c){ await apriConv(c.id); vaiAMessaggio(id); } });
   }
   orologioPromemoria();
@@ -6671,8 +6722,8 @@ function tuttiProgrammati(){
 function testoColpetto(m){
   const a = m.media && m.media.a;
   if(m.autore === S.io) return 'Hai dato un colpetto a ' + nomeDi(a);
-  if(a === S.io) return nomeDi(m.autore) + ' ti ha dato un colpetto';
-  return nomeDi(m.autore) + ' ha dato un colpetto a ' + nomeDi(a);
+  if(a === S.io) return nomeMsg(m) + ' ti ha dato un colpetto';
+  return nomeMsg(m) + ' ha dato un colpetto a ' + nomeDi(a);
 }
 function colpettoHTML(m){
   const nuovo = Date.now() - new Date(m.creato_il).getTime() < 8000 && !S.visti.has(m.id);
@@ -6696,7 +6747,7 @@ function colpettoRicevuto(m, guardo){
   try{ navigator.vibrate && navigator.vibrate([25, 70, 25]); }catch(e){}
   if(m.conv_id === S.aperta){
     const cv = el('conv'); if(cv){ cv.classList.remove('colpito'); void cv.offsetWidth; cv.classList.add('colpito'); setTimeout(() => cv.classList.remove('colpito'), 900); }
-  } else if(!c.silenziata) toast('👋 ' + nomeDi(m.autore) + ' ti ha dato un colpetto' + (c.tipo === 'gruppo' ? ' in «' + nomeConv(c) + '»' : ''), 'Apri', () => apriConv(c.id));
+  } else if(!c.silenziata) toast('👋 ' + nomeMsg(m) + ' ti ha dato un colpetto' + (c.tipo === 'gruppo' ? ' in «' + nomeConv(c) + '»' : ''), 'Apri', () => apriConv(c.id));
   setTimeout(() => segnaVisto(m.id), 3000);
 }
 /* il doppio tocco: sulle foto accanto ai messaggi di un gruppo e sulla foto in cima a una chat privata */
@@ -6755,7 +6806,7 @@ async function messaggiImportanti(conv){
 function rigaImportante(m, conNome){
   const c = S.convs.get(m.conv_id);
   return '<button class="voce imp-voce" data-imp="'+m.id+'" data-conv="'+m.conv_id+'">'+avatar(m.autore)+'<span class="vc">'+
-    '<span class="imp-chi">'+esc(m.autore === S.io ? 'Tu' : nomeDi(m.autore))+(conNome && c ? ' <i>›</i> ' + esc(nomeConv(c)) : '')+'<em>'+esc(dataBreve(m.creato_il))+'</em></span>'+
+    '<span class="imp-chi">'+esc(m.autore === S.io ? 'Tu' : nomeMsg(m))+(conNome && c ? ' <i>›</i> ' + esc(nomeConv(c)) : '')+'<em>'+esc(dataBreve(m.creato_il))+'</em></span>'+
     '<b>'+esc(testoAnteprima(m))+'</b></span><span class="imp-stella">'+svg('stellaPiena', 1.6)+'</span></button>';
 }
 /* nelle info della chat */
@@ -6780,6 +6831,420 @@ async function apriImportante(id, conv){
   if(S.aperta !== conv) await apriConv(conv);
   if(suTelefono() && infoAperta) chiudiInfo();
   vaiAMessaggio(id);
+}
+
+/* ======================= IMPORTARE UNA CHAT DI WHATSAPP =======================
+   Su WhatsApp: chat › Altro › Esporta chat. Arriva un .zip (con foto, video, vocali)
+   o un .txt. Qui lo leggo, chiedo "chi è chi" (i nomi su WhatsApp e su FOSS possono
+   essere diversi) e metto i messaggi nella chat aperta, con la loro data. */
+
+const WA_INVIS = /[‎‏‪-‮⁦-⁩﻿]/g;
+const WA_TESTA_IOS = /^\[(\d{1,4})[\/.\-](\d{1,2})[\/.\-](\d{1,4}),?\s+(\d{1,2})[:.](\d{2})(?:[:.](\d{2}))?\s*([AaPp]\.?\s?[Mm]\.?)?\]\s?(.*)$/;
+const WA_TESTA_AND = /^(\d{1,4})[\/.\-](\d{1,2})[\/.\-](\d{1,4}),?\s+(\d{1,2})[:.](\d{2})(?:[:.](\d{2}))?\s*([AaPp]\.?\s?[Mm]\.?)?\s+[-–]\s+(.*)$/;
+const WA_ALLEGATO_IOS = /^<(?:allegato|attached|adjunto|anexo|pi[eè]ce jointe|anhang|bijlage):\s*([^>]+)>\s*$/i;
+const WA_ALLEGATO_AND = /^(.+?\.[A-Za-z0-9]{1,5})\s+\((?:file allegato|file attached|archivo adjunto|arquivo anexado|fichier joint|datei angeh[aä]ngt|bestand bijgevoegd)\)\s*$/i;
+const WA_OMESSO = [
+  [/^<?(?:media omessi|media omitted|multimedia omitido|m[ií]dia oculta|m[eé]dias omis|medien ausgeschlossen)>?$/i, '📎 Allegato non esportato'],
+  [/^(?:immagine omessa|image omitted|imagen omitida|imagem ocultada|image absente|bild weggelassen)$/i, '📷 Foto non esportata'],
+  [/^(?:video omesso|video omitted|video omitido|v[ií]deo oculto|vid[eé]o absente|video weggelassen)$/i, '🎥 Video non esportato'],
+  [/^(?:audio omesso|audio omitted|audio omitido|[aá]udio ocultado|audio omis|audio weggelassen)$/i, '🎤 Vocale non esportato'],
+  [/^(?:sticker omess[oa]|sticker omitted|sticker omitido|figurinha omitida|autocollant omis|sticker weggelassen)$/i, 'Sticker non esportato'],
+  [/^(?:documento omesso|document omitted|documento omitido|document omis|dokument weggelassen)$/i, '📄 Documento non esportato'],
+  [/^(?:gif (?:omessa|esclusa|omitted|omitida)|gif omitido)$/i, 'GIF non esportata'],
+  [/^(?:scheda contatto omessa|contact card omitted|tarjeta de contacto omitida)$/i, '👤 Contatto non esportato'],
+];
+const WA_MODIFICATO = /\s*<(?:questo messaggio è stato modificato|this message was edited|se edit[oó] este mensaje|messaggio modificato)>\s*$/i;
+const WA_ELIMINATO = /^(?:questo messaggio è stato eliminato|hai eliminato questo messaggio|this message was deleted|you deleted this message|se elimin[oó] este mensaje|eliminaste este mensaje)\.?$/i;
+
+/* ---------- il .zip: lo leggo a pezzi, senza caricarlo tutto in memoria ---------- */
+async function waLeggiZip(file){
+  const coda = Math.min(file.size, 65557 + 22);
+  const fine = new DataView(await file.slice(file.size - coda).arrayBuffer());
+  let p = -1;
+  for(let i = fine.byteLength - 22; i >= 0; i--) if(fine.getUint32(i, true) === 0x06054b50){ p = i; break; }
+  if(p < 0) throw new Error('zip');
+  let n = fine.getUint16(p + 10, true), dimCD = fine.getUint32(p + 12, true), offCD = fine.getUint32(p + 16, true);
+  if((offCD === 0xffffffff || dimCD === 0xffffffff || n === 0xffff) && p >= 20 && fine.getUint32(p - 20, true) === 0x07064b50){
+    const off64 = Number(fine.getBigUint64(p - 12, true));
+    const z = new DataView(await file.slice(off64, off64 + 56).arrayBuffer());
+    n = Number(z.getBigUint64(32, true)); dimCD = Number(z.getBigUint64(40, true)); offCD = Number(z.getBigUint64(48, true));
+  }
+  const cd = new DataView(await file.slice(offCD, offCD + dimCD).arrayBuffer());
+  const dec = new TextDecoder('utf-8'), voci = new Map();
+  let q = 0;
+  while(q + 46 <= cd.byteLength && cd.getUint32(q, true) === 0x02014b50){
+    const metodo = cd.getUint16(q + 10, true);
+    let csize = cd.getUint32(q + 20, true), usize = cd.getUint32(q + 24, true), off = cd.getUint32(q + 42, true);
+    const ln = cd.getUint16(q + 28, true), lx = cd.getUint16(q + 30, true), lc = cd.getUint16(q + 32, true);
+    const nome = dec.decode(new Uint8Array(cd.buffer, cd.byteOffset + q + 46, ln));
+    /* zip grandi: le misure vere stanno nell'extra 0x0001 */
+    let e = q + 46 + ln; const fe = e + lx;
+    while(e + 4 <= fe){
+      const id = cd.getUint16(e, true), l = cd.getUint16(e + 2, true);
+      if(id === 1){
+        let k = e + 4;
+        if(usize === 0xffffffff){ usize = Number(cd.getBigUint64(k, true)); k += 8; }
+        if(csize === 0xffffffff){ csize = Number(cd.getBigUint64(k, true)); k += 8; }
+        if(off === 0xffffffff){ off = Number(cd.getBigUint64(k, true)); }
+      }
+      e += 4 + l;
+    }
+    if(!/\/$/.test(nome)) voci.set(nome.split('/').pop(), {nome, metodo, csize, usize, off});
+    q += 46 + ln + lx + lc;
+  }
+  return voci;
+}
+async function waEstrai(file, v, tipo){
+  const h = new DataView(await file.slice(v.off, v.off + 30).arrayBuffer());
+  if(h.getUint32(0, true) !== 0x04034b50) throw new Error('zip');
+  const da = v.off + 30 + h.getUint16(26, true) + h.getUint16(28, true);
+  const pezzo = file.slice(da, da + v.csize);
+  let b;
+  if(v.metodo === 0) b = pezzo;
+  else if(v.metodo === 8 && window.DecompressionStream) b = await new Response(pezzo.stream().pipeThrough(new DecompressionStream('deflate-raw'))).blob();
+  else throw new Error('zip');
+  return new Blob([b], {type: tipo || ''});
+}
+function waTipoFile(nome){
+  const x = estensione(nome);
+  const t = {jpg: 'image/jpeg', jpeg: 'image/jpeg', png: 'image/png', webp: 'image/webp', gif: 'image/gif', heic: 'image/heic',
+    mp4: 'video/mp4', mov: 'video/quicktime', m4v: 'video/mp4', '3gp': 'video/3gpp', webm: 'video/webm',
+    opus: 'audio/ogg', ogg: 'audio/ogg', m4a: 'audio/mp4', mp3: 'audio/mpeg', aac: 'audio/aac', amr: 'audio/amr', wav: 'audio/wav',
+    pdf: 'application/pdf', vcf: 'text/vcard', txt: 'text/plain', doc: 'application/msword', xls: 'application/vnd.ms-excel',
+    docx: 'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
+    xlsx: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
+    pptx: 'application/vnd.openxmlformats-officedocument.presentationml.presentation', zip: 'application/zip'}[x];
+  return t || 'application/octet-stream';
+}
+
+/* ---------- il testo della chat ---------- */
+function waLeggiTesto(txt){
+  const righe = txt.replace(/\r\n?/g, '\n').split('\n');
+  const grezzi = [];
+  for(const r0 of righe){
+    const r = r0.replace(/^[‎‏﻿]+/, '');
+    const m = WA_TESTA_IOS.exec(r) || WA_TESTA_AND.exec(r);
+    if(m) grezzi.push({p: [m[1], m[2], m[3]], h: +m[4], mi: +m[5], s: +(m[6] || 0), ap: m[7] || '', resto: m[8]});
+    else if(grezzi.length) grezzi[grezzi.length - 1].resto += '\n' + r0;
+  }
+  if(!grezzi.length) return null;
+  /* giorno/mese o mese/giorno? Lo capisco dai numeri: un 13 o piu' dice tutto */
+  let ymd = grezzi.some(g => g.p[0].length === 4), dm = 0, md = 0;
+  grezzi.forEach(g => { if(+g.p[0] > 12) dm++; if(+g.p[1] > 12) md++; });
+  let meseGiorno = !ymd && md > 0 && dm === 0;
+  if(!ymd && !dm && !md){
+    /* nessun numero oltre il 12: scelgo il verso che tiene i messaggi in ordine; a parita', AM/PM vuol dire americano */
+    const indietro = mg => { let n = 0, prima = 0; grezzi.forEach(g => { const t = mg ? (+g.p[2]) * 1e4 + (+g.p[0]) * 100 + (+g.p[1]) : (+g.p[2]) * 1e4 + (+g.p[1]) * 100 + (+g.p[0]); if(t < prima) n++; prima = t; }); return n; };
+    const a = indietro(false), b = indietro(true);
+    meseGiorno = b < a || (a === b && grezzi.some(g => g.ap));
+  }
+  const msgs = [];
+  for(const g of grezzi){
+    let y, mo, d;
+    if(ymd){ y = +g.p[0]; mo = +g.p[1]; d = +g.p[2]; }
+    else if(meseGiorno){ mo = +g.p[0]; d = +g.p[1]; y = +g.p[2]; }
+    else { d = +g.p[0]; mo = +g.p[1]; y = +g.p[2]; }
+    if(y < 100) y += 2000;
+    let h = g.h;
+    if(g.ap){ const pm = /^p/i.test(g.ap); if(pm && h < 12) h += 12; if(!pm && h === 12) h = 0; }
+    const quando = new Date(y, mo - 1, d, h, g.mi, g.s);
+    if(isNaN(quando) || mo < 1 || mo > 12 || d < 1 || d > 31) continue;
+    const i = g.resto.indexOf(': ');
+    if(i <= 0) continue;                                  /* messaggi di sistema: "X ha creato il gruppo" */
+    const nome = g.resto.slice(0, i).replace(WA_INVIS, '').replace(/^~\s*/, '').trim();
+    let corpo = g.resto.slice(i + 2);
+    /* su iPhone i messaggi di sistema (e gli allegati) cominciano con un segno invisibile */
+    const invisibile = /^[‎‏]/.test(corpo);
+    corpo = corpo.replace(WA_INVIS, '').replace(WA_MODIFICATO, '').replace(/\s+$/, '');
+    if(!nome || nome.length > 80) continue;
+    const prima = corpo.split('\n')[0].trim(), dopo = corpo.split('\n').slice(1).join('\n').trim();
+    const ai = WA_ALLEGATO_IOS.exec(prima) || WA_ALLEGATO_AND.exec(prima);
+    if(ai){ msgs.push({quando, nome, file: ai[1].trim(), testo: dopo}); continue; }
+    const om = WA_OMESSO.find(o => o[0].test(prima));
+    if(om){ msgs.push({quando, nome, omesso: om[1], testo: dopo}); continue; }
+    if(WA_ELIMINATO.test(corpo.trim()) || corpo.trim() === 'null') continue;
+    if(invisibile) continue;
+    if(!corpo.trim()) continue;
+    msgs.push({quando, nome, testo: corpo});
+  }
+  return msgs;
+}
+
+/* ---------- chi e' chi: provo a indovinare ---------- */
+function waNorm(t){
+  return String(t || '').normalize('NFD').replace(/[̀-ͯ]/g, '').toLowerCase().replace(/[^a-z0-9 ]+/g, ' ').replace(/\s+/g, ' ').trim();
+}
+function waIndovina(nomi, membri){
+  const voci = membri.map(id => {
+    const p = S.persone.get(id) || {};
+    const n = waNorm(p.nome), k = waNorm(p.nick);
+    return {id, n, k, primo: n.split(' ')[0] || ''};
+  });
+  const scelte = new Map();
+  nomi.forEach(w => {
+    const x = waNorm(w); if(!x) return;
+    let c = voci.filter(v => (v.n && v.n === x) || (v.k && v.k === x));
+    if(c.length !== 1) c = voci.filter(v => v.n && (x.startsWith(v.n + ' ') || v.n.startsWith(x + ' ') || x.split(' ')[0] === v.primo));
+    if(c.length !== 1) c = voci.filter(v => v.k && x.includes(v.k) && v.k.length >= 3);
+    if(c.length === 1) scelte.set(w, c[0].id);
+  });
+  /* due nomi e due persone (chat a due): se ne ho indovinato uno, l'altro e' l'altra persona */
+  if(nomi.length === 2 && membri.length === 2){
+    const fatti = nomi.filter(w => scelte.has(w));
+    if(fatti.length === 1){
+      const resto = membri.find(id => id !== scelte.get(fatti[0]));
+      const altroNome = nomi.find(w => !scelte.has(w));
+      if(resto) scelte.set(altroNome, resto);
+    }
+  }
+  /* due nomi uguali sulla stessa persona: tengo solo il piu' convincente (il primo) */
+  const usati = new Set();
+  nomi.forEach(w => { const id = scelte.get(w); if(!id) return; if(usati.has(id)) scelte.delete(w); else usati.add(id); });
+  return scelte;
+}
+
+/* ---------- la finestra ---------- */
+function importaWhatsApp(){
+  const c = S.convs.get(S.aperta); if(!c) return;
+  if(c.ruolo !== 'admin'){ toast('Solo chi amministra il gruppo può importare una chat.'); return; }
+  const v = document.createElement('div'); v.className = 'velo scuro'; v.id = 'veloImporta';
+  v.innerHTML = '<div class="foglio imp-foglio" role="dialog" aria-label="Importa da WhatsApp">'+
+    '<div class="foglio-t">Importa da WhatsApp<button class="ib" data-x="1" aria-label="Chiudi">'+svg('chiudi')+'</button></div>'+
+    '<div class="foglio-c" id="impC"></div><div class="foglio-f" id="impF"></div></div>';
+  document.body.appendChild(v);
+  const st = {c, fase: 'scegli', lotto: null, lavoro: false};
+  v.addEventListener('click', e => {
+    if((e.target === v || e.target.closest('[data-x]')) && !st.lavoro) return v.remove();
+  });
+  waPasso1(v, st);
+}
+function waPasso1(v, st, avviso){
+  el('impC').innerHTML = (avviso ? '<p class="imp-errore">'+esc(avviso)+'</p>' : '')+
+    '<p style="margin-top:0">Su WhatsApp apri la chat, tocca il nome in alto › <b>Esporta chat</b> (con o senza media) e salva il file. Poi sceglilo qui: i messaggi entrano in «'+esc(nomeConv(st.c))+'» con la loro data.</p>'+
+    '<button class="imp-scegli" data-scegli="1">'+svg('allega', 1.8)+'<span><b>Scegli il file esportato</b><i>.zip (con foto, video e vocali) oppure .txt</i></span></button>';
+  el('impF').innerHTML = '<button class="btn" data-x="1">Annulla</button>';
+  $('[data-scegli]', v).onclick = () => scegliFile('.zip,.txt,application/zip,application/x-zip-compressed,text/plain', false, f => waApri(v, st, f[0]));
+}
+async function waApri(v, st, file){
+  el('impC').innerHTML = '<p class="imp-attesa"><span class="giro"></span>Leggo la chat…</p>'; el('impF').innerHTML = '';
+  try{
+    let txt = null, voci = null;
+    if(/\.zip$/i.test(file.name) || /zip/.test(file.type)){
+      voci = await waLeggiZip(file);
+      const nomi = Array.from(voci.keys());
+      const t = nomi.find(n => n === '_chat.txt') || nomi.find(n => /\.txt$/i.test(n));
+      if(!t) return waPasso1(v, st, 'Nel file .zip non c’è la chat: esportala di nuovo da WhatsApp.');
+      txt = await (await waEstrai(file, voci.get(t), 'text/plain')).text();
+      voci.delete(t);
+    } else txt = await file.text();
+    const msgs = waLeggiTesto(txt);
+    if(!msgs || !msgs.length) return waPasso1(v, st, 'Non trovo messaggi di WhatsApp in questo file.');
+    st.file = file; st.voci = voci; st.msgs = msgs;
+    waPasso2(v, st);
+  }catch(e){
+    console.warn(e);
+    waPasso1(v, st, e && e.message === 'zip' ? 'Questo file .zip non si riesce a leggere: prova a esportare di nuovo, oppure scegli il .txt.' : 'Il file non si riesce a leggere.');
+  }
+}
+function waPasso2(v, st){
+  const c = st.c, msgs = st.msgs;
+  const conta = new Map();
+  msgs.forEach(m => conta.set(m.nome, (conta.get(m.nome) || 0) + 1));
+  const nomi = Array.from(conta.keys()).sort((a, b) => conta.get(b) - conta.get(a));
+  const membri = (c.membri || []).map(m => m.id);
+  const indov = waIndovina(nomi, membri);
+  st.mappa = new Map(nomi.map(n => [n, indov.has(n) ? indov.get(n) : '']));
+  const conFile = msgs.filter(m => m.file && st.voci && st.voci.has(m.file));
+  const peso = conFile.reduce((s, m) => s + (st.voci.get(m.file).usize || 0), 0);
+  st.media = conFile.length > 0;
+  const opz = n => '<option value="">Non è su FOSS: resta «'+esc(n)+'»</option>'+
+    membri.map(id => '<option value="'+id+'">'+esc(id === S.io ? nomeLungo(id) + ' (tu)' : nomeLungo(id))+'</option>').join('')+
+    '<option value="-">Non importare i suoi messaggi</option>';
+  el('impC').innerHTML =
+    '<p class="imp-riass">'+msgs.length.toLocaleString('it-IT')+' messaggi, dal '+esc(dataBreve(msgs[0].quando))+' al '+esc(dataBreve(msgs[msgs.length - 1].quando))+'</p>'+
+    '<div class="imp-tit">Chi è chi</div><p class="imp-nota">Scegli a chi di FOSS appartengono i messaggi di ogni nome di WhatsApp.</p>'+
+    '<div class="imp-nomi">'+nomi.map((n, i) => '<label class="imp-riga"><span class="av" style="background:'+colore('wa:' + n)+'">'+esc(inizialiNome(n))+'</span>'+
+      '<span class="imp-n"><b>'+esc(n)+'</b><i>'+conta.get(n).toLocaleString('it-IT')+(conta.get(n) === 1 ? ' messaggio' : ' messaggi')+'</i></span>'+
+      '<select data-i="'+i+'" aria-label="Chi è '+esc(n)+' su FOSS">'+opz(n)+'</select></label>').join('')+'</div>'+
+    (st.media ? '<label class="imp-media"><input type="checkbox" id="impMedia" checked><span><b>Importa anche foto, video e vocali</b><i>'+conFile.length+' file, '+esc(pesoFile(peso))+'</i></span></label>' :
+      (msgs.some(m => m.file || m.omesso) ? '<p class="imp-nota">Questa esportazione non ha i file: al loro posto resta una nota.</p>' : ''));
+  $$('select', v).forEach(s => {
+    const n = nomi[+s.dataset.i]; s.value = st.mappa.get(n) || '';
+    s.onchange = () => { st.mappa.set(n, s.value); conta2(); };
+  });
+  const conta2 = () => {
+    const n = msgs.filter(m => st.mappa.get(m.nome) !== '-').length;
+    const b = el('impVai'); if(b){ b.disabled = !n; b.textContent = n ? 'Importa ' + n.toLocaleString('it-IT') + ' messaggi' : 'Niente da importare'; }
+  };
+  el('impF').innerHTML = '<button class="btn" data-altro="1">Altro file</button><button class="btn pieno" id="impVai">Importa</button>';
+  $('[data-altro]', v).onclick = () => waPasso1(v, st);
+  el('impVai').onclick = () => waImporta(v, st, !!(el('impMedia') && el('impMedia').checked));
+  conta2();
+}
+function pesoFile(b){ return b > 1048576 * 900 ? (b / 1073741824).toFixed(1).replace('.', ',') + ' GB' : b > 1048576 ? Math.round(b / 1048576) + ' MB' : Math.max(1, Math.round(b / 1024)) + ' KB'; }
+
+async function waChiave(m, n){
+  const s = m.quando.toISOString() + '|' + m.nome + '|' + (m.file || m.omesso || '') + '|' + (m.testo || '') + '|' + n;
+  const h = new Uint8Array(await crypto.subtle.digest('SHA-256', new TextEncoder().encode(s)));
+  let b = ''; h.forEach(x => b += String.fromCharCode(x));
+  return 'wa' + btoa(b).replace(/\+/g, '-').replace(/\//g, '_').replace(/=+$/, '').slice(0, 30);
+}
+function waPezzi(t, max){ const out = []; t = String(t || ''); while(t.length > max){ let i = t.lastIndexOf('\n', max); if(i < max / 2) i = max; out.push(t.slice(0, i)); t = t.slice(i).replace(/^\n/, ''); } if(t.trim()) out.push(t); return out; }
+
+async function waVocale(blob, nome){
+  const x = estensione(nome), media = {mime: blob.type, dim: blob.size};
+  try{
+    const AC = window.AudioContext || window.webkitAudioContext;
+    const ac = new AC();
+    const ab = await blob.arrayBuffer();
+    const buf = await new Promise((ok, ko) => { const p = ac.decodeAudioData(ab, ok, ko); if(p && p.then) p.then(ok, ko); });
+    try{ ac.close(); }catch(e){}
+    const d = buf.getChannelData(0), n = 48, passo = Math.max(1, Math.floor(d.length / n)), lv = [];
+    for(let i = 0; i < n; i++){ let mx = 0; for(let j = i * passo; j < Math.min(d.length, (i + 1) * passo); j += 64) mx = Math.max(mx, Math.abs(d[j])); lv.push(mx); }
+    const picco = Math.max(.05, ...lv);
+    media.dur = Math.round(buf.duration * 10) / 10;
+    media.onda = lv.map(v => String.fromCharCode(65 + Math.round(Math.min(1, v / picco) * 31))).join('');
+  }catch(e){
+    media.dur = await new Promise(ok => {
+      const a = new Audio(), u = URL.createObjectURL(blob); let f = false;
+      const fine = d => { if(f) return; f = true; URL.revokeObjectURL(u); ok(d && isFinite(d) ? Math.round(d * 10) / 10 : 0); };
+      a.preload = 'metadata'; a.onloadedmetadata = () => fine(a.duration); a.onerror = () => fine(0); a.src = u; setTimeout(() => fine(0), 4000);
+    });
+  }
+  return {tipo: 'vocale', blob, ext: x || 'ogg', media};
+}
+async function waPreparaFile(st, nome){
+  const v = st.voci.get(nome);
+  const blob = await waEstrai(st.file, v, waTipoFile(nome));
+  if(blob.size > MAX_FILE) return null;
+  const f = new File([blob], nome, {type: blob.type});
+  const t = blob.type;
+  if(/^audio\//.test(t)) return waVocale(f, nome);
+  if(t === 'image/webp'){
+    /* gli sticker: li tengo come sono, con la trasparenza */
+    let w = 512, h = 512, mini = '';
+    try{ const im = await decodifica(f); [w, h] = lato(im); mini = miniatura(im, w, h); }catch(e){}
+    return {tipo: 'foto', blob: f, ext: 'webp', media: {w, h, mini, dim: f.size}};
+  }
+  if(/^(image|video)\//.test(t)) return prepara(f);
+  return {tipo: 'file', blob: f, ext: estensione(nome) || 'bin', media: {nome: nome.slice(0, 120), dim: f.size, mime: t}};
+}
+
+async function waImporta(v, st, conMedia){
+  const c = st.c;
+  st.lavoro = true; st.lotto = uuid();
+  const ferma = e => { e.preventDefault(); e.returnValue = ''; };
+  window.addEventListener('beforeunload', ferma);
+  const scrivi = (t, q) => { el('impC').innerHTML = '<p class="imp-attesa"><span class="giro"></span>'+esc(t)+'</p><div class="imp-barra"><i style="width:'+Math.round((q || 0) * 100)+'%"></i></div>'; };
+  el('impF').innerHTML = '';
+  scrivi('Preparo i messaggi…', 0);
+  let fatti = 0, saltati = 0, fileKo = 0;
+  try{
+    /* gia' importati prima (stessa chat esportata di nuovo): li salto, anche i loro file */
+    const gia = new Set();
+    for(let da = 0; ; da += 1000){
+      const {data, error} = await sb.from('chat_messaggi').select('k:media->importato->>k').eq('conv_id', c.id).not('media->importato', 'is', null).range(da, da + 999);
+      if(error) throw error;
+      (data || []).forEach(r => r.k && gia.add(r.k));
+      if(!data || data.length < 1000) break;
+    }
+    /* la lista finale, nell'ordine giusto */
+    const visti = new Map(), lista = [];
+    for(const m of st.msgs){
+      const chi = st.mappa.get(m.nome);
+      if(chi === '-') continue;
+      const base = m.quando.toISOString() + m.nome + (m.file || '') + (m.testo || '');
+      const n = (visti.get(base) || 0) + 1; visti.set(base, n);
+      lista.push({m, k: await waChiave(m, n), a: chi || null});
+    }
+    const daFare = lista.filter(x => !gia.has(x.k));
+    saltati = lista.length - daFare.length;
+    const BLOCCO = 200;
+    for(let i = 0; i < daFare.length; i += BLOCCO){
+      const pezzo = daFare.slice(i, i + BLOCCO), righe = [];
+      for(const x of pezzo){
+        const m = x.m, base = {n: m.nome, a: x.a, il: m.quando.toISOString()};
+        const testo = (t, suff) => waPezzi(t, 6000).forEach((p, j) => righe.push(Object.assign({}, base, {k: x.k + (suff || '') + (j ? '-' + j : ''), t: 'testo', x: p})));
+        if(m.file && conMedia && st.voci && st.voci.has(m.file)){
+          scrivi('Carico i file… ' + (i + righe.length) + ' di ' + daFare.length, (i + righe.length) / daFare.length);
+          let p = null;
+          try{ p = await waPreparaFile(st, m.file); }catch(e){ console.warn(e); }
+          if(p){
+            try{
+              const path = c.id + '/' + uuid() + '.' + (p.ext || 'bin');
+              const r = await caricaFile(path, p.blob);
+              const media = Object.assign({}, p.media, r.path ? {path: r.path} : {url: r.url});
+              const did = (p.tipo === 'foto' || p.tipo === 'video') && m.testo && m.testo.length <= 1000 ? m.testo : '';
+              if(did) media.did = did;
+              righe.push(Object.assign({}, base, {k: x.k, t: p.tipo, m: media}));
+              if(m.testo && !did) testo(m.testo, '-t');
+              continue;
+            }catch(e){ console.warn(e); fileKo++; }
+          } else fileKo++;
+        }
+        if(m.file || m.omesso){
+          const nota = m.omesso ? m.omesso : '📎 ' + m.file + (conMedia && st.voci && st.voci.has(m.file) ? ' (non caricato)' : ' (non esportato)');
+          testo(nota + (m.testo ? '\n' + m.testo : ''));
+        } else testo(m.testo);
+      }
+      scrivi('Importo i messaggi… ' + Math.min(daFare.length, i + pezzo.length) + ' di ' + daFare.length, Math.min(1, (i + pezzo.length) / daFare.length));
+      for(let j = 0; j < righe.length; j += 500){
+        const {data, error} = await sb.rpc('chat_importa', {p_conv: c.id, p_lotto: st.lotto, p_msgs: righe.slice(j, j + 500)});
+        if(error) throw error;
+        fatti += data || 0;
+      }
+    }
+  }catch(e){
+    console.warn(e);
+    window.removeEventListener('beforeunload', ferma);
+    st.lavoro = false;
+    await waRicarica(c.id);
+    el('impC').innerHTML = '<p class="imp-errore">L’importazione si è fermata'+(fatti ? ' dopo ' + fatti + ' messaggi' : '')+'. '+esc(/non puoi|amministra|solo a chi/i.test(e && e.message) ? e.message : 'Controlla la connessione e riprova: i messaggi già entrati non si doppiano.')+'</p>';
+    el('impF').innerHTML = (fatti ? '<button class="btn rosso" data-annulla="1">Togli quelli importati</button>' : '')+'<button class="btn pieno" data-x="1">Chiudi</button>';
+    waAnnullabile(v, st);
+    return;
+  }
+  window.removeEventListener('beforeunload', ferma);
+  st.lavoro = false;
+  await waRicarica(c.id);
+  el('impC').innerHTML = '<div class="imp-fatto">'+svg('spunta', 2.4)+'<b>'+(fatti ? fatti.toLocaleString('it-IT') + (fatti === 1 ? ' messaggio importato' : ' messaggi importati') : 'Niente di nuovo da importare')+'</b>'+
+    (saltati ? '<i>'+saltati.toLocaleString('it-IT')+' erano già nella chat</i>' : '')+
+    (fileKo ? '<i>'+fileKo+' file non sono entrati: al loro posto c’è una nota</i>' : '')+'</div>';
+  el('impF').innerHTML = (fatti ? '<button class="btn rosso" data-annulla="1">Annulla importazione</button>' : '')+'<button class="btn pieno" data-x="1">Fatto</button>';
+  waAnnullabile(v, st);
+}
+function waAnnullabile(v, st){
+  const b = $('[data-annulla]', v); if(!b) return;
+  b.onclick = () => conferma('Annullare l’importazione?', 'Tolgo dalla chat tutti i messaggi appena importati da WhatsApp.', 'Togli', async () => {
+    const {data, error} = await sb.rpc('chat_importa_annulla', {p_conv: st.c.id, p_lotto: st.lotto});
+    if(error) return errore(error, 'Importazione non annullata');
+    await waRicarica(st.c.id);
+    v.remove();
+    toast(data === 1 ? 'Tolto 1 messaggio importato.' : 'Tolti ' + (data || 0) + ' messaggi importati.');
+  }, true);
+}
+/* dopo un'importazione la chat si ricarica da capo (i messaggi vecchi vanno al loro posto) */
+async function waRicarica(conv){
+  S.msgs.delete(conv);
+  const c = S.convs.get(conv);
+  if(c){
+    const {data} = await sb.from('chat_messaggi').select('*').eq('conv_id', conv).order('creato_il', {ascending: false}).limit(1);
+    if(data && data[0]){ const u = data[0]; c.ultimo = {id: u.id, autore: u.autore, tipo: u.tipo, testo: (u.testo || '').slice(0, 140), creato_il: u.creato_il, eliminato: u.eliminato, media: u.media}; c.ultimo_il = u.creato_il; }
+  }
+  if(S.aperta === conv) await apriConv(conv);
+  disegnaLista();
+}
+/* arrivano dal vivo (un altro ha importato): non suonano e non contano, la chat si rifa' quando serve */
+let waRitardo = new Map();
+function arrivaImportato(m){
+  const conv = m.conv_id;
+  clearTimeout(waRitardo.get(conv));
+  waRitardo.set(conv, setTimeout(() => {
+    waRitardo.delete(conv);
+    if(document.getElementById('veloImporta')) return;      /* sono io che sto importando: ricarico alla fine */
+    if(S.aperta === conv) waRicarica(conv);
+    else S.msgs.delete(conv);
+  }, 1500));
 }
 
 /* ======================= VIA ======================= */
