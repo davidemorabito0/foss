@@ -7,7 +7,7 @@ services:
     restart: unless-stopped
     command: ["sh", "-c", "wget -qO /tmp/server.mjs https://foss.team/nas/server.mjs && exec node /tmp/server.mjs"]
     volumes:
-      - /share/FOSS.chat:/data
+      - /share/FOSSchat:/data
     environment:
       - PUBBLICO=https://media.foss.team
   tunnel:
