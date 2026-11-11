@@ -3,7 +3,7 @@
    la copia in cache serve solo quando sei offline. I DATI non stanno qui:
    vivono nel database e nella memoria del browser, quindi un aggiornamento
    dell'app non può cancellarli. */
-const CACHE = 'foss-guscio-v72';
+const CACHE = 'foss-guscio-v73';
 const GUSCIO = ['./', './index.html', './manifest.json',
                 './icone/icona-192-v2.png', './icone/icona-512-v2.png'];
 
@@ -77,16 +77,24 @@ self.addEventListener('push', e=>{
   if(!d || typeof d !== 'object') d = {testo: d == null ? '' : String(d)};
   const tag = String(d.tag || 'foss');
   const chat = tag.indexOf('fosschat-') === 0;      // anche i promemoria: la chat aperta li mostra gia' da se'
+  /* FOSS.chat: la faccia di chi scrive al posto del logo, e l'anteprima di una foto */
+  const https = v => typeof v === 'string' && /^https:\/\/\S+$/.test(v) && v.length < 1200 ? v : '';
+  const icona = https(d.icona), immagine = https(d.immagine);
+  const opzioni = {
+    body: String(d.testo || ''),
+    tag,
+    renotify: !d.silenzioso && !d.muto,   // una notifica che si somma aggiorna quella di prima senza suonare
+    silent: !!d.muto,                     // FOSS.chat: un messaggio mandato «senza suono»
+    icon: icona || './icone/icona-192-v2.png',
+    data: {url: d.url || './', nid: tag.indexOf('foss-') === 0 ? tag.slice(5) : ''}
+  };
+  if(immagine) opzioni.image = immagine;
   e.waitUntil((chat ? chatDavanti() : Promise.resolve(false)).then(davanti=>{
     if(davanti) return;
-    return self.registration.showNotification(String(d.titolo || 'FOSS'), {
-      body: String(d.testo || ''),
-      tag,
-      renotify: !d.silenzioso && !d.muto,   // una notifica che si somma aggiorna quella di prima senza suonare
-      silent: !!d.muto,                     // FOSS.chat: un messaggio mandato «senza suono»
-      icon: './icone/icona-192-v2.png',
-      data: {url: d.url || './', nid: tag.indexOf('foss-') === 0 ? tag.slice(5) : ''}
-    });
+    return self.registration.showNotification(String(d.titolo || 'FOSS'), opzioni)
+      /* se la foto non si carica, l'avviso arriva lo stesso col logo */
+      .catch(()=>self.registration.showNotification(String(d.titolo || 'FOSS'),
+        Object.assign({}, opzioni, {icon: './icone/icona-192-v2.png', image: undefined})));
   }));
 });
 /* tocco sulla notifica: porto FOSS davanti sul lavoro giusto (se e' gia'
