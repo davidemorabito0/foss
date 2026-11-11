@@ -65,7 +65,7 @@
   color-scheme:light;
 }
 *{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
-html,body{margin:0;height:100%;background:var(--app);color:var(--testo);font:400 var(--t)/1.35 var(--font);overflow:hidden;
+html,body{margin:0;height:100%;position:fixed;inset:0;width:100%;background:var(--app);color:var(--testo);font:400 var(--t)/1.35 var(--font);overflow:hidden;
   -webkit-font-smoothing:antialiased;-webkit-text-size-adjust:100%;overscroll-behavior:none}
 button{font:inherit;color:inherit;background:none;border:0;padding:0;cursor:pointer}
 input,textarea{font:inherit;color:inherit}
@@ -76,7 +76,7 @@ svg{display:block}
 ::-webkit-scrollbar-thumb{background:rgba(134,150,160,.35);border-radius:3px}
 ::-webkit-scrollbar-track{background:transparent}
 
-#app{display:flex;height:100vh;height:100dvh;width:100%;position:relative;overflow:hidden;background:var(--pannello)}
+#app{display:flex;height:100vh;height:var(--alto,100dvh);width:100%;position:relative;overflow:hidden;background:var(--pannello)}
 @media (min-width:1441px){
   body{background:var(--app)}
   #app{max-width:1600px;margin:0 auto;height:calc(100dvh - 38px);top:19px;box-shadow:0 6px 18px rgba(11,20,26,.18)}
@@ -3629,15 +3629,10 @@ function benvenuto(){
     v.innerHTML = '<div class="foglio" style="max-width:520px"><div class="foglio-c" style="padding-top:26px">'+
       '<div style="display:flex;align-items:center;gap:14px;margin-bottom:8px"><div style="width:56px;height:56px;border-radius:16px;overflow:hidden;flex:none">'+LOGO+'</div>'+
         '<div><div style="font-size:22px;color:var(--testo);font-weight:500">Benvenuto in FOSS.chat</div><div>La chat del tuo team, dentro FOSS.</div></div></div>'+
-      p('nuova', 'Come WhatsApp e Telegram', 'Chat a due e gruppi di lavoro, spunte di lettura, risposte, reazioni, inoltro. Il tuo account è quello di FOSS: niente da registrare.')+
-      p('mic', 'Vocali, foto, video e documenti', 'Tieni premuto il microfono per un vocale. Trascina o incolla i file direttamente nella chat.')+
-      p('sticker', 'Sticker e GIF', 'Crea uno sticker da una foto in un attimo (anche togliendo lo sfondo), salva le GIF e incollale da altre app.')+
-      p('effetti', 'Effetti come su iMessage', 'Tieni premuto il tasto invia: coriandoli, fuochi d’artificio, inchiostro invisibile, testo animato. E puoi disegnare.')+
-      p('lucchetto', 'Chat bloccate', 'Ogni chat si può chiudere con un codice di 4 cifre: chi passa davanti al tuo schermo non la apre.')+
-      p('sfondo', 'Lo sfondo che vuoi', 'Una tua foto, un colore o i disegni: per tutte le chat o per una sola. Lo trovi nelle impostazioni.')+
+      '<p style="margin:10px 0 0;line-height:1.55">Funziona come WhatsApp: chat, gruppi, vocali, foto, sticker e GIF. Tieni premuto il tasto invia per gli effetti. Il tuo account è quello di FOSS.</p>'+
       '<div style="margin-top:18px;padding:14px 16px;border-radius:10px;background:var(--testa);color:var(--testo)">'+
-        '<b style="font-weight:500">Vuoi proteggere tutta FOSS.chat con un codice?</b><div style="color:var(--testo-2);font-size:13.5px;margin-top:4px">'+
-        'Ogni volta che la apri (e dopo un po’ che non la usi) ti chiederà 4 cifre. Puoi toglierlo quando vuoi dalle impostazioni.</div></div>'+
+        '<b style="font-weight:500">Proteggere la chat con un codice di 4 cifre?</b><div style="color:var(--testo-2);font-size:13.5px;margin-top:4px">'+
+        'Si toglie quando vuoi dalle impostazioni.</div></div>'+
       '</div><div class="foglio-f"><button class="btn" data-b="no">No, grazie</button><button class="btn pieno" data-b="si">Sì, proteggila</button></div></div>';
     document.body.appendChild(v);
     v.onclick = async e => {
@@ -4582,6 +4577,23 @@ if('serviceWorker' in navigator){
     if(h && location.hash !== h) location.hash = h; else seguiIndirizzo();
   });
 }
+/* tastiera su iPhone: Safari non accorcia la pagina, la sposta. Adatto la chat allo spazio
+   che resta sopra la tastiera, cosi' messaggi e barra restano sempre visibili (come WhatsApp) */
+(function(){
+  const vv = window.visualViewport; if(!vv) return;
+  const adatta = () => {
+    const h = Math.round(vv.height);
+    document.documentElement.style.setProperty('--alto', h + 'px');
+    if(Math.abs(window.scrollY) > 0 || vv.offsetTop > 0) window.scrollTo(0, 0);
+    const app = el('app'); if(app) app.style.transform = vv.offsetTop ? 'translateY(' + vv.offsetTop + 'px)' : '';
+    const M = el('msgs');
+    if(M && M._eraInFondo !== false) M.scrollTop = M.scrollHeight;
+  };
+  vv.addEventListener('resize', adatta); vv.addEventListener('scroll', adatta);
+  document.addEventListener('focusin', e => { if(e.target.id === 'testoIn'){ const M = el('msgs'); if(M) M._eraInFondo = vicinoAlFondo(); setTimeout(adatta, 60); setTimeout(adatta, 350); } });
+  document.addEventListener('focusout', () => setTimeout(adatta, 120));
+  adatta();
+})();
 window.addEventListener('resize', debounce(() => {
   const t = $('.torna-foss'); if(t) t.style.display = suTelefono() ? 'grid' : 'none';
   if(!suTelefono() && !S.aperta) disegnaConvVuota();
