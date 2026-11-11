@@ -872,6 +872,31 @@ svg{display:block}
 @media (prefers-reduced-motion:reduce){
   *{animation-duration:.01ms!important;transition-duration:.01ms!important}
 }
+/* ---- come un'app: niente selezione del testo né menu del tocco lungo ---- */
+html,body,#app{-webkit-user-select:none;user-select:none;-webkit-touch-callout:none;-webkit-tap-highlight-color:transparent}
+img,video,svg,a{-webkit-user-drag:none;-webkit-touch-callout:none}
+input,textarea,[contenteditable="true"]{-webkit-user-select:text;user-select:text;-webkit-touch-callout:default}
+@media (hover:hover) and (pointer:fine){ .bolla .testo{-webkit-user-select:text;user-select:text} }
+
+/* ---- GIF: ricerca, tendenze ---- */
+.pe-cerca{display:flex;align-items:center;gap:8px;margin:8px 10px 2px;padding:0 12px;height:36px;border-radius:10px;background:var(--campo,rgba(134,150,160,.14));color:var(--testo-2)}
+.pe-cerca svg{width:17px;height:17px;flex:none}
+.pe-cerca input{flex:1;min-width:0;border:0;outline:0;background:none;color:var(--testo);font:inherit;font-size:15px;height:100%}
+.pe-cerca input::-webkit-search-cancel-button{filter:grayscale(1);opacity:.6}
+.gif-mosaico{columns:150px;column-gap:6px}
+@media (max-width:899px){.gif-mosaico{columns:3}}
+.gif-mosaico>button{display:block;width:100%;margin:0 0 6px;break-inside:avoid;border-radius:8px;overflow:hidden;background:rgba(134,150,160,.14);padding:0}
+.gif-mosaico>button img{width:100%;height:100%;object-fit:cover;display:block}
+.gif-mosaico>button:active{transform:scale(.96)}
+.gif-mosaico>.nuovo-stk{aspect-ratio:4/3;border:2px dashed rgba(134,150,160,.45);background:none;color:var(--testo-2);font-size:13px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:6px}
+.gif-mosaico>.nuovo-stk svg{width:26px;height:26px}
+.gif-attesa{display:flex;justify-content:center;gap:6px;padding:18px}
+.gif-attesa span{width:8px;height:8px;border-radius:50%;background:var(--testo-2);animation:gifPunto 1s infinite ease-in-out}
+.gif-attesa span:nth-child(2){animation-delay:.15s}.gif-attesa span:nth-child(3){animation-delay:.3s}
+@keyframes gifPunto{0%,80%,100%{opacity:.25;transform:scale(.8)}40%{opacity:1;transform:scale(1)}}
+.gif-giphy{text-align:center;font-size:11px;letter-spacing:.04em;color:var(--testo-2);opacity:.7;padding:8px 0 4px}
+.tasto-link{color:var(--verde,#00a884);font-weight:600;margin-top:8px;padding:6px 10px}
+
 </style>
 </head>
 <body>
@@ -2046,7 +2071,7 @@ async function idrataMedia(root){
 function mediaNonArriva(mid){
   const c = S.convs.get(S.aperta); if(!c) return;
   const m = trovaMsg(c.id, mid); if(!m || m._avanza != null) return;
-  const nas = !!(m.media && m.media.url);
+  const nas = !!(m.media && m.media.url && !m.media.giphy);
   const box = $('.msg[data-id="'+mid+'"] .media-box, .msg[data-id="'+mid+'"] .stk', el('msgs'));
   const html = '<div class="media-offline">'+svg(nas ? 'server' : 'foto', 1.6)+
     '<b>'+(nas ? 'Il server dei media sembra offline' : (navigator.onLine ? 'File non disponibile' : 'Sei offline'))+'</b>'+
@@ -2315,6 +2340,7 @@ function disegnaScrivi(){
   t.addEventListener('input', () => { adatta(t); aggiornaTastoManda(); dicoCheScrivo(); salvaBozzaPresto(); });
   t.addEventListener('keydown', tastiTesto);
   t.addEventListener('paste', incolla);
+  t.addEventListener('focus', () => { if(tocco() && pannelloEmojiAperto) chiudiPannelloEmoji(); });
   const mb = el('mandaB');
   mb.addEventListener('pointerdown', premiManda);
   mb.addEventListener('contextmenu', e => { e.preventDefault(); if(t.value.trim()) apriEffetti(); });
@@ -2790,7 +2816,7 @@ async function disegnaVisore(){
   const u = await urlMedia(md);
   const quando = dataGiorno(m.creato_il) + ' alle ' + ora(m.creato_il);
   let cont;
-  if(!u) cont = '<div class="media-offline" style="max-width:340px">'+svg(md.url ? 'server' : 'foto', 1.6)+'<b>'+(md.url ? 'Il server dei media sembra offline' : 'File non disponibile')+'</b></div>';
+  if(!u) cont = '<div class="media-offline" style="max-width:340px">'+svg(md.url && !md.giphy ? 'server' : 'foto', 1.6)+'<b>'+(md.url && !md.giphy ? 'Il server dei media sembra offline' : 'File non disponibile')+'</b></div>';
   else if(m.tipo === 'video') cont = '<video src="'+esc(u)+'" controls autoplay playsinline'+(md.gif ? ' loop muted' : '')+'></video>';
   else cont = '<img src="'+esc(u)+'" alt="" id="visoreImg" draggable="false" style="'+(m.tipo === 'sticker' ? 'max-width:60vmin;max-height:60vmin' : '')+'">';
   v.innerHTML = '<div class="visore-t">'+avatar(m.autore)+'<span class="tt"><b>'+esc(m.autore === S.io ? 'Tu' : nomeDi(m.autore))+'</b><span>'+quando+'</span></span>'+
@@ -4158,12 +4184,8 @@ function apriPannelloEmoji(scheda){
       '<div class="pe-corpo" id="peCorpo"><div class="pe-tit">'+(emojiCat ? EMOJI[emojiCat - 1][1] : 'Usate di recente')+'</div><div class="pe-griglia">'+
       (emojiCat ? EMOJI[emojiCat - 1][2].split(' ') : recenti()).map(e => '<button data-emo="'+e+'">'+e+'</button>').join('')+'</div></div>';
   } else if(pannelloEmojiScheda === 'gif'){
-    corpo = '<div class="pe-corpo"><div class="pe-tit">Le tue GIF</div><div class="pe-griglia stk gif">'+
-      '<button class="nuovo-stk" data-a="importa-gif">'+svg('piu')+'Importa GIF</button>'+
-      S.gif.map(x => '<button data-racc="'+x.id+'">'+(/\.mp4$/.test(x.path) ? '<video data-path="'+esc(x.path)+'" muted loop playsinline autoplay></video>' : '<img data-path="'+esc(x.path)+'" alt="GIF">')+'</button>').join('')+'</div>'+
-      '<div class="pe-vuoto">Hai una GIF su WhatsApp o Telegram? Copiala e incollala nella chat, oppure salvala e importala da qui.'+
-      (/Android/.test(navigator.userAgent) ? ' Puoi anche condividerla direttamente con FOSS dal menu «Condividi».' : '')+
-      '<br>Su una GIF ricevuta, dal menu del messaggio scegli «Aggiungi alle mie GIF».</div></div>';
+    corpo = '<div class="pe-cerca">'+svg('cerca', 2)+'<input id="gifQ" type="search" enterkeyhint="search" autocomplete="off" placeholder="Cerca GIF" value="'+esc(GIFW.q)+'"></div>'+
+      '<div class="pe-corpo" id="gifCorpo">'+corpoGif()+'</div>';
   } else {
     corpo = '<div class="pe-corpo"><div class="pe-griglia stk">'+
       '<button class="nuovo-stk" data-a="nuovo-sticker">'+svg('foto', 1.8)+'Da una foto</button>'+
@@ -4174,13 +4196,71 @@ function apriPannelloEmoji(scheda){
   }
   p.innerHTML = sch + corpo;
   $$('[data-path]', p).forEach(async n => { n.src = await urlFirmata(n.dataset.path); });
+  if(pannelloEmojiScheda === 'gif') avviaGif(p);
   p.onclick = e => {
     const s = e.target.closest('[data-pe]'); if(s){ apriPannelloEmoji(s.dataset.pe); return; }
     const c = e.target.closest('[data-cat]'); if(c){ emojiCat = +c.dataset.cat; apriPannelloEmoji('emoji'); return; }
     const em = e.target.closest('[data-emo]'); if(em){ inserisci(em.dataset.emo); usaEmoji(em.dataset.emo); return; }
     const f = e.target.closest('[data-foss]'); if(f){ mandaStickerFoss(f.dataset.foss); return; }
+    const g = e.target.closest('[data-giphy]'); if(g){ const x = GIFW.lista.find(z => z.id === g.dataset.giphy); if(x) mandaGiphy(x); return; }
+    if(e.target.closest('[data-a="gif-riprova"]')){ GIFW.err = ''; GIFW.lista = []; GIFW.fine = false; cercaGif(); return; }
     const r = e.target.closest('[data-racc]'); if(r){ const x = S.sticker.concat(S.gif).find(z => z.id === r.dataset.racc); if(x) mandaDaRaccolta(x); return; }
   };
+}
+/* ---------- GIF: tendenze e ricerca (GIPHY, tramite la funzione «gif») ---------- */
+const GIFW = {q: '', lista: [], off: 0, fine: false, carica: false, err: '', giro: 0};
+function corpoGif(){
+  let h = '';
+  if(!GIFW.q && S.gif.length) h += '<div class="pe-tit">Le tue GIF</div><div class="pe-griglia stk gif">'+
+    S.gif.map(x => '<button data-racc="'+x.id+'">'+(/\.mp4$/.test(x.path) ? '<video data-path="'+esc(x.path)+'" muted loop playsinline autoplay></video>' : '<img data-path="'+esc(x.path)+'" alt="GIF">')+'</button>').join('')+'</div>';
+  h += '<div class="pe-tit">'+(GIFW.q ? 'Risultati' : 'Di tendenza')+'</div><div class="gif-mosaico" id="gifMos">'+
+    (GIFW.q ? '' : '<button class="nuovo-stk" data-a="importa-gif">'+svg('piu')+'Importa GIF</button>')+
+    GIFW.lista.map(gifCella).join('')+'</div>';
+  if(GIFW.err) h += '<div class="pe-vuoto">'+esc(GIFW.err)+(GIFW.err.indexOf('chiave') < 0 ? '<br><button class="tasto-link" data-a="gif-riprova">Riprova</button>' : '')+'</div>';
+  else if(GIFW.carica || !GIFW.lista.length && !GIFW.fine) h += '<div class="gif-attesa"><span></span><span></span><span></span></div>';
+  else if(!GIFW.lista.length) h += '<div class="pe-vuoto">Nessuna GIF per «'+esc(GIFW.q)+'».</div>';
+  h += '<div class="gif-giphy">Powered by GIPHY</div>';
+  return h;
+}
+function gifCella(x){
+  return '<button data-giphy="'+esc(x.id)+'" title="'+esc(x.titolo || 'GIF')+'" style="aspect-ratio:'+(x.w || 200)+'/'+(x.h || 200)+'"><img src="'+esc(x.anteprima)+'" alt="'+esc(x.titolo || 'GIF')+'" loading="lazy" decoding="async"></button>';
+}
+function avviaGif(p){
+  const q = el('gifQ'), C = el('gifCorpo'); if(!q || !C) return;
+  let t = 0;
+  q.oninput = () => { clearTimeout(t); t = setTimeout(() => { const v = q.value.trim(); if(v === GIFW.q) return; GIFW.q = v; GIFW.lista = []; GIFW.off = 0; GIFW.fine = false; GIFW.err = ''; ridisegnaGif(); cercaGif(); }, 350); };
+  q.onkeydown = e => { if(e.key === 'Enter'){ e.preventDefault(); q.blur(); } };
+  C.onscroll = () => { if(C.scrollTop + C.clientHeight > C.scrollHeight - 300) cercaGif(); };
+  if(!GIFW.lista.length && !GIFW.fine) cercaGif();
+}
+function ridisegnaGif(){
+  const C = el('gifCorpo'); if(!C) return;
+  const top = C.scrollTop; C.innerHTML = corpoGif(); C.scrollTop = top;
+  $$('[data-path]', C).forEach(async n => { n.src = await urlFirmata(n.dataset.path); });
+}
+async function cercaGif(){
+  if(GIFW.carica || GIFW.fine || GIFW.err) return;
+  GIFW.carica = true; const giro = ++GIFW.giro, q = GIFW.q;
+  try{
+    const {data, error} = await sb.functions.invoke('gif', {body: {q, offset: GIFW.off}});
+    if(giro !== GIFW.giro || q !== GIFW.q) return;
+    if(error) throw error;
+    if(data && data.errore === 'chiave'){ GIFW.err = 'La ricerca delle GIF non è ancora attiva: manca la chiave di GIPHY.'; }
+    else if(!data || data.errore) throw new Error('gif');
+    else{
+      const visti = new Set(GIFW.lista.map(x => x.id));
+      const nuove = (data.lista || []).filter(x => !visti.has(x.id));
+      GIFW.lista = GIFW.lista.concat(nuove); GIFW.off = data.prossimo || GIFW.off + 24; GIFW.fine = !!data.fine || !nuove.length;
+    }
+  }catch(e){ if(giro === GIFW.giro) GIFW.err = navigator.onLine ? 'Non riesco a caricare le GIF.' : 'Sei offline.'; }
+  finally{ if(giro === GIFW.giro){ GIFW.carica = false; ridisegnaGif(); } }
+}
+async function mandaGiphy(x){
+  if(!S.aperta) return;
+  const m = nuovoLocale('video', {media: {gif: true, url: x.mp4, w: x.w || 200, h: x.h || 200, giphy: x.id}});
+  if(S.risposta){ S.risposta = null; disegnaScrivi(); } mettiInLista(m); suono('invio');
+  if(tocco()) chiudiPannelloEmoji();
+  try{ await salvaMessaggio(m); }catch(e){ m._stato = 'errore'; ridisegnaMessaggio(m.id); errore(e, 'GIF non inviata'); }
 }
 function inserisci(t){
   const i = el('testoIn'); if(!i) return;
@@ -4529,6 +4609,12 @@ function schermataAvvio(testo, bottone){
   a.innerHTML = '<div class="logo">'+LOGO+'</div>'+(testo ? '<p>'+testo+'</p>' : '<div class="barra"><i></i></div><p>FOSS.chat</p>')+(bottone || '');
 }
 function togliAvvio(){ const a = el('avvio'); if(a){ a.style.opacity = '0'; setTimeout(() => a.remove(), 300); } }
+/* il pannello emoji/GIF/sticker si chiude toccando la chat */
+document.addEventListener('pointerdown', e => {
+  if(!pannelloEmojiAperto) return;
+  const t = e.target;
+  if(t.closest && t.closest('.msgs-wrap, #msgs, .conv-testa, .testa-conv')) chiudiPannelloEmoji();
+}, true);
 async function avvia(){
   applicaTema();
   schermataAvvio();
