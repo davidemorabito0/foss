@@ -2,3 +2,6 @@
 node_modules/
 .DS_Store
 Thumbs.db
+sviluppo/test/db/node_modules/
+sviluppo/test/app/shot/
+__pycache__/

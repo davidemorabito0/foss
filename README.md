@@ -101,9 +101,10 @@ Usa lo stesso account di FOSS: nessuna registrazione in più.
 - Tabelle: `chat_conversazioni`, `chat_membri`, `chat_messaggi`, `chat_reazioni`, `chat_nascosti`,
   `chat_sticker` (sticker e GIF salvati), `chat_presenza`, `chat_pin` (codice di 4 cifre, cifrato)
 - Si può scrivere solo a chi sta in uno dei propri team; ogni chat la vede solo chi ne fa parte
-- File (foto, vocali, video, documenti, sticker) nel bucket privato `chat`. Quando il NAS sarà
-  collegato basta scrivere il suo indirizzo in `MEDIA_NAS` dentro `chat.html`: se il NAS non
-  risponde, la chat mostra «Il server dei media sembra offline»
+- File (foto, vocali, video, documenti, sticker) sul NAS (`media.foss.team`, cartella `nas/`),
+  con ripiego sul bucket privato `chat` se il NAS non risponde
+- **Sorgenti e consegne per lo sviluppo:** `sviluppo/` (leggere prima `sviluppo/FOSS-CHAT.md`).
+  `chat.html` è generato da `sviluppo/chat/build.py`: non si modifica a mano
 - Avvisi sul telefono: la stessa funzione `push` di FOSS (tipo `fosschat`)
 - Le impostazioni della chat stanno nella colonna `profili.chat_cfg`
 

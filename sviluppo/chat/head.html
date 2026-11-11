@@ -1,0 +1,39 @@
+<!doctype html>
+<html lang="it">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover, interactive-widget=resizes-content">
+<meta name="description" content="FOSS.chat: la chat del tuo team su FOSS.">
+<meta name="robots" content="noindex">
+<meta name="theme-color" content="#111b21">
+<link rel="manifest" href="manifest.json">
+<link rel="icon" href="icone/favicon.svg?v=45" type="image/svg+xml">
+<link rel="icon" href="icone/favicon-32.png?v=45" type="image/png" sizes="32x32">
+<link rel="apple-touch-icon" href="icone/apple-touch-icon-v2.png">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="FOSS">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="color-scheme" content="dark light">
+<script>
+/* dal vecchio indirizzo (GitHub Pages) si passa a foss.team, come fa FOSS */
+(function(){
+  if(!/\.github\.io$/i.test(location.hostname)) return;
+  var dove = 'https://foss.team/chat.html' + location.search + location.hash;
+  fetch('https://foss.team/manifest.json', {mode:'no-cors', cache:'no-store'})
+    .then(function(){ location.replace(dove); }, function(){});
+})();
+/* il tema giusto prima di disegnare qualsiasi cosa: niente lampi bianchi */
+(function(){
+  try{
+    var c = JSON.parse(localStorage.getItem('fosschat_cfg') || '{}');
+    var t = c.tema || 'sistema';
+    if(t === 'sistema') t = matchMedia('(prefers-color-scheme: light)').matches ? 'chiaro' : 'scuro';
+    document.documentElement.setAttribute('data-tema', t);
+    if(c.testo) document.documentElement.setAttribute('data-testo', c.testo);
+  }catch(e){ document.documentElement.setAttribute('data-tema', 'scuro'); }
+})();
+</script>
+<title>FOSS.chat</title>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.4/dist/umd/supabase.js"></script>
+<style>
