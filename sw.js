@@ -3,7 +3,7 @@
    la copia in cache serve solo quando sei offline. I DATI non stanno qui:
    vivono nel database e nella memoria del browser, quindi un aggiornamento
    dell'app non può cancellarli. */
-const CACHE = 'foss-guscio-v71';
+const CACHE = 'foss-guscio-v72';
 const GUSCIO = ['./', './index.html', './manifest.json',
                 './icone/icona-192-v2.png', './icone/icona-512-v2.png'];
 
@@ -56,20 +56,37 @@ self.addEventListener('fetch', e=>{
 
 /* avvisi sul telefono: il servizio push (Apple, Google, Mozilla) consegna il
    messaggio cifrato, il browser lo decifra e qui diventa una notifica.
-   Va mostrata SEMPRE: un push senza notifica visibile fa revocare l'iscrizione. */
+   Va mostrata sempre: un push senza notifica visibile fa revocare l'iscrizione.
+   Unica eccezione: FOSS.chat davanti a te (finestra attiva e visibile) su Chrome, Edge
+   e Firefox, che in quel caso non la pretendono. Come su WhatsApp Web il messaggio lo
+   vedi gia', col suono e il numero nella lista. Safari (anche su iPhone e iPad) la vuole
+   sempre, se no smette di mandarli: li' resta sempre. */
+const SAFARI = (()=>{ try{ const u = String(self.navigator && self.navigator.userAgent || '');
+  return /AppleWebKit/.test(u) && !/(Chrome|Chromium|Edg)\//.test(u); }catch(_){ return true; } })();
+function chatDavanti(){
+  if(SAFARI) return Promise.resolve(false);
+  return self.clients.matchAll({type:'window', includeUncontrolled:true}).then(lista=>lista.some(c=>{
+    try{ return /\/chat(\.html)?$/.test(new URL(c.url).pathname) && c.focused === true && c.visibilityState === 'visible'; }
+    catch(_){ return false; }
+  })).catch(()=>false);
+}
 self.addEventListener('push', e=>{
   let d = null;
   try { d = e.data ? e.data.json() : null; }
   catch(_){ try { d = {testo: e.data.text()}; } catch(__){ d = null; } }
   if(!d || typeof d !== 'object') d = {testo: d == null ? '' : String(d)};
   const tag = String(d.tag || 'foss');
-  e.waitUntil(self.registration.showNotification(String(d.titolo || 'FOSS'), {
-    body: String(d.testo || ''),
-    tag,
-    renotify: !d.silenzioso && !d.muto,   // una notifica che si somma aggiorna quella di prima senza suonare
-    silent: !!d.muto,                     // FOSS.chat: un messaggio mandato «senza suono»
-    icon: './icone/icona-192-v2.png',
-    data: {url: d.url || './', nid: tag.indexOf('foss-') === 0 ? tag.slice(5) : ''}
+  const chat = tag.indexOf('fosschat-') === 0;      // anche i promemoria: la chat aperta li mostra gia' da se'
+  e.waitUntil((chat ? chatDavanti() : Promise.resolve(false)).then(davanti=>{
+    if(davanti) return;
+    return self.registration.showNotification(String(d.titolo || 'FOSS'), {
+      body: String(d.testo || ''),
+      tag,
+      renotify: !d.silenzioso && !d.muto,   // una notifica che si somma aggiorna quella di prima senza suonare
+      silent: !!d.muto,                     // FOSS.chat: un messaggio mandato «senza suono»
+      icon: './icone/icona-192-v2.png',
+      data: {url: d.url || './', nid: tag.indexOf('foss-') === 0 ? tag.slice(5) : ''}
+    });
   }));
 });
 /* tocco sulla notifica: porto FOSS davanti sul lavoro giusto (se e' gia'

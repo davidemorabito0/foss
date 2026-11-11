@@ -1730,6 +1730,7 @@ async function caricaElenco(){
     const {data: pp} = await sb.rpc('chat_persone', {p_ids: Array.from(ids)});
     (pp || []).forEach(p => S.persone.set(p.id, p));
   }
+  pulisciAvvisi();
 }
 async function caricaNascosti(){
   const {data} = await sb.from('chat_nascosti').select('msg_id').limit(5000);
@@ -1932,7 +1933,8 @@ function arrivaMessaggio(m){
   const mio = m.autore === S.io;
   if(!gia && !mio && m.tipo !== 'sistema'){
     S.scrive.get(m.conv_id) && S.scrive.get(m.conv_id).delete(m.autore);
-    const guardo = m.conv_id === S.aperta && document.visibilityState === 'visible' && vicinoAlFondo() && sbloccata(c);
+    /* letto solo se lo stai davvero guardando: chat aperta, finestra davanti a te, in fondo ai messaggi */
+    const guardo = m.conv_id === S.aperta && document.visibilityState === 'visible' && finestraAttiva() && vicinoAlFondo() && sbloccata(c);
     const menz = menzionaMe(m), muto = m.media && m.media.silenzioso;
     if(guardo){ segnaLetto(m.conv_id); }
     else {
@@ -1995,7 +1997,13 @@ function cambiaMembro(p){
   const c = S.convs.get(conv);
   if(!c){ if(n.utente_id === S.io) recupera(); return; }
   if(n.utente_id === S.io){
+    const prima = c.letto_fino;
     ['silenziata','archiviata','fissata','svuotata_il','bloccata','letto_fino','ruolo'].forEach(k => { if(k in n) c[k] = n[k]; });
+    /* letta su un altro dispositivo (per esempio sul telefono): qui spariscono il numero e gli avvisi */
+    if(n.letto_fino && (c.non_lette || c.menzioni) && (!prima || new Date(n.letto_fino) > new Date(prima))
+       && (!c.ultimo || new Date(n.letto_fino) >= new Date(c.ultimo.creato_il))){
+      c.non_lette = 0; c.menzioni = 0; aggiornaTitolo(); chiudiAvvisi(conv);
+    }
   }
   let mm = (c.membri || []).find(x => x.id === n.utente_id);
   if(!mm){ mm = {id: n.utente_id}; c.membri = (c.membri || []).concat([mm]); if(!S.persone.has(n.utente_id)) caricaPersone([n.utente_id]).then(() => aggiornaTestaConv()); }
@@ -2027,7 +2035,29 @@ const segnaLettoPresto = debounce(async () => {
 function segnaLetto(conv){
   const c = S.convs.get(conv); if(!c) return;
   c.non_lette = 0; c.menzioni = 0; c.letto_fino = new Date().toISOString();
-  letturaInCoda.add(conv); segnaLettoPresto(); aggiornaTitolo();
+  letturaInCoda.add(conv); segnaLettoPresto(); aggiornaTitolo(); chiudiAvvisi(conv);
+}
+
+/* ---------- avvisi sul dispositivo: letta una chat, i suoi spariscono (come su WhatsApp) ---------- */
+function finestraAttiva(){ try{ return document.hasFocus(); }catch(e){ return true; } }
+function avvisiSW(fai){
+  try{
+    if(!('serviceWorker' in navigator) || !navigator.serviceWorker.getRegistration) return;
+    navigator.serviceWorker.getRegistration().then(reg => { if(reg && reg.getNotifications) return fai(reg); }).catch(() => {});
+  }catch(e){}
+}
+function chiudiAvvisi(conv){
+  avvisiSW(reg => reg.getNotifications().then(ns => ns.forEach(n => {
+    if(n.tag === 'fosschat-' + conv || n.tag === 'fosschat-colpetto-' + conv) n.close();
+  })));
+}
+/* all'apertura e quando torno sulla chat: via gli avvisi delle chat gia' lette (anche su un altro dispositivo) */
+function pulisciAvvisi(){
+  avvisiSW(reg => reg.getNotifications().then(ns => ns.forEach(n => {
+    const m = /^fosschat-(?:colpetto-)?([0-9a-f-]{36})$/.exec(n.tag || '');
+    const c = m && S.convs.get(m[1]);
+    if(c && !c.non_lette) n.close();
+  })));
 }
 function aggiornaTitolo(){
   let n = 0; S.convs.forEach(c => { if(!c.silenziata && !c.archiviata && c.non_lette) n++; });
@@ -5245,7 +5275,13 @@ async function avvia(){
   ping(); setInterval(ping, 60000);
   setInterval(() => { aggiornaTestaConv(); }, 30000);
   document.addEventListener('visibilitychange', () => {
-    if(document.visibilityState === 'visible'){ ping(); scattaPromemoria(); const c = S.aperta && S.convs.get(S.aperta); if(c && c.non_lette && vicinoAlFondo() && sbloccata(c)) segnaLetto(c.id); }
+    if(document.visibilityState === 'visible'){ ping(); scattaPromemoria(); pulisciAvvisi(); const c = S.aperta && S.convs.get(S.aperta); if(c && c.non_lette && vicinoAlFondo() && sbloccata(c)) segnaLetto(c.id); }
+  });
+  /* torni sulla finestra della chat (per esempio da un altro programma): la chat aperta diventa letta */
+  window.addEventListener('focus', () => {
+    pulisciAvvisi();
+    const c = S.aperta && S.convs.get(S.aperta);
+    if(c && c.non_lette && document.visibilityState === 'visible' && vicinoAlFondo() && sbloccata(c)) segnaLetto(c.id);
   });
   window.addEventListener('online', recupera);
   sveglia();
