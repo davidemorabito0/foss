@@ -1330,9 +1330,10 @@ const SUPA_URL = 'https://suqpteanvnvvmfujlevi.supabase.co';
 const SUPA_KEY = 'sb_publishable_f5Kjp6NHT9yTxr1bhWJjhg_4y72V-Kj';
 const VAPID_PUBBLICA = 'BNlGbW4nZrXmx8DioKxnl7ubULVOr5_6CAKvpuQYoiXeObmxYAzGU6UrkExx2zu1hACmtRNDcpoMh_ARQ0GSmlw';
 /* il server dei file sul NAS (es. 'https://media.foss.team'). Vuoto = si usa Supabase. */
-const MEDIA_NAS = '';
+const MEDIA_NAS = 'https://media.foss.team';
 const VERSIONE = 'chat-2.0';
-const MAX_FILE = 50 * 1024 * 1024;
+const MAX_SUPA = 50 * 1024 * 1024;
+const MAX_FILE = MEDIA_NAS ? 2048 * 1024 * 1024 : MAX_SUPA;   // sul NAS anche i video lunghi
 
 let sb = null;
 try{ if(window.supabase) sb = window.supabase.createClient(SUPA_URL, SUPA_KEY); }catch(e){ sb = null; }
@@ -1687,32 +1688,42 @@ async function token(){
   return data && data.session ? data.session.access_token : '';
 }
 function caricaFile(path, blob, avanza){
+  /* prima il NAS dello studio; se non risponde (spento, senza rete) il file va su Supabase come prima */
+  if(!MEDIA_NAS) return inviaFile(path, blob, avanza, false);
+  return inviaFile(path, blob, avanza, true).catch(e => {
+    if(!e || !e.rete || blob.size > MAX_SUPA) throw e;
+    if(avanza) avanza(0);
+    return inviaFile(path, blob, avanza, false);
+  });
+}
+function inviaFile(path, blob, avanza, nas){
   return new Promise(async (ok, ko) => {
     let tk = '';
     try{ tk = await token(); }catch(e){}
     if(!tk) return ko(new Error('sessione scaduta: rientra in FOSS'));
     const xhr = new XMLHttpRequest();
-    /* quando il NAS sara' collegato, i file andranno li': stessa barra, stesso giro */
-    const dest = MEDIA_NAS ? MEDIA_NAS.replace(/\/$/, '') + '/carica/' + path
-                           : SUPA_URL + '/storage/v1/object/chat/' + path.split('/').map(encodeURIComponent).join('/');
+    const dest = nas ? MEDIA_NAS.replace(/\/$/, '') + '/carica/' + path
+                     : SUPA_URL + '/storage/v1/object/chat/' + path.split('/').map(encodeURIComponent).join('/');
     xhr.open('POST', dest);
     xhr.setRequestHeader('Authorization', 'Bearer ' + tk);
-    if(!MEDIA_NAS){ xhr.setRequestHeader('apikey', SUPA_KEY); xhr.setRequestHeader('x-upsert', 'false'); }
+    if(!nas){ xhr.setRequestHeader('apikey', SUPA_KEY); xhr.setRequestHeader('x-upsert', 'false'); }
     xhr.setRequestHeader('Content-Type', blob.type || 'application/octet-stream');
     xhr.setRequestHeader('Cache-Control', 'max-age=31536000');
     xhr.upload.onprogress = e => { if(e.lengthComputable && avanza) avanza(e.loaded / e.total); };
+    const errore = (m, rete) => { const e = new Error(m); e.rete = !!rete; ko(e); };
     xhr.onload = () => {
       if(xhr.status >= 200 && xhr.status < 300){
         let r = {}; try{ r = JSON.parse(xhr.responseText || '{}'); }catch(e){}
-        ok(MEDIA_NAS ? {url: r.url} : {path});
+        if(nas && !(r.url && /^https:\/\//.test(r.url))) return errore('Il server dei media non ha risposto bene', true);
+        ok(nas ? {url: r.url} : {path});
       } else {
         let m = 'caricamento non riuscito (' + xhr.status + ')';
         try{ const j = JSON.parse(xhr.responseText); if(j && (j.message || j.error)) m = j.message || j.error; }catch(e){}
-        if(/exceeded|too large|payload/i.test(m)) m = 'il file è troppo grande (massimo 50 MB)';
-        ko(new Error(m));
+        if(!nas && /exceeded|too large|payload/i.test(m)) m = 'il file è troppo grande (massimo 50 MB)';
+        errore(m, nas && (xhr.status >= 500 || xhr.status === 0));
       }
     };
-    xhr.onerror = () => ko(new Error(MEDIA_NAS ? 'Il server dei media sembra offline' : 'connessione assente'));
+    xhr.onerror = () => errore(nas ? 'Il server dei media sembra offline' : 'connessione assente', nas);
     xhr.send(blob);
   });
 }
@@ -3296,7 +3307,7 @@ function versoBlob(c, tipo, q){ return new Promise(ok => c.toBlob(b => ok(b), ti
 async function prepara(file, modo){
   const t = (file.type || '').toLowerCase(), nome = file.name || 'file';
   const ext = estensione(nome);
-  if(file.size > MAX_FILE) throw new Error('«' + nome + '» è troppo grande: il massimo è 50 MB');
+  if(file.size > MAX_FILE) throw new Error('«' + nome + '» è troppo grande: il massimo è ' + (MEDIA_NAS ? '2 GB' : '50 MB'));
   if(modo === 'file' || /svg/.test(t)) return {tipo: 'file', blob: file, ext: ext || 'bin', media: {nome: nome.slice(0, 120), dim: file.size, mime: t}};
   if(t === 'image/gif'){
     let w = 300, h = 300, mini = '';
