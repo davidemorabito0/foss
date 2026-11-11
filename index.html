@@ -4535,10 +4535,10 @@ const PRIO = {alta:'Alta', media:'Media', bassa:'Bassa'};
 /* i tag sostituiscono il vecchio "tipo di lavoro": liberi, creabili al volo */
 const TAG_BASE = ['Evento','Spot','Musicale','Prodotto','Formazione','Food','Corporate','Live','Reel'];
 const TEMI = [
-  {id:'ardesia', nome:'Ardesia', ds:'Blu-grigio, accento teal — il predefinito', c:['#101619','#1D272D','#2FB3A4'], breve:'Il classico di FOSS'},
+  {id:'brand',   nome:'Brand',   ds:'Navy e ambra — il predefinito',             c:['#0D1926','#1A3149','#FFAD01'], breve:'I colori di FOSS'},
   {id:'nebbia',  nome:'Nebbia',  ds:'Chiaro attenuato, non abbaglia di notte',   c:['#DCE2E8','#EDF1F4','#2F7D8C'], breve:'Chiaro e morbido'},
   {id:'sabbia',  nome:'Sabbia',  ds:'Carta calda, riposa gli occhi la sera',     c:['#E4DDD2','#F1ECE4','#B4632A'], breve:'Caldo e naturale'},
-  {id:'brand',   nome:'Brand',   ds:'Navy e ambra — il tuo',                     c:['#0D1926','#1A3149','#FFAD01'], breve:'I colori di FOSS'},
+  {id:'ardesia', nome:'Ardesia', ds:'Blu-grigio, accento teal',                  c:['#101619','#1D272D','#2FB3A4'], breve:'Blu-grigio e teal'},
   {id:'bosco',   nome:'Bosco',   ds:'Verdi bassi, molto calmo',                  c:['#0F1714','#1C2924','#7FB069'], breve:'Verde e rilassante'},
   {id:'grafite', nome:'Grafite', ds:'Monocromo, arancio secco',                  c:['#141312','#232120','#E2723B'], breve:'Scuro e deciso'},
   {id:'notte',   nome:'Notte',   ds:'Indaco e lilla, riposante',                 c:['#101223','#1E2239','#7C6CF0'], breve:'Viola e blu profondo'},
@@ -4691,7 +4691,7 @@ let state = {
   ],
   me:{nome:'Davide', cognome:'Morabito', nick:'', email:'morabito1992@gmail.com',
       ruolo:'Regia · Montaggio', foto:null},
-  cfg:{boxFull:true, toast:false, soloMiei:false, snoozeMin:10, tema:'ardesia'},
+  cfg:{boxFull:true, toast:false, soloMiei:false, snoozeMin:10, tema:'brand'},
   azioni:[
     {ts:'22/09 09:12', tx:'Spostata <b>Riprese giornata 2</b> (Esselunga) dal 21/09 al 22/09', chi:'Davide Morabito'},
     {ts:'21/09 18:40', tx:'Chiuso <b>Ingest e backup</b> — Piano City', chi:'Susanna Giammona'},
@@ -10138,7 +10138,7 @@ function cartaModelli(){
    Come si fa tutto, capitolo per capitolo: dai primi passi alle cose per chi
    organizza un team. Si cerca per parola (anche senza accenti); in fondo c'e'
    il tasto per segnalare quello che manca o non funziona. */
-const VERSIONE = 'v70';
+const VERSIONE = 'v71';
 const LIVELLI_GUIDA = {base:'Per cominciare', medio:'Tutti i giorni', esperto:'Per chi organizza', aiuto:'Se qualcosa non va'};
 const GUIDA = [
 {id:'primi-passi', liv:'base', ic:'spark', t:'Primi passi', s:'Cos’è FOSS e come ci si muove', v:[
@@ -14265,7 +14265,7 @@ function normalizza(){
   if(!Array.isArray(state.azioni)) state.azioni = [];
   if(!Array.isArray(state.notifiche)) state.notifiche = [];
   if(!state.cfg) state.cfg = {};
-  if(!state.cfg.tema) state.cfg.tema = 'ardesia';
+  if(!state.cfg.tema) state.cfg.tema = 'brand';
   if(!Array.isArray(state.ordineViste) || !state.ordineViste.length)
     state.ordineViste = ['tessere','lista','calendario','mappa','note'];
   state.schema = SCHEMA;
