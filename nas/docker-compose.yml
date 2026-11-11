@@ -1,21 +1,13 @@
 # FOSS.chat — server dei media sul NAS (Container Station → Applicazioni → Crea)
-# Al posto di INCOLLA_QUI_IL_TOKEN va il token del tunnel Cloudflare «fosschat-nas».
+# In CF va incollato il comando copiato da Cloudflare (tunnel «fosschat-nas»), anche intero.
 services:
   media:
     image: node:22-alpine
     container_name: fosschat-media
     restart: unless-stopped
-    command: ["sh", "-c", "wget -qO /tmp/server.mjs https://foss.team/nas/server.mjs && exec node /tmp/server.mjs"]
+    command: ["sh", "-c", "wget -qO /tmp/avvio.sh https://foss.team/nas/avvio.sh && exec sh /tmp/avvio.sh"]
     volumes:
       - /share/FOSSchat:/data
     environment:
       - PUBBLICO=https://media.foss.team
-  tunnel:
-    image: cloudflare/cloudflared:latest
-    container_name: fosschat-tunnel
-    restart: unless-stopped
-    command: tunnel --no-autoupdate run
-    environment:
-      - TUNNEL_TOKEN=INCOLLA_QUI_IL_TOKEN
-    depends_on:
-      - media
+      - CF=INCOLLA_QUI
