@@ -2588,6 +2588,7 @@ function formatta(t, md){
   s = s.replace(/`([^`\n]+)`/g, (_, x) => metti('<code>' + x + '</code>'));
   s = s.replace(/(https?:\/\/[^\s<]+[^\s<.,;:!?)\]'"])/g, u => metti('<a href="' + u + '" target="_blank" rel="noopener noreferrer">' + u + '</a>'));
   s = decoraTesto(s, md, metti);
+  s = s.replace(/(^|[\s(])\*\*(\S(?:[^*\n]*\S)?)\*\*(?=$|[\s).,!?:;])/g, '$1<b>$2</b>');   /* anche **cosi'** */
   s = s.replace(/(^|[\s(])\*(\S(?:[^*\n]*\S)?)\*(?=$|[\s).,!?:;])/g, '$1<b>$2</b>')
        .replace(/(^|[\s(])_(\S(?:[^_\n]*\S)?)_(?=$|[\s).,!?:;])/g, '$1<i>$2</i>')
        .replace(/(^|[\s(])~(\S(?:[^~\n]*\S)?)~(?=$|[\s).,!?:;])/g, '$1<s>$2</s>');
