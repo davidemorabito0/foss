@@ -5160,7 +5160,7 @@ document.addEventListener('click', async e => {
         ['Messaggi importanti', 'stella', () => apriInfo('importanti')]].concat(
         nFis ? [['Messaggi fissati', 'spillo', elencoFissati]] : [],
         [['Crea un lavoro di FOSS', 'lavoro', () => creaLavoro({})]],
-        c.ruolo === 'admin' ? [['Importa chat di WhatsApp', 'importa', importaWhatsApp]] : [],
+        S.adminFoss ? [['Importa chat di WhatsApp', 'importa', importaWhatsApp]] : [],
         c.tipo === 'privata' && altro(c) !== S.io ? [['Dai un colpetto', 'mano', () => colpetto(altro(c))]] : [], [
         null,
         [c.silenziata ? 'Riattiva notifiche' : 'Silenzia notifiche', c.silenziata ? 'campana' : 'silenzia', () => impostaMembro(c, {silenziata: !c.silenziata})],
@@ -5361,6 +5361,7 @@ async function avvia(){
   S.io = u.id;
   try{
     await Promise.all([caricaProfilo(), caricaPin()]);
+    sb.rpc('e_admin_foss').then(r => { S.adminFoss = !!(r && r.data === true); }, () => {});
     if(S.tutto){ togliAvvio(); const ok = await bloccoTotale(); if(!ok) return; schermataAvvio(); }
     await Promise.all([caricaPersone(), caricaElenco(), caricaNascosti(), caricaRaccolta(), caricaMieCose().catch(e => console.warn('mie cose', e))]);
   }catch(e){
@@ -7006,7 +7007,7 @@ function waIndovina(nomi, membri){
 /* ---------- la finestra ---------- */
 function importaWhatsApp(){
   const c = S.convs.get(S.aperta); if(!c) return;
-  if(c.ruolo !== 'admin'){ toast('Solo chi amministra il gruppo può importare una chat.'); return; }
+  if(!S.adminFoss){ toast('Solo l’amministratore di FOSS può importare una chat.'); return; }
   const v = document.createElement('div'); v.className = 'velo scuro'; v.id = 'veloImporta';
   v.innerHTML = '<div class="foglio imp-foglio" role="dialog" aria-label="Importa da WhatsApp">'+
     '<div class="foglio-t">Importa da WhatsApp<button class="ib" data-x="1" aria-label="Chiudi">'+svg('chiudi')+'</button></div>'+
@@ -7199,7 +7200,7 @@ async function waImporta(v, st, conMedia){
     window.removeEventListener('beforeunload', ferma);
     st.lavoro = false;
     await waRicarica(c.id);
-    el('impC').innerHTML = '<p class="imp-errore">L’importazione si è fermata'+(fatti ? ' dopo ' + fatti + ' messaggi' : '')+'. '+esc(/non puoi|amministra|solo a chi/i.test(e && e.message) ? e.message : 'Controlla la connessione e riprova: i messaggi già entrati non si doppiano.')+'</p>';
+    el('impC').innerHTML = '<p class="imp-errore">L’importazione si è fermata'+(fatti ? ' dopo ' + fatti + ' messaggi' : '')+'. '+esc(/non puoi|amministratore|solo a chi/i.test(e && e.message) ? e.message : 'Controlla la connessione e riprova: i messaggi già entrati non si doppiano.')+'</p>';
     el('impF').innerHTML = (fatti ? '<button class="btn rosso" data-annulla="1">Togli quelli importati</button>' : '')+'<button class="btn pieno" data-x="1">Chiudi</button>';
     waAnnullabile(v, st);
     return;
