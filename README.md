@@ -107,6 +107,33 @@ Usa lo stesso account di FOSS: nessuna registrazione in più.
 - Avvisi sul telefono: la stessa funzione `push` di FOSS (tipo `fosschat`)
 - Le impostazioni della chat stanno nella colonna `profili.chat_cfg`
 
+### FOSS.chat 2
+
+- **Tocco lungo su un messaggio** (clic destro sul computer): reazioni, Rispondi, Copia, Modifica,
+  Fissa, Ricordamelo, Inoltra, Importante, Seleziona, Info, Elimina. In cima al menu: letto da chi
+  e quando, se è stato modificato, chi l'ha fissato, il promemoria attivo
+- **Modifica** entro 15 minuti (anche con ↑ sul computer): accanto all'ora compare «modificato»,
+  toccandolo si vede quando (`chat_modifica`, colonna `modificato_il`)
+- **Menzioni** con `@nome` e `@tutti`: avvisano anche chi ha silenziato il gruppo; nell'elenco
+  delle chat un badge @ finché non le leggi. L'avviso porta dritto al messaggio
+- **Messaggi fissati** (fino a 10 per chat) in una barra in alto (`chat_fissa`)
+- **Sondaggi** a scelta singola o multipla, voti in tempo reale, chiusura da chi l'ha creato
+  (`chat_voti`, `chat_vota`, `chat_chiudi_sondaggio`)
+- **Invia più tardi** e **Invia senza suono** dal tasto invio (tieni premuto): i programmati li
+  manda il database anche ad app chiusa (`chat_programmati`, cron `fosschat-orologio` ogni 20 secondi)
+- **Ricordamelo** su un messaggio: alla data scelta arriva un avviso che apre quel messaggio
+  (`chat_promemoria`)
+- **Importanti**: i messaggi segnati restano in un elenco tuo (`chat_importanti`)
+- **Lavori di FOSS in chat**: con `#` si cita un lavoro e diventa una scheda viva (fase,
+  avanzamento, date, location, squadra) che si aggiorna da sola; chi non è nel lavoro vede solo
+  che esiste. Dal menu + → «Lavoro di FOSS» si **crea un lavoro** (titolo, cliente, giorno e ora
+  delle riprese, location, consegna, spazio, squadra): nasce subito in FOSS (`chat_crea_lavoro`) e
+  la prima volta che qualcuno con i permessi apre FOSS si completa con fasi e task del suo tipo
+  (`foss_completa_da_chat`); da lì si modifica tutto il resto
+- **Colpetto**: doppio tocco sulla foto di qualcuno (gruppi) o dal menu della chat; fa vibrare la
+  sua chat e arriva come avviso
+- **Seleziona**: più messaggi insieme da copiare, inoltrare o eliminare
+
 ## Pubblicazione su GitHub Pages
 
 1. Carica i file di questa cartella nel repository

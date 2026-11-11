@@ -7657,7 +7657,19 @@ function applicaIndirizzo(){
     if(n) n.nuova = false;
   }
   const p = state.progetti.find(x=>x.id===a.pid);
-  if(!p){ toast('Il link punta a un progetto che non è in questo archivio.','warn','Non trovato'); return false; }
+  if(!p){
+    /* un lavoro appena nato (per esempio dalla chat) puo' non essere ancora arrivato: lo vado a prendere */
+    if(sb && utenteCloud && cloudPronto && !applicaIndirizzo.cerco && typeof caricaLavoro === 'function'){
+      applicaIndirizzo.cerco = a.pid;
+      Promise.resolve(caricaLavoro(a.pid)).then(()=>{
+        applicaIndirizzo.cerco = null;
+        if(state.progetti.some(x=>x.id===a.pid)) applicaIndirizzo();
+        else toast('Il link punta a un progetto che non è in questo archivio.','warn','Non trovato');
+      }, ()=>{ applicaIndirizzo.cerco = null; });
+      return false;
+    }
+    toast('Il link punta a un progetto che non è in questo archivio.','warn','Non trovato'); return false;
+  }
   state.ospite = !!a.ospite;
   if(p.spazio) state.spazioId = p.spazio;
   state.progettoId = p.id; state.schermo = 'progetto';
@@ -14783,6 +14795,7 @@ async function caricaCloud(){
     giaCollegato = false;
     ascoltaCloud();
     risincronizzaPush();
+    setTimeout(completaDaChat, 1500);
   }catch(e){
     cloudPronto = false;
     console.warn('caricamento:', e && e.message);
@@ -15004,6 +15017,45 @@ function togliLavoroLocale(pid, perche){
   return true;
 }
 
+/* ============ LAVORI NATI IN FOSS.CHAT ============
+   Dalla chat si crea la base di un lavoro: titolo, cliente, giorno, location e squadra.
+   Il primo che lo apre qui (e puo' modificarlo) gli mette le fasi e le task di partenza
+   della sua professione, come se fosse nato dalla procedura guidata. Una volta sola:
+   il database lascia passare solo il primo. */
+let completandoChat = false;
+async function completaDaChat(){
+  if(!sb || !utenteCloud || !cloudPronto || completandoChat) return;
+  const da = (state.progetti||[]).filter(p=>p && p.daChat && typeof p.daChat === 'object' && p.daChat.completo === false && !(p.subs||[]).length);
+  if(!da.length) return;
+  completandoChat = true;
+  let cambiato = false;
+  try{
+    for(const p of da){
+      const org = orgProg[p.id] || orgSpazio[p.spazio] || orgMia;
+      const {data, error} = await sb.rpc('foss_completa_da_chat', {p_org:org, p_id:p.id});
+      if(error){ console.warn('lavoro dalla chat:', error.message); continue; }
+      if(!data) continue;          // senza permesso, o l'ha gia' completato qualcun altro: arriva da solo
+      p.daChat = Object.assign({}, p.daChat, {completo:true});
+      if(ombraNucleo[p.id]) ombraNucleo[p.id].daChat = canon(p.daChat);
+      if((p.subs||[]).length) continue;
+      const chi = (p.daChat.da && UUID.test(p.daChat.da)) ? p.daChat.da : state.utente;
+      const piano = pianoDi(p.tipo, p.lavoro).slice(0, FZ(p).length);
+      let n = 0;
+      p.subs = [];
+      piano.forEach((f,fi)=>f.task.forEach(t=>{
+        p.subs.push({id:'s'+(++n)+'_'+fi+'_'+p.id.slice(-5), fase:fi, titolo:t.titolo, aperto:false, assegnato:chi, nota:'', taggati:[],
+          items:t.items.map(v=>{ const x = {t:v.t, done:false}; if(v.lista) x.lista = v.lista.map(c=>({t:c.t, done:false})); return x; })});
+      }));
+      const prima = p.subs.find(s=>s.fase===(p.fase||0)); if(prima) prima.aperto = true;
+      if(!p.faseAss || typeof p.faseAss !== 'object') p.faseAss = {};
+      FZ(p).forEach((f,i)=>{ if(!p.faseAss[i]) p.faseAss[i] = chi; });
+      cambiato = true;
+    }
+  }catch(e){ console.warn('lavoro dalla chat:', e && e.message); }
+  finally{ completandoChat = false; }
+  if(cambiato){ save(); ridisegnaDaRemoto(); }
+}
+
 let caricoInCorso = {};
 async function caricaLavoro(pid, org){
   if(caricoInCorso[pid]) return;
@@ -15038,6 +15090,7 @@ async function caricaLavoro(pid, org){
       if(p) applicaPezzi(p, s);
     }
     ridisegnaDaRemoto();
+    setTimeout(completaDaChat, 300);
   }catch(e){ console.warn('lavoro', pid, e && e.message); }
   finally{ delete caricoInCorso[pid]; }
 }
@@ -15243,6 +15296,7 @@ async function aggiornaDaCloud(){
     }
     ultimaRilettura = Date.now();
     if(tocca) ridisegnaDaRemoto();
+    setTimeout(completaDaChat, 300);
   }catch(e){ console.warn('rilettura:', e && e.message); }
   finally{ rileggendo = false; }
 }

@@ -799,7 +799,7 @@ svg{display:block}
   :root[data-tema="chiaro"] .azioni-testa .ib{color:#111}
   .azioni-testa .ib svg{width:25px;height:25px}
   .messaggi{padding-top:calc(76px + env(safe-area-inset-top))}
-  .giorno{top:calc(70px + env(safe-area-inset-top))}
+  .giorno{top:6px}
   .giorno span,.sistema span{text-transform:none;font-size:13.5px;font-weight:600;border-radius:9px;padding:4px 14px;box-shadow:none;-webkit-backdrop-filter:blur(10px);backdrop-filter:blur(10px)}
   .sistema span{font-weight:400}
   .nonlette-sep span{text-transform:none;font-weight:600}
@@ -897,6 +897,391 @@ input,textarea,[contenteditable="true"]{-webkit-user-select:text;user-select:tex
 .gif-giphy{text-align:center;font-size:11px;letter-spacing:.04em;color:var(--testo-2);opacity:.7;padding:8px 0 4px}
 .tasto-link{color:var(--verde,#00a884);font-weight:600;margin-top:8px;padding:6px 10px}
 
+/* ======================= FOSS.chat 2 ======================= */
+.msg.mio .bolla{--fondo:var(--mio)}
+.msg.mio .sond-bar i,.msg.mio .sond-op.mio .sond-sel{background:var(--verde-chiaro)}
+.msg.mio .sond-op.mio .sond-sel{border-color:var(--verde-chiaro)}
+.msg.mio .sond-vedi:not(:disabled),.msg.mio .lav-apri{color:var(--verde-chiaro)}
+:root[data-tema="chiaro"] .msg.mio .sond-bar i,:root[data-tema="chiaro"] .msg.mio .sond-op.mio .sond-sel{background:var(--verde-forte)}
+:root[data-tema="chiaro"] .msg.mio .sond-op.mio .sond-sel{border-color:var(--verde-forte)}
+:root[data-tema="chiaro"] .msg.mio .sond-vedi:not(:disabled),:root[data-tema="chiaro"] .msg.mio .lav-apri{color:var(--verde-forte)}
+.msg.suo .bolla{--fondo:var(--suo)}
+.giro{display:inline-block;width:16px;height:16px;border-radius:50%;border:2px solid rgba(134,150,160,.35);border-top-color:var(--verde);animation:gira .8s linear infinite;vertical-align:-3px;margin-right:6px}
+.giro.bianco{border-color:rgba(255,255,255,.35);border-top-color:#fff}
+@keyframes gira{to{transform:rotate(360deg)}}
+
+/* ---------- menu del messaggio (focus) ---------- */
+.focus{position:fixed;inset:0;z-index:70}
+.focus-velo{position:absolute;inset:0}
+.focus.telefono .focus-velo{background:rgba(0,0,0,.38);-webkit-backdrop-filter:blur(14px) saturate(1.2);backdrop-filter:blur(14px) saturate(1.2);animation:appari .18s ease}
+:root[data-tema="chiaro"] .focus.telefono .focus-velo{background:rgba(220,220,225,.45)}
+.focus.via{animation:sparisci .16s ease forwards}
+@keyframes sparisci{to{opacity:0}}
+.focus-bolla{position:fixed;transition:transform .26s cubic-bezier(.2,.9,.25,1.15);will-change:transform;pointer-events:none}
+.focus-bolla.su{transform:translateY(var(--dy,0)) scale(1.015)}
+.focus-bolla .msg{padding:0!important;margin:0!important}
+.focus-bolla .msg.mio{justify-content:flex-end}
+.focus-bolla.taglia{overflow:hidden;-webkit-mask-image:linear-gradient(#000 82%,transparent);mask-image:linear-gradient(#000 82%,transparent)}
+.focus-bolla .bolla{box-shadow:0 10px 30px rgba(0,0,0,.28)}
+.focus-reaz{position:fixed;display:flex;align-items:center;gap:2px;padding:5px 7px;border-radius:30px;background:var(--menu);box-shadow:0 8px 28px rgba(0,0,0,.28);
+  animation:fm-in .22s cubic-bezier(.2,.9,.3,1.2);z-index:2}
+.focus.telefono .focus-reaz{background:rgba(44,44,46,.86);-webkit-backdrop-filter:blur(26px) saturate(1.6);backdrop-filter:blur(26px) saturate(1.6);box-shadow:0 10px 34px rgba(0,0,0,.35),inset 0 0 0 .5px rgba(255,255,255,.12)}
+:root[data-tema="chiaro"] .focus.telefono .focus-reaz{background:rgba(255,255,255,.9);box-shadow:0 10px 34px rgba(0,0,0,.15)}
+.focus-reaz>button{width:42px;height:42px;border-radius:50%;font-size:27px;line-height:42px;transition:transform .12s}
+.focus-reaz>button:hover,.focus-reaz>button:active{transform:scale(1.2)}
+.focus-reaz>button.mia{background:rgba(134,150,160,.35)}
+.focus-reaz>button.piu{width:34px;height:34px;display:grid;place-items:center;background:rgba(134,150,160,.22);color:var(--testo);margin-left:3px}
+.focus-reaz>button.piu svg{width:20px;height:20px}
+.focus-reaz.tutte{display:block;width:min(352px,calc(100vw - 16px));padding:6px 4px;border-radius:22px}
+.fr-scorre{max-height:min(320px,48vh);overflow-y:auto;padding:0 6px}
+.focus-reaz.in-menu{position:static;display:flex;justify-content:space-between;gap:0;padding:2px 8px 6px;margin:0 0 4px;border-radius:0;background:transparent;box-shadow:none;animation:none;border-bottom:1px solid var(--linea)}
+.focus-reaz.in-menu>button{width:34px;height:34px;font-size:22px;line-height:34px}
+.focus-reaz.in-menu>button.piu{width:30px;height:30px;margin:2px 0 0 2px}
+.focus-reaz.in-menu>button.piu svg{width:17px;height:17px}
+.focus-reaz.in-menu.tutte{width:auto;padding:0 2px 4px;border-bottom:0;margin:0}
+.focus.computer .focus-menu{min-width:292px}
+.focus.computer .focus-menu .fm-testa{margin-top:0}
+.fr-tit{font-size:12px;color:var(--testo-2);padding:8px 4px 4px;text-transform:uppercase;letter-spacing:.03em}
+.fr-griglia{display:grid;grid-template-columns:repeat(auto-fill,minmax(40px,1fr))}
+.fr-griglia button{height:42px;font-size:27px;border-radius:10px}
+.fr-griglia button:active{background:rgba(134,150,160,.25)}
+.focus-menu{position:fixed;min-width:230px;max-width:min(320px,calc(100vw - 16px));overflow-y:auto;background:var(--menu);border-radius:12px;padding:6px 0;
+  box-shadow:0 6px 24px rgba(11,20,26,.28);animation:fm-in .2s cubic-bezier(.2,.9,.3,1.15);z-index:2;overscroll-behavior:contain}
+@keyframes fm-in{from{opacity:0;transform:scale(.86)}to{opacity:1;transform:none}}
+.focus.telefono .focus-menu{min-width:250px;border-radius:22px;padding:6px 0;background:rgba(44,44,46,.88);-webkit-backdrop-filter:blur(30px) saturate(1.7);backdrop-filter:blur(30px) saturate(1.7);
+  box-shadow:0 12px 40px rgba(0,0,0,.4),inset 0 0 0 .5px rgba(255,255,255,.1)}
+:root[data-tema="chiaro"] .focus.telefono .focus-menu{background:rgba(255,255,255,.92);box-shadow:0 12px 40px rgba(0,0,0,.18)}
+.fm-voce{display:flex;align-items:center;gap:14px;width:100%;height:40px;padding:0 20px 0 18px;text-align:left;font-size:14.5px;color:var(--testo)}
+.fm-voce:hover{background:var(--hover)}
+.fm-voce .fm-ic{order:-1;width:20px;height:20px;color:var(--icona);flex:none}
+.fm-voce .fm-ic svg{width:20px;height:20px}
+.fm-voce .fm-tx{flex:1}
+.fm-voce.rosso,.fm-voce.rosso .fm-ic{color:var(--rosso)}
+.fm-voce.indietro .fm-ic.sx svg{width:18px;height:18px}
+.focus.telefono .fm-voce{height:48px;font-size:17px;gap:16px;padding:0 22px 0 20px}
+.focus.telefono .fm-voce:hover{background:transparent}
+.focus.telefono .fm-voce:active{background:rgba(134,150,160,.22)}
+.focus.telefono .fm-voce .fm-ic{color:var(--testo)}
+.focus.telefono .fm-voce .fm-ic svg{width:23px;height:23px}
+.focus.telefono .fm-voce.rosso,.focus.telefono .fm-voce.rosso .fm-ic{color:#ff6b6b}
+:root[data-tema="chiaro"] .focus.telefono .fm-voce.rosso,:root[data-tema="chiaro"] .focus.telefono .fm-voce.rosso .fm-ic{color:#e5383b}
+.fm-sep{height:1px;background:var(--linea);margin:5px 0}
+.focus.telefono .fm-sep{height:1px;margin:6px 18px;background:rgba(134,150,160,.28)}
+.fm-testa{padding:4px 0 6px;margin-bottom:4px;border-bottom:1px solid var(--linea)}
+.focus.telefono .fm-testa{border-bottom-color:rgba(134,150,160,.28);margin:0 0 4px}
+.fm-riga{display:flex;align-items:center;gap:12px;padding:5px 20px 5px 18px;font-size:13.5px;color:var(--testo-2)}
+.fm-riga .fm-ic{width:18px;height:18px;flex:none}
+.fm-riga .fm-ic svg{width:18px;height:18px}
+.fm-riga .fm-tx{flex:1}
+.fm-riga.blu .fm-ic{color:var(--blu-spunta)}
+.fm-riga[data-fm]{cursor:pointer}
+.fm-riga .fm-va{width:16px;height:16px;opacity:.7}
+.focus.telefono .fm-riga{font-size:15px;padding:7px 22px 7px 20px}
+
+/* ---------- selezione ---------- */
+.conv.selezione .msg{cursor:pointer;padding-left:58px}
+.conv.selezione .msg::before{content:"";position:absolute;left:18px;top:50%;width:22px;height:22px;margin-top:-11px;border-radius:50%;border:2px solid var(--testo-2);
+  box-sizing:border-box;background:transparent}
+.conv.selezione .msg.scelto::before{border-color:var(--verde);background:var(--verde) url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='white' stroke-width='3.4' stroke-linecap='round' stroke-linejoin='round'><path d='m6 12.5 4 4L18 8'/></svg>") center/14px no-repeat}
+.conv.selezione .msg.scelto{background:rgba(0,168,132,.13)}
+.conv.selezione .menu-msg{display:none!important}
+.conv.selezione .bolla *{pointer-events:none}
+.sel-testa{position:absolute;left:0;right:0;top:0;height:59px;z-index:8;display:flex;align-items:center;gap:14px;padding:0 16px 0 8px;background:var(--testa);border-left:1px solid var(--linea)}
+.sel-testa b{font-size:16px;font-weight:500}
+.sel-barra{display:flex;justify-content:space-around;align-items:center;min-height:62px;padding:4px 8px}
+.sel-barra button{display:flex;flex-direction:column;align-items:center;gap:3px;min-width:68px;padding:6px 8px;border-radius:10px;font-size:12px;color:var(--testo)}
+.sel-barra button svg{width:23px;height:23px}
+.sel-barra button.rosso{color:var(--rosso)}
+.sel-barra button:disabled{opacity:.35}
+.sel-barra button:not(:disabled):hover{background:var(--hover)}
+
+/* ---------- meta: modificato, stella, fissato, promemoria ---------- */
+.meta .mt-ic{display:inline-flex;width:12px;height:12px;flex:none}
+.meta .mt-ic svg{width:12px;height:12px}
+.meta .mt-ic.stella{color:#f5b301}
+.meta .mod{font:inherit;font-size:inherit;color:inherit;font-style:italic;padding:0;margin-right:3px;cursor:pointer;opacity:.95}
+.meta .mod:hover{text-decoration:underline}
+.bolla.solo-media .meta .mt-ic.stella{color:#ffd54a}
+
+/* ---------- modifica ---------- */
+.modifica-a .citazione .cc b{display:flex;align-items:center;gap:5px}
+.modifica-a .citazione .cc b svg{width:14px;height:14px}
+.barra-scrivi.in-modifica #allegaB,.barra-scrivi.in-modifica .stk-b,.barra-scrivi.in-modifica .cam-b,.barra-scrivi.in-modifica .effetti-b{display:none!important}
+.barra-scrivi.in-modifica .manda{background:var(--verde);color:#fff}
+
+/* ---------- @menzioni e #lavori nel testo ---------- */
+.menz{color:var(--link);font-weight:500;cursor:pointer}
+.menz.io{background:rgba(83,189,235,.16);border-radius:4px;padding:0 2px}
+.menz.tutti{cursor:default}
+.lav-chip{display:inline-flex;align-items:center;gap:3px;padding:0 6px 0 4px;margin:0 1px;border-radius:6px;background:rgba(255,173,1,.2);font-weight:500;cursor:pointer;line-height:1.35;white-space:normal}
+.lav-chip svg{width:13px;height:13px;flex:none}
+.contatore.menz{background:var(--badge);color:var(--badge-testo);font-weight:700;margin-right:4px;padding:0}
+.menz-b{position:absolute;right:20px;bottom:76px;width:42px;height:42px;border-radius:50%;display:grid;place-items:center;background:var(--pannello);color:var(--verde);
+  box-shadow:0 2px 8px rgba(11,20,26,.25);z-index:4}
+.menz-b svg{width:22px;height:22px}
+.menz-b .contatore{position:absolute;top:-6px;right:-6px}
+
+/* ---------- elenco @ e # mentre scrivo ---------- */
+.picker{background:var(--pannello);border-top:1px solid var(--linea);box-shadow:0 -4px 14px rgba(11,20,26,.08)}
+.pk-scorre{max-height:min(280px,38vh);overflow-y:auto;padding:4px 0}
+.pk-voce{display:flex;align-items:center;gap:12px;width:100%;padding:7px 16px;text-align:left;min-height:52px}
+.pk-voce:hover,.pk-voce.on{background:var(--hover)}
+.pk-voce .av{width:38px;height:38px;flex:none}
+.pk-voce.carica{color:var(--testo-2)}
+.pk-t{flex:1;min-width:0;display:flex;flex-direction:column}
+.pk-t b{font-weight:500;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.pk-t span{font-size:13px;color:var(--testo-2);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.pk-ic{width:38px;height:38px;border-radius:50%;display:grid;place-items:center;flex:none;background:rgba(134,150,160,.22);color:var(--testo)}
+.pk-ic svg{width:20px;height:20px}
+.pk-ic.lav{border-radius:11px;background:var(--col);color:#0d1926}
+.pk-ic.verde{background:var(--verde);color:#fff}
+
+/* ---------- barra dei programmati ---------- */
+.prog-barra button{display:flex;align-items:center;gap:8px;width:100%;padding:8px 16px 4px;font-size:13.5px;color:var(--testo-2);text-align:left}
+.prog-barra button svg{width:17px;height:17px;flex:none;color:var(--verde)}
+.prog-barra button span{flex:1;min-width:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.prog-barra button b{color:var(--testo);font-weight:500}
+.prog-barra button svg:last-child{color:var(--testo-2);width:15px;height:15px}
+.pr-riga{padding:12px 0;border-bottom:1px solid var(--linea)}
+.pr-riga:last-child{border-bottom:0}
+.pr-quando{display:flex;align-items:center;gap:6px;font-size:13px;color:var(--verde);font-weight:500}
+.pr-quando svg{width:15px;height:15px}
+.pr-testo{margin:6px 0 10px;color:var(--testo);white-space:pre-wrap;word-wrap:break-word;font-size:15px;line-height:1.4;max-height:120px;overflow:auto}
+.pr-azioni{display:flex;gap:8px;flex-wrap:wrap}
+.pr-azioni button{display:inline-flex;align-items:center;gap:6px;height:32px;padding:0 12px;border-radius:16px;border:1px solid var(--linea);font-size:13px;color:var(--testo)}
+.pr-azioni button svg{width:15px;height:15px}
+.pr-azioni button.rosso{color:var(--rosso)}
+
+/* ---------- quando (data e ora) ---------- */
+.q-nota{margin:0 0 12px;font-size:14px}
+.q-veloci{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.q-veloci button{display:flex;flex-direction:column;align-items:flex-start;gap:2px;padding:10px 12px;border-radius:12px;border:1px solid var(--linea);text-align:left;background:var(--scelta)}
+.q-veloci button:hover{border-color:var(--verde)}
+.q-veloci b{font-size:15px;font-weight:500;color:var(--testo)}
+.q-veloci span{font-size:12.5px;color:var(--testo-2)}
+.q-tit{font-size:13px;color:var(--testo-2);margin:16px 0 8px}
+.q-scegli{display:flex;gap:8px}
+.q-scegli input,.cl-campo input,.cl-campo select,.cl-campo textarea{flex:1;min-width:0;height:44px;border-radius:10px;border:1px solid var(--linea);background:var(--campo);color:var(--testo);
+  padding:0 12px;font:inherit;font-size:16px;outline:0;-webkit-appearance:none;appearance:none}
+.q-scegli input:focus,.cl-campo input:focus,.cl-campo select:focus,.cl-campo textarea:focus{border-color:var(--verde)}
+.q-scegli input[type=time]{flex:0 0 112px}
+
+/* ---------- effetti: invia piu' tardi, senza suono ---------- */
+.eff-extra{display:grid;grid-template-columns:1fr 1fr;gap:8px;padding:2px 20px 10px}
+.eff-extra button{display:flex;align-items:center;gap:10px;padding:9px 12px;border-radius:12px;border:1px solid var(--linea);text-align:left}
+.eff-extra button:hover{border-color:var(--verde)}
+.eff-extra svg{width:22px;height:22px;flex:none;color:var(--verde)}
+.eff-extra b{display:block;font-weight:500;font-size:14px;color:var(--testo)}
+.eff-extra i{font-style:normal;font-size:12px;color:var(--testo-2)}
+
+/* ---------- fissati ---------- */
+.fissati-barra{flex:none;display:flex;align-items:center;gap:4px;min-height:52px;padding:0 8px 0 12px;background:var(--testa);border-top:1px solid var(--linea);border-left:1px solid var(--linea);z-index:2}
+.fis-vai{flex:1;min-width:0;display:flex;align-items:center;gap:10px;text-align:left;height:52px}
+.fis-tacche{display:flex;flex-direction:column;gap:2px;height:36px;width:3px;flex:none}
+.fis-tacche i{flex:1;border-radius:2px;background:rgba(134,150,160,.4)}
+.fis-tacche i.on{background:var(--verde)}
+.fis-ic{width:20px;height:20px;color:var(--testo-2);flex:none}
+.fis-ic svg{width:20px;height:20px}
+.fis-tx{flex:1;min-width:0;display:flex;flex-direction:column}
+.fis-tx b{font-size:13px;font-weight:500;color:var(--verde)}
+.fis-tx b i{font-style:normal;color:var(--testo-2);font-weight:400;margin-left:4px}
+.fis-tx span{font-size:14px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.fis-mini{width:38px;height:38px;border-radius:6px;object-fit:cover;flex:none}
+.fis-lista{color:var(--testo-2)}
+.sistema.fissato span{display:inline-flex;align-items:center;gap:6px;cursor:pointer}
+.sistema.fissato svg{width:14px;height:14px;flex:none}
+.fis-elenco{margin:0 -8px}
+.fis-riga{display:flex;align-items:center;gap:6px;border-bottom:1px solid var(--linea)}
+.fis-riga:last-child{border-bottom:0}
+.fis-r-vai{flex:1;min-width:0;display:flex;flex-direction:column;align-items:flex-start;padding:10px 8px;text-align:left}
+.fis-r-vai b{font-weight:500;color:var(--testo);font-size:14px}
+.fis-r-vai b i{font-style:normal;color:var(--testo-2);font-weight:400;font-size:12.5px;margin-left:8px}
+.fis-r-vai span{font-size:14px;color:var(--testo-2);display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
+
+/* ---------- sondaggi ---------- */
+.msg.largo .bolla{max-width:min(86%,360px)}
+.bolla.sondaggio{min-width:min(290px,72vw)}
+.sond-dom{font-weight:600;font-size:calc(var(--t) + 1.5px);line-height:1.3;margin:2px 2px 3px}
+.sond-sub{display:flex;align-items:center;gap:5px;font-size:12.5px;color:var(--testo-2);margin:0 2px 8px}
+.sond-sub svg{width:14px;height:14px}
+.sond-op{display:flex;gap:10px;align-items:flex-start;width:100%;padding:7px 2px;text-align:left;border-radius:8px}
+.sond-op:not(:disabled):active{background:rgba(134,150,160,.15)}
+.sond-sel{width:22px;height:22px;border-radius:50%;border:2px solid var(--testo-2);flex:none;display:grid;place-items:center;margin-top:0;transition:background .15s,border-color .15s}
+.sond-sel.quadro{border-radius:6px}
+.sond-sel svg{width:13px;height:13px}
+.sond-op.mio .sond-sel{background:var(--verde);border-color:var(--verde);color:#fff}
+.sond-cc{flex:1;min-width:0}
+.sond-r1{display:flex;align-items:center;gap:6px}
+.sond-t{flex:1;min-width:0;font-size:var(--t);line-height:1.3}
+.sond-r1 b{font-weight:500;font-size:13px;color:var(--testo-2);min-width:12px;text-align:right}
+.sond-av{display:flex;padding-left:5px}
+.sond-av .av{width:18px;height:18px;margin-left:-5px;border:1.5px solid var(--fondo,var(--suo));font-size:8px}
+.sond-av .av svg{width:11px;height:11px}
+.sond-bar{display:block;height:6px;border-radius:3px;background:rgba(134,150,160,.25);margin-top:6px;overflow:hidden}
+.sond-bar i{display:block;height:100%;background:var(--verde);border-radius:3px;transition:width .35s ease}
+.sond-op.testa .sond-bar i{background:var(--verde)}
+.sond-vedi{display:block;width:calc(100% + 16px);margin:6px -8px -2px;padding:9px 0 4px;text-align:center;border-top:1px solid rgba(134,150,160,.25);color:var(--verde);font-weight:500;font-size:14px}
+.sond-vedi:disabled{color:var(--testo-2);font-weight:400}
+.sond-foglio .foglio-c{padding-top:4px}
+.sond-tit{font-size:13px;color:var(--verde);margin:14px 0 6px}
+.sond-opz{display:flex;flex-direction:column;gap:6px}
+.sond-riga{display:flex;align-items:center;gap:6px;border-bottom:1px solid var(--linea);padding:2px 0}
+.sond-maniglia{width:18px;height:18px;color:var(--testo-3);flex:none}
+.sond-maniglia svg{width:18px;height:18px}
+.sond-riga input{flex:1;min-width:0;border:0;outline:0;background:transparent;height:40px;font-size:16px;color:var(--testo)}
+.sond-riga .ib{width:34px;height:34px}
+.sond-riga .ib svg{width:18px;height:18px}
+.sond-agg{display:flex;align-items:center;gap:8px;color:var(--verde);font-weight:500;padding:12px 0 6px}
+.sond-agg svg{width:22px;height:22px}
+.sond-multi{display:flex;align-items:center;gap:12px;width:100%;text-align:left;padding:12px 0 4px;border-top:1px solid var(--linea);margin-top:8px}
+.sond-multi span:first-child{flex:1}
+.sond-multi b{display:block;font-weight:500;color:var(--testo)}
+.sond-multi i{font-style:normal;font-size:13px;color:var(--testo-2)}
+.voti-dom{font-weight:600;color:var(--testo);font-size:16px;margin-bottom:6px}
+.voti-op{padding:10px 0;border-bottom:1px solid var(--linea)}
+.voti-op:last-child{border-bottom:0}
+.voti-t{display:flex;justify-content:space-between;gap:12px;color:var(--testo)}
+.voti-t b{font-weight:500}
+.voti-t span{color:var(--testo-2);font-size:13px;white-space:nowrap}
+.voti-vuoto{font-size:13px;color:var(--testo-3);padding:4px 0}
+
+/* ---------- lavori di FOSS ---------- */
+.bolla.lavoro{padding:4px 4px 6px}
+.bolla.lavoro .meta{margin-right:4px}
+.lav-scheda{display:block;width:min(310px,74vw);border-radius:12px;overflow:hidden;background:rgba(11,20,26,.05);text-align:left;border:1px solid rgba(134,150,160,.2);cursor:default}
+:root[data-tema="scuro"] .lav-scheda{background:rgba(0,0,0,.2)}
+.bolla.con-scheda .lav-scheda{margin:8px 0 2px}
+.lav-cop{height:92px;position:relative;display:grid;place-items:center;overflow:hidden;
+  background:linear-gradient(135deg,var(--col),color-mix(in srgb,var(--col) 52%,#0d1926))}
+.lav-cop.vuota{height:56px}
+.lav-cop.foto img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover}
+.lav-cop.foto::after{content:"";position:absolute;inset:0;background:linear-gradient(rgba(0,0,0,.25),transparent 45%,rgba(0,0,0,.15))}
+.lav-ic-grande{width:44px;height:44px;color:rgba(13,25,38,.7)}
+.lav-ic-grande svg{width:44px;height:44px}
+.lav-tag{position:absolute;left:10px;top:9px;display:inline-flex;align-items:center;gap:5px;font:700 10.5px/1 var(--font);letter-spacing:.05em;text-transform:uppercase;color:#fff;
+  background:rgba(13,25,38,.58);padding:5px 9px 5px 7px;border-radius:20px;-webkit-backdrop-filter:blur(8px);backdrop-filter:blur(8px);z-index:1}
+.lav-tag svg{width:12px;height:12px}
+.lav-nuovo{position:absolute;right:10px;top:9px;display:inline-flex;align-items:center;gap:4px;background:#21c063;color:#fff;font:700 11px/1 var(--font);padding:5px 9px;border-radius:20px;z-index:1}
+.lav-nuovo.scuro{background:rgba(13,25,38,.6);top:auto;bottom:9px}
+.lav-nuovo svg{width:11px;height:11px}
+.lav-corpo{padding:10px 12px 9px;display:flex;flex-direction:column;gap:1px}
+.lav-nome{font-size:16.5px;font-weight:700;line-height:1.25;color:var(--testo)}
+.lav-cli{font-size:13.5px;color:var(--testo-2);line-height:1.35}
+.lav-righe{display:flex;flex-direction:column;gap:6px;margin-top:9px}
+.lav-riga{display:flex;gap:8px;align-items:flex-start;font-size:13.5px;line-height:1.3;text-align:left;color:var(--testo)}
+.lav-riga svg{width:16px;height:16px;flex:none;color:var(--testo-2);margin-top:1px}
+.lav-riga b{font-weight:600}
+.lav-luogo{cursor:pointer}
+.lav-luogo span{text-decoration:underline;text-decoration-color:rgba(134,150,160,.55);text-underline-offset:2px}
+.lav-fasi{display:flex;gap:3px;margin-top:11px}
+.lav-fasi i{flex:1;height:5px;border-radius:3px;background:rgba(134,150,160,.3)}
+.lav-fasi i.fatta{background:var(--col)}
+.lav-fasi i.ora{background:linear-gradient(90deg,var(--col) 55%,rgba(134,150,160,.3) 55%)}
+.lav-stato{display:flex;justify-content:space-between;gap:8px;font-size:12.5px;color:var(--testo-2);margin-top:6px}
+.lav-stato b{font-weight:600;color:var(--testo)}
+.lav-fatto{color:#21c063;display:inline-flex;gap:4px;align-items:center;font-weight:600}
+.lav-fatto svg{width:13px;height:13px}
+.lav-team{display:flex;align-items:center;margin-top:9px;padding-left:2px}
+.lav-team .av{width:26px;height:26px;margin-right:-7px;border:2px solid var(--fondo,var(--suo));font-size:10px}
+.lav-team .av svg{width:15px;height:15px}
+.lav-team .piu{margin-left:12px;font-size:12.5px;color:var(--testo-2)}
+.lav-apri{display:flex;align-items:center;justify-content:center;gap:6px;width:100%;padding:10px;border-top:1px solid rgba(134,150,160,.22);font-weight:600;color:var(--verde);font-size:14.5px}
+.lav-apri svg{width:15px;height:15px}
+.lav-apri:hover{background:rgba(0,168,132,.07)}
+.lav-scheda.compatta .lav-cop{height:58px}
+.lav-scheda.compatta .lav-ic-grande,.lav-scheda.compatta .lav-ic-grande svg{width:30px;height:30px}
+.lav-corpo.chiusa{flex-direction:row;gap:12px;align-items:center;padding:12px}
+.lav-corpo.chiusa .lav-nome{font-size:15px}
+.lav-lucc{width:38px;height:38px;border-radius:50%;background:rgba(134,150,160,.2);display:grid;place-items:center;flex:none;color:var(--testo-2)}
+.lav-lucc svg{width:18px;height:18px}
+.lav-attesa{display:flex;gap:5px;padding:8px 0 4px}
+.lav-attesa i{width:7px;height:7px;border-radius:50%;background:var(--testo-2);animation:gifPunto 1s infinite ease-in-out}
+.lav-attesa i:nth-child(2){animation-delay:.15s}.lav-attesa i:nth-child(3){animation-delay:.3s}
+.lav-grande .lav-scheda{width:100%;margin:0}
+.lav-grande .lav-cop{height:130px}
+.foglio-lav .foglio-c{padding-top:4px}
+.lav-crea-b{display:flex;align-items:center;gap:12px;width:100%;padding:12px;border-radius:14px;border:1.5px dashed rgba(0,168,132,.55);text-align:left;margin:2px 0 8px;color:var(--verde)}
+.lav-crea-b svg{width:28px;height:28px;flex:none}
+.lav-crea-b b{display:block;font-weight:600;color:var(--testo)}
+.lav-crea-b i{font-style:normal;font-size:13px;color:var(--testo-2)}
+.lav-crea-b.spento{opacity:.5}
+.lav-voce{display:flex;align-items:center;gap:12px;width:100%;padding:8px 6px;text-align:left;border-radius:10px}
+.lav-voce:hover{background:var(--hover)}
+.lav-manda{width:20px;height:20px;color:var(--verde);flex:none}
+.lav-manda svg{width:20px;height:20px}
+
+/* ---------- creare un lavoro ---------- */
+.cl-foglio{max-width:520px}
+.cl-foglio .foglio-t svg{width:24px;height:24px;color:var(--verde)}
+.cl-campo{display:block;margin:0 0 12px;color:var(--testo-2)}
+.cl-campo>span{display:flex;align-items:center;gap:5px;font-size:12.5px;margin:0 0 5px 2px;color:var(--testo-2)}
+.cl-campo>span svg{width:14px;height:14px}
+.cl-campo>span i{font-style:normal;opacity:.75}
+.cl-campo input,.cl-campo select,.cl-campo textarea{width:100%}
+.cl-campo textarea{height:auto;min-height:64px;padding:10px 12px;resize:vertical;line-height:1.4}
+.cl-campo select{background-image:url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%238696a0' stroke-width='2.2' stroke-linecap='round'><path d='m6 9 6 6 6-6'/></svg>");background-repeat:no-repeat;background-position:right 10px center;background-size:18px;padding-right:34px}
+.cl-campo.grande input{font-size:18px;font-weight:600;height:48px}
+.cl-due{display:flex;gap:10px}
+.cl-due .cl-campo{flex:1;min-width:0}
+.cl-due .cl-campo.ora{flex:0 0 134px}
+.cl-squadra{display:flex;flex-wrap:wrap;gap:8px}
+.cl-pers{display:flex;align-items:center;gap:7px;padding:4px 10px 4px 4px;border-radius:22px;border:1px solid var(--linea);color:var(--testo);font-size:14px}
+.cl-pers .av{width:28px;height:28px;font-size:11px}
+.cl-pers i{display:none;width:16px;height:16px;border-radius:50%;background:var(--verde);color:#fff;place-items:center}
+.cl-pers i svg{width:10px;height:10px}
+.cl-pers.on{border-color:var(--verde);background:rgba(0,168,132,.12)}
+.cl-pers.on i{display:grid}
+.cl-info{font-size:13px;color:var(--testo-2);line-height:1.45;margin-top:6px}
+.cl-nota{margin-right:auto;font-size:12.5px;color:var(--testo-2);align-self:center}
+
+/* ---------- colpetto ---------- */
+.sistema.colpetto span{display:inline-flex;align-items:center;gap:6px}
+.sistema.colpetto .mano{display:inline-flex;width:16px;height:16px;transform-origin:70% 90%}
+.sistema.colpetto .mano svg{width:16px;height:16px}
+.sistema.colpetto.nuovo .mano{animation:saluta .9s ease 2}
+@keyframes saluta{0%,100%{transform:rotate(0)}20%{transform:rotate(-18deg)}40%{transform:rotate(14deg)}60%{transform:rotate(-10deg)}80%{transform:rotate(6deg)}}
+.conv.colpito .msgs-wrap{animation:sobbalzo .55s cubic-bezier(.3,1.6,.5,1)}
+@keyframes sobbalzo{0%{transform:none}25%{transform:translateY(-7px) scale(1.006)}55%{transform:translateY(3px)}100%{transform:none}}
+.av.dai-colpetto{animation:colpito .45s ease}
+@keyframes colpito{0%{transform:none}30%{transform:scale(.82) rotate(-8deg)}65%{transform:scale(1.12) rotate(5deg)}100%{transform:none}}
+
+/* ---------- importanti e info ---------- */
+.imp-voce{align-items:flex-start;padding-top:10px;padding-bottom:10px}
+.imp-voce .vc b{white-space:normal;display:-webkit-box;-webkit-line-clamp:3;-webkit-box-orient:vertical;overflow:hidden;font-weight:400;font-size:15px}
+.imp-chi{font-size:12.5px;color:var(--testo-2);display:flex;gap:4px;align-items:baseline}
+.imp-chi i{font-style:normal}
+.imp-chi em{margin-left:auto;font-style:normal;padding-left:8px;white-space:nowrap}
+.imp-stella{width:16px;height:16px;color:#f5b301;flex:none;margin-top:2px}
+.imp-stella svg{width:16px;height:16px}
+.freccia-d{width:18px;height:18px;color:var(--testo-2);flex:none}
+.freccia-d svg{width:18px;height:18px}
+.info-msg-ant{background:var(--scelta);border-radius:10px;padding:10px 12px;margin-bottom:10px;color:var(--testo);font-size:14.5px;white-space:pre-wrap;word-wrap:break-word;max-height:140px;overflow:auto}
+.pr-voce .vc b{font-weight:400;font-size:14.5px}
+
+/* ---------- telefono ---------- */
+@media (max-width:899px){
+  .sel-testa{height:auto;padding:calc(10px + env(safe-area-inset-top)) 16px 12px 10px;background:var(--testa);border:0}
+  .sel-barra{min-height:64px}
+  .fissati-barra{position:absolute;left:10px;right:10px;top:calc(68px + env(safe-area-inset-top));z-index:5;min-height:50px;border:0;border-radius:18px;padding:0 6px 0 14px;
+    background:rgba(44,44,46,.78);-webkit-backdrop-filter:blur(24px) saturate(1.6);backdrop-filter:blur(24px) saturate(1.6);box-shadow:0 4px 18px rgba(0,0,0,.28),inset 0 0 0 .5px rgba(255,255,255,.12)}
+  :root[data-tema="chiaro"] .fissati-barra{background:rgba(255,255,255,.86);box-shadow:0 4px 18px rgba(0,0,0,.1)}
+  .fis-vai{height:50px}
+  .fis-tx span{font-size:15px}
+  .conv.con-fissati .messaggi{padding-top:calc(134px + env(safe-area-inset-top))}
+  .menz-b{right:12px;bottom:68px;background:rgba(60,60,67,.72);color:#fff;-webkit-backdrop-filter:blur(20px);backdrop-filter:blur(20px)}
+  .picker{border-top:0;background:var(--testa)}
+  .pk-voce{min-height:56px;padding:8px 16px}
+  .prog-barra button{padding:10px 16px 2px;font-size:14px}
+  .q-veloci b{font-size:16px}
+  .lav-nome{font-size:17.5px}
+  .lav-riga{font-size:14.5px}
+  .sond-t{font-size:16px}
+  .sond-dom{font-size:17.5px}
+  .conv.selezione .msg{padding-left:54px}
+  .cl-due .cl-campo.ora{flex:0 0 124px}
+  .cl-foglio .foglio-f{flex-wrap:wrap}
+  .cl-nota{flex-basis:100%;margin:0 0 2px;text-align:center}
+}
 </style>
 </head>
 <body>
@@ -916,7 +1301,7 @@ const SUPA_KEY = 'sb_publishable_f5Kjp6NHT9yTxr1bhWJjhg_4y72V-Kj';
 const VAPID_PUBBLICA = 'BNlGbW4nZrXmx8DioKxnl7ubULVOr5_6CAKvpuQYoiXeObmxYAzGU6UrkExx2zu1hACmtRNDcpoMh_ARQ0GSmlw';
 /* il server dei file sul NAS (es. 'https://media.foss.team'). Vuoto = si usa Supabase. */
 const MEDIA_NAS = '';
-const VERSIONE = 'chat-1.0';
+const VERSIONE = 'chat-2.0';
 const MAX_FILE = 50 * 1024 * 1024;
 
 let sb = null;
@@ -965,6 +1350,18 @@ function dataGiorno(d){
   if(g < 7) return GIORNI[d.getDay()].replace(/^./, c => c.toUpperCase());
   return d.getDate() + ' ' + MESI[d.getMonth()] + (d.getFullYear() !== new Date().getFullYear() ? ' ' + d.getFullYear() : '');
 }
+/* «oggi alle 14:32», «domani alle 9:00», «lunedì alle 9:00», «il 12 dicembre alle 9:00» */
+function quando(d, conIl){
+  d = new Date(d); const g = giorniFa(d);
+  const h = ' alle ' + ora(d);
+  if(g === 0) return 'oggi' + h;
+  if(g === 1) return 'ieri' + h;
+  if(g === -1) return 'domani' + h;
+  if(g > 1 && g < 7) return GIORNI[d.getDay()] + (d.getDay() === 0 ? ' scorsa' : ' scorso') + h;
+  if(g < -1 && g > -7) return GIORNI[d.getDay()] + h;
+  return (conIl === false ? '' : 'il ') + d.getDate() + ' ' + MESI[d.getMonth()] + (d.getFullYear() !== new Date().getFullYear() ? ' ' + d.getFullYear() : '') + h;
+}
+function maiuscola(t){ t = String(t || ''); return t.charAt(0).toUpperCase() + t.slice(1); }
 function ultimoAccesso(v){
   if(!v) return '';
   const d = new Date(v), g = giorniFa(d);
@@ -1058,6 +1455,24 @@ const I = {
   freccia:'<path d="M12 19V5M5.5 11.5 12 5l6.5 6.5"/>',
   chatTab:'<path d="M20.5 11.5a8.5 8.5 0 0 1-12.4 7.5L3.5 20.5l1.6-4.3A8.5 8.5 0 1 1 20.5 11.5z"/>',
   sfondo:'<rect x="3" y="3" width="18" height="18" rx="3"/><path d="m3 16 5-5 4 4 3-3 6 6"/><circle cx="15.5" cy="8.5" r="1.5"/>',
+  stellaPiena:'<path d="m12 3 2.7 5.6 6.1.9-4.4 4.3 1 6.1L12 17l-5.4 2.9 1-6.1-4.4-4.3 6.1-.9z" fill="currentColor"/>',
+  sveglia:'<circle cx="12" cy="13" r="7.5"/><path d="M12 9.5V13l2.6 1.7M4.5 4.5 2.5 6.5M19.5 4.5l2 2"/>',
+  sondaggio:'<path d="M5 20V11M12 20V4M19 20v-6.5"/>',
+  lavoro:'<path d="M4 9.5h16v9A1.5 1.5 0 0 1 18.5 20h-13A1.5 1.5 0 0 1 4 18.5z"/><path d="m4 9.5-.7-3.3 15.6-3.3.7 3.3zM8.4 5.3l2.4 3.4M13.5 4.2l2.4 3.4"/>',
+  calendario:'<rect x="3.5" y="5" width="17" height="15.5" rx="2.5"/><path d="M3.5 10h17M8 3v4M16 3v4"/>',
+  luogo:'<path d="M12 21s-7-6.2-7-11.5a7 7 0 0 1 14 0C19 14.8 12 21 12 21z"/><circle cx="12" cy="9.5" r="2.5"/>',
+  chiocciola:'<circle cx="12" cy="12" r="3.6"/><path d="M15.6 12v1.4a2.6 2.6 0 0 0 5.2 0V12a8.8 8.8 0 1 0-3.5 7"/>',
+  mano:'<path d="M7.2 11.6V6.9a1.4 1.4 0 0 1 2.8 0v4.2M10 10.6V5a1.4 1.4 0 0 1 2.8 0v5.6M12.8 10.6V6a1.4 1.4 0 0 1 2.8 0v6.3M15.6 12.3V9.4a1.4 1.4 0 0 1 2.8 0v5.2A6.4 6.4 0 0 1 12 21h-.8a6 6 0 0 1-4.7-2.3l-2.9-3.6a1.5 1.5 0 0 1 2.2-2l1.4 1.3"/>',
+  seleziona:'<circle cx="12" cy="12" r="9"/><path d="m8 12.3 2.8 2.8 5.4-5.6"/>',
+  apri:'<path d="M14 4h6v6M20 4l-9 9M18 13.5V18a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4.5"/>',
+  lista:'<path d="M9 6h11M9 12h11M9 18h11"/><circle cx="4.5" cy="6" r="1" fill="currentColor" stroke="none"/><circle cx="4.5" cy="12" r="1" fill="currentColor" stroke="none"/><circle cx="4.5" cy="18" r="1" fill="currentColor" stroke="none"/>',
+  spillo:'<path d="M9.5 3.5h5l-.8 6 3.3 3.3v1.7H7v-1.7l3.3-3.3z"/><path d="M12 14.5V21"/>',
+  spilloVia:'<path d="M9.5 3.5h5l-.8 6 3.3 3.3v1.7H7v-1.7l3.3-3.3z"/><path d="M12 14.5V21M3.5 3.5l17 17"/>',
+  programma:'<circle cx="11" cy="12.5" r="7.5"/><path d="M11 8.5v4.2l2.7 1.6"/><path d="M17.5 3.5l3 3"/>',
+  cancelletto:'<path d="M9 3.5 7 20.5M17 3.5l-2 17M4 9h16.5M3.5 15H20"/>',
+  piuCerchio:'<circle cx="12" cy="12" r="9"/><path d="M12 8v8M8 12h8"/>',
+  avanti:'<path d="m9 4.5 7.5 7.5L9 19.5"/>',
+  squadra:'<circle cx="8" cy="9" r="3"/><circle cx="16" cy="9" r="3"/><path d="M2.5 19a5.5 5.5 0 0 1 11 0M10.5 19a5.5 5.5 0 0 1 11 0"/>',
   foss:'',
 };
 function svg(n, sw){
@@ -1115,6 +1530,15 @@ const S = {
   effettoScelto: null,      // {bolla, schermo, anim}
   visti: new Set(memoria('effetti_visti') || []),
   pronti: false,
+  importanti: new Set(),    // i miei messaggi con la stella
+  promemoria: new Map(),    // msg -> {id, quando, conv_id}
+  programmati: [],          // i miei messaggi programmati
+  fissati: new Map(),       // conv -> [messaggi fissati, il piu' recente prima]
+  voti: new Map(),          // msg -> Map(utente -> Set(opzioni))
+  lavori: new Map(),        // id lavoro FOSS -> {d: dati o null, t: quando}
+  modifica: null,           // il messaggio che sto modificando
+  menzBozza: [], lavBozza: [],   // menzioni e lavori scelti mentre scrivo
+  selezione: null,          // Set dei messaggi scelti (modalita' selezione)
 };
 function nomeDi(id){
   if(id === S.io) return 'Tu';
@@ -1346,6 +1770,8 @@ async function caricaMessaggi(conv, prima){
     s.lista = prima ? nuovi.concat(s.lista) : mescola(s.lista, nuovi);
     s.caricato = true;
     await caricaReazioni(nuovi.map(m => m.id));
+    await caricaVoti(nuovi.filter(m => m.tipo === 'sondaggio').map(m => m.id));
+    if(!prima && !S.fissati.has(conv)) caricaFissati(conv);
     /* i messaggi citati che non sono ancora caricati */
     const mancano = nuovi.filter(m => m.risponde_a && !trovaMsg(conv, m.risponde_a)).map(m => m.risponde_a);
     if(mancano.length){
@@ -1374,6 +1800,54 @@ async function caricaReazioni(ids){
   }
 }
 
+/* ---------- voti dei sondaggi ---------- */
+async function caricaVoti(ids){
+  if(!ids.length) return;
+  for(let i = 0; i < ids.length; i += 100){
+    const pezzo = ids.slice(i, i + 100);
+    const {data, error} = await sb.from('chat_voti').select('msg_id,utente_id,opzione').in('msg_id', pezzo);
+    if(error) return;
+    pezzo.forEach(id => S.voti.set(id, new Map()));
+    (data || []).forEach(r => mettiVoto(r.msg_id, r.utente_id, r.opzione));
+  }
+}
+function mettiVoto(msg, u, o){
+  if(!S.voti.has(msg)) S.voti.set(msg, new Map());
+  const v = S.voti.get(msg); if(!v.has(u)) v.set(u, new Set());
+  v.get(u).add(o);
+}
+function togliVoto(msg, u, o){
+  const v = S.voti.get(msg); if(!v || !v.has(u)) return;
+  v.get(u).delete(o); if(!v.get(u).size) v.delete(u);
+}
+/* ---------- messaggi fissati di una chat ---------- */
+async function caricaFissati(conv){
+  const {data, error} = await sb.from('chat_messaggi').select('*').eq('conv_id', conv).not('fissato_il', 'is', null).order('fissato_il', {ascending: false}).limit(10);
+  if(error) return;
+  S.fissati.set(conv, (data || []).filter(m => !m.eliminato));
+  if(conv === S.aperta) disegnaFissati();
+}
+function aggiornaFissato(m){
+  const l = S.fissati.get(m.conv_id); if(!l) return;
+  const i = l.findIndex(x => x.id === m.id);
+  if(m.fissato_il && !m.eliminato){ if(i >= 0) l[i] = Object.assign(l[i], m); else l.unshift(m); }
+  else if(i >= 0) l.splice(i, 1);
+  l.sort((a, b) => new Date(b.fissato_il) - new Date(a.fissato_il));
+  if(m.conv_id === S.aperta) disegnaFissati();
+}
+/* ---------- le mie cose personali: stelle, promemoria, programmati ---------- */
+async function caricaMieCose(){
+  const [a, b, c] = await Promise.all([
+    sb.from('chat_importanti').select('msg_id,conv_id').limit(3000),
+    sb.from('chat_promemoria').select('id,msg_id,conv_id,quando').limit(1000),
+    sb.from('chat_programmati').select('*').order('quando').limit(500)
+  ]);
+  if(!a.error) S.importanti = new Set((a.data || []).map(r => r.msg_id));
+  if(!b.error){ S.promemoria = new Map(); (b.data || []).forEach(r => S.promemoria.set(r.msg_id, r)); }
+  if(!c.error) S.programmati = c.data || [];
+  orologioPromemoria();
+}
+
 /* ---------- spunte: inviato, arrivato, letto ---------- */
 function statoSpunte(m, c){
   if(m._stato === 'invio') return 'invio';
@@ -1395,6 +1869,10 @@ function avviaTempoReale(){
     .on('postgres_changes', {event: '*', schema: 'public', table: 'chat_membri'}, p => cambiaMembro(p))
     .on('postgres_changes', {event: 'UPDATE', schema: 'public', table: 'chat_conversazioni'}, p => cambiaConv(p.new))
     .on('postgres_changes', {event: '*', schema: 'public', table: 'chat_reazioni'}, p => cambiaReazione(p))
+    .on('postgres_changes', {event: '*', schema: 'public', table: 'chat_voti'}, p => cambiaVoto(p))
+    .on('postgres_changes', {event: '*', schema: 'public', table: 'chat_programmati'}, p => cambiaProgrammato(p))
+    .on('postgres_changes', {event: 'UPDATE', schema: 'public', table: 'progetti'}, p => lavoroCambiato(p.new && p.new.id))
+    .on('postgres_changes', {event: '*', schema: 'public', table: 'elementi'}, p => { const r = p.new && p.new.progetto_id ? p.new : p.old; if(r && (!r.tipo || r.tipo === 'evento' || r.tipo === 'voce')) lavoroCambiato(r.progetto_id); })
     .subscribe(st => { if(st === 'SUBSCRIBED' && S.pronti) recupera(); });
 
   canaleOnline = sb.channel('fosschat-online', {config: {presence: {key: S.io}}});
@@ -1455,8 +1933,14 @@ function arrivaMessaggio(m){
   if(!gia && !mio && m.tipo !== 'sistema'){
     S.scrive.get(m.conv_id) && S.scrive.get(m.conv_id).delete(m.autore);
     const guardo = m.conv_id === S.aperta && document.visibilityState === 'visible' && vicinoAlFondo() && sbloccata(c);
+    const menz = menzionaMe(m), muto = m.media && m.media.silenzioso;
     if(guardo){ segnaLetto(m.conv_id); }
-    else { c.non_lette = (c.non_lette || 0) + 1; if(!c.silenziata) suono('arrivo'); }
+    else {
+      c.non_lette = (c.non_lette || 0) + 1;
+      if(menz) c.menzioni = (c.menzioni || 0) + 1;
+      if((!c.silenziata || menz) && !muto && (m.tipo !== 'colpetto' || m.media.a === S.io)) suono('arrivo');
+    }
+    if(m.tipo === 'colpetto' && m.media && m.media.a === S.io) colpettoRicevuto(m, guardo);
     aggiornaTitolo();
   }
   if(m.conv_id === S.aperta && !gia){
@@ -1467,9 +1951,37 @@ function arrivaMessaggio(m){
 }
 function cambiaMessaggio(m){
   const s = S.msgs.get(m.conv_id);
-  if(s){ const i = s.lista.findIndex(x => x.id === m.id); if(i >= 0){ s.lista[i] = Object.assign(s.lista[i], m); ridisegnaMessaggio(m.id); } }
+  if(s){
+    const i = s.lista.findIndex(x => x.id === m.id);
+    if(i >= 0){ s.lista[i] = Object.assign(s.lista[i], m); ridisegnaMessaggio(m.id); }
+    else if(s.citati && s.citati.has(m.id)) Object.assign(s.citati.get(m.id), m);
+  }
+  if('fissato_il' in m) aggiornaFissato(m);
+  if(m.eliminato){ S.importanti.delete(m.id); S.promemoria.delete(m.id); }
+  if(S.modifica && S.modifica.id === m.id && m.eliminato) annullaModifica();
   const c = S.convs.get(m.conv_id);
-  if(c && c.ultimo && c.ultimo.id === m.id){ c.ultimo.eliminato = m.eliminato; if(m.eliminato){ c.ultimo.testo = null; c.ultimo.media = null; } disegnaLista(); }
+  if(c && c.ultimo && c.ultimo.id === m.id){
+    c.ultimo.eliminato = m.eliminato;
+    if(m.eliminato){ c.ultimo.testo = null; c.ultimo.media = null; }
+    else if(!c.bloccata){ c.ultimo.testo = (m.testo || '').slice(0, 140); c.ultimo.media = m.media; c.ultimo.modificato_il = m.modificato_il; }
+    disegnaLista();
+  }
+}
+function cambiaVoto(p){
+  const r = p.eventType === 'DELETE' ? p.old : p.new;
+  if(!r || !r.msg_id || !r.utente_id) return;
+  if(p.eventType === 'DELETE') togliVoto(r.msg_id, r.utente_id, r.opzione);
+  else mettiVoto(r.msg_id, r.utente_id, r.opzione);
+  if(S.aperta) ridisegnaMessaggio(r.msg_id);
+}
+function cambiaProgrammato(p){
+  if(p.eventType === 'DELETE'){ const id = p.old && p.old.id; S.programmati = S.programmati.filter(x => x.id !== id); }
+  else if(p.new && p.new.id && p.new.autore === S.io){
+    const i = S.programmati.findIndex(x => x.id === p.new.id);
+    if(i >= 0) S.programmati[i] = p.new; else S.programmati.push(p.new);
+    S.programmati.sort((a, b) => new Date(a.quando) - new Date(b.quando));
+  }
+  disegnaBarraProgrammati();
 }
 function cambiaMembro(p){
   const n = p.new && p.new.conv_id ? p.new : null, o = p.old || {};
@@ -1514,7 +2026,7 @@ const segnaLettoPresto = debounce(async () => {
 }, 500);
 function segnaLetto(conv){
   const c = S.convs.get(conv); if(!c) return;
-  c.non_lette = 0; c.letto_fino = new Date().toISOString();
+  c.non_lette = 0; c.menzioni = 0; c.letto_fino = new Date().toISOString();
   letturaInCoda.add(conv); segnaLettoPresto(); aggiornaTitolo();
 }
 function aggiornaTitolo(){
@@ -1657,6 +2169,9 @@ function anteprimaTipo(u){
   if(u.tipo === 'vocale') return svg('mic', 1.8) + '<span class="tx">' + fmtDur(md.dur) + '</span>';
   if(u.tipo === 'sticker') return svg('sticker', 1.8) + '<span class="tx">Sticker</span>';
   if(u.tipo === 'file') return svg('doc', 1.8) + '<span class="tx">' + esc(md.nome || 'Documento') + '</span>';
+  if(u.tipo === 'sondaggio') return svg('sondaggio', 2) + '<span class="tx">' + esc(u.testo || 'Sondaggio') + '</span>';
+  if(u.tipo === 'lavoro') return svg('lavoro', 1.8) + '<span class="tx">' + (md.nuovo ? 'Nuovo lavoro: ' : '') + esc(md.lavoro ? md.lavoro.n : 'Lavoro di FOSS') + '</span>';
+  if(u.tipo === 'colpetto') return svg('mano', 1.8) + '<span class="tx">' + esc(testoColpetto(u)) + '</span>';
   return '<span class="tx">' + esc(testoSemplice(u.testo || '')) + '</span>';
 }
 function testoSemplice(t){ return String(t || '').replace(/```([\s\S]*?)```/g, '$1').replace(/([*_~`])(\S(?:.*?\S)?)\1/g, '$2').replace(/\s+/g, ' '); }
@@ -1670,7 +2185,8 @@ function rigaHTML(c){
     ant = svg('lucchetto', 1.8) + '<span class="tx">Chat bloccata</span>';
   } else if(u){
     if(u.eliminato) ant = svg('vietato', 1.8) + '<span class="tx" style="font-style:italic">'+(u.autore === S.io ? 'Hai eliminato questo messaggio' : 'Questo messaggio è stato eliminato')+'</span>';
-    else if(u.tipo === 'sistema') ant = '<span class="tx">'+esc(u.testo || '')+'</span>';
+    else if(u.tipo === 'sistema') ant = '<span class="tx">'+esc(u.media && u.media.fissato ? (u.autore === S.io ? 'Hai fissato un messaggio' : nomeDi(u.autore) + ' ha fissato un messaggio') : (u.testo || ''))+'</span>';
+    else if(u.tipo === 'colpetto') ant = anteprimaTipo(u);
     else {
       if(u.autore === S.io){ const st = statoSpunte(u, c); ant += spunteHTML(st, true); }
       else if(c.tipo === 'gruppo') ant += '<span class="chi">'+esc(nomeDi(u.autore))+':&nbsp;</span>';
@@ -1680,6 +2196,7 @@ function rigaHTML(c){
   else ant = '<span class="tx">'+esc((S.persone.get(altro(c)) || {}).ruolo || 'Nuova chat')+'</span>';
   const nl = c.non_lette > 0 || c._nonLetta;
   const icone = (c.silenziata ? svg('silenzia', 1.8) : '') + (c.fissata ? svg('fissa', 1.8) : '') +
+    (c.menzioni > 0 ? '<span class="contatore menz" title="Ti hanno menzionato">@</span>' : '') +
     (nl ? '<span class="contatore">'+(c.non_lette > 0 ? (c.non_lette > 99 ? '99+' : c.non_lette) : '')+'</span>' : '');
   return '<div class="riga'+(S.aperta === c.id ? ' on' : '')+(nl ? ' da-leggere' : '')+'" role="button" tabindex="0" data-a="apri" data-id="'+c.id+'">'+avatarConv(c)+
     '<span class="corpo"><span class="r1"><span class="nome">'+esc(nomeConv(c))+'</span>'+
@@ -1749,6 +2266,7 @@ async function apriConv(id, opz){
   }
   if(S.aperta && S.aperta !== id) lasciaConv();
   const giaAperta = S.aperta === id;
+  if(!giaAperta){ chiudiSelezione(); if(S.modifica) annullaModifica(); chiudiPicker(); fissatoIdx = 0; }
   S.aperta = id;
   if(c.archiviata && S.vista !== 'archiviate' && !opz.daHash){ /* resta archiviata, la apro comunque */ }
   el('app').classList.add('in-conv');
@@ -1768,6 +2286,10 @@ async function apriConv(id, opz){
   }
   disegnaMessaggi();
   vaiInFondo(true);
+  preparaMenzioni(c.non_lette > 0 ? c : null);
+  if(S.fissati.has(id)) disegnaFissati(); else caricaFissati(id);
+  disegnaBarraProgrammati();
+  if(opz.msg) setTimeout(() => vaiAMessaggio(opz.msg), 120);
   if(c.non_lette > 0 || c._nonLetta){ c._nonLetta = false; segnaLetto(id); }
   disegnaLista();
   if(!tocco()) setTimeout(() => { const t = el('testoIn'); if(t) t.focus(); }, 60);
@@ -1780,6 +2302,8 @@ async function apriConv(id, opz){
 }
 function lasciaConv(){
   const id = S.aperta; if(!id) return;
+  chiudiFocus(true); chiudiSelezione(); chiudiPicker();
+  if(S.modifica) annullaModifica();
   salvaBozza();
   const c = S.convs.get(id);
   if(c && c.bloccata) S.sbloccate.delete(id);    /* uscendo, una chat bloccata si richiude */
@@ -1799,7 +2323,9 @@ function disegnaConv(){
   const c = S.convs.get(S.aperta); if(!c) return;
   el('conv').innerHTML =
     '<header class="conv-testa" id="convTesta"></header>'+
+    '<div class="fissati-barra nascosto" id="fissatiB"></div>'+
     '<div class="msgs-wrap"><div class="messaggi'+(S.cfg.doodle === false ? ' niente-doodle' : '')+'" id="msgs"></div>'+
+    '<button class="menz-b nascosto" id="menzB" data-a="vai-menzione" aria-label="Vai alla menzione">'+svg('chiocciola', 2.2)+'</button>'+
     '<button class="giu-b nascosto" id="giuB" data-a="in-fondo" aria-label="Vai in fondo">'+svg('giu')+'</button></div>'+
     '<footer class="scrivi" id="scrivi"></footer>';
   aggiornaTestaConv();
@@ -1867,17 +2393,24 @@ function disegnaMessaggi(mantieni){
   if(conEff.length) setTimeout(() => conEff.forEach(m => segnaVisto(m.id)), 2600);
 }
 function stessoGruppo(a, b){
-  if(!a || !b || a.tipo === 'sistema' || b.tipo === 'sistema') return false;
+  if(!a || !b || a.tipo === 'sistema' || b.tipo === 'sistema' || a.tipo === 'colpetto' || b.tipo === 'colpetto') return false;
   if(a.autore !== b.autore) return false;
   const da = new Date(a.creato_il), db = new Date(b.creato_il);
   return stessoGiorno(da, db) && Math.abs(db - da) < 7 * 60000;
 }
 function msgHTML(m, prev, next, c){
-  if(m.tipo === 'sistema') return '<div class="sistema" data-id="'+m.id+'"><span>'+esc(m.testo || '')+'</span></div>';
+  if(m.tipo === 'sistema'){
+    const md = m.media || {};
+    if(md.fissato) return '<div class="sistema fissato" data-id="'+m.id+'"><span data-a="vai-msg" data-id="'+esc(md.fissato)+'" role="button">'+svg('spillo', 2)+
+      esc(m.autore === S.io ? 'Hai fissato un messaggio' : nomeDi(m.autore) + ' ha fissato un messaggio')+'</span></div>';
+    return '<div class="sistema" data-id="'+m.id+'"><span>'+esc(m.testo || '')+'</span></div>';
+  }
+  if(m.tipo === 'colpetto') return colpettoHTML(m);
   const mio = m.autore === S.io, gr = c.tipo === 'gruppo';
   const primo = !stessoGruppo(prev, m), ultimo = !stessoGruppo(m, next);
   const r = S.reazioni.get(m.id), haR = r && r.size;
-  let cls = 'msg ' + (mio ? 'mio' : 'suo') + (primo ? ' primo' : '') + (ultimo ? ' ultimo' : '') + (gr ? ' gr' : '') + (haR ? ' con-reazioni' : '');
+  let cls = 'msg ' + (mio ? 'mio' : 'suo') + (primo ? ' primo' : '') + (ultimo ? ' ultimo' : '') + (gr ? ' gr' : '') + (haR ? ' con-reazioni' : '') +
+    (S.selezione && S.selezione.has(m.id) ? ' scelto' : '') + (m.tipo === 'lavoro' || m.tipo === 'sondaggio' ? ' largo' : '');
   const conAv = suTelefono() ? ultimo : primo;   /* su iPhone la foto sta accanto all'ultimo messaggio del gruppo */
   const pre = gr && !mio ? (conAv ? avatar(m.autore, 'av-g') : '<span class="vuoto-av"></span>') : '';
   return '<div class="'+cls+'" data-id="'+m.id+'">'+pre+bollaHTML(m, c, primo, mio, gr)+'</div>';
@@ -1898,7 +2431,8 @@ function bollaHTML(m, c, primo, mio, gr){
     const em = soloEmoji(m.testo);
     if(em && !cit && !md.anim){ bcls += ' solo-emoji'; corpo = '<div class="testo grande-emoji">'+esc(m.testo.trim())+'</div>'; }
     else corpo = '<div class="testo'+(md.anim && nuovoEff ? ' anim-' + md.anim : '')+'"'+(md.anim ? ' data-anim="'+esc(md.anim)+'" data-a="rianima"' : '')+'>'+
-      (md.anim ? testoAnimato(m.testo, md.anim) : formatta(m.testo))+'</div>';
+      (md.anim ? testoAnimato(m.testo, md.anim) : formatta(m.testo, md))+'</div>' + (md.lavori && md.lavori.length && !md.anim ? schedeInTesto(md) : '');
+    if(md.lavori && md.lavori.length) bcls += ' con-scheda';
   } else if(m.tipo === 'foto' || m.tipo === 'video'){
     const solo = !md.did && !cit;
     if(solo) bcls += ' solo-media';
@@ -1910,6 +2444,12 @@ function bollaHTML(m, c, primo, mio, gr){
     corpo = vocaleHTML(m, mio);
   } else if(m.tipo === 'file'){
     corpo = docHTML(m);
+  } else if(m.tipo === 'sondaggio'){
+    bcls += ' sondaggio';
+    corpo = sondaggioHTML(m);
+  } else if(m.tipo === 'lavoro'){
+    bcls += ' lavoro';
+    corpo = lavoroHTML(m);
   }
   const menu = '<button class="menu-msg" data-a="menu-msg" data-id="'+m.id+'" aria-label="Opzioni">'+svg('giu')+'</button>';
   const polvere = md.bolla === 'inchiostro' ? '<span class="polvere"><canvas data-polvere="1"></canvas></span>' : '';
@@ -1918,7 +2458,13 @@ function bollaHTML(m, c, primo, mio, gr){
     polvere+reazioniHTML(m.id)+'</div>';
 }
 function meta(m, c, mio){
-  return '<span class="meta">'+(m.media && (m.media.schermo || m.media.bolla || m.media.anim) ? '<span title="Inviato con effetto" style="display:inline-block;width:12px">'+svg('effetti', 2)+'</span>' : '')+
+  const md = m.media || {};
+  return '<span class="meta">'+
+    (m.fissato_il ? '<span class="mt-ic" title="Fissato">'+svg('spillo', 2.2)+'</span>' : '')+
+    (S.importanti.has(m.id) ? '<span class="mt-ic stella" title="Importante">'+svg('stellaPiena', 1.6)+'</span>' : '')+
+    (S.promemoria.has(m.id) ? '<span class="mt-ic" title="Promemoria '+esc(quando(S.promemoria.get(m.id).quando))+'">'+svg('sveglia', 2.2)+'</span>' : '')+
+    (md.schermo || md.bolla || md.anim ? '<span class="mt-ic" title="Inviato con effetto">'+svg('effetti', 2)+'</span>' : '')+
+    (m.modificato_il ? '<button class="mod" data-a="info-modifica" data-id="'+m.id+'" title="Modificato '+esc(quando(m.modificato_il))+'">modificato</button>' : '')+
     ora(m.creato_il)+(mio ? spunteHTML(statoSpunte(m, c)) : '')+'</span>';
 }
 function reazioniHTML(id){
@@ -1956,14 +2502,14 @@ function soloEmoji(t){
   }catch(e){ return false; }
 }
 /* *grassetto* _corsivo_ ~barrato~ `codice` e i link */
-function formatta(t){
+function formatta(t, md){
   let s = esc(t || '');
   const blocchi = [];
-  s = s.replace(/```([\s\S]+?)```/g, (_, x) => { blocchi.push('<pre>' + x + '</pre>'); return '\u0000' + (blocchi.length - 1) + '\u0000'; });
-  s = s.replace(/`([^`\n]+)`/g, (_, x) => { blocchi.push('<code>' + x + '</code>'); return '\u0000' + (blocchi.length - 1) + '\u0000'; });
-  s = s.replace(/(https?:\/\/[^\s<]+[^\s<.,;:!?)\]'"])/g, u => {
-    blocchi.push('<a href="' + u + '" target="_blank" rel="noopener noreferrer">' + u + '</a>'); return '\u0000' + (blocchi.length - 1) + '\u0000';
-  });
+  const metti = h => { blocchi.push(h); return '\u0000' + (blocchi.length - 1) + '\u0000'; };
+  s = s.replace(/```([\s\S]+?)```/g, (_, x) => metti('<pre>' + x + '</pre>'));
+  s = s.replace(/`([^`\n]+)`/g, (_, x) => metti('<code>' + x + '</code>'));
+  s = s.replace(/(https?:\/\/[^\s<]+[^\s<.,;:!?)\]'"])/g, u => metti('<a href="' + u + '" target="_blank" rel="noopener noreferrer">' + u + '</a>'));
+  s = decoraTesto(s, md, metti);
   s = s.replace(/(^|[\s(])\*(\S(?:[^*\n]*\S)?)\*(?=$|[\s).,!?:;])/g, '$1<b>$2</b>')
        .replace(/(^|[\s(])_(\S(?:[^_\n]*\S)?)_(?=$|[\s).,!?:;])/g, '$1<i>$2</i>')
        .replace(/(^|[\s(])~(\S(?:[^~\n]*\S)?)~(?=$|[\s).,!?:;])/g, '$1<s>$2</s>');
@@ -2119,7 +2665,7 @@ function aggiungiMessaggioAlFondo(m, altrui){
   const md = m.media || {};
   if(md.bolla === 'slam' && !S.visti.has(m.id)){ const cv = el('conv'); cv.classList.remove('scossa'); void cv.offsetWidth; cv.classList.add('scossa'); }
   if(giu || !altrui) vaiInFondo(!altrui ? false : true);
-  else { nuoviSotto++; mostraGiu(); }
+  else { nuoviSotto++; mostraGiu(); if(menzionaMe(m)){ menzDaVedere.push(m.id); mostraMenz(); } }
   if(md.bolla || md.anim) setTimeout(() => segnaVisto(m.id), 2600);
 }
 function segnaVisto(id){ S.visti.add(id); const a = Array.from(S.visti).slice(-400); memoria('effetti_visti', a); }
@@ -2146,6 +2692,7 @@ let caricandoSu = false;
 async function alloScorrere(){
   const M = el('msgs'); if(!M) return;
   mostraGiu();
+  if(menzDaVedere.length) mostraMenz();
   if(vicinoAlFondo()){ nuoviSotto = 0; const c = S.convs.get(S.aperta); if(c && c.non_lette) segnaLetto(c.id); }
   if(M.scrollTop < 300 && !caricandoSu){
     const s = S.msgs.get(S.aperta); if(!s || s.tutti) return;
@@ -2155,70 +2702,21 @@ async function alloScorrere(){
   }
 }
 async function vaiAMessaggio(id){
-  const conv = S.aperta; let giri = 0;
-  while(!$('.msg[data-id="'+id+'"]', el('msgs')) && giri < 30){
+  const conv = S.aperta; if(!conv || !id) return;
+  let giri = 0;
+  while(!msgVisibili(conv).some(m => m.id === id) && giri < 40){
     const s = S.msgs.get(conv); if(!s || s.tutti) break;
     await caricaMessaggi(conv, true); giri++;
   }
+  if(S.aperta !== conv) return;
   if(giri) disegnaMessaggi(true);
-  const n = $('.msg[data-id="'+id+'"]', el('msgs'));
-  if(!n){ toast('Messaggio non trovato.'); return; }
+  const n = $('.msg[data-id="'+id+'"], .sistema[data-id="'+id+'"]', el('msgs'));
+  if(!n){ toast(S.nascosti.has(id) ? 'Hai eliminato quel messaggio.' : 'Messaggio non trovato: forse è stato eliminato o la chat è stata svuotata.'); return; }
   n.scrollIntoView({block: 'center', behavior: 'smooth'});
   n.classList.remove('evidenzia'); void n.offsetWidth; n.classList.add('evidenzia');
 }
 
-/* ---------- menu del messaggio e reazioni ---------- */
-const REAZ = ['👍','❤️','😂','😮','😢','🙏'];
-function menuMessaggio(id, x, y, conBarra){
-  const c = S.convs.get(S.aperta); const m = c && trovaMsg(c.id, id); if(!m || m.tipo === 'sistema') return;
-  const mio = m.autore === S.io, md = m.media || {};
-  const voci = [];
-  if(!m.eliminato){
-    voci.push(['Rispondi', 'rispondi', () => impostaRisposta(m)]);
-    if(m.tipo === 'testo' || md.did) voci.push(['Copia', 'copia', () => copia(m.testo || md.did)]);
-    voci.push(['Reagisci', 'emoji', () => barraReazioni(m.id, x, y, true)]);
-    voci.push(['Inoltra', 'inoltra', () => inoltra([m])]);
-    if(m.tipo === 'foto' && !md.gif) voci.push(['Crea sticker', 'sticker', () => stickerDaMessaggio(m)]);
-    if(m.tipo === 'sticker' && !(md.path && /^sticker\/[^/]+/.test(md.path) && md.path.indexOf(S.io) === 8)) voci.push(['Aggiungi ai miei sticker', 'stella', () => salvaInRaccolta(m, 'sticker')]);
-    if(md.gif) voci.push(['Aggiungi alle mie GIF', 'gif', () => salvaInRaccolta(m, 'gif')]);
-    if(['foto','video','file','vocale'].includes(m.tipo)) voci.push(['Scarica', 'scarica', () => scaricaMedia(m)]);
-    if(mio) voci.push(['Info', 'info', () => infoMessaggio(m)]);
-  }
-  voci.push(null);
-  voci.push(['Elimina', 'cestino', () => eliminaMessaggio(m), 'rosso']);
-  apriMenu(x, y, voci, false);
-  if(conBarra && !m.eliminato){
-    /* come sul telefono: le reazioni sopra il messaggio, il menu sotto (o sopra se manca spazio) */
-    const b = $('.msg[data-id="'+id+'"] .bolla'), menu = el('menuPop');
-    if(b && menu){
-      const r = b.getBoundingClientRect(), h = menu.offsetHeight, w = menu.offsetWidth;
-      let top = r.bottom + 8;
-      if(top + h > window.innerHeight - 8) top = Math.max(70, r.top - 8 - h);
-      const left = m.autore === S.io ? Math.min(window.innerWidth - w - 8, r.right - w) : Math.max(8, r.left);
-      menu.style.top = top + 'px'; menu.style.left = Math.max(8, left) + 'px';
-      const sopra = top < r.top ? top - 58 : r.top - 58;
-      barraReazioni(m.id, m.autore === S.io ? r.right - 150 : r.left + 150, Math.max(8, sopra));
-    } else barraReazioni(m.id, x, y - 60);
-  }
-}
-function barraReazioni(id, x, y, sola){
-  const vecchia = el('reazBarra'); if(vecchia) vecchia.remove();
-  const mia = (S.reazioni.get(id) || new Map()).get(S.io);
-  const b = document.createElement('div'); b.className = 'reaz-barra'; b.id = 'reazBarra';
-  b.innerHTML = REAZ.map(e => '<button class="'+(mia === e ? 'mia' : '')+'" data-e="'+e+'">'+e+'</button>').join('')+
-    '<button class="piu" data-e="+" aria-label="Altre">'+svg('piu')+'</button>';
-  document.body.appendChild(b);
-  const w = b.offsetWidth, h = b.offsetHeight;
-  b.style.left = Math.max(8, Math.min(window.innerWidth - w - 8, x - w / 2)) + 'px';
-  b.style.top = Math.max(8, Math.min(window.innerHeight - h - 8, y)) + 'px';
-  b.onclick = e => {
-    const t = e.target.closest('button'); if(!t) return;
-    chiudiMenu();
-    if(t.dataset.e === '+') return sceltaEmoji(em => reagisci(id, em));
-    reagisci(id, t.dataset.e);
-  };
-  if(sola){ setTimeout(() => { const chiudi = ev => { if(!b.contains(ev.target)){ b.remove(); document.removeEventListener('pointerdown', chiudi, true); } }; document.addEventListener('pointerdown', chiudi, true); }, 0); }
-}
+/* ---------- reazioni (il menu del messaggio sta in 13-menu.js) ---------- */
 async function reagisci(id, emoji){
   const c = S.convs.get(S.aperta); if(!c) return;
   if(!S.reazioni.has(id)) S.reazioni.set(id, new Map());
@@ -2268,15 +2766,20 @@ function eliminaMessaggio(m){
   foglio('Eliminare il messaggio?', mio ? 'Puoi eliminarlo solo per te o per tutti quelli della chat.' : 'Il messaggio sparisce solo da questo dispositivo e dagli altri tuoi.',
     voci.concat([['Annulla']]));
 }
-function infoMessaggio(m){
-  const c = S.convs.get(S.aperta); const t = new Date(m.creato_il).getTime();
+async function infoMessaggio(m){
+  const c = S.convs.get(m.conv_id) || S.convs.get(S.aperta); if(!c) return;
+  const t = new Date(m.creato_il).getTime();
   const altri = (c.membri || []).filter(x => x.id !== S.io);
-  const letti = altri.filter(x => new Date(x.letto).getTime() >= t), arrivati = altri.filter(x => new Date(x.letto).getTime() < t && new Date(x.ricevuto).getTime() >= t);
-  const resto = altri.filter(x => new Date(x.ricevuto).getTime() < t);
-  const blocco = (tit, ic, l) => l.length ? '<div class="sez-t" style="padding:14px 0 6px;display:flex;gap:8px;align-items:center">'+ic+tit+'</div>'+
-    l.map(x => '<div class="voce" style="padding:6px 0">'+avatar(x.id)+'<span class="vc"><b>'+esc(nomeLungo(x.id))+'</b></span></div>').join('') : '';
-  foglio('Info messaggio', '<div style="color:var(--testo-2);font-size:13px">Inviato '+dataGiorno(m.creato_il).toLowerCase()+' alle '+ora(m.creato_il)+'</div>'+
-    blocco('Letto da', '<span style="width:18px;color:var(--blu-spunta)">'+svg('spunte')+'</span>', letti)+
+  let ore = new Map();
+  try{ const {data} = await sb.from('chat_letture').select('utente_id,letto_il').eq('msg_id', m.id); (data || []).forEach(r => ore.set(r.utente_id, r.letto_il)); }catch(e){}
+  const letti = altri.filter(x => ore.has(x.id) || new Date(x.letto).getTime() >= t);
+  const arrivati = altri.filter(x => !letti.includes(x) && new Date(x.ricevuto).getTime() >= t);
+  const resto = altri.filter(x => !letti.includes(x) && !arrivati.includes(x));
+  const blocco = (tit, ic, l, conOra) => l.length ? '<div class="sez-t" style="padding:14px 0 6px;display:flex;gap:8px;align-items:center">'+ic+tit+'</div>'+
+    l.map(x => '<div class="voce" style="padding:6px 0">'+avatar(x.id)+'<span class="vc"><b>'+esc(nomeLungo(x.id))+'</b>'+(conOra && ore.has(x.id) ? '<span>'+esc(maiuscola(quando(ore.get(x.id))))+'</span>' : '')+'</span></div>').join('') : '';
+  foglio('Info messaggio', '<div class="info-msg-ant">'+esc(testoAnteprima(m)).slice(0, 300)+'</div>'+
+    '<div style="color:var(--testo-2);font-size:13px">Inviato '+esc(quando(m.creato_il))+(m.modificato_il ? '<br>Modificato '+esc(quando(m.modificato_il)) : '')+'</div>'+
+    blocco('Letto da', '<span style="width:18px;color:var(--blu-spunta)">'+svg('spunte')+'</span>', letti, true)+
     blocco('Consegnato a', '<span style="width:18px">'+svg('spunte')+'</span>', arrivati)+
     blocco('In attesa', '<span style="width:18px">'+svg('spunta')+'</span>', resto), [['Chiudi']]);
 }
@@ -2316,39 +2819,53 @@ function attivaScorriPerRispondere(M){
 /* ======================= SCRIVERE E MANDARE ======================= */
 function disegnaScrivi(){
   const F = el('scrivi'); const c = S.convs.get(S.aperta); if(!F || !c) return;
+  if(S.selezione){ disegnaSelezione(); return; }
   const vecchio = el('testoIn'), testo = vecchio ? vecchio.value : (S.bozze[c.id] || '');
   const r = S.risposta && S.risposta.conv_id === c.id ? S.risposta : null;
   const e = S.effettoScelto;
+  const md = S.modifica && S.modifica.conv_id === c.id ? S.modifica : null;
+  if(S.modifica && !md){ S.modifica = null; S.extraModifica = null; }
+  const pieno = !!testo.trim() || !!md;
   F.innerHTML =
-    (r ? '<div class="rispondi-a">'+citazioneHTML(r.id, c).replace('data-a="vai-msg"', '')+'<button class="ib" data-a="annulla-risposta" aria-label="Annulla">'+svg('chiudi')+'</button></div>' : '')+
+    '<div class="prog-barra nascosto" id="progBarra"></div>'+
+    '<div class="picker nascosto" id="picker"></div>'+
+    (md ? '<div class="rispondi-a modifica-a"><div class="citazione" style="--col:var(--verde)"><span class="barra"></span><span class="cc"><b>'+svg('matita', 2.2)+'Modifica '+(md.tipo === 'testo' ? 'messaggio' : 'didascalia')+'</b>'+
+        '<span>'+esc(testoAnteprima(md))+'</span></span></div><button class="ib" data-a="annulla-modifica" aria-label="Annulla la modifica">'+svg('chiudi')+'</button></div>'
+      : r ? '<div class="rispondi-a">'+citazioneHTML(r.id, c).replace('data-a="vai-msg"', '')+'<button class="ib" data-a="annulla-risposta" aria-label="Annulla">'+svg('chiudi')+'</button></div>' : '')+
     '<div id="pannelloEmoji"></div>'+
-    '<div class="barra-scrivi" id="barraScrivi">'+
+    '<div class="barra-scrivi'+(md ? ' in-modifica' : '')+'" id="barraScrivi">'+
       '<button class="ib" data-a="emoji" id="emojiB" title="Emoji, GIF e sticker">'+svg('emoji', 1.8)+'</button>'+
       '<span class="allega-wrap"><button class="ib" data-a="allega" id="allegaB" title="Allega">'+svg('piu', 2)+'</button></span>'+
       '<div class="campo">'+
-        '<textarea class="testo-in" id="testoIn" rows="1" placeholder="'+(suTelefono() ? '' : 'Scrivi un messaggio')+'" enterkeyhint="'+(S.cfg.invio && !tocco() ? 'send' : 'enter')+'" '+
+        '<textarea class="testo-in" id="testoIn" rows="1" placeholder="'+(md ? 'Modifica il messaggio' : suTelefono() ? '' : 'Scrivi un messaggio')+'" enterkeyhint="'+(S.cfg.invio && !tocco() ? 'send' : 'enter')+'" '+
           'autocomplete="off" autocapitalize="sentences" spellcheck="true"></textarea>'+
-        '<button class="ib effetti-b'+(e ? ' on' : '')+'" data-a="effetti" id="effettiB" title="Effetti" style="'+(testo.trim() || e ? '' : 'display:none')+'">'+svg('effetti', 1.8)+'</button>'+
-        '<button class="ib stk-b" data-a="emoji-sticker" id="stkB" title="Sticker" style="'+(testo.trim() ? 'display:none' : '')+'">'+svg('sticker', 1.8)+'</button>'+
+        '<button class="ib effetti-b'+(e ? ' on' : '')+'" data-a="effetti" id="effettiB" title="Effetti" style="'+(!md && (testo.trim() || e) ? '' : 'display:none')+'">'+svg('effetti', 1.8)+'</button>'+
+        '<button class="ib stk-b" data-a="emoji-sticker" id="stkB" title="Sticker" style="'+(testo.trim() || md ? 'display:none' : '')+'">'+svg('sticker', 1.8)+'</button>'+
       '</div>'+
-      '<button class="ib cam-b" data-a="fotocamera" id="camB" title="Fotocamera" style="'+(testo.trim() ? 'display:none' : '')+'">'+svg('camera', 1.8)+'</button>'+
-      '<button class="manda'+(testo.trim() ? ' pieno' : '')+'" id="mandaB" aria-label="'+(testo.trim() ? 'Invia' : 'Registra un vocale')+'">'+
-        svg(testo.trim() ? (suTelefono() ? 'freccia' : 'manda') : 'mic', suTelefono() && testo.trim() ? 2.6 : 1.8)+(e ? '<span class="effetto-segno">'+svg('effetti', 2.4)+'</span>' : '')+'</button>'+
+      '<button class="ib cam-b" data-a="fotocamera" id="camB" title="Fotocamera" style="'+(testo.trim() || md ? 'display:none' : '')+'">'+svg('camera', 1.8)+'</button>'+
+      '<button class="manda'+(pieno ? ' pieno' : '')+'" id="mandaB" aria-label="'+(md ? 'Salva la modifica' : testo.trim() ? 'Invia' : 'Registra un vocale')+'">'+
+        svg(md ? 'ok' : testo.trim() ? (suTelefono() ? 'freccia' : 'manda') : 'mic', md ? 2.6 : suTelefono() && testo.trim() ? 2.6 : 1.8)+(e && !md ? '<span class="effetto-segno">'+svg('effetti', 2.4)+'</span>' : '')+'</button>'+
     '</div>';
   const t = el('testoIn');
   t.value = testo; adatta(t);
-  t.addEventListener('input', () => { adatta(t); aggiornaTastoManda(); dicoCheScrivo(); salvaBozzaPresto(); });
+  t.addEventListener('input', () => { adatta(t); aggiornaTastoManda(); if(!S.modifica){ dicoCheScrivo(); salvaBozzaPresto(); } controllaPicker(); });
   t.addEventListener('keydown', tastiTesto);
+  t.addEventListener('keyup', e => { if(['ArrowLeft','ArrowRight','Home','End'].includes(e.key)) controllaPicker(); });
+  t.addEventListener('click', controllaPicker);
+  t.addEventListener('blur', () => setTimeout(() => { if(document.activeElement !== t && !(document.activeElement && document.activeElement.closest && document.activeElement.closest('#picker'))) chiudiPicker(); }, 180));
   t.addEventListener('paste', incolla);
   t.addEventListener('focus', () => { if(tocco() && pannelloEmojiAperto) chiudiPannelloEmoji(); });
   const mb = el('mandaB');
   mb.addEventListener('pointerdown', premiManda);
-  mb.addEventListener('contextmenu', e => { e.preventDefault(); if(t.value.trim()) apriEffetti(); });
+  mb.addEventListener('contextmenu', e => { e.preventDefault(); if(t.value.trim() && !S.modifica) apriEffetti(); });
+  el('picker').addEventListener('pointerdown', e => { const b = e.target.closest('[data-pk]'); if(!b) return; e.preventDefault(); scegliPicker(+b.dataset.pk); });
+  disegnaBarraProgrammati();
   if(pannelloEmojiAperto) apriPannelloEmoji(pannelloEmojiScheda);
 }
 function adatta(t){ t.style.height = 'auto'; t.style.height = Math.min(140, t.scrollHeight) + 'px'; }
 function aggiornaTastoManda(){
   const t = el('testoIn'), b = el('mandaB'); if(!t || !b) return;
+  if(S.modifica){ b.classList.add('pieno'); return; }
   const pieno = !!t.value.trim();
   if(b.classList.contains('pieno') !== pieno){
     b.classList.toggle('pieno', pieno);
@@ -2361,14 +2878,21 @@ function aggiornaTastoManda(){
   if(sk) sk.style.display = pieno ? 'none' : '';
 }
 function tastiTesto(e){
-  if(e.key === 'Enter' && !e.shiftKey && !e.isComposing && S.cfg.invio && !tocco()){ e.preventDefault(); mandaTesto(); }
-  if(e.key === 'Escape'){ if(S.risposta){ S.risposta = null; disegnaScrivi(); } else if(pannelloEmojiAperto) chiudiPannelloEmoji(); }
-  if(e.key === 'ArrowUp' && !e.target.value){ /* niente modifica: su FOSS.chat i messaggi non si cambiano */ }
+  if(tastiPicker(e)) return;
+  if(e.key === 'Enter' && !e.shiftKey && !e.isComposing && S.cfg.invio && !tocco()){ e.preventDefault(); if(S.modifica) salvaModifica(); else mandaTesto(); return; }
+  if(e.key === 'Escape'){
+    if(S.modifica){ e.preventDefault(); annullaModifica(); }
+    else if(S.risposta){ S.risposta = null; disegnaScrivi(); }
+    else if(pannelloEmojiAperto) chiudiPannelloEmoji();
+    return;
+  }
+  /* freccia su con la barra vuota: modifico il mio ultimo messaggio (come Telegram) */
+  if(e.key === 'ArrowUp' && !e.target.value && !S.modifica && !tocco()){ if(modificaUltimo()) e.preventDefault(); }
 }
 const salvaBozzaPresto = debounce(salvaBozza, 600);
 function salvaBozza(){
-  const t = el('testoIn'); if(!t || !S.aperta) return;
-  if(t.value.trim()) S.bozze[S.aperta] = t.value; else delete S.bozze[S.aperta];
+  const t = el('testoIn'); if(!t || !S.aperta || S.modifica) return;
+  if(t.value.trim()) S.bozze[S.aperta] = t.value; else { delete S.bozze[S.aperta]; pulisciBozzaExtra(S.aperta); }
   memoria('bozze', S.bozze);
 }
 
@@ -2377,6 +2901,7 @@ let tPress = null;
 function premiManda(e){
   const t = el('testoIn');
   if(e.button === 2) return;
+  if(S.modifica){ e.preventDefault(); salvaModifica(); return; }
   if(t && t.value.trim()){
     let lungo = false;
     tPress = setTimeout(() => { lungo = true; apriEffetti(); }, 520);
@@ -2417,19 +2942,22 @@ function pulisciMedia(md){
   const o = {}; Object.keys(md).forEach(k => { if(k !== 'locale' && md[k] != null && md[k] !== '') o[k] = md[k]; });
   return Object.keys(o).length ? o : null;
 }
-async function mandaTesto(){
+async function mandaTesto(opz){
   const t = el('testoIn'); if(!t) return;
+  if(S.modifica) return salvaModifica();
   const testo = t.value.replace(/\s+$/, '').replace(/^\n+/, '');
   if(!testo.trim()) return;
   if(testo.length > 6000){ toast('Il messaggio è troppo lungo (massimo 6000 caratteri).'); return; }
-  const eff = S.effettoScelto ? Object.assign({}, S.effettoScelto) : null;
-  const m = nuovoLocale('testo', {testo, media: eff});
+  const c = S.convs.get(S.aperta);
+  const eff = Object.assign({}, S.effettoScelto || {}, raccogliExtra(testo, c), opz && opz.muto ? {silenzioso: true} : {});
+  const m = nuovoLocale('testo', {testo, media: Object.keys(eff).length ? eff : null});
   t.value = ''; adatta(t); S.effettoScelto = null; S.risposta = null;
-  delete S.bozze[S.aperta]; memoria('bozze', S.bozze);
+  delete S.bozze[S.aperta]; memoria('bozze', S.bozze); pulisciBozzaExtra(S.aperta); chiudiPicker();
   disegnaScrivi(); el('testoIn').focus();
   mettiInLista(m);
   suono('invio');
-  if(eff && eff.schermo) setTimeout(() => eseguiEffettoSchermo(m), 250);
+  if(eff.schermo) setTimeout(() => eseguiEffettoSchermo(m), 250);
+  if(opz && opz.muto) toast('Inviato senza suono: arriva senza far suonare il telefono.');
   try{ await salvaMessaggio(m); }
   catch(e){ m._stato = 'errore'; ridisegnaMessaggio(m.id); errore(e, 'Messaggio non inviato'); }
 }
@@ -2643,6 +3171,9 @@ function menuAllega(){
     ['Disegno', 'disegno', () => apriDisegno(null, blob => anteprimaInvio([new File([blob], 'disegno.png', {type: 'image/png'})]))],
     ['Nuovo sticker', 'sticker', () => nuovoSticker()],
     ['GIF dal dispositivo', 'gif', () => scegliFile('image/gif,video/mp4,video/webm', true, f => anteprimaInvio(f, 'gif'))],
+    null,
+    ['Sondaggio', 'sondaggio', () => nuovoSondaggio()],
+    ['Lavoro di FOSS', 'lavoro', () => foglioLavori()],
   ], false, true);
 }
 function scegliFile(accept, multi, fatto, cattura){
@@ -2895,6 +3426,8 @@ function apriEffetti(){
   const v = document.createElement('div'); v.className = 'velo scuro basso'; v.id = 'veloEffetti';
   v.innerHTML = '<div class="foglio eff-foglio" role="dialog" aria-label="Invia con effetto">'+
     '<div class="foglio-t">Invia con effetto<button class="ib" data-e="chiudi">'+svg('chiudi')+'</button></div>'+
+    '<div class="eff-extra"><button data-e="programma">'+svg('programma', 2)+'<span><b>Invia più tardi</b><i>Scegli giorno e ora</i></span></button>'+
+      '<button data-e="muto">'+svg('silenzia', 2)+'<span><b>Senza suono</b><i>Arriva senza far suonare</i></span></button></div>'+
     '<div class="eff-schede" id="effSchede"></div>'+
     '<div class="eff-anteprima" id="effAnt"></div>'+
     '<div class="eff-lista" id="effLista"></div>'+
@@ -2942,6 +3475,8 @@ function apriEffetti(){
     S.effettoScelto = Object.keys(pulito).length ? pulito : null;
     chiudi(); aggiornaSegnoEffetto();
     if(a === 'invia') mandaTesto();
+    if(a === 'programma') programmaInvio();
+    if(a === 'muto') mandaTesto({muto: true});
   };
   function chiudi(){ v.remove(); }
 }
@@ -3786,6 +4321,7 @@ function chiudiInfo(){ infoAperta = null; const i = el('info'); if(i){ i.classLi
 async function disegnaInfo(){
   const I2 = el('info'); const c = S.convs.get(infoAperta); if(!I2 || !c){ chiudiInfo(); return; }
   if(infoModo === 'cerca') return disegnaCerca();
+  if(infoModo === 'importanti') return disegnaImportanti();
   const gr = c.tipo === 'gruppo', a = gr ? null : altro(c), p = a ? S.persone.get(a) || {} : {};
   const admin = c.ruolo === 'admin';
   const toggle = (k, t, ic, on) => '<button class="voce" data-a="info-toggle" data-k="'+k+'"><span class="ic-sem">'+svg(ic, 1.8)+'</span><span class="vc"><b>'+t+'</b></span><span class="interr'+(on ? ' on' : '')+'"></span></button>';
@@ -3805,8 +4341,16 @@ async function disegnaInfo(){
   h += '<div class="blocco"><div class="sez-t grigio" style="padding:16px 20px 10px">Media e file</div>'+
     (media.length ? '<div class="grid-media">'+media.map(m => '<button data-a="vedi" data-id="'+m.id+'">'+(m.media && m.media.mini ? '<img src="'+esc(m.media.mini)+'" data-mid-g="'+m.id+'" alt="">' : '')+'</button>').join('')+'</div>'
       : '<div style="padding:0 20px 16px;color:var(--testo-2);font-size:14px">Ancora niente: foto e video della chat compariranno qui.</div>')+'</div>';
-  h += '<div class="blocco"><button class="voce" data-a="sfondo-chat"><span class="ic-sem">'+svg('sfondo', 1.8)+'</span><span class="vc"><b>Sfondo di questa chat</b><span>'+
+  const nFis = fissatiDi(c.id).length, nProg = S.programmati.filter(x => x.conv_id === c.id).length;
+  h += '<div class="blocco">'+
+    '<button class="voce" data-a="info-importanti"><span class="ic-sem">'+svg('stella', 1.8)+'</span><span class="vc"><b>Messaggi importanti</b><span>Quelli che hai segnato con la stella</span></span><span class="freccia-d">'+svg('avanti', 2)+'</span></button>'+
+    (nFis ? '<button class="voce" data-a="fissati-lista"><span class="ic-sem">'+svg('spillo', 1.8)+'</span><span class="vc"><b>Messaggi fissati</b><span>'+nFis+(nFis === 1 ? ' messaggio' : ' messaggi')+'</span></span><span class="freccia-d">'+svg('avanti', 2)+'</span></button>' : '')+
+    (nProg ? '<button class="voce" data-a="programmati"><span class="ic-sem">'+svg('programma', 1.8)+'</span><span class="vc"><b>Messaggi programmati</b><span>'+nProg+' in attesa</span></span><span class="freccia-d">'+svg('avanti', 2)+'</span></button>' : '')+
+    '<button class="voce" data-a="sfondo-chat"><span class="ic-sem">'+svg('sfondo', 1.8)+'</span><span class="vc"><b>Sfondo di questa chat</b><span>'+
       (sfondoPer(c.id).proprio ? 'Personalizzato' : 'Come le altre chat')+'</span></span></button></div>';
+  h += '<div class="blocco">'+
+    '<button class="voce" data-a="crea-lavoro"><span class="ic-sem">'+svg('lavoro', 1.8)+'</span><span class="vc"><b>Crea un lavoro di FOSS</b><span>'+(gr ? 'Con la squadra di questo gruppo' : 'Con ' + esc(nomeDi(a)))+'</span></span></button>'+
+    (!gr && a !== S.io ? '<button class="voce" data-a="colpetto" data-id="'+a+'"><span class="ic-sem">'+svg('mano', 1.8)+'</span><span class="vc"><b>Dai un colpetto</b><span>Per farti notare (anche col doppio tocco sulla foto)</span></span></button>' : '')+'</div>';
   h += '<div class="blocco">'+toggle('silenziata', 'Silenzia notifiche', 'silenzia', c.silenziata)+toggle('bloccata', 'Chat bloccata con codice', 'lucchetto', c.bloccata)+
     toggle('fissata', 'Fissa in alto', 'fissa', c.fissata)+toggle('archiviata', 'Archiviata', 'archivio', c.archiviata)+'</div>';
   if(gr){
@@ -3838,7 +4382,7 @@ function menuMembro(id, x, y){
   const c = S.convs.get(infoAperta); if(!c) return;
   const m = (c.membri || []).find(z => z.id === id); if(!m || id === S.io) return;
   const admin = c.ruolo === 'admin';
-  const voci = [['Scrivi a ' + nomeDi(id), 'nuova', () => scriviA(id)]];
+  const voci = [['Scrivi a ' + nomeDi(id), 'nuova', () => scriviA(id)], ['Dai un colpetto', 'mano', () => { if(S.aperta !== c.id) return; colpetto(id); }]];
   if(admin){
     voci.push(m.ruolo === 'admin' ? ['Togli da amministratore', 'persona', () => cambiaAdmin(c, id, false)] : ['Rendi amministratore', 'persona', () => cambiaAdmin(c, id, true)]);
     voci.push(['Rimuovi dal gruppo', 'esci', () => conferma('Rimuovere ' + nomeDi(id) + '?', 'Non vedrà più i nuovi messaggi del gruppo.', 'Rimuovi', async () => {
@@ -3964,7 +4508,9 @@ function inoltra(msgs){
 }
 async function inoltraUno(m, conv){
   const md = m.media ? Object.assign({}, m.media) : null;
-  if(md){ delete md.locale; delete md.bolla; delete md.schermo; delete md.anim; }
+  if(md){ delete md.locale; delete md.bolla; delete md.schermo; delete md.anim; delete md.silenzioso; delete md.chiuso; delete md.menzioni; delete md.tutti; }
+  if(m.tipo === 'lavoro' && md) md.nuovo = false;
+  if(m.tipo === 'colpetto') return;
   if(md && md.path && !/^foss:|^sticker\//.test(md.path)){
     const dest = conv + '/' + uuid() + '.' + (estensione(md.path) || 'bin');
     const {error} = await sb.storage.from('chat').copy(md.path, dest);
@@ -3972,7 +4518,8 @@ async function inoltraUno(m, conv){
     const u = firme.get(md.path); if(u) firme.set(dest, u);
     md.path = dest;
   }
-  const n = nuovoLocale(m.tipo, {testo: m.testo, media: m.tipo === 'testo' ? null : md, risponde_a: null}, conv);
+  const mediaTesto = md && md.lavori ? {lavori: md.lavori} : null;
+  const n = nuovoLocale(m.tipo, {testo: m.testo, media: m.tipo === 'testo' ? mediaTesto : (md && Object.keys(md).length ? md : null), risponde_a: null}, conv);
   if(conv === S.aperta) mettiInLista(n); else { const s = S.msgs.get(conv); if(s && s.caricato){ s.ids.add(n.id); s.lista = mescola(s.lista, [n]); } }
   try{ await salvaMessaggio(n); }catch(e){ n._stato = 'errore'; ridisegnaMessaggio(n.id); errore(e, 'Non inoltrato'); }
 }
@@ -4008,6 +4555,9 @@ function disegnaImpostazioni(){
       (S.cfg.sfondoFoto ? '' : voce('cfg-doodle', 'foto', 'Disegni sullo sfondo', 'Camere, ciak e gocce di FOSS', interr(S.cfg.doodle !== false)))+
       '<div style="padding:0 20px 12px;font-size:13px;color:var(--testo-2)">Ogni chat può avere il suo sfondo: aprila, tocca il nome in alto e scegli «Sfondo di questa chat».</div>'+
       voce('cfg-invio', 'manda', 'Invio manda il messaggio', 'Sulla tastiera del computer', interr(S.cfg.invio))+'</div>'+
+    '<div class="blocco"><div class="sez-t">Messaggi</div>'+
+      voce('tutti-importanti', 'stella', 'Messaggi importanti', 'Tutti quelli con la stella, in ogni chat')+
+      (S.programmati.length ? voce('tutti-programmati', 'programma', 'Messaggi programmati', S.programmati.length + ' in attesa di partire') : '')+'</div>'+
     '<div class="blocco"><div class="sez-t">Sticker e GIF</div>'+
       voce('gestisci-sticker', 'sticker', 'I tuoi sticker', S.sticker.length + ' salvati')+
       voce('gestisci-gif', 'gif', 'Le tue GIF', S.gif.length + ' salvate')+'</div>'+
@@ -4418,12 +4968,43 @@ function chiediTesto(titolo, testo, max, tipo, valore){
 function vaiAFoss(cosa){
   const u = './' + (cosa || '');
   if(window.opener && !window.opener.closed){ try{ window.opener.focus(); if(cosa) window.opener.location.hash = cosa.replace(/^#?/, '#'); return; }catch(e){} }
+  /* sul computer FOSS si apre accanto (sempre la stessa scheda), la chat resta qui */
+  if(cosa && !suTelefono() && !aTuttoSchermo()){ const w = window.open(u, 'foss-team'); if(w){ try{ w.focus(); }catch(e){} return; } }
   location.href = u;
 }
 document.addEventListener('click', async e => {
+  /* modalita' selezione: un tocco sceglie o toglie il messaggio */
+  if(S.selezione && !e.target.closest('.sel-barra, .sel-testa, .velo, .foglio, #focusMenu')){
+    const n = e.target.closest('#msgs .msg[data-id]');
+    if(n){ e.preventDefault(); e.stopPropagation(); alternaScelto(n.dataset.id); return; }
+  }
   const t = e.target.closest('[data-a]'); if(!t) return;
   const a = t.dataset.a, id = t.dataset.id;
   switch(a){
+    case 'sel-chiudi': chiudiSelezione(); break;
+    case 'sel-stella': azioneSelezione('stella'); break;
+    case 'sel-copia': azioneSelezione('copia'); break;
+    case 'sel-inoltra': azioneSelezione('inoltra'); break;
+    case 'sel-elimina': azioneSelezione('elimina'); break;
+    case 'annulla-modifica': annullaModifica(); { const i = el('testoIn'); if(i && !tocco()) i.focus(); } break;
+    case 'info-modifica': e.stopPropagation(); infoModifica(id); break;
+    case 'menz': { e.stopPropagation(); const r = t.getBoundingClientRect(); menuMenzione(id, r.left + 200, r.bottom + 4); break; }
+    case 'vai-menzione': vaiAMenzione(); break;
+    case 'lavoro-chip': e.stopPropagation(); vediLavoro({id, org: t.dataset.org, n: t.dataset.n}); break;
+    case 'apri-lavoro': e.stopPropagation(); apriLavoroInFoss({id}); break;
+    case 'mappa': e.stopPropagation(); apriMappa(t.dataset.q); break;
+    case 'vota': e.stopPropagation(); vota(id, t.dataset.o); break;
+    case 'vedi-voti': { e.stopPropagation(); const c = S.convs.get(S.aperta); const m = c && trovaMsg(c.id, id); if(m) vediVoti(m); break; }
+    case 'fissato-vai': vaiAlFissato(); break;
+    case 'fissati-lista': if(suTelefono() && infoAperta) chiudiInfo(); elencoFissati(); break;
+    case 'fissato-togli': togliFissato(id); break;
+    case 'programmati': if(suTelefono() && infoAperta) chiudiInfo(); elencoProgrammati(); break;
+    case 'tutti-programmati': tuttiProgrammati(); break;
+    case 'info-importanti': infoModo = 'importanti'; disegnaInfo(); break;
+    case 'info-indietro': infoModo = 'info'; disegnaInfo(); break;
+    case 'tutti-importanti': tuttiImportanti(); break;
+    case 'crea-lavoro': if(suTelefono() && infoAperta) chiudiInfo(); creaLavoro({}); break;
+    case 'colpetto': if(suTelefono() && infoAperta) chiudiInfo(); colpetto(id); break;
     case 'foss': vaiAFoss(); break;
     case 'apri': chiudiInfo(); chiudiPannelloSinistra(); apriConv(id); break;
     case 'chiudi-conv': if(suTelefono() && history.state && history.state.c) history.back(); else chiudiConv(); break;
@@ -4440,15 +5021,22 @@ document.addEventListener('click', async e => {
       ['Segna tutte come lette', 'spunte', () => { S.convs.forEach(c => { if(c.non_lette) segnaLetto(c.id); }); disegnaLista(); }],
       ['Impostazioni', 'impostazioni', impostazioni], null, ['Torna a FOSS', 'esci', () => vaiAFoss()]]); break; }
     case 'menu-conv': { const c = S.convs.get(S.aperta); if(!c) break; const r = t.getBoundingClientRect();
+      const nFis = fissatiDi(c.id).length;
       apriMenu(r.right, r.bottom, [
         [c.tipo === 'gruppo' ? 'Info gruppo' : 'Info contatto', 'info', () => apriInfo()],
         ['Cerca', 'cerca', () => apriInfo('cerca')],
+        ['Seleziona messaggi', 'seleziona', () => avviaSelezione()],
+        ['Messaggi importanti', 'stella', () => apriInfo('importanti')]].concat(
+        nFis ? [['Messaggi fissati', 'spillo', elencoFissati]] : [],
+        [['Crea un lavoro di FOSS', 'lavoro', () => creaLavoro({})]],
+        c.tipo === 'privata' && altro(c) !== S.io ? [['Dai un colpetto', 'mano', () => colpetto(altro(c))]] : [], [
+        null,
         [c.silenziata ? 'Riattiva notifiche' : 'Silenzia notifiche', c.silenziata ? 'campana' : 'silenzia', () => impostaMembro(c, {silenziata: !c.silenziata})],
         [c.bloccata ? 'Sblocca chat' : 'Blocca chat', c.bloccata ? 'lucchettoAperto' : 'lucchetto', () => alternaBlocco(c)],
         ['Svuota chat', 'vietato', svuotaChat],
         null,
         c.tipo === 'gruppo' ? ['Esci dal gruppo', 'esci', () => esciGruppo(c), 'rosso'] : ['Elimina chat', 'cestino', () => eliminaChat(c), 'rosso'],
-        ['Chiudi chat', 'chiudi', chiudiConv]]); break; }
+        ['Chiudi chat', 'chiudi', chiudiConv]])); break; }
     case 'info': apriInfo(); break;
     case 'chiudi-info': chiudiInfo(); break;
     case 'cerca-in-chat': apriInfo('cerca'); break;
@@ -4462,10 +5050,10 @@ document.addEventListener('click', async e => {
     case 'esci-gruppo': esciGruppo(); break;
     case 'elimina-chat': { const c = S.convs.get(infoAperta); if(c){ chiudiInfo(); eliminaChat(c); } break; }
     case 'in-fondo': primaNonLetta = null; vaiInFondo(false); break;
-    case 'menu-msg': { e.stopPropagation(); const r = t.getBoundingClientRect(); menuMessaggio(id, r.right, r.bottom); break; }
+    case 'menu-msg': { e.stopPropagation(); const r = t.getBoundingClientRect(); menuMessaggio(id, r.right, r.bottom + 4); break; }
     case 'chi-reagisce': chiReagisce(id); break;
     case 'togli-reazione': chiudiVelo(); { const m = S.reazioni.get(id); const em = m && m.get(S.io); if(em) reagisci(id, em); } break;
-    case 'vai-msg': if(infoModo === 'cerca' && suTelefono()) chiudiInfo(); vaiAMessaggio(id); break;
+    case 'vai-msg': if((infoModo === 'cerca' || infoModo === 'importanti') && suTelefono()) chiudiInfo(); vaiAMessaggio(id); break;
     case 'vedi': { const c = S.convs.get(S.aperta); const m = c && trovaMsg(c.id, id); if(m && m._avanza == null && !t.closest('.eff-inchiostro:not(.svelato)')) apriVisore(id); break; }
     case 'apri-doc': apriDocumento(id); break;
     case 'play-voc': suonaVocale(id); break;
@@ -4517,6 +5105,11 @@ document.addEventListener('click', async e => {
     case 'sfondo-chat': { const r = t.getBoundingClientRect(); menuSfondoChat(r.left + 260, r.bottom - 10); break; }
   }
 });
+/* le righe dei messaggi importanti portano al messaggio, anche in un'altra chat */
+document.addEventListener('click', e => {
+  const b = e.target.closest('[data-imp]'); if(!b) return;
+  apriImportante(b.dataset.imp, b.dataset.conv);
+});
 document.addEventListener('input', e => {
   if(e.target.matches && e.target.matches('[data-buio]')){ cambiaCfg('sfondoBuio', (+e.target.value || 0) / 100); riempiAnteprimaSfondo(); applicaSfondoConv(); }
 });
@@ -4525,18 +5118,20 @@ document.addEventListener('contextmenu', e => {
   if(e.target.closest('input, textarea, a')) return;
   const r = e.target.closest('.riga[data-id]');
   if(r){ e.preventDefault(); menuRiga(r.dataset.id, e.clientX + 200, e.clientY); return; }
-  const m = e.target.closest('.msg[data-id]');
-  if(m && !e.target.closest('.media-box video')){ e.preventDefault(); menuMessaggio(m.dataset.id, e.clientX + 220, e.clientY, true); }
+  const m = e.target.closest('#msgs .msg[data-id]');
+  if(m && !e.target.closest('.media-box video')){ e.preventDefault(); menuMessaggio(m.dataset.id, e.clientX + 230, e.clientY); }
+  else if(e.target.closest('#msgs, #focusMenu')) e.preventDefault();
 });
 (function pressioneLunga(){
   let t = null, x0 = 0, y0 = 0, fatto = false;
   document.addEventListener('touchstart', e => {
-    const n = e.target.closest('.riga[data-id], .msg[data-id]'); if(!n || e.touches.length > 1) return;
+    const n = e.target.closest('.riga[data-id], #msgs .msg[data-id]'); if(!n || e.touches.length > 1 || e.target.closest('.sond-op, .lav-apri, .lav-luogo, .vocale .onda')) return;
     x0 = e.touches[0].clientX; y0 = e.touches[0].clientY; fatto = false;
     t = setTimeout(() => {
       fatto = true; try{ navigator.vibrate && navigator.vibrate(18); }catch(err){}
       if(n.classList.contains('riga')) menuRiga(n.dataset.id, Math.min(window.innerWidth - 10, x0 + 100), y0);
-      else menuMessaggio(n.dataset.id, Math.min(window.innerWidth - 10, x0 + 110), y0 + 10, true);
+      else if(S.selezione) alternaScelto(n.dataset.id);
+      else menuMessaggio(n.dataset.id, x0, y0);
     }, 480);
   }, {passive: true});
   document.addEventListener('touchmove', e => { if(t && (Math.abs(e.touches[0].clientX - x0) > 10 || Math.abs(e.touches[0].clientY - y0) > 10)){ clearTimeout(t); t = null; } }, {passive: true});
@@ -4544,7 +5139,9 @@ document.addEventListener('contextmenu', e => {
 })();
 document.addEventListener('keydown', e => {
   if(e.key === 'Escape'){
+    if(el('focusMenu')){ chiudiFocus(); return; }
     if(el('menuPop')){ chiudiMenu(); return; }
+    if(S.selezione){ chiudiSelezione(); return; }
     if(el('visore')){ chiudiVisore(); return; }
     if(el('anteprimaInvio')){ chiudiAnteprima(); return; }
     if(infoAperta){ chiudiInfo(); return; }
@@ -4561,7 +5158,12 @@ window.addEventListener('hashchange', seguiIndirizzo);
 window.addEventListener('popstate', () => { if(!location.hash && S.aperta && suTelefono()) chiudiConv(); });
 function seguiIndirizzo(){
   const m = /#c=([0-9a-f-]{36})/.exec(location.hash || '');
-  if(m && m[1] !== S.aperta && S.pronti) apriConv(m[1], {daHash: true});
+  const mm = /[&?]m=([0-9a-f-]{36})/.exec(location.hash || '');
+  if(m && S.pronti){
+    if(m[1] !== S.aperta) apriConv(m[1], {daHash: true, msg: mm && mm[1]});
+    else if(mm) vaiAMessaggio(mm[1]);
+    if(mm) history.replaceState(history.state, '', '#c=' + m[1]);
+  }
   if(/#impostazioni/.test(location.hash) && S.pronti) impostazioni();
 }
 
@@ -4628,7 +5230,7 @@ async function avvia(){
   try{
     await Promise.all([caricaProfilo(), caricaPin()]);
     if(S.tutto){ togliAvvio(); const ok = await bloccoTotale(); if(!ok) return; schermataAvvio(); }
-    await Promise.all([caricaPersone(), caricaElenco(), caricaNascosti(), caricaRaccolta()]);
+    await Promise.all([caricaPersone(), caricaElenco(), caricaNascosti(), caricaRaccolta(), caricaMieCose().catch(e => console.warn('mie cose', e))]);
   }catch(e){
     console.warn(e);
     schermataAvvio('Non riesco a caricare le chat. Controlla la connessione e riprova.', '<button class="btn pieno" onclick="location.reload()">Riprova</button>');
@@ -4643,9 +5245,10 @@ async function avvia(){
   ping(); setInterval(ping, 60000);
   setInterval(() => { aggiornaTestaConv(); }, 30000);
   document.addEventListener('visibilitychange', () => {
-    if(document.visibilityState === 'visible'){ ping(); const c = S.aperta && S.convs.get(S.aperta); if(c && c.non_lette && vicinoAlFondo() && sbloccata(c)) segnaLetto(c.id); }
+    if(document.visibilityState === 'visible'){ ping(); scattaPromemoria(); const c = S.aperta && S.convs.get(S.aperta); if(c && c.non_lette && vicinoAlFondo() && sbloccata(c)) segnaLetto(c.id); }
   });
   window.addEventListener('online', recupera);
+  sveglia();
   sorveglianza();
   /* le persone cambiano nome o foto in FOSS: ogni tanto rileggo */
   setInterval(() => caricaPersone().then(disegnaListaPresto).catch(() => {}), 5 * 60000);
@@ -4684,6 +5287,1415 @@ window.addEventListener('resize', debounce(() => {
   const t = $('.torna-foss'); if(t) t.style.display = suTelefono() ? 'grid' : 'none';
   if(!suTelefono() && !S.aperta) disegnaConvVuota();
 }, 200));
+
+/* ======================= IL MENU DEL MESSAGGIO (come WhatsApp e Telegram) =======================
+   Sul telefono: pressione lunga, lo sfondo si sfoca, il messaggio si alza, sopra le reazioni,
+   sotto il menu (con «Altro…» per le voci meno usate). Sul computer: tasto destro o la freccina. */
+const REAZ = ['👍','❤️','😂','😮','😢','🙏','🔥'];
+
+function testoDi(m){
+  const md = m.media || {};
+  if(m.tipo === 'testo' || m.tipo === 'sondaggio') return m.testo || '';
+  if(m.tipo === 'lavoro') return m.testo || (md.lavoro ? md.lavoro.n : '');
+  return md.did || '';
+}
+function puoModificare(m){
+  return !!m && m.autore === S.io && !m.eliminato && !m._stato && ['testo','foto','video','file'].includes(m.tipo) &&
+    Date.now() - new Date(m.creato_il).getTime() < 15 * 60000 - 3000;
+}
+function vociMessaggio(m, c){
+  const mio = m.autore === S.io, md = m.media || {};
+  const p = [], a = [];
+  if(m.eliminato){
+    p.push(['Seleziona', 'seleziona', () => avviaSelezione(m.id)]);
+    p.push(['Elimina', 'cestino', () => eliminaMessaggio(m), 'rosso']);
+    return {p, a};
+  }
+  const colp = m.tipo === 'colpetto';
+  if(!colp) p.push(['Rispondi', 'rispondi', () => impostaRisposta(m)]);
+  if(m.tipo === 'lavoro' && md.lavoro) p.push(['Apri in FOSS', 'apri', () => apriLavoroInFoss(md.lavoro)]);
+  if(testoDi(m) && m.tipo !== 'lavoro') p.push(['Copia', 'copia', () => copia(testoDi(m))]);
+  if(['foto','video','file','vocale'].includes(m.tipo)) p.push([m.tipo === 'foto' ? 'Salva immagine' : m.tipo === 'video' ? (md.gif ? 'Salva GIF' : 'Salva video') : 'Salva', 'scarica', () => scaricaMedia(m)]);
+  if(puoModificare(m)) p.push([m.tipo === 'testo' ? 'Modifica' : 'Modifica didascalia', 'matita', () => avviaModifica(m)]);
+  if(!colp) p.push(m.fissato_il ? ['Togli dai fissati', 'spilloVia', () => fissa(m, false)] : ['Fissa', 'spillo', () => fissa(m, true)]);
+  if(!colp) p.push(['Inoltra', 'inoltra', () => inoltra([m])]);
+  p.push(['Elimina', 'cestino', () => eliminaMessaggio(m), 'rosso']);
+
+  if(!colp) a.push(S.importanti.has(m.id) ? ['Non più importante', 'stellaPiena', () => importante(m, false)] : ['Importante', 'stella', () => importante(m, true)]);
+  if(!colp) a.push(S.promemoria.has(m.id) ? ['Togli il promemoria', 'sveglia', () => togliPromemoria(m)] : ['Ricordamelo', 'sveglia', () => ricordamelo(m)]);
+  if(mio) a.push(['Info', 'info', () => infoMessaggio(m)]);
+  a.push(['Seleziona', 'seleziona', () => avviaSelezione(m.id)]);
+  if(m.tipo === 'sondaggio') a.push(['Vedi i voti', 'sondaggio', () => vediVoti(m)]);
+  if(m.tipo === 'sondaggio' && mio && !md.chiuso) a.push(['Chiudi il sondaggio', 'lucchetto', () => chiudiSondaggio(m)]);
+  if(m.tipo === 'foto' && !md.gif) a.push(['Crea sticker', 'sticker', () => stickerDaMessaggio(m)]);
+  if(m.tipo === 'sticker' && !(md.path && /^sticker\/[^/]+/.test(md.path) && md.path.indexOf(S.io) === 8)) a.push(['Aggiungi ai miei sticker', 'stella', () => salvaInRaccolta(m, 'sticker')]);
+  if(md.gif) a.push(['Aggiungi alle mie GIF', 'gif', () => salvaInRaccolta(m, 'gif')]);
+  if(c.tipo === 'gruppo' && !mio && m.autore) a.push(['Scrivi a ' + nomeDi(m.autore), 'nuova', () => scriviA(m.autore)]);
+  return {p, a};
+}
+
+/* le righe in cima al menu: letto / modificato / promemoria (come Telegram) */
+function testataMenu(m, c){
+  const r = [];
+  if(m.autore === S.io && !m.eliminato && m.tipo !== 'colpetto'){
+    const st = statoSpunte(m, c);
+    const altri = (c.membri || []).filter(x => x.id !== S.io);
+    if(st === 'invio') r.push(['orologio', 'In invio…']);
+    else if(st === 'errore') r.push(['info', 'Non inviato']);
+    else if(c.tipo === 'gruppo'){
+      const t = new Date(m.creato_il).getTime();
+      const n = altri.filter(x => new Date(x.letto).getTime() >= t).length;
+      r.push(['spunte', n === altri.length ? 'Letto da tutti' : n ? 'Letto da ' + n + ' su ' + altri.length : (st === 'arrivato' ? 'Consegnato a tutti' : 'Inviato'), 'letto-g', n > 0]);
+    } else {
+      r.push([st === 'inviato' ? 'spunta' : 'spunte', st === 'letto' ? 'Letto' : st === 'arrivato' ? 'Consegnato' : 'Inviato', 'letto-p', st === 'letto']);
+    }
+  }
+  if(m.modificato_il) r.push(['matita', 'Modificato ' + quando(m.modificato_il)]);
+  if(m.fissato_il) r.push(['spillo', 'Fissato' + (m.fissato_da && m.fissato_da !== S.io ? ' da ' + nomeDi(m.fissato_da) : '')]);
+  const pr = S.promemoria.get(m.id);
+  if(pr) r.push(['sveglia', 'Promemoria ' + quando(pr.quando)]);
+  if(m.programmato) r.push(['programma', 'Era programmato']);
+  return r;
+}
+function testataHTML(righe, id){
+  if(!righe.length) return '';
+  return '<div class="fm-testa">'+righe.map(x => '<div class="fm-riga'+(x[2] ? ' ' + x[2] : '')+(x[3] ? ' blu' : '')+'"'+(x[2] === 'letto-g' ? ' data-fm="info"' : '')+'>'+
+    '<span class="fm-ic">'+svg(x[0], 2)+'</span><span class="fm-tx">'+esc(x[1])+'</span>'+(x[2] === 'letto-g' ? '<span class="fm-va">'+svg('avanti', 2.2)+'</span>' : '')+'</div>').join('')+'</div>';
+}
+/* l'ora esatta della lettura, in una chat privata: arriva dopo */
+async function oraLettura(m, nodo){
+  try{
+    const {data, error} = await sb.from('chat_letture').select('utente_id,letto_il').eq('msg_id', m.id);
+    if(error || !data || !data.length || !nodo) return;
+    const t = data.map(x => new Date(x.letto_il)).sort((a, b) => b - a)[0];
+    const tx = nodo.querySelector('.fm-riga.letto-p .fm-tx'); if(tx) tx.textContent = 'Letto ' + quando(t);
+  }catch(e){}
+}
+
+let fm = null;   // il menu aperto
+function chiudiFocus(subito){
+  const f = el('focusMenu'); if(!f){ fm = null; return; }
+  const orig = fm && fm.orig; fm = null;
+  document.removeEventListener('keydown', tastoFocus, true);
+  if(subito){ f.remove(); if(orig) orig.style.visibility = ''; return; }
+  f.classList.add('via');
+  setTimeout(() => { f.remove(); if(orig) orig.style.visibility = ''; }, 160);
+}
+function tastoFocus(e){ if(e.key === 'Escape'){ e.stopPropagation(); chiudiFocus(); } }
+
+function menuMessaggio(id, x, y){
+  const c = S.convs.get(S.aperta); const m = c && trovaMsg(c.id, id);
+  if(!m || m.tipo === 'sistema' || m._finto) return;
+  if(S.selezione){ alternaScelto(id); return; }
+  chiudiMenu(); chiudiFocus(true);
+  const nodo = $('.msg[data-id="'+id+'"]', el('msgs'));
+  const bolla = nodo && (nodo.querySelector('.bolla') || nodo.querySelector('span'));
+  if(!nodo || !bolla) return;
+  const {p, a} = vociMessaggio(m, c);
+  const righe = testataMenu(m, c);
+  const reazioni = !m.eliminato && m.tipo !== 'colpetto' && !m._stato;
+  const telefono = tocco() || suTelefono();
+  const f = document.createElement('div'); f.className = 'focus' + (telefono ? ' telefono' : ' computer'); f.id = 'focusMenu';
+  const mia = (S.reazioni.get(id) || new Map()).get(S.io);
+  const barra = reazioni ? '<div class="focus-reaz'+(telefono ? '' : ' in-menu')+'" id="fmReaz">'+REAZ.map(e => '<button class="'+(mia === e ? 'mia' : '')+'" data-e="'+e+'">'+e+'</button>').join('')+
+      '<button class="piu" data-e="+" aria-label="Altre reazioni">'+svg(telefono ? 'giu' : 'piu', 2.2)+'</button></div>' : '';
+  /* sul telefono le reazioni stanno sopra il messaggio; sul computer in cima al menu (come Telegram) */
+  f.innerHTML = '<div class="focus-velo" data-fm="chiudi"></div>'+
+    (telefono ? barra + '<div class="focus-bolla" id="fmBolla"></div>' : '')+
+    '<div class="focus-menu" id="fmMenu" role="menu">'+(telefono ? '' : barra)+'<div id="fmVoci"></div></div>';
+  document.body.appendChild(f);
+  fm = {id, m, c, p, a, righe, pagina: 'p', telefono, orig: telefono ? nodo : null};
+  disegnaVociFocus();
+  if(telefono){
+    const clone = nodo.cloneNode(true);
+    clone.classList.add('clone'); clone.removeAttribute('data-id');
+    clone.querySelectorAll('[data-a]').forEach(n => n.removeAttribute('data-a'));
+    clone.querySelectorAll('video').forEach(v => { v.muted = true; });
+    el('fmBolla').appendChild(clone);
+    piazzaFocus(nodo);
+    nodo.style.visibility = 'hidden';
+  } else piazzaComputer(nodo, x, y);
+  f.addEventListener('click', clicFocus);
+  document.addEventListener('keydown', tastoFocus, true);
+  if(m.autore === S.io && c.tipo === 'privata') oraLettura(m, el('fmMenu'));
+}
+function disegnaVociFocus(){
+  const M = el('fmVoci'); if(!M || !fm) return;
+  const riga = (v, i, pag) => v ? '<button role="menuitem" class="fm-voce '+(v[3] || '')+'" data-v="'+pag+':'+i+'"><span class="fm-tx">'+esc(v[0])+'</span><span class="fm-ic">'+svg(v[1], 1.9)+'</span></button>' : '<div class="fm-sep"></div>';
+  let h = '';
+  if(fm.pagina === 'p'){
+    h += testataHTML(fm.righe, fm.id);
+    if(fm.telefono){
+      h += fm.p.map((v, i) => riga(v, i, 'p')).join('');
+      if(fm.a.length) h += '<div class="fm-sep"></div><button class="fm-voce altro" data-fm="altro"><span class="fm-tx">Altro…</span><span class="fm-ic">'+svg('puntini', 2)+'</span></button>';
+    } else {
+      /* sul computer tutto in una lista, come WhatsApp Web */
+      const primo = fm.p.filter(v => v[3] !== 'rosso'), rosse = fm.p.filter(v => v[3] === 'rosso');
+      h += primo.map(v => riga(v, fm.p.indexOf(v), 'p')).join('') + (fm.a.length ? '<div class="fm-sep"></div>' + fm.a.map((v, i) => riga(v, i, 'a')).join('') : '') +
+        '<div class="fm-sep"></div>' + rosse.map(v => riga(v, fm.p.indexOf(v), 'p')).join('');
+    }
+  } else {
+    h += '<button class="fm-voce indietro" data-fm="indietro"><span class="fm-ic sx">'+svg('chevron', 2.2)+'</span><span class="fm-tx">Indietro</span></button><div class="fm-sep"></div>'+
+      fm.a.map((v, i) => riga(v, i, 'a')).join('');
+  }
+  M.innerHTML = h;
+}
+function clicFocus(e){
+  if(!fm) return;
+  const r = e.target.closest('[data-e]');
+  if(r){
+    const id = fm.id;
+    if(r.dataset.e === '+'){ apriReazioniTutte(); return; }
+    chiudiFocus(); reagisci(id, r.dataset.e); return;
+  }
+  const t = e.target.closest('[data-fm], [data-v]'); if(!t) return;
+  if(t.dataset.fm === 'chiudi'){ chiudiFocus(); return; }
+  if(t.dataset.fm === 'altro'){ fm.pagina = 'a'; disegnaVociFocus(); riposizionaMenu(); return; }
+  if(t.dataset.fm === 'indietro'){ fm.pagina = 'p'; disegnaVociFocus(); riposizionaMenu(); return; }
+  if(t.dataset.fm === 'info'){ const m = fm.m; chiudiFocus(); infoMessaggio(m); return; }
+  if(t.dataset.v){
+    const [pag, i] = t.dataset.v.split(':'); const v = (pag === 'p' ? fm.p : fm.a)[+i];
+    chiudiFocus(); if(v && v[2]) setTimeout(v[2], 30);
+  }
+}
+/* tutte le emoji, dentro la barra che si allarga (come Telegram) */
+function apriReazioniTutte(){
+  const R = el('fmReaz'); if(!R || !fm) return;
+  const id = fm.id;
+  const rec = recenti().slice(0, 16);
+  const blocchi = (rec.length ? [['Recenti', rec]] : []).concat(EMOJI.map(x => [x[1], x[2].split(' ')]));
+  R.classList.add('tutte');
+  R.innerHTML = '<div class="fr-scorre">'+blocchi.map(b => '<div class="fr-tit">'+esc(b[0])+'</div><div class="fr-griglia">'+b[1].map(e => '<button data-e2="'+e+'">'+e+'</button>').join('')+'</div>').join('')+'</div>';
+  R.onclick = ev => {
+    const b = ev.target.closest('[data-e2]'); if(!b) return;
+    ev.stopPropagation(); usaEmoji(b.dataset.e2); chiudiFocus(); reagisci(id, b.dataset.e2);
+  };
+  if(fm.telefono){
+    const M = el('fmMenu'); if(M) M.classList.add('nascosto');
+    /* la barra larga resta nello schermo */
+    const r = R.getBoundingClientRect();
+    if(r.bottom > window.innerHeight - 10) R.style.top = Math.max(10, window.innerHeight - 10 - r.height) + 'px';
+    if(r.left < 8) R.style.left = '8px';
+    if(r.right > window.innerWidth - 8) R.style.left = Math.max(8, window.innerWidth - 8 - r.width) + 'px';
+  } else {
+    const V = el('fmVoci'); if(V) V.classList.add('nascosto');
+    riposizionaMenu();
+  }
+}
+
+/* telefono: il messaggio resta dov'era (o sale quanto basta), reazioni sopra e menu sotto */
+function piazzaFocus(nodo){
+  const B = el('fmBolla'), R = el('fmReaz'), M = el('fmMenu'); if(!B || !M) return;
+  const bolla = nodo.querySelector('.bolla') || nodo;
+  const rb = bolla.getBoundingClientRect(), rn = nodo.getBoundingClientRect();
+  const alto = window.innerHeight, largo = window.innerWidth;
+  const sopra = 12 + (parseFloat(getComputedStyle(document.documentElement).getPropertyValue('--safe-top')) || 0) + (suIOS() ? 44 : 0);
+  const sotto = 12 + (suIOS() ? 20 : 0);
+  const hR = R ? 58 : 0, gap = 8;
+  const hM = Math.min(M.scrollHeight, alto * .55);
+  const maxB = Math.max(80, alto - sopra - sotto - hR - hM - gap * 3);
+  const hB = Math.min(rb.height, maxB);
+  if(rb.height > maxB) B.classList.add('taglia');
+  B.style.height = (rn.height - rb.height + hB) + 'px';
+  /* dove sta il blocco intero */
+  let top = rb.top - hR - gap;
+  const tot = hR + gap + hB + gap + hM;
+  if(top + tot > alto - sotto) top = alto - sotto - tot;
+  if(top < sopra) top = sopra;
+  const topB = top + hR + gap;
+  const dy = topB - rb.top;
+  B.style.top = (rn.top) + 'px'; B.style.left = rn.left + 'px'; B.style.width = rn.width + 'px';
+  B.style.setProperty('--dy', dy + 'px');
+  requestAnimationFrame(() => B.classList.add('su'));
+  const mio = nodo.classList.contains('mio');
+  if(R){
+    const w = R.offsetWidth;
+    let l = mio ? rb.right - w : rb.left;
+    l = Math.max(8, Math.min(largo - w - 8, l));
+    R.style.left = l + 'px'; R.style.top = top + 'px';
+    R.style.transformOrigin = (mio ? 'right' : 'left') + ' bottom';
+  }
+  const wM = M.offsetWidth;
+  let lM = mio ? rb.right - wM : rb.left;
+  lM = Math.max(8, Math.min(largo - wM - 8, lM));
+  M.style.left = lM + 'px'; M.style.top = (topB + hB + gap) + 'px';
+  M.style.maxHeight = Math.max(160, alto - sotto - (topB + hB + gap)) + 'px';
+  M.style.transformOrigin = (mio ? 'right' : 'left') + ' top';
+}
+function riposizionaMenu(){
+  const M = el('fmMenu'); if(!M) return;
+  if(fm && fm.telefono){
+    const r = M.getBoundingClientRect();
+    M.style.maxHeight = Math.max(160, window.innerHeight - 12 - r.top) + 'px';
+  } else {
+    const r = M.getBoundingClientRect();
+    if(r.bottom > window.innerHeight - 8) M.style.top = Math.max(8, window.innerHeight - 8 - r.height) + 'px';
+    if(r.right > window.innerWidth - 8) M.style.left = Math.max(8, window.innerWidth - 8 - r.width) + 'px';
+  }
+}
+/* computer: il menu (con le reazioni in cima) dove ho cliccato, sempre dentro lo schermo */
+function piazzaComputer(nodo, x, y){
+  const M = el('fmMenu'); if(!M) return;
+  M.style.maxHeight = (window.innerHeight - 16) + 'px';
+  const w = M.offsetWidth, h = M.offsetHeight;
+  let l = x - w, t = y;
+  if(l < 8) l = Math.min(x, window.innerWidth - w - 8);
+  if(t + h > window.innerHeight - 8) t = Math.max(8, window.innerHeight - 8 - h);
+  M.style.left = Math.max(8, l) + 'px'; M.style.top = Math.max(8, t) + 'px';
+}
+
+/* ======================= SELEZIONE DI PIU' MESSAGGI ======================= */
+function avviaSelezione(id){
+  S.selezione = new Set(id ? [id] : []);
+  el('conv').classList.add('selezione');
+  chiudiPannelloEmoji();
+  $$('.msg[data-id]', el('msgs')).forEach(n => n.classList.toggle('scelto', S.selezione.has(n.dataset.id)));
+  disegnaSelezione();
+}
+function chiudiSelezione(){
+  if(!S.selezione) return;
+  S.selezione = null;
+  const C = el('conv'); if(C) C.classList.remove('selezione');
+  $$('.msg.scelto').forEach(n => n.classList.remove('scelto'));
+  const T = el('selTesta'); if(T) T.remove();
+  aggiornaTestaConv(); disegnaScrivi();
+}
+function alternaScelto(id){
+  if(!S.selezione) return;
+  const c = S.convs.get(S.aperta); const m = c && trovaMsg(c.id, id);
+  if(!m || m.tipo === 'sistema') return;
+  if(S.selezione.has(id)) S.selezione.delete(id); else S.selezione.add(id);
+  const n = $('.msg[data-id="'+id+'"]', el('msgs')); if(n) n.classList.toggle('scelto', S.selezione.has(id));
+  try{ navigator.vibrate && navigator.vibrate(8); }catch(e){}
+  disegnaSelezione();
+}
+function msgScelti(){
+  const c = S.convs.get(S.aperta); if(!c || !S.selezione) return [];
+  return msgVisibili(c.id).filter(m => S.selezione.has(m.id));
+}
+function disegnaSelezione(){
+  const C = el('conv'); if(!C || !S.selezione) return;
+  const n = S.selezione.size, l = msgScelti();
+  let T = el('selTesta');
+  if(!T){ T = document.createElement('div'); T.className = 'sel-testa'; T.id = 'selTesta'; C.appendChild(T); }
+  T.innerHTML = '<button class="ib" data-a="sel-chiudi" aria-label="Annulla">'+svg('chiudi')+'</button><b>'+(n === 1 ? '1 selezionato' : n + ' selezionati')+'</b>';
+  const F = el('scrivi'); if(!F) return;
+  const vivi = l.filter(m => !m.eliminato);
+  const tutteStella = vivi.length && vivi.every(m => S.importanti.has(m.id));
+  const testo = vivi.some(m => testoDi(m));
+  F.innerHTML = '<div class="sel-barra">'+
+    '<button data-a="sel-stella"'+(vivi.length ? '' : ' disabled')+'>'+svg(tutteStella ? 'stellaPiena' : 'stella', 1.9)+'<span>'+(tutteStella ? 'Togli stella' : 'Importante')+'</span></button>'+
+    '<button data-a="sel-copia"'+(testo ? '' : ' disabled')+'>'+svg('copia', 1.9)+'<span>Copia</span></button>'+
+    '<button data-a="sel-inoltra"'+(vivi.length && !vivi.some(m => m.tipo === 'colpetto') ? '' : ' disabled')+'>'+svg('inoltra', 1.9)+'<span>Inoltra</span></button>'+
+    '<button data-a="sel-elimina" class="rosso"'+(n ? '' : ' disabled')+'>'+svg('cestino', 1.9)+'<span>Elimina</span></button></div>';
+}
+async function azioneSelezione(cosa){
+  const l = msgScelti(); if(!l.length) return;
+  const vivi = l.filter(m => !m.eliminato);
+  if(cosa === 'copia'){
+    const c = S.convs.get(S.aperta);
+    const io = S.persone.get(S.io) || {};
+    const nome = id => id === S.io ? ((io.nick || '').trim() || (io.nome || '').trim() || 'Io') : nomeDi(id);
+    const t = vivi.filter(m => testoDi(m)).map(m => vivi.length > 1 ? '[' + ora(m.creato_il) + '] ' + nome(m.autore) + ': ' + testoDi(m) : testoDi(m)).join('\n');
+    await copia(t); chiudiSelezione(); return;
+  }
+  if(cosa === 'inoltra'){ chiudiSelezione(); inoltra(vivi); return; }
+  if(cosa === 'stella'){
+    const si = !vivi.every(m => S.importanti.has(m.id));
+    for(const m of vivi) await importante(m, si, true);
+    toast(si ? (vivi.length === 1 ? 'Segnato come importante' : vivi.length + ' messaggi importanti') : 'Stelle tolte');
+    chiudiSelezione(); return;
+  }
+  if(cosa === 'elimina'){
+    const miei = vivi.length === l.length && l.every(m => m.autore === S.io && m.tipo !== 'sistema');
+    const perMe = async () => {
+      for(const m of l){
+        S.nascosti.add(m.id); const n = $('.msg[data-id="'+m.id+'"]'); if(n) n.remove();
+        const {error} = await sb.from('chat_nascosti').insert({msg_id: m.id, utente_id: S.io});
+        if(error && !/duplicate/i.test(error.message)) errore(error, 'Non eliminato');
+      }
+      chiudiSelezione();
+    };
+    const perTutti = async () => {
+      for(const m of l){
+        try{
+          const {data, error} = await sb.rpc('chat_elimina', {p_id: m.id}); if(error) throw error;
+          const md = m.media; m.eliminato = true; m.testo = null; m.media = null; m.fissato_il = null; aggiornaFissato(m); ridisegnaMessaggio(m.id);
+          const p = (data && data.path) || (md && md.path);
+          if(p && !/^foss:|^sticker\//.test(p)) sb.storage.from('chat').remove([p]).catch(() => {});
+        }catch(e){ errore(e, 'Non eliminato'); }
+      }
+      chiudiSelezione();
+    };
+    const voci = [['Elimina per me', perMe, 'rosso']];
+    if(miei) voci.unshift(['Elimina per tutti', perTutti, 'rosso']);
+    foglio(l.length === 1 ? 'Eliminare il messaggio?' : 'Eliminare ' + l.length + ' messaggi?',
+      miei ? 'Puoi eliminarli solo per te o per tutti quelli della chat.' : 'Spariscono solo per te, su tutti i tuoi dispositivi.', voci.concat([['Annulla']]));
+  }
+}
+
+/* ======================= MODIFICARE UN MESSAGGIO (entro 15 minuti) =======================
+   Come WhatsApp: il testo torna nella barra, sopra compare «Modifica messaggio», il tasto
+   diventa una spunta. Il messaggio resta al suo posto con «modificato» e l'ora vicino. */
+function avviaModifica(m){
+  if(!puoModificare(m)){ toast('Un messaggio si può modificare solo nei primi 15 minuti.'); return; }
+  const t = el('testoIn');
+  if(!S.modifica && t) S.bozzaPrimaModifica = {conv: S.aperta, testo: t.value};
+  S.modifica = m; S.risposta = null; S.effettoScelto = null;
+  const md = m.media || {};
+  S.extraModifica = {menz: (md.menzioni || []).slice(), lav: (md.lavori || []).slice()};
+  chiudiPannelloEmoji();
+  disegnaScrivi();
+  const i = el('testoIn'); if(!i) return;
+  i.value = m.tipo === 'testo' ? (m.testo || '') : (md.did || '');
+  adatta(i); aggiornaTastoManda();
+  i.focus(); try{ i.setSelectionRange(i.value.length, i.value.length); }catch(e){}
+}
+function annullaModifica(){
+  if(!S.modifica) return;
+  S.modifica = null; S.extraModifica = null;
+  const b = S.bozzaPrimaModifica; S.bozzaPrimaModifica = null;
+  disegnaScrivi();
+  const i = el('testoIn');
+  if(i){ i.value = b && b.conv === S.aperta ? b.testo : (S.bozze[S.aperta] || ''); adatta(i); aggiornaTastoManda(); }
+}
+/* freccia su nella barra vuota (computer): modifico il mio ultimo messaggio, come Telegram */
+function modificaUltimo(){
+  const c = S.convs.get(S.aperta); if(!c) return false;
+  const l = msgVisibili(c.id);
+  for(let i = l.length - 1; i >= 0 && i >= l.length - 30; i--){
+    const m = l[i];
+    if(m.autore === S.io && m.tipo === 'testo' && puoModificare(m)){ avviaModifica(m); return true; }
+  }
+  return false;
+}
+async function salvaModifica(){
+  const m = S.modifica; const t = el('testoIn'); if(!m || !t) return;
+  const testo = t.value.replace(/\s+$/, '').replace(/^\n+/, '');
+  if(m.tipo === 'testo' && !testo.trim()){ toast('Il messaggio non può restare vuoto: per toglierlo usa «Elimina».'); return; }
+  if(testo.length > (m.tipo === 'testo' ? 6000 : 1024)){ toast('Il testo è troppo lungo.'); return; }
+  const c = S.convs.get(m.conv_id);
+  const extra = m.tipo === 'testo' ? raccogliExtra(testo, c, S.extraModifica) : {};
+  const md = m.media || {};
+  const vecchio = m.tipo === 'testo' ? (m.testo || '') : (md.did || '');
+  const extraPrima = JSON.stringify({menzioni: md.menzioni || null, tutti: md.tutti || null, lavori: md.lavori || null});
+  const extraOra = JSON.stringify({menzioni: extra.menzioni || null, tutti: extra.tutti || null, lavori: extra.lavori || null});
+  annullaModifica();
+  if(testo === vecchio && (m.tipo !== 'testo' || extraPrima === extraOra)) return;
+  if(!puoModificare(m)){ toast('Sono passati più di 15 minuti: il messaggio non si può più modificare.'); return; }
+  const prima = {testo: m.testo, media: m.media ? JSON.parse(JSON.stringify(m.media)) : null, modificato_il: m.modificato_il};
+  if(m.tipo === 'testo'){
+    const nm = Object.assign({}, md); delete nm.menzioni; delete nm.tutti; delete nm.lavori;
+    Object.assign(nm, extra);
+    m.testo = testo; m.media = Object.keys(nm).length ? nm : null;
+  } else {
+    m.media = Object.assign({}, md); if(testo.trim()) m.media.did = testo; else delete m.media.did;
+  }
+  m.modificato_il = new Date().toISOString();
+  ridisegnaMessaggio(m.id); disegnaLista();
+  try{
+    const {data, error} = await sb.rpc('chat_modifica', {p_id: m.id, p_testo: testo, p_extra: m.tipo === 'testo' ? extra : null});
+    if(error) throw error;
+    if(data) Object.assign(m, data);
+    ridisegnaMessaggio(m.id);
+    const cc = S.convs.get(m.conv_id); if(cc && cc.ultimo && cc.ultimo.id === m.id){ cc.ultimo.testo = (m.testo || '').slice(0, 140); cc.ultimo.media = m.media; disegnaLista(); }
+  }catch(e){
+    Object.assign(m, prima); ridisegnaMessaggio(m.id); disegnaLista();
+    errore(e, 'Modifica non salvata');
+  }
+}
+/* tocco su «modificato»: quando */
+function infoModifica(id){
+  const c = S.convs.get(S.aperta); const m = c && trovaMsg(c.id, id);
+  if(m && m.modificato_il) toast('Modificato ' + quando(m.modificato_il) + '.');
+}
+
+/* ======================= @MENZIONI E #LAVORI MENTRE SCRIVO =======================
+   @ in un gruppo: l'elenco di chi c'e' (e @tutti). # ovunque: i lavori di FOSS che vedo.
+   Chi viene menzionato riceve l'avviso anche se ha silenziato il gruppo. */
+function bozzaExtra(){
+  if(S.modifica && S.extraModifica) return S.extraModifica;
+  S.bozzeExtra = S.bozzeExtra || memoria('bozze_extra') || {};
+  const k = S.aperta || '_';
+  if(!S.bozzeExtra[k]) S.bozzeExtra[k] = {menz: [], lav: []};
+  return S.bozzeExtra[k];
+}
+function salvaBozzeExtra(){
+  if(!S.bozzeExtra) return;
+  Object.keys(S.bozzeExtra).forEach(k => { const x = S.bozzeExtra[k]; if(!x.menz.length && !x.lav.length) delete S.bozzeExtra[k]; });
+  memoria('bozze_extra', S.bozzeExtra);
+}
+function pulisciBozzaExtra(conv){
+  if(S.bozzeExtra && S.bozzeExtra[conv]){ delete S.bozzeExtra[conv]; memoria('bozze_extra', S.bozzeExtra); }
+}
+function nomeMenzione(id){
+  const p = S.persone.get(id) || {};
+  const k = (p.nick || '').trim();
+  if(k) return k.replace(/\s+/g, ' ').slice(0, 40);
+  return ((p.nome || '').trim().split(/\s+/)[0] || 'Utente').slice(0, 40);
+}
+function senzaAccenti(t){ return String(t || '').normalize('NFD').replace(/[̀-ͯ]/g, '').toLowerCase(); }
+/* dal testo che sto mandando: le menzioni e i lavori che ci sono davvero */
+function raccogliExtra(testo, c, ex){
+  ex = ex || bozzaExtra();
+  const o = {};
+  const menz = [], visti = new Set();
+  ex.menz.forEach(x => { if(!visti.has(x.id) && testo.indexOf('@' + x.n) >= 0){ visti.add(x.id); menz.push({id: x.id, n: x.n}); } });
+  if(menz.length) o.menzioni = menz.slice(0, 50);
+  if(c && c.tipo === 'gruppo' && /(^|[\s(])@tutti(?![\p{L}\p{N}])/iu.test(testo)) o.tutti = true;
+  const lav = [], vl = new Set();
+  ex.lav.forEach(x => { if(!vl.has(x.id) && testo.indexOf('#' + x.n) >= 0){ vl.add(x.id); lav.push({id: x.id, org: x.org, n: x.n.slice(0, 120)}); } });
+  if(lav.length) o.lavori = lav.slice(0, 10);
+  return o;
+}
+function menzionaMe(m){
+  if(!m || m.tipo !== 'testo' || m.autore === S.io || m.eliminato) return false;
+  const md = m.media || {};
+  return !!(md.tutti || (md.menzioni || []).some(x => x.id === S.io));
+}
+
+/* ---------- l'elenco che compare sopra la barra ---------- */
+let pk = null;
+function chiudiPicker(){ pk = null; const P = el('picker'); if(P){ P.innerHTML = ''; P.classList.add('nascosto'); } }
+function controllaPicker(){
+  const t = el('testoIn'); const c = S.convs.get(S.aperta);
+  if(!t || !c || S.selezione){ chiudiPicker(); return; }
+  const pos = t.selectionStart;
+  if(pos == null || t.selectionStart !== t.selectionEnd){ chiudiPicker(); return; }
+  const prima = t.value.slice(0, pos);
+  const m = /(^|[\s(])([@#])([^\s@#]{0,40})$/.exec(prima);
+  if(!m){ chiudiPicker(); return; }
+  const tipo = m[2], q = m[3];
+  if(tipo === '@' && c.tipo !== 'gruppo'){ chiudiPicker(); return; }
+  const stesso = pk && pk.tipo === tipo && pk.da === pos - q.length - 1;
+  pk = {tipo, da: pos - q.length - 1, q, i: stesso ? Math.min(pk.i, 99) : 0};
+  if(tipo === '@'){
+    pk.lista = candidatiMenzione(c, q);
+    if(!pk.lista.length){ chiudiPicker(); return; }
+  } else {
+    if(!elencoLavori.dati){
+      pk.lista = [{carica: true}];
+      caricaElencoLavori().then(() => { if(pk && pk.tipo === '#') controllaPicker(); });
+    } else {
+      pk.lista = candidatiLavoro(q);
+      if(doveCreare.dati && doveCreare.dati.archivi.some(a => a.spazi.length)) pk.lista.push({crea: true, nome: q});
+      else if(!doveCreare.dati) caricaDoveCreare().then(() => { if(pk && pk.tipo === '#') controllaPicker(); }).catch(() => {});
+      if(!pk.lista.length){ chiudiPicker(); return; }
+    }
+  }
+  pk.i = Math.max(0, Math.min(pk.i, pk.lista.length - 1));
+  disegnaPicker();
+}
+function candidatiMenzione(c, q){
+  const qq = senzaAccenti(q);
+  const l = (c.membri || []).map(x => x.id).filter(id => id !== S.io).map(id => ({id, n: nomeMenzione(id), lungo: nomeLungo(id), ruolo: (S.persone.get(id) || {}).ruolo || ''}))
+    .filter(x => !qq || senzaAccenti(x.n).startsWith(qq) || senzaAccenti(x.lungo).split(/[\s()]+/).some(p => p.startsWith(qq)))
+    .sort((a, b) => a.n.localeCompare(b.n));
+  if((c.membri || []).length > 2 && (!qq || 'tutti'.startsWith(qq))) l.unshift({tutti: true, n: 'tutti'});
+  return l.slice(0, 30);
+}
+function candidatiLavoro(q){
+  const qq = senzaAccenti(q);
+  return (elencoLavori.dati || []).filter(x => !qq || senzaAccenti(x.nome).includes(qq) || senzaAccenti(x.cliente).includes(qq))
+    .sort((a, b) => (a.completato - b.completato) || (qq ? senzaAccenti(a.nome).indexOf(qq) - senzaAccenti(b.nome).indexOf(qq) : 0))
+    .slice(0, 30).map(x => Object.assign({}, x, {n: String(x.nome || 'Lavoro').replace(/\s+/g, ' ').trim().slice(0, 60)}));
+}
+function disegnaPicker(){
+  const P = el('picker'); if(!P || !pk) return;
+  P.classList.remove('nascosto');
+  P.innerHTML = '<div class="pk-scorre">'+pk.lista.map((x, i) => {
+    const on = i === pk.i ? ' on' : '';
+    if(x.carica) return '<div class="pk-voce carica"><span class="giro"></span><span class="pk-t"><b>Carico i lavori di FOSS…</b></span></div>';
+    if(x.crea) return '<button class="pk-voce crea'+on+'" data-pk="'+i+'"><span class="pk-ic verde">'+svg('piu', 2.4)+'</span><span class="pk-t"><b>'+(x.nome ? 'Crea il lavoro «'+esc(x.nome)+'»' : 'Crea un nuovo lavoro')+'</b><span>Con data e location: i dettagli li completi su FOSS</span></span></button>';
+    if(pk.tipo === '@'){
+      if(x.tutti) return '<button class="pk-voce'+on+'" data-pk="'+i+'"><span class="pk-ic tutti">'+svg('squadra', 2)+'</span><span class="pk-t"><b>@tutti</b><span>Avvisa tutto il gruppo, anche chi l’ha silenziato</span></span></button>';
+      return '<button class="pk-voce'+on+'" data-pk="'+i+'">'+avatar(x.id)+'<span class="pk-t"><b>'+esc(x.lungo)+'</b><span>'+esc(x.ruolo || '@' + x.n)+'</span></span></button>';
+    }
+    return '<button class="pk-voce'+on+'" data-pk="'+i+'"><span class="pk-ic lav" style="--col:'+esc(coloreLavoro(x))+'">'+svg(iconaLavoro(x), 2)+'</span>'+
+      '<span class="pk-t"><b>'+esc(x.nome || 'Senza titolo')+'</b><span>'+esc([x.cliente, x.completato ? 'Consegnato' : x.prossimo ? giornoBreve(x.prossimo) : ''].filter(Boolean).join(' · '))+'</span></span></button>';
+  }).join('')+'</div>';
+  const on = P.querySelector('.pk-voce.on'); if(on) on.scrollIntoView({block: 'nearest'});
+}
+function scegliPicker(i){
+  if(!pk) return;
+  const x = pk.lista[i]; const t = el('testoIn'); if(!x || x.carica || !t) return;
+  if(x.crea){ const nome = x.nome; togliTokenPicker(); chiudiPicker(); creaLavoro({nome}); return; }
+  const tok = pk.tipo + x.n.replace(/\s+$/, '') + ' ';
+  const fine = t.selectionStart;
+  t.value = t.value.slice(0, pk.da) + tok + t.value.slice(fine);
+  const p = pk.da + tok.length;
+  const ex = bozzaExtra();
+  if(pk.tipo === '@' && !x.tutti) ex.menz.push({id: x.id, n: x.n});
+  if(pk.tipo === '#') ex.lav.push({id: x.id, org: x.org, n: x.n});
+  salvaBozzeExtra();
+  chiudiPicker();
+  adatta(t); aggiornaTastoManda(); salvaBozzaPresto();
+  t.focus(); try{ t.setSelectionRange(p, p); }catch(e){}
+}
+function togliTokenPicker(){
+  const t = el('testoIn'); if(!t || !pk) return;
+  const fine = t.selectionStart;
+  t.value = t.value.slice(0, pk.da) + t.value.slice(fine);
+  adatta(t); aggiornaTastoManda();
+}
+/* tasti mentre l'elenco e' aperto: su, giu', invio, tab, esc */
+function tastiPicker(e){
+  if(!pk || !pk.lista || !pk.lista.length) return false;
+  if(e.key === 'ArrowDown'){ e.preventDefault(); pk.i = (pk.i + 1) % pk.lista.length; disegnaPicker(); return true; }
+  if(e.key === 'ArrowUp'){ e.preventDefault(); pk.i = (pk.i - 1 + pk.lista.length) % pk.lista.length; disegnaPicker(); return true; }
+  if((e.key === 'Enter' && !e.shiftKey) || e.key === 'Tab'){ e.preventDefault(); scegliPicker(pk.i); return true; }
+  if(e.key === 'Escape'){ e.preventDefault(); chiudiPicker(); return true; }
+  return false;
+}
+
+/* ---------- nel messaggio: @nomi e #lavori evidenziati ---------- */
+function decoraTesto(s, md, metti){
+  if(!md) return s;
+  const voci = [];
+  (md.menzioni || []).forEach(x => voci.push({tok: esc('@' + x.n), html: '<span class="menz'+(x.id === S.io ? ' io' : '')+'" data-a="menz" data-id="'+esc(x.id)+'">@'+esc(x.n)+'</span>'}));
+  (md.lavori || []).forEach(x => voci.push({tok: esc('#' + x.n), html: '<span class="lav-chip" data-a="lavoro-chip" data-id="'+esc(x.id)+'" data-org="'+esc(x.org)+'" data-n="'+esc(x.n)+'">'+svg('lavoro', 2)+esc(x.n)+'</span>'}));
+  voci.sort((a, b) => b.tok.length - a.tok.length);
+  voci.forEach(v => { if(s.indexOf(v.tok) >= 0) s = s.split(v.tok).join(metti(v.html)); });
+  if(md.tutti) s = s.replace(/(^|[\s(])@tutti(?![\p{L}\p{N}])/giu, (_, a) => a + metti('<span class="menz tutti'+(S.io ? ' io' : '')+'">@tutti</span>'));
+  return s;
+}
+function menuMenzione(id, x, y){
+  const c = S.convs.get(S.aperta);
+  if(!id || id === S.io){ return; }
+  const voci = [['Scrivi a ' + nomeDi(id), 'nuova', () => scriviA(id)]];
+  if(c && (c.membri || []).some(z => z.id === id)) voci.push(['Dai un colpetto a ' + nomeDi(id), 'mano', () => colpetto(id)]);
+  apriMenu(x, y, voci);
+}
+
+/* ---------- il tasto «@»: porta alle menzioni non ancora viste ---------- */
+let menzDaVedere = [];
+function preparaMenzioni(c){
+  menzDaVedere = [];
+  if(!c || !c.letto_fino) return;
+  const da = new Date(c.letto_fino);
+  msgVisibili(c.id).forEach(m => { if(menzionaMe(m) && new Date(m.creato_il) > da) menzDaVedere.push(m.id); });
+  mostraMenz();
+}
+function mostraMenz(){
+  const b = el('menzB'); if(!b) return;
+  /* quelle gia' sullo schermo non contano piu' */
+  const M = el('msgs');
+  if(M && menzDaVedere.length){
+    const r = M.getBoundingClientRect();
+    menzDaVedere = menzDaVedere.filter(id => { const n = $('.msg[data-id="'+id+'"]', M); if(!n) return true; const q = n.getBoundingClientRect(); return !(q.top < r.bottom - 40 && q.bottom > r.top + 60); });
+  }
+  b.classList.toggle('nascosto', !menzDaVedere.length);
+  b.innerHTML = svg('chiocciola', 2.2) + (menzDaVedere.length > 1 ? '<span class="contatore">'+menzDaVedere.length+'</span>' : '');
+}
+function vaiAMenzione(){
+  const id = menzDaVedere.shift(); mostraMenz();
+  if(id) vaiAMessaggio(id);
+}
+
+/* ======================= MESSAGGI FISSATI =======================
+   Una barra sotto il nome della chat (come Telegram e WhatsApp): mostra il fissato piu'
+   recente; toccandola si va al messaggio e la barra passa al fissato prima. Fino a 10. */
+let fissatoIdx = 0;
+function testoAnteprima(m){
+  if(!m) return '';
+  const md = m.media || {};
+  if(m.eliminato) return 'Messaggio eliminato';
+  switch(m.tipo){
+    case 'testo': return testoSemplice(m.testo || '');
+    case 'foto': return '📷 ' + (md.did || (md.gif ? 'GIF' : 'Foto'));
+    case 'video': return md.gif ? 'GIF' : '🎥 ' + (md.did || 'Video');
+    case 'vocale': return '🎤 Messaggio vocale (' + fmtDur(md.dur) + ')';
+    case 'sticker': return 'Sticker';
+    case 'file': return '📄 ' + (md.nome || 'Documento');
+    case 'sondaggio': return '📊 ' + (m.testo || 'Sondaggio');
+    case 'lavoro': return '🎬 ' + (md.lavoro ? md.lavoro.n : 'Lavoro di FOSS');
+    case 'colpetto': return '👋 Colpetto';
+  }
+  return m.testo || '';
+}
+function fissatiDi(conv){ return (S.fissati.get(conv) || []).filter(m => !m.eliminato && !S.nascosti.has(m.id)); }
+function disegnaFissati(){
+  const B = el('fissatiB'), C = el('conv'); const c = S.convs.get(S.aperta); if(!B || !c) return;
+  const l = fissatiDi(c.id);
+  if(C) C.classList.toggle('con-fissati', !!l.length);
+  if(!l.length){ B.innerHTML = ''; B.classList.add('nascosto'); return; }
+  B.classList.remove('nascosto');
+  if(fissatoIdx >= l.length) fissatoIdx = 0;
+  const m = l[fissatoIdx], md = m.media || {};
+  const tacche = l.length > 1 ? '<span class="fis-tacche">'+l.map((_, i) => '<i class="'+(i === fissatoIdx ? 'on' : '')+'"></i>').join('')+'</span>' : '';
+  const mini = (m.tipo === 'foto' || m.tipo === 'video') && md.mini ? '<img class="fis-mini" src="'+esc(md.mini)+'" alt="">' : '';
+  B.innerHTML = '<button class="fis-vai" data-a="fissato-vai">'+tacche+'<span class="fis-ic">'+svg('spillo', 2)+'</span>'+
+    '<span class="fis-tx"><b>'+(l.length > 1 ? 'Messaggio fissato <i>'+(fissatoIdx + 1)+' di '+l.length+'</i>' : 'Messaggio fissato')+'</b>'+
+    '<span>'+esc((m.autore === S.io ? 'Tu: ' : (c.tipo === 'gruppo' ? nomeDi(m.autore) + ': ' : '')) + testoAnteprima(m))+'</span></span>'+mini+'</button>'+
+    (l.length > 1 ? '<button class="ib fis-lista" data-a="fissati-lista" title="Tutti i fissati">'+svg('lista', 2)+'</button>'
+                  : '<button class="ib fis-lista" data-a="fissato-togli" data-id="'+m.id+'" title="Togli dai fissati">'+svg('chiudi', 2)+'</button>');
+}
+function vaiAlFissato(){
+  const c = S.convs.get(S.aperta); if(!c) return;
+  const l = fissatiDi(c.id); if(!l.length) return;
+  const m = l[fissatoIdx % l.length];
+  vaiAMessaggio(m.id);
+  fissatoIdx = (fissatoIdx + 1) % l.length;
+  setTimeout(disegnaFissati, 350);
+}
+async function fissa(m, si){
+  try{
+    const {error} = await sb.rpc('chat_fissa', {p_id: m.id, p_si: si});
+    if(error) throw error;
+    m.fissato_il = si ? new Date().toISOString() : null; m.fissato_da = si ? S.io : null;
+    if(!S.fissati.has(m.conv_id)) S.fissati.set(m.conv_id, []);
+    if(si) fissatoIdx = 0;
+    aggiornaFissato(m); ridisegnaMessaggio(m.id);
+    toast(si ? 'Messaggio fissato: lo vedono tutti in cima alla chat.' : 'Tolto dai fissati.');
+  }catch(e){ errore(e, si ? 'Messaggio non fissato' : 'Non tolto dai fissati'); }
+}
+function togliFissato(id){
+  const c = S.convs.get(S.aperta); if(!c) return;
+  const m = fissatiDi(c.id).find(x => x.id === id); if(!m) return;
+  conferma('Togliere dai fissati?', 'Il messaggio resta nella chat: sparisce solo dalla barra in alto, per tutti.', 'Togli', () => fissa(m, false));
+}
+function elencoFissati(){
+  const c = S.convs.get(S.aperta); if(!c) return;
+  const l = fissatiDi(c.id); if(!l.length) return;
+  const corpo = () => '<div class="fis-elenco">'+fissatiDi(c.id).map(m => '<div class="fis-riga">'+
+      '<button class="fis-r-vai" data-vai="'+m.id+'"><b>'+esc(m.autore === S.io ? 'Tu' : nomeDi(m.autore))+'<i>'+esc(dataBreve(m.creato_il))+'</i></b><span>'+esc(testoAnteprima(m))+'</span></button>'+
+      '<button class="ib" data-togli="'+m.id+'" title="Togli dai fissati">'+svg('spilloVia', 1.9)+'</button></div>').join('')+'</div>';
+  const v = foglio(l.length + ' messaggi fissati', corpo(), [['Chiudi']]);
+  v.querySelector('.foglio-c').onclick = e => {
+    const a = e.target.closest('[data-vai]'); if(a){ v.remove(); vaiAMessaggio(a.dataset.vai); return; }
+    const t = e.target.closest('[data-togli]');
+    if(t){ const m = fissatiDi(c.id).find(x => x.id === t.dataset.togli); if(m) fissa(m, false).then(() => { const C = v.querySelector('.foglio-c'); if(!fissatiDi(c.id).length) v.remove(); else if(C) C.innerHTML = corpo(); }); }
+  };
+}
+
+/* ======================= SONDAGGI =======================
+   Come WhatsApp: una domanda, da 2 a 12 risposte, una sola o piu' di una.
+   I voti si vedono subito per tutti (barre, numeri e chi ha votato). */
+function nuovoSondaggio(){
+  const c = S.convs.get(S.aperta); if(!c) return;
+  const v = document.createElement('div'); v.className = 'velo scuro basso'; v.id = 'veloSondaggio';
+  let multi = false;
+  v.innerHTML = '<div class="foglio sond-foglio" role="dialog" aria-label="Nuovo sondaggio">'+
+    '<div class="foglio-t">Nuovo sondaggio<button class="ib" data-x="1" aria-label="Chiudi">'+svg('chiudi')+'</button></div>'+
+    '<div class="foglio-c">'+
+      '<label class="campo-t"><span>Domanda</span><textarea id="sDom" rows="1" maxlength="300" placeholder="Fai una domanda"></textarea></label>'+
+      '<div class="sond-tit">Risposte</div><div id="sOpz" class="sond-opz"></div>'+
+      '<button class="sond-agg" data-agg="1">'+svg('piuCerchio', 1.9)+'Aggiungi una risposta</button>'+
+      '<button class="sond-multi" data-multi="1"><span><b>Più risposte</b><i>Ognuno può sceglierne più di una</i></span><span class="interr" id="sMulti"></span></button>'+
+    '</div><div class="foglio-f"><button class="btn" data-x="1">Annulla</button><button class="btn pieno" data-invia="1" id="sInvia" disabled>Invia</button></div></div>';
+  document.body.appendChild(v);
+  const O = el('sOpz'), D = el('sDom');
+  const riga = (t) => {
+    const d = document.createElement('div'); d.className = 'sond-riga';
+    d.innerHTML = '<span class="sond-maniglia">'+svg('lista', 1.8)+'</span><input maxlength="100" placeholder="Risposta" value="'+esc(t || '')+'"><button class="ib" data-togli="1" aria-label="Togli">'+svg('chiudi', 2)+'</button>';
+    O.appendChild(d); return d;
+  };
+  riga(); riga();
+  const valori = () => $$('input', O).map(i => i.value.trim());
+  const aggiorna = () => {
+    const vv = valori(), pieni = vv.filter(Boolean);
+    const doppie = new Set(pieni.map(x => x.toLowerCase())).size !== pieni.length;
+    el('sInvia').disabled = !D.value.trim() || pieni.length < 2 || doppie;
+    $$('.sond-riga', O).forEach((r, i) => { r.querySelector('input').placeholder = 'Risposta ' + (i + 1); r.querySelector('[data-togli]').style.visibility = $$('.sond-riga', O).length > 2 ? '' : 'hidden'; });
+    $('[data-agg]', v).style.display = $$('.sond-riga', O).length >= 12 ? 'none' : '';
+  };
+  aggiorna();
+  setTimeout(() => D.focus(), 80);
+  D.addEventListener('input', () => { adatta(D); aggiorna(); });
+  D.addEventListener('keydown', e => { if(e.key === 'Enter'){ e.preventDefault(); const i = $('input', O); if(i) i.focus(); } });
+  O.addEventListener('input', e => {
+    aggiorna();
+    /* scrivendo nell'ultima ne compare un'altra vuota, fino a 12 */
+    const r = $$('.sond-riga', O);
+    if(e.target === r[r.length - 1].querySelector('input') && e.target.value.trim() && r.length < 12){ riga(); aggiorna(); }
+  });
+  O.addEventListener('keydown', e => {
+    if(e.key !== 'Enter' || e.target.tagName !== 'INPUT') return;
+    e.preventDefault();
+    const ii = $$('input', O), i = ii.indexOf(e.target);
+    if(ii[i + 1]) ii[i + 1].focus(); else if(ii.length < 12 && e.target.value.trim()){ riga().querySelector('input').focus(); aggiorna(); }
+  });
+  const chiudi = () => v.remove();
+  v.addEventListener('click', async e => {
+    if(e.target === v || e.target.closest('[data-x]')) return chiudi();
+    const t = e.target.closest('[data-togli]');
+    if(t){ if($$('.sond-riga', O).length > 2){ t.closest('.sond-riga').remove(); aggiorna(); } return; }
+    if(e.target.closest('[data-agg]')){ if($$('.sond-riga', O).length < 12){ riga().querySelector('input').focus(); aggiorna(); } return; }
+    if(e.target.closest('[data-multi]')){ multi = !multi; el('sMulti').classList.toggle('on', multi); return; }
+    if(e.target.closest('[data-invia]')){
+      const dom = D.value.trim(); const vv = valori().filter(Boolean);
+      if(!dom || vv.length < 2) return;
+      const lettere = 'abcdefghijkl';
+      const media = {opzioni: vv.slice(0, 12).map((t, i) => ({id: lettere[i], t})), multi};
+      chiudi();
+      const m = nuovoLocale('sondaggio', {testo: dom, media});
+      S.risposta = null; disegnaScrivi(); mettiInLista(m); suono('invio');
+      try{ await salvaMessaggio(m); }catch(err){ m._stato = 'errore'; ridisegnaMessaggio(m.id); errore(err, 'Sondaggio non inviato'); }
+    }
+  });
+}
+
+function conteggioVoti(m){
+  const op = (m.media && m.media.opzioni) || [];
+  const v = S.voti.get(m.id) || new Map();
+  const per = new Map(op.map(o => [o.id, []]));
+  v.forEach((set, u) => set.forEach(o => { if(per.has(o)) per.get(o).push(u); }));
+  return {op, v, per, votanti: v.size, miei: v.get(S.io) || new Set()};
+}
+function sondaggioHTML(m){
+  const md = m.media || {}, chiuso = !!md.chiuso;
+  const {op, per, votanti, miei} = conteggioVoti(m);
+  const max = Math.max(0, ...Array.from(per.values()).map(a => a.length));
+  return '<div class="sond" data-sond="'+m.id+'">'+
+    '<div class="sond-dom">'+esc(m.testo || '')+'</div>'+
+    '<div class="sond-sub">'+svg(md.multi ? 'seleziona' : 'sondaggio', 2)+'<span>'+(chiuso ? 'Sondaggio chiuso' : md.multi ? 'Scegli una o più risposte' : 'Scegli una risposta')+'</span></div>'+
+    op.map(o => {
+      const l = per.get(o.id) || [], mio = miei.has(o.id);
+      const pc = votanti ? Math.round(l.length / votanti * 100) : 0;
+      return '<button class="sond-op'+(mio ? ' mio' : '')+(l.length && l.length === max ? ' testa' : '')+'" data-a="vota" data-id="'+m.id+'" data-o="'+esc(o.id)+'"'+(chiuso || m._stato ? ' disabled' : '')+'>'+
+        '<span class="sond-sel'+(md.multi ? ' quadro' : '')+'">'+(mio ? svg('ok', 3.2) : '')+'</span>'+
+        '<span class="sond-cc"><span class="sond-r1"><span class="sond-t">'+esc(o.t)+'</span>'+
+          '<span class="sond-av">'+l.slice(0, 3).map(u => avatar(u, 'mini')).join('')+'</span><b>'+l.length+'</b></span>'+
+        '<span class="sond-bar"><i style="width:'+pc+'%"></i></span></span></button>';
+    }).join('')+
+    '<button class="sond-vedi" data-a="vedi-voti" data-id="'+m.id+'"'+(votanti ? '' : ' disabled')+'>'+(votanti ? 'Vedi i voti' : 'Ancora nessun voto')+'</button></div>';
+}
+async function vota(id, o){
+  const c = S.convs.get(S.aperta); const m = c && trovaMsg(c.id, id);
+  if(!m || !m.media || m.media.chiuso || m._stato) return;
+  if(!S.voti.has(id)) S.voti.set(id, new Map());
+  const v = S.voti.get(id);
+  const prima = new Set(v.get(S.io) || []);
+  const ora_ = new Set(prima);
+  if(m.media.multi){ if(ora_.has(o)) ora_.delete(o); else ora_.add(o); }
+  else { if(ora_.has(o)) ora_.clear(); else { ora_.clear(); ora_.add(o); } }
+  if(ora_.size) v.set(S.io, ora_); else v.delete(S.io);
+  ridisegnaMessaggio(id);
+  try{ navigator.vibrate && navigator.vibrate(10); }catch(e){}
+  try{
+    const {error} = await sb.rpc('chat_vota', {p_msg: id, p_opzioni: Array.from(ora_)});
+    if(error) throw error;
+  }catch(e){
+    if(prima.size) v.set(S.io, prima); else v.delete(S.io);
+    ridisegnaMessaggio(id); errore(e, 'Voto non salvato');
+  }
+}
+function vediVoti(m){
+  const {op, per, votanti} = conteggioVoti(m);
+  const corpo = '<div class="voti-dom">'+esc(m.testo || '')+'</div>'+
+    op.map(o => { const l = per.get(o.id) || [];
+      return '<div class="voti-op"><div class="voti-t"><b>'+esc(o.t)+'</b><span>'+(l.length === 1 ? '1 voto' : l.length + ' voti')+'</span></div>'+
+        (l.length ? l.map(u => '<div class="voce" style="padding:6px 0">'+avatar(u)+'<span class="vc"><b>'+esc(u === S.io ? 'Tu' : nomeLungo(u))+'</b></span></div>').join('')
+                  : '<div class="voti-vuoto">Nessuno</div>')+'</div>'; }).join('');
+  foglio(votanti === 1 ? '1 persona ha votato' : votanti + ' persone hanno votato', corpo, [['Chiudi']]);
+}
+function chiudiSondaggio(m){
+  conferma('Chiudere il sondaggio?', 'Nessuno potrà più votare o cambiare il voto. I risultati restano visibili.', 'Chiudi sondaggio', async () => {
+    try{
+      const {error} = await sb.rpc('chat_chiudi_sondaggio', {p_msg: m.id}); if(error) throw error;
+      m.media = Object.assign({}, m.media, {chiuso: true}); ridisegnaMessaggio(m.id);
+    }catch(e){ errore(e, 'Sondaggio non chiuso'); }
+  });
+}
+
+/* ======================= I LAVORI DI FOSS DENTRO LA CHAT =======================
+   #nome nel testo diventa un collegamento; un lavoro condiviso arriva come scheda viva
+   (date, location, fase, avanzamento, squadra) che si aggiorna da sola quando cambia su FOSS.
+   Dalla chat si crea anche la base di un lavoro nuovo: titolo, cliente, data, location, squadra.
+   Ognuno vede solo i lavori che vede su FOSS. */
+const TIPI_FOSS = {
+  video: {ic: 'camera', fasi: ['Brief','Piano','Produzione','Revisione','Consegna'], giorno: ['Giorno delle riprese','Riprese'], luogo: 'Dove si gira', cons: ['Consegna','Consegna']},
+  foto: {ic: 'foto', fasi: ['Brief','Piano','Shooting','Selezione','Consegna'], giorno: ['Giorno dello shooting','Shooting'], luogo: 'Dove si scatta', cons: ['Consegna delle foto','Consegna foto']},
+  design: {ic: 'disegno', fasi: ['Brief','Concept','Proposte','Revisioni','Esecutivi'], giorno: ['Presentazione delle proposte','Presentazione'], luogo: 'Indirizzo del cliente', cons: ['Consegna','Consegna']},
+  social: {ic: 'chatTab', fasi: ['Brief','Piano editoriale','Produzione','Approvazione','Pubblicazione'], giorno: ['Prima uscita','Prima uscita'], luogo: 'Dove si producono i contenuti', cons: ['Fine del periodo','Fine periodo']},
+  web: {ic: 'link', fasi: ['Brief','Design','Sviluppo','Test','Online'], giorno: ['Presentazione della grafica','Presentazione grafica'], luogo: 'Indirizzo del cliente', cons: ['Messa online','Online']},
+  evento: {ic: 'effetti', fasi: ['Brief','Pianificazione','Allestimento','Evento','Chiusura'], giorno: ['Sopralluogo','Sopralluogo'], luogo: 'Location dell’evento', cons: ['Data dell’evento','Evento']},
+  legale: {ic: 'doc', fasi: ['Primo incontro','Studio','Attività','Esito','Chiusura'], giorno: ['Prossima udienza','Udienza'], luogo: 'Tribunale o ufficio', cons: ['Prossima scadenza','Scadenza']},
+  fiscale: {ic: 'doc', fasi: ['Incarico','Documenti','Elaborazione','Verifica','Invio'], giorno: ['Appuntamento con il cliente','Appuntamento'], luogo: 'Sede del cliente', cons: ['Scadenza','Scadenza']},
+  moda: {ic: 'disegno', fasi: ['Concept','Design','Prototipi','Produzione','Presentazione'], giorno: ['Prima prova','Prova'], luogo: 'Laboratorio o atelier', cons: ['Consegna','Consegna']},
+  architettura: {ic: 'lavoro', fasi: ['Rilievo','Concept','Progetto','Pratiche','Cantiere','Fine lavori'], giorno: ['Sopralluogo','Sopralluogo'], luogo: 'Indirizzo dell’immobile', cons: ['Fine lavori prevista','Fine lavori']},
+  consulenza: {ic: 'persona', fasi: ['Analisi','Proposta','Strategia','Esecuzione','Report'], giorno: ['Primo incontro','Incontro'], luogo: 'Sede del cliente', cons: ['Consegna','Consegna']},
+  copy: {ic: 'testo', fasi: ['Brief','Ricerca','Stesura','Revisione','Consegna'], giorno: ['Giorno del lavoro','Lavoro'], luogo: 'Indirizzo del cliente', cons: ['Consegna','Consegna']},
+  generico: {ic: 'lista', fasi: ['Da fare','In corso','Revisione','Chiuso'], giorno: ['Giorno del lavoro','Lavoro'], luogo: 'Indirizzo del lavoro', cons: ['Scadenza','Scadenza']}
+};
+const ICONE_FOSS = {camera: 'camera', foto: 'foto', palette: 'disegno', chat: 'chatTab', code: 'link', spark: 'effetti', scale: 'doc', calc: 'doc', shirt: 'disegno',
+  casa: 'lavoro', briefcase: 'lavoro', type: 'testo', list: 'lista', review: 'occhio', deliver: 'inoltra', pin: 'luogo', calendar: 'calendario', brief: 'doc', grid: 'lista', clip: 'allega'};
+function tipoFoss(t){ return TIPI_FOSS[t] || TIPI_FOSS.video; }
+function iconaLavoro(x){ return (x && ICONE_FOSS[x.icona]) || tipoFoss(x && x.tipo).ic; }
+function coloreLavoro(x){ const c = x && x.col; return /^#[0-9a-f]{3,8}$/i.test(c || '') ? c : '#FFAD01'; }
+const MESI3 = ['gen','feb','mar','apr','mag','giu','lug','ago','set','ott','nov','dic'];
+const GIORNI3 = ['dom','lun','mar','mer','gio','ven','sab'];
+function giornoBreve(iso, ora_){
+  const m = /^(\d{4})-(\d{2})-(\d{2})$/.exec(iso || ''); if(!m) return '';
+  const d = new Date(+m[1], +m[2] - 1, +m[3]);
+  const g = giorniFa(d);
+  const base = g === 0 ? 'Oggi' : g === -1 ? 'Domani' : g === 1 ? 'Ieri' : GIORNI3[d.getDay()] + ' ' + d.getDate() + ' ' + MESI3[d.getMonth()] + (d.getFullYear() !== new Date().getFullYear() ? ' ' + d.getFullYear() : '');
+  return base + (ora_ ? ', ' + ora_ : '');
+}
+
+/* ---------- dati: cache e caricamento a gruppi ---------- */
+let lavDaCaricare = new Set(), lavTimer = null;
+function datiLavoro(id){
+  const x = S.lavori.get(id);
+  if(!x || Date.now() - x.t > 5 * 60000){ lavDaCaricare.add(id); clearTimeout(lavTimer); lavTimer = setTimeout(caricaLavoriInCoda, 40); }
+  return x ? x.d : undefined;
+}
+async function caricaLavoriInCoda(){
+  const ids = Array.from(lavDaCaricare); lavDaCaricare.clear();
+  for(let i = 0; i < ids.length; i += 30){
+    const pezzo = ids.slice(i, i + 30);
+    try{
+      const {data, error} = await sb.rpc('chat_lavori', {p_ids: pezzo});
+      if(error) throw error;
+      const per = new Map((data || []).map(x => [x.id, x]));
+      pezzo.forEach(id => S.lavori.set(id, {d: per.get(id) || null, t: Date.now()}));
+    }catch(e){
+      pezzo.forEach(id => { if(!S.lavori.has(id)) S.lavori.set(id, {d: null, t: Date.now() - 4 * 60000, errore: true}); });
+    }
+    aggiornaSchede(pezzo);
+  }
+}
+const lavoriCambiati = new Set(); let lavCambTimer = null;
+function lavoroCambiato(id){
+  if(!id || !S.lavori.has(id)) return;
+  lavoriCambiati.add(id);
+  clearTimeout(lavCambTimer);
+  lavCambTimer = setTimeout(() => {
+    const ids = Array.from(lavoriCambiati); lavoriCambiati.clear();
+    ids.forEach(x => { const v = S.lavori.get(x); if(v) v.t = 0; });
+    const visibili = ids.filter(x => $('[data-lav="'+x+'"]'));
+    visibili.forEach(x => datiLavoro(x));
+    if(elencoLavori.dati) elencoLavori.t = 0;
+  }, 1500);
+}
+function aggiornaSchede(ids){
+  ids.forEach(id => {
+    $$('.lav-scheda[data-lav="'+id+'"]').forEach(n => {
+      const d = document.createElement('div');
+      d.innerHTML = schedaLavoroHTML({id, org: n.dataset.org, n: n.dataset.n}, {nuovo: n.classList.contains('nuovo'), compatta: n.classList.contains('compatta')});
+      n.replaceWith(d.firstChild);
+    });
+  });
+}
+
+/* ---------- la scheda ---------- */
+function schedaLavoroHTML(ref, opz){
+  opz = opz || {};
+  const x = datiLavoro(ref.id);
+  const base = 'class="lav-scheda'+(opz.nuovo ? ' nuovo' : '')+(opz.compatta ? ' compatta' : '')+'" data-lav="'+esc(ref.id)+'" data-org="'+esc(ref.org || '')+'" data-n="'+esc(ref.n || '')+'"';
+  if(x === undefined){
+    return '<div '+base+' style="--col:#8696a0"><div class="lav-cop vuota"><span class="lav-tag">'+svg('lavoro', 2)+'Lavoro di FOSS</span></div>'+
+      '<div class="lav-corpo"><b class="lav-nome">'+esc(ref.n || 'Lavoro')+'</b><span class="lav-attesa"><i></i><i></i><i></i></span></div></div>';
+  }
+  if(x === null){
+    return '<div '+base+' style="--col:#8696a0"><div class="lav-corpo chiusa"><span class="lav-lucc">'+svg('lucchetto', 2)+'</span>'+
+      '<span><b class="lav-nome">'+esc(ref.n || 'Lavoro di FOSS')+'</b><span class="lav-cli">Non fai parte di questo lavoro: lo vede solo la sua squadra.</span></span></div></div>';
+  }
+  const T = tipoFoss(x.tipo), col = coloreLavoro(x);
+  const fasi = (x.fasi && x.fasi.length ? x.fasi : T.fasi);
+  const fase = Math.max(0, Math.min(fasi.length - 1, x.fase || 0));
+  const oggi = new Date(); const iso = d => d.getFullYear() + '-' + String(d.getMonth() + 1).padStart(2, '0') + '-' + String(d.getDate()).padStart(2, '0');
+  const ev = (x.eventi || []).slice().sort((a, b) => (a.d + (a.ora || '')).localeCompare(b.d + (b.ora || '')));
+  const prossimo = ev.find(e => e.d >= iso(oggi)) || null;
+  const ultimo = !prossimo && ev.length ? ev[ev.length - 1] : null;
+  const evShow = prossimo || ultimo;
+  const pc = x.voci && x.voci.tot ? Math.round(x.voci.fatte / x.voci.tot * 100) : null;
+  const team = (x.team || []).filter(u => /^[0-9a-f-]{36}$/.test(u));
+  const cop = x.copertina ? '<img src="'+esc(x.copertina)+'" alt="" style="object-position:'+(x.posizione && x.posizione.x != null ? (+x.posizione.x) + '% ' + (+x.posizione.y || 50) + '%' : 'center')+'">' : '<span class="lav-ic-grande">'+svg(iconaLavoro(x), 1.6)+'</span>';
+  const righe = [];
+  if(!x.protetto){
+    if(evShow) righe.push('<span class="lav-riga">'+svg('calendario', 2)+'<span><b>'+esc(evShow.t || 'Data')+'</b> · '+esc(giornoBreve(evShow.d, evShow.ora))+(ultimo ? ' (passato)' : '')+'</span></span>');
+    else if(x.consegna) righe.push('<span class="lav-riga">'+svg('calendario', 2)+'<span><b>Consegna</b> · '+esc(x.consegna)+'</span></span>');
+    if(x.indirizzo) righe.push('<button class="lav-riga lav-luogo" data-a="mappa" data-q="'+esc(x.indirizzo)+'">'+svg('luogo', 2)+'<span>'+esc(x.indirizzo)+'</span></button>');
+  }
+  const stato = x.completato ? '<span class="lav-fatto">'+svg('ok', 3)+'Consegnato</span>'
+    : '<span>Fase '+(fase + 1)+' di '+fasi.length+' · <b>'+esc(fasi[fase] || '')+'</b></span>'+(pc != null ? '<span>'+pc+'%</span>' : '');
+  return '<div '+base+' style="--col:'+esc(col)+'">'+
+    '<div class="lav-cop'+(x.copertina ? ' foto' : '')+'">'+cop+'<span class="lav-tag">'+svg('lavoro', 2)+'Lavoro di FOSS</span>'+
+      (opz.nuovo ? '<span class="lav-nuovo">Nuovo</span>' : '')+(x.protetto ? '<span class="lav-nuovo scuro">'+svg('lucchetto', 2.2)+'Protetto</span>' : '')+'</div>'+
+    '<div class="lav-corpo"><b class="lav-nome">'+esc(x.nome || ref.n || 'Senza titolo')+'</b>'+(x.cliente ? '<span class="lav-cli">'+esc(x.cliente)+'</span>' : '')+
+      (righe.length ? '<div class="lav-righe">'+righe.join('')+'</div>' : '')+
+      (!x.protetto ? '<div class="lav-fasi">'+fasi.map((f, i) => '<i class="'+(x.completato || i < fase ? 'fatta' : i === fase ? 'ora' : '')+'" title="'+esc(f)+'"></i>').join('')+'</div>'+
+        '<div class="lav-stato">'+stato+'</div>' : '')+
+      (team.length ? '<div class="lav-team">'+team.slice(0, 6).map(u => avatar(u, 'mini')).join('')+(team.length > 6 ? '<span class="piu">+'+(team.length - 6)+'</span>' : '')+'</div>' : '')+
+    '</div>'+
+    '<button class="lav-apri" data-a="apri-lavoro" data-id="'+esc(x.id)+'">Apri in FOSS'+svg('apri', 2)+'</button></div>';
+}
+function lavoroHTML(m){
+  const md = m.media || {};
+  return schedaLavoroHTML(md.lavoro || {}, {nuovo: md.nuovo}) + (m.testo ? '<div class="testo didascalia">'+formatta(m.testo)+'</div>' : '');
+}
+/* sotto un testo con #lavori: la scheda del primo (gli altri restano come collegamenti) */
+function schedeInTesto(md){
+  const l = (md && md.lavori) || [];
+  if(!l.length) return '';
+  return schedaLavoroHTML(l[0], {compatta: true});
+}
+function apriLavoroInFoss(ref){
+  if(!ref || !ref.id) return;
+  vaiAFoss('#/p/' + encodeURIComponent(ref.id));
+}
+function apriMappa(q){
+  if(!q) return;
+  const u = suIOS() ? 'https://maps.apple.com/?q=' + encodeURIComponent(q) : 'https://www.google.com/maps/search/?api=1&query=' + encodeURIComponent(q);
+  window.open(u, '_blank', 'noopener');
+}
+/* tocco su #lavoro nel testo: la scheda in grande */
+function vediLavoro(ref){
+  const v = foglio('Lavoro di FOSS', '<div class="lav-grande">'+schedaLavoroHTML(ref, {})+'</div>', [['Chiudi'], ['Condividi qui', () => mandaLavoro(ref)]]);
+  v.querySelector('.foglio').classList.add('foglio-lav');
+}
+async function mandaLavoro(ref, testo){
+  const c = S.convs.get(S.aperta); if(!c || !ref || !ref.id) return;
+  const m = nuovoLocale('lavoro', {testo: testo || null, media: {lavoro: {id: ref.id, org: ref.org, n: String(ref.n || ref.nome || 'Lavoro').slice(0, 120)}}});
+  S.risposta = null; disegnaScrivi(); mettiInLista(m); suono('invio');
+  try{ await salvaMessaggio(m); }catch(e){ m._stato = 'errore'; ridisegnaMessaggio(m.id); errore(e, 'Lavoro non condiviso'); }
+}
+
+/* ---------- elenco dei lavori (per # e per «Condividi un lavoro») ---------- */
+const elencoLavori = {dati: null, t: 0, p: null};
+function caricaElencoLavori(){
+  if(elencoLavori.p) return elencoLavori.p;
+  if(elencoLavori.dati && Date.now() - elencoLavori.t < 60000) return Promise.resolve(elencoLavori.dati);
+  elencoLavori.p = sb.rpc('chat_lavori_elenco').then(({data, error}) => {
+    elencoLavori.p = null;
+    if(error) throw error;
+    elencoLavori.dati = data || []; elencoLavori.t = Date.now();
+    return elencoLavori.dati;
+  }).catch(e => { elencoLavori.p = null; elencoLavori.dati = elencoLavori.dati || []; throw e; });
+  return elencoLavori.p;
+}
+const doveCreare = {dati: null, t: 0};
+async function caricaDoveCreare(forza){
+  if(!forza && doveCreare.dati && Date.now() - doveCreare.t < 120000) return doveCreare.dati;
+  const {data, error} = await sb.rpc('chat_dove_creare');
+  if(error) throw error;
+  doveCreare.dati = data || {archivi: []}; doveCreare.dati.archivi = doveCreare.dati.archivi || []; doveCreare.t = Date.now();
+  return doveCreare.dati;
+}
+async function foglioLavori(){
+  const c = S.convs.get(S.aperta); if(!c) return;
+  const v = document.createElement('div'); v.className = 'velo scuro basso';
+  v.innerHTML = '<div class="foglio lav-foglio" role="dialog"><div class="foglio-t">Lavori di FOSS<button class="ib" data-x="1">'+svg('chiudi')+'</button></div>'+
+    '<div class="foglio-c"><button class="lav-crea-b" data-crea="1">'+svg('piuCerchio', 1.9)+'<span><b>Crea un nuovo lavoro</b><i>Titolo, data e location ora; il resto su FOSS</i></span></button>'+
+    '<div class="cerca" style="padding:6px 0 8px"><label>'+svg('cerca')+'<input id="lfCerca" placeholder="Cerca un lavoro o un cliente" autocomplete="off"></label></div>'+
+    '<div id="lfLista"><div class="vuoto-lista">Carico i lavori…</div></div></div></div>';
+  document.body.appendChild(v);
+  const L = el('lfLista'), Q = el('lfCerca');
+  const disegna = () => {
+    if(!elencoLavori.dati){ return; }
+    const q = senzaAccenti(Q.value.trim());
+    const l = elencoLavori.dati.filter(x => !q || senzaAccenti(x.nome).includes(q) || senzaAccenti(x.cliente).includes(q));
+    L.innerHTML = l.length ? l.slice(0, 80).map(x => '<button class="lav-voce" data-id="'+esc(x.id)+'"><span class="pk-ic lav" style="--col:'+esc(coloreLavoro(x))+'">'+svg(iconaLavoro(x), 2)+'</span>'+
+        '<span class="pk-t"><b>'+esc(x.nome || 'Senza titolo')+'</b><span>'+esc([x.cliente, x.completato ? 'Consegnato' : x.prossimo ? giornoBreve(x.prossimo) : ''].filter(Boolean).join(' · '))+'</span></span>'+
+        '<span class="lav-manda">'+svg('manda', 1.8)+'</span></button>').join('')
+      : '<div class="vuoto-lista">'+(q ? 'Nessun lavoro con «'+esc(Q.value.trim())+'».' : 'Non vedi ancora nessun lavoro su FOSS.')+'</div>';
+  };
+  caricaElencoLavori().then(disegna).catch(() => { L.innerHTML = '<div class="vuoto-lista">Non riesco a caricare i lavori. Riprova tra poco.</div>'; });
+  caricaDoveCreare().then(d => { const b = $('[data-crea]', v); if(b && !d.archivi.some(a => a.spazi.length)) b.classList.add('spento'); }).catch(() => {});
+  Q.addEventListener('input', disegna);
+  if(!tocco()) setTimeout(() => Q.focus(), 80);
+  v.addEventListener('click', e => {
+    if(e.target === v || e.target.closest('[data-x]')){ v.remove(); return; }
+    if(e.target.closest('[data-crea]')){ v.remove(); creaLavoro({}); return; }
+    const b = e.target.closest('.lav-voce[data-id]');
+    if(b){ const x = (elencoLavori.dati || []).find(z => z.id === b.dataset.id); v.remove(); if(x) mandaLavoro({id: x.id, org: x.org, n: x.nome}); }
+  });
+}
+
+/* ---------- creare la base di un lavoro ---------- */
+async function creaLavoro(pre){
+  pre = pre || {};
+  const c = S.convs.get(S.aperta); if(!c) return;
+  let dove;
+  try{ dove = await caricaDoveCreare(true); }catch(e){ errore(e, 'Non riesco a parlare con FOSS'); return; }
+  const archivi = dove.archivi.filter(a => a.spazi.length);
+  if(!archivi.length){
+    foglio('Creare un lavoro', dove.archivi.length
+      ? 'Per creare un lavoro serve uno spazio di lavoro su FOSS. Aprilo su FOSS (o chiedilo all’amministratore), poi torna qui.'
+      : 'Non hai il permesso di creare lavori. Chiedilo all’amministratore del tuo team su FOSS.', [['Ho capito']]);
+    return;
+  }
+  /* lo spazio di partenza: l'ultimo usato su FOSS, se posso */
+  let org = archivi[0].org, spazio = archivi[0].spazi[0].id;
+  archivi.forEach(a => a.spazi.forEach(s => { if(s.id === dove.ultimo){ org = a.org; spazio = s.id; } }));
+  const membriChat = (c.membri || []).map(x => x.id);
+  const squadra = new Set(membriChat.filter(id => id !== S.io));
+  const v = document.createElement('div'); v.className = 'velo scuro basso'; v.id = 'veloCreaLavoro';
+  const oggi = new Date(); const isoOggi = oggi.getFullYear() + '-' + String(oggi.getMonth() + 1).padStart(2, '0') + '-' + String(oggi.getDate()).padStart(2, '0');
+  v.innerHTML = '<div class="foglio cl-foglio" role="dialog" aria-label="Nuovo lavoro"><div class="foglio-t">'+svg('lavoro', 2)+'Nuovo lavoro<button class="ib" data-x="1">'+svg('chiudi')+'</button></div>'+
+    '<div class="foglio-c" id="clCorpo"></div><div class="foglio-f"><span class="cl-nota">I dettagli li completi su FOSS</span><button class="btn" data-x="1">Annulla</button><button class="btn pieno" data-crea="1" id="clCrea">Crea lavoro</button></div></div>';
+  document.body.appendChild(v);
+  const stato = {nome: pre.nome || '', cliente: pre.cliente || '', giorno: '', ora: '', consegna: '', luogo: '', nota: ''};
+  const leggi = () => { ['nome','cliente','giorno','ora','consegna','luogo','nota'].forEach(k => { const i = el('cl_' + k); if(i) stato[k] = i.value; }); };
+  const disegna = () => {
+    const A = archivi.find(a => a.org === org) || archivi[0];
+    const S2 = A.spazi.find(s => s.id === spazio) || A.spazi[0]; spazio = S2.id;
+    const T = tipoFoss(S2.tipo);
+    const nelArchivio = new Set(A.membri || []);
+    const scelte = membriChat.filter(id => id !== S.io && nelArchivio.has(id));
+    const fuori = membriChat.filter(id => id !== S.io && !nelArchivio.has(id));
+    const tutti = [];
+    archivi.forEach(a => a.spazi.forEach(s => tutti.push([a, s])));
+    el('clCorpo').innerHTML =
+      '<label class="cl-campo grande"><span>Titolo</span><input id="cl_nome" maxlength="120" placeholder="Es. Videoclip Il Merlo" value="'+esc(stato.nome)+'" autocomplete="off"></label>'+
+      '<label class="cl-campo"><span>Cliente</span><input id="cl_cliente" maxlength="120" list="cl_clienti" placeholder="Per chi è il lavoro" value="'+esc(stato.cliente)+'" autocomplete="off">'+
+        '<datalist id="cl_clienti">'+(dove.clienti || []).slice(0, 200).map(x => '<option value="'+esc(x)+'">').join('')+'</datalist></label>'+
+      '<div class="cl-due"><label class="cl-campo"><span>'+esc(T.giorno[0])+'</span><input id="cl_giorno" type="date" min="'+isoOggi.slice(0, 4)+'-01-01" value="'+esc(stato.giorno)+'"></label>'+
+        '<label class="cl-campo ora"><span>Ora</span><input id="cl_ora" type="time" value="'+esc(stato.ora)+'"></label></div>'+
+      '<label class="cl-campo"><span>'+svg('luogo', 2)+'Location</span><input id="cl_luogo" maxlength="300" placeholder="'+esc(T.luogo)+'" value="'+esc(stato.luogo)+'" autocomplete="off"></label>'+
+      '<label class="cl-campo"><span>'+esc(T.cons[0])+' <i>facoltativa</i></span><input id="cl_consegna" type="date" value="'+esc(stato.consegna)+'"></label>'+
+      (tutti.length > 1 ? '<label class="cl-campo"><span>Spazio di FOSS</span><select id="cl_spazio">'+tutti.map(([a, s]) => '<option value="'+esc(a.org + '|' + s.id)+'"'+(a.org === org && s.id === spazio ? ' selected' : '')+'>'+
+          esc(s.nome + (archivi.length > 1 ? ' · ' + a.nome : ''))+'</option>').join('')+'</select></label>' : '')+
+      '<div class="cl-campo"><span>Squadra</span>'+
+        (A.squadra ? (scelte.length ? '<div class="cl-squadra">'+scelte.map(id => '<button class="cl-pers'+(squadra.has(id) ? ' on' : '')+'" data-pers="'+id+'">'+avatar(id)+'<span>'+esc(nomeDi(id))+'</span><i>'+svg('ok', 3)+'</i></button>').join('')+'</div>'
+                     : '<div class="cl-info">Nessun altro di questa chat lavora in questo archivio: il lavoro lo vedi tu.</div>')+
+          (fuori.length ? '<div class="cl-info">'+esc(fuori.map(nomeDi).join(', '))+(fuori.length === 1 ? ' non è' : ' non sono')+' in questo archivio di FOSS.</div>' : '')
+        : '<div class="cl-info">Il lavoro lo vedi tu (e l’amministratore). Chi altro lo vede lo decide l’amministratore su FOSS.</div>')+'</div>'+
+      '<label class="cl-campo"><span>Note <i>facoltative</i></span><textarea id="cl_nota" rows="2" maxlength="4000" placeholder="Indicazioni, contatti, cosa portare…">'+esc(stato.nota)+'</textarea></label>';
+    const s = el('cl_spazio'); if(s) s.onchange = () => { leggi(); const [o, sp] = s.value.split('|'); org = o; spazio = sp; disegna(); };
+    controlla();
+  };
+  const controlla = () => { const n = (el('cl_nome') || {}).value || '', cl = (el('cl_cliente') || {}).value || ''; el('clCrea').disabled = !(n.trim() || cl.trim()); };
+  disegna();
+  setTimeout(() => { const i = el('cl_nome'); if(i){ i.focus(); try{ i.setSelectionRange(i.value.length, i.value.length); }catch(e){} } }, 80);
+  v.addEventListener('input', controlla);
+  v.addEventListener('click', async e => {
+    if(e.target === v || e.target.closest('[data-x]')){ v.remove(); return; }
+    const p = e.target.closest('[data-pers]');
+    if(p){ const id = p.dataset.pers; if(squadra.has(id)) squadra.delete(id); else squadra.add(id); p.classList.toggle('on', squadra.has(id)); return; }
+    if(e.target.closest('[data-crea]')){
+      leggi();
+      if(!stato.nome.trim() && !stato.cliente.trim()){ toast('Scrivi almeno il titolo o il cliente.'); return; }
+      const A = archivi.find(a => a.org === org); const S2 = A.spazi.find(s => s.id === spazio); const T = tipoFoss(S2.tipo);
+      const b = el('clCrea'); b.disabled = true; b.innerHTML = '<span class="giro bianco"></span>Creo…';
+      try{
+        const {data, error} = await sb.rpc('chat_crea_lavoro', {
+          p_org: org, p_spazio: spazio, p_nome: stato.nome.trim(), p_cliente: stato.cliente.trim(),
+          p_giorno: stato.giorno || null, p_ora: stato.giorno && stato.ora ? stato.ora : null, p_giorno_t: T.giorno[1],
+          p_consegna: stato.consegna || null, p_consegna_t: T.cons[1],
+          p_luogo: stato.luogo.trim(), p_nota: stato.nota.trim(),
+          p_team: A.squadra ? Array.from(squadra).filter(id => (A.membri || []).includes(id)) : [], p_conv: c.id});
+        if(error) throw error;
+        v.remove();
+        elencoLavori.t = 0;
+        if(data && data.msg){ const m = data.msg; if(!trovaMsg(c.id, m.id)) arrivaMessaggio(m); }
+        toast('«' + (data && data.nome || 'Lavoro') + '» creato su FOSS.', 'Apri', () => apriLavoroInFoss({id: data.id}));
+      }catch(err){
+        b.disabled = false; b.textContent = 'Crea lavoro';
+        errore(err, 'Lavoro non creato');
+      }
+    }
+  });
+}
+
+/* ======================= INVIA PIU' TARDI E «RICORDAMELO» =======================
+   Programmati: partono dal database all'ora scelta, anche con FOSS.chat chiuso.
+   Promemoria: all'ora scelta arriva un avviso con il messaggio (e qui un richiamo). */
+function oraTonda(d, h, m){ const x = new Date(d); x.setHours(h, m || 0, 0, 0); return x; }
+function opzioniQuando(){
+  const ora_ = new Date(), o = [];
+  const traUnOra = new Date(ora_.getTime() + 3600000); traUnOra.setSeconds(0, 0);
+  o.push(['Tra un’ora', traUnOra]);
+  if(ora_.getHours() < 19) o.push(['Stasera', oraTonda(ora_, 21)]);
+  if(ora_.getHours() < 7) o.push(['Stamattina', oraTonda(ora_, 9)]);
+  const domani = new Date(ora_); domani.setDate(domani.getDate() + 1);
+  o.push(['Domani mattina', oraTonda(domani, 9)]);
+  const lun = new Date(ora_); lun.setDate(lun.getDate() + ((8 - lun.getDay()) % 7 || 7));
+  if(giorniFa(lun) < -1) o.push(['Lunedì', oraTonda(lun, 9)]);
+  return o;
+}
+function isoLocale(d){ return d.getFullYear() + '-' + String(d.getMonth() + 1).padStart(2, '0') + '-' + String(d.getDate()).padStart(2, '0'); }
+function scegliQuando(titolo, nota, attuale){
+  return new Promise(fine => {
+    const v = document.createElement('div'); v.className = 'velo scuro basso';
+    const base = attuale ? new Date(attuale) : new Date(Date.now() + 3600000);
+    let fatto = false;
+    v.innerHTML = '<div class="foglio quando-foglio" role="dialog"><div class="foglio-t">'+esc(titolo)+'<button class="ib" data-x="1">'+svg('chiudi')+'</button></div>'+
+      '<div class="foglio-c">'+(nota ? '<p class="q-nota">'+esc(nota)+'</p>' : '')+
+      '<div class="q-veloci">'+opzioniQuando().map((x, i) => '<button data-q="'+i+'"><b>'+esc(x[0])+'</b><span>'+esc(quando(x[1]))+'</span></button>').join('')+'</div>'+
+      '<div class="q-tit">Oppure scegli</div><div class="q-scegli"><input type="date" id="qData" min="'+isoLocale(new Date())+'" value="'+isoLocale(base)+'"><input type="time" id="qOra" value="'+ora(base)+'"></div>'+
+      '</div><div class="foglio-f"><button class="btn" data-x="1">Annulla</button><button class="btn pieno" data-ok="1">Conferma</button></div></div>';
+    document.body.appendChild(v);
+    const ops = opzioniQuando();
+    const chiudi = r => { if(fatto) return; fatto = true; v.remove(); fine(r); };
+    v.addEventListener('click', e => {
+      if(e.target === v || e.target.closest('[data-x]')) return chiudi(null);
+      const q = e.target.closest('[data-q]'); if(q) return chiudi(ops[+q.dataset.q][1]);
+      if(e.target.closest('[data-ok]')){
+        const d = el('qData').value, h = el('qOra').value || '09:00';
+        const m = /^(\d{4})-(\d{2})-(\d{2})$/.exec(d), hh = /^(\d{2}):(\d{2})/.exec(h);
+        if(!m || !hh){ toast('Scegli giorno e ora.'); return; }
+        const x = new Date(+m[1], +m[2] - 1, +m[3], +hh[1], +hh[2], 0, 0);
+        if(x.getTime() < Date.now() + 30000){ toast('Scegli un momento nel futuro.'); return; }
+        if(x.getTime() > Date.now() + 365 * 864e5){ toast('Al massimo tra un anno.'); return; }
+        chiudi(x);
+      }
+    });
+  });
+}
+
+/* ---------- messaggi programmati ---------- */
+function programmatiQui(){ return S.programmati.filter(x => x.conv_id === S.aperta).sort((a, b) => new Date(a.quando) - new Date(b.quando)); }
+async function programmaInvio(){
+  const t = el('testoIn'); const c = S.convs.get(S.aperta); if(!t || !c) return;
+  const testo = t.value.replace(/\s+$/, '').replace(/^\n+/, '');
+  if(!testo.trim()){ toast('Scrivi prima il messaggio.'); return; }
+  if(testo.length > 6000){ toast('Il messaggio è troppo lungo (massimo 6000 caratteri).'); return; }
+  const d = await scegliQuando('Programma il messaggio', 'Parte all’ora scelta anche se FOSS.chat è chiuso.');
+  if(!d) return;
+  const extra = raccogliExtra(testo, c);
+  const media = Object.assign({}, S.effettoScelto || {}, extra);
+  const riga = {conv_id: c.id, autore: S.io, testo, media: Object.keys(media).length ? media : null,
+                risponde_a: S.risposta && S.risposta.conv_id === c.id ? S.risposta.id : null, quando: d.toISOString()};
+  try{
+    const {data, error} = await sb.from('chat_programmati').insert(riga).select().single();
+    if(error) throw error;
+    if(!S.programmati.some(x => x.id === data.id)) S.programmati.push(data);
+    t.value = ''; adatta(t); S.effettoScelto = null; S.risposta = null;
+    delete S.bozze[c.id]; memoria('bozze', S.bozze); pulisciBozzaExtra(c.id);
+    disegnaScrivi();
+    toast('Messaggio programmato per ' + quando(d) + '.');
+    sveglia();
+  }catch(e){ errore(e, 'Messaggio non programmato'); }
+}
+function disegnaBarraProgrammati(){
+  const B = el('progBarra'); if(!B) return;
+  const l = programmatiQui();
+  if(!l.length || S.modifica || S.selezione){ B.classList.add('nascosto'); B.innerHTML = ''; return; }
+  B.classList.remove('nascosto');
+  B.innerHTML = '<button data-a="programmati">'+svg('programma', 2)+'<span><b>'+(l.length === 1 ? '1 messaggio programmato' : l.length + ' messaggi programmati')+'</b> · '+esc(quando(l[0].quando))+'</span>'+svg('avanti', 2.2)+'</button>';
+}
+function elencoProgrammati(){
+  const v = foglio('Messaggi programmati', '<div id="prElenco"></div>', [['Chiudi']]);
+  const disegna = () => {
+    const E = el('prElenco'); if(!E) return;
+    const l = programmatiQui();
+    if(!l.length){ v.remove(); return; }
+    E.innerHTML = l.map(x => '<div class="pr-riga"><div class="pr-quando">'+svg('programma', 2)+esc(maiuscola(quando(x.quando)))+'</div>'+
+      '<div class="pr-testo">'+formatta(x.testo, x.media)+'</div>'+
+      '<div class="pr-azioni"><button data-ora="'+x.id+'">'+svg('manda', 1.8)+'Invia ora</button><button data-orario="'+x.id+'">'+svg('orologio', 1.9)+'Cambia ora</button>'+
+      '<button class="rosso" data-via="'+x.id+'">'+svg('cestino', 1.8)+'Elimina</button></div></div>').join('');
+  };
+  disegna();
+  v.querySelector('.foglio-c').onclick = async e => {
+    const b = e.target.closest('[data-ora], [data-orario], [data-via]'); if(!b) return;
+    const id = b.dataset.ora || b.dataset.orario || b.dataset.via;
+    const x = S.programmati.find(z => z.id === id); if(!x) return;
+    if(b.dataset.via){
+      const {error} = await sb.from('chat_programmati').delete().eq('id', id);
+      if(error) return errore(error, 'Non eliminato');
+      S.programmati = S.programmati.filter(z => z.id !== id); disegna(); disegnaBarraProgrammati(); return;
+    }
+    if(b.dataset.orario){
+      const d = await scegliQuando('Cambia ora', '', x.quando); if(!d) return;
+      const {error} = await sb.from('chat_programmati').update({quando: d.toISOString()}).eq('id', id);
+      if(error) return errore(error, 'Ora non cambiata');
+      x.quando = d.toISOString(); disegna(); disegnaBarraProgrammati(); sveglia(); return;
+    }
+    if(b.dataset.ora){
+      const {error} = await sb.from('chat_programmati').delete().eq('id', id);
+      if(error) return errore(error, 'Non inviato');
+      S.programmati = S.programmati.filter(z => z.id !== id); disegna(); disegnaBarraProgrammati();
+      const m = nuovoLocale('testo', {testo: x.testo, media: x.media, risponde_a: x.risponde_a});
+      mettiInLista(m); suono('invio');
+      try{ await salvaMessaggio(m); }catch(err){ m._stato = 'errore'; ridisegnaMessaggio(m.id); errore(err, 'Messaggio non inviato'); }
+    }
+  };
+}
+
+/* ---------- promemoria ---------- */
+async function ricordamelo(m){
+  const d = await scegliQuando('Ricordamelo', 'All’ora scelta ti arriva un avviso con questo messaggio.');
+  if(!d) return;
+  try{
+    const {data, error} = await sb.from('chat_promemoria').upsert({utente_id: S.io, msg_id: m.id, conv_id: m.conv_id, quando: d.toISOString()}, {onConflict: 'utente_id,msg_id'}).select().single();
+    if(error) throw error;
+    S.promemoria.set(m.id, data || {msg_id: m.id, conv_id: m.conv_id, quando: d.toISOString()});
+    ridisegnaMessaggio(m.id); orologioPromemoria();
+    const p = await statoPush().catch(() => null);
+    if(p === 'no' || p === 'ios-home') toast('Te lo ricordo ' + quando(d) + '. Attiva gli avvisi per riceverlo anche a FOSS.chat chiusa.', 'Attiva', () => attivaPush());
+    else toast('Te lo ricordo ' + quando(d) + '.');
+  }catch(e){ errore(e, 'Promemoria non salvato'); }
+}
+async function togliPromemoria(m){
+  const x = S.promemoria.get(m.id);
+  S.promemoria.delete(m.id); ridisegnaMessaggio(m.id); orologioPromemoria();
+  const {error} = await sb.from('chat_promemoria').delete().eq('msg_id', m.id).eq('utente_id', S.io);
+  if(error){ if(x) S.promemoria.set(m.id, x); ridisegnaMessaggio(m.id); errore(error, 'Promemoria non tolto'); }
+  else toast('Promemoria tolto.');
+}
+/* quando scatta mentre FOSS.chat e' aperta: un richiamo qui (l'avviso sul telefono arriva comunque) */
+let tPromemoria = null;
+function orologioPromemoria(){
+  clearTimeout(tPromemoria);
+  let primo = null;
+  S.promemoria.forEach(x => { const t = new Date(x.quando).getTime(); if(primo == null || t < primo) primo = t; });
+  if(primo == null) return;
+  const attesa = Math.max(500, Math.min(primo - Date.now(), 6 * 3600000));
+  tPromemoria = setTimeout(scattaPromemoria, attesa);
+}
+async function scattaPromemoria(){
+  const ora_ = Date.now(), scaduti = [];
+  S.promemoria.forEach((x, id) => { if(new Date(x.quando).getTime() <= ora_ + 1000) scaduti.push([id, x]); });
+  for(const [id, x] of scaduti){
+    S.promemoria.delete(id);
+    let m = trovaMsg(x.conv_id, id);
+    if(!m){ try{ const {data} = await sb.from('chat_messaggi').select('*').eq('id', id).maybeSingle(); m = data; }catch(e){} }
+    if(S.aperta === x.conv_id) ridisegnaMessaggio(id);
+    if(!m || m.eliminato) continue;
+    const c = S.convs.get(x.conv_id);
+    suono('arrivo');
+    const chi = m.autore === S.io ? 'Tu' : nomeDi(m.autore);
+    toast('⏰ ' + chi + ': ' + testoAnteprima(m).slice(0, 80), 'Apri', async () => { if(c){ await apriConv(c.id); vaiAMessaggio(id); } });
+  }
+  orologioPromemoria();
+}
+/* il messaggio programmato parte dal database: al momento giusto ricontrollo l'elenco */
+let tProg = null;
+function sveglia(){
+  clearTimeout(tProg);
+  const l = S.programmati.map(x => new Date(x.quando).getTime()).sort((a, b) => a - b);
+  disegnaBarraProgrammati();
+  if(!l.length) return;
+  tProg = setTimeout(async () => {
+    try{ const {data} = await sb.from('chat_programmati').select('*').order('quando').limit(500); if(data) S.programmati = data; }catch(e){}
+    disegnaBarraProgrammati(); sveglia();
+  }, Math.max(15000, Math.min(l[0] - Date.now() + 25000, 6 * 3600000)));
+}
+/* tutti i programmati, di tutte le chat (dalle impostazioni) */
+function tuttiProgrammati(){
+  const disegna = () => {
+    const l = S.programmati.slice().sort((a, b) => new Date(a.quando) - new Date(b.quando));
+    return l.length ? l.map(x => { const c = S.convs.get(x.conv_id);
+      return '<button class="voce pr-voce" data-prconv="'+x.conv_id+'">'+(c ? avatarConv(c) : '')+'<span class="vc"><span class="imp-chi">'+esc(c ? nomeConv(c) : 'Chat')+'<em>'+esc(maiuscola(quando(x.quando)))+'</em></span>'+
+        '<b>'+esc(testoSemplice(x.testo))+'</b></span></button>'; }).join('') : '<div class="vuoto-lista">Nessun messaggio programmato.</div>';
+  };
+  const p = pannelloSinistra('Messaggi programmati', '<div id="prTutti">'+disegna()+'</div>', false);
+  p.addEventListener('click', async e => {
+    const b = e.target.closest('[data-prconv]'); if(!b) return;
+    chiudiPannelloSinistra(); await apriConv(b.dataset.prconv); elencoProgrammati();
+  });
+}
+
+/* ======================= IL COLPETTO (come «Pat» di WeChat) =======================
+   Doppio tocco sulla foto di qualcuno: «Davide ha dato un colpetto a Momo».
+   A chi lo riceve vibra il telefono e la chat fa un piccolo sobbalzo. */
+function testoColpetto(m){
+  const a = m.media && m.media.a;
+  if(m.autore === S.io) return 'Hai dato un colpetto a ' + nomeDi(a);
+  if(a === S.io) return nomeDi(m.autore) + ' ti ha dato un colpetto';
+  return nomeDi(m.autore) + ' ha dato un colpetto a ' + nomeDi(a);
+}
+function colpettoHTML(m){
+  const nuovo = Date.now() - new Date(m.creato_il).getTime() < 8000 && !S.visti.has(m.id);
+  return '<div class="sistema colpetto'+(nuovo ? ' nuovo' : '')+'" data-id="'+m.id+'"><span><i class="mano">'+svg('mano', 1.9)+'</i>'+esc(testoColpetto(m))+'</span></div>';
+}
+async function colpetto(a){
+  const c = S.convs.get(S.aperta); if(!c || !a || a === S.io) return;
+  if(!(c.membri || []).some(x => x.id === a)){ toast(nomeDi(a) + ' non è in questa chat.'); return; }
+  const m = nuovoLocale('colpetto', {media: {a}, risponde_a: null});
+  mettiInLista(m);
+  try{ navigator.vibrate && navigator.vibrate(20); }catch(e){}
+  try{ await salvaMessaggio(m); segnaVisto(m.id); }
+  catch(e){
+    const s = S.msgs.get(m.conv_id); if(s){ s.lista = s.lista.filter(x => x.id !== m.id); s.ids.delete(m.id); }
+    const n = $('.sistema[data-id="'+m.id+'"]'); if(n) n.remove();
+    errore(e, 'Colpetto non dato');
+  }
+}
+function colpettoRicevuto(m, guardo){
+  const c = S.convs.get(m.conv_id); if(!c || !sbloccata(c)) return;
+  try{ navigator.vibrate && navigator.vibrate([25, 70, 25]); }catch(e){}
+  if(m.conv_id === S.aperta){
+    const cv = el('conv'); if(cv){ cv.classList.remove('colpito'); void cv.offsetWidth; cv.classList.add('colpito'); setTimeout(() => cv.classList.remove('colpito'), 900); }
+  } else if(!c.silenziata) toast('👋 ' + nomeDi(m.autore) + ' ti ha dato un colpetto' + (c.tipo === 'gruppo' ? ' in «' + nomeConv(c) + '»' : ''), 'Apri', () => apriConv(c.id));
+  setTimeout(() => segnaVisto(m.id), 3000);
+}
+/* il doppio tocco: sulle foto accanto ai messaggi di un gruppo e sulla foto in cima a una chat privata */
+(function doppioTocco(){
+  let ultimo = null, quando_ = 0, tSingolo = null;
+  document.addEventListener('click', e => {
+    const av = e.target.closest('.msg .av-g, .conv-testa .chi .av');
+    if(!av || S.selezione) return;
+    const c = S.convs.get(S.aperta); if(!c) return;
+    let chi = null;
+    if(av.classList.contains('av-g')){ const n = av.closest('.msg[data-id]'); const m = n && trovaMsg(c.id, n.dataset.id); chi = m && m.autore; }
+    else if(c.tipo === 'privata') chi = altro(c);
+    if(!chi || chi === S.io) return;
+    const t = Date.now();
+    if(ultimo === av && t - quando_ < 380){
+      e.preventDefault(); e.stopImmediatePropagation();
+      clearTimeout(tSingolo); ultimo = null;
+      av.classList.remove('dai-colpetto'); void av.offsetWidth; av.classList.add('dai-colpetto');
+      colpetto(chi);
+      return;
+    }
+    ultimo = av; quando_ = t;
+    /* sulla foto in cima il tocco singolo apre le info: aspetto un attimo per capire se e' doppio */
+    if(av.closest('.conv-testa')){
+      e.preventDefault(); e.stopImmediatePropagation();
+      clearTimeout(tSingolo);
+      tSingolo = setTimeout(() => { if(ultimo === av) apriInfo(); ultimo = null; }, 320);
+    }
+  }, true);
+})();
+
+/* ======================= MESSAGGI IMPORTANTI (la stella) =======================
+   Una stella sul messaggio, solo per me. Li ritrovo nelle info della chat e nelle impostazioni. */
+async function importante(m, si, zitto){
+  if(si) S.importanti.add(m.id); else S.importanti.delete(m.id);
+  ridisegnaMessaggio(m.id);
+  const r = si ? await sb.from('chat_importanti').insert({utente_id: S.io, msg_id: m.id, conv_id: m.conv_id})
+               : await sb.from('chat_importanti').delete().eq('msg_id', m.id).eq('utente_id', S.io);
+  if(r.error && !/duplicate/i.test(r.error.message)){
+    if(si) S.importanti.delete(m.id); else S.importanti.add(m.id);
+    ridisegnaMessaggio(m.id); errore(r.error, 'Stella non salvata'); return;
+  }
+  if(!zitto) toast(si ? 'Segnato come importante.' : 'Non è più importante.');
+  if(infoAperta && infoModo === 'importanti') disegnaImportanti();
+}
+async function messaggiImportanti(conv){
+  const ids = Array.from(S.importanti); if(!ids.length) return [];
+  const out = [];
+  for(let i = 0; i < ids.length; i += 150){
+    let q = sb.from('chat_messaggi').select('*').in('id', ids.slice(i, i + 150)).eq('eliminato', false);
+    if(conv) q = q.eq('conv_id', conv);
+    const {data} = await q; (data || []).forEach(m => out.push(m));
+  }
+  return out.filter(m => !S.nascosti.has(m.id)).sort((a, b) => new Date(b.creato_il) - new Date(a.creato_il));
+}
+function rigaImportante(m, conNome){
+  const c = S.convs.get(m.conv_id);
+  return '<button class="voce imp-voce" data-imp="'+m.id+'" data-conv="'+m.conv_id+'">'+avatar(m.autore)+'<span class="vc">'+
+    '<span class="imp-chi">'+esc(m.autore === S.io ? 'Tu' : nomeDi(m.autore))+(conNome && c ? ' <i>›</i> ' + esc(nomeConv(c)) : '')+'<em>'+esc(dataBreve(m.creato_il))+'</em></span>'+
+    '<b>'+esc(testoAnteprima(m))+'</b></span><span class="imp-stella">'+svg('stellaPiena', 1.6)+'</span></button>';
+}
+/* nelle info della chat */
+async function disegnaImportanti(){
+  const I2 = el('info'); const c = S.convs.get(infoAperta); if(!I2 || !c) return;
+  I2.innerHTML = '<div class="scorre destra" style="position:absolute"><div class="scorre-testa basso"><button class="ib" data-a="info-indietro" aria-label="Indietro">'+svg('indietro')+'</button>'+
+    '<h2>Messaggi importanti</h2></div><div class="scorre-corpo" id="impLista"><div class="vuoto-lista">Carico…</div></div></div>';
+  const l = await messaggiImportanti(c.id);
+  const L = el('impLista'); if(!L) return;
+  L.innerHTML = l.length ? l.map(m => rigaImportante(m)).join('') : '<div class="vuoto-lista">'+svg('stella', 1.6).replace('<svg', '<svg style="width:46px;height:46px;margin:0 auto 12px;opacity:.5"')+
+    'Nessun messaggio importante.<br>Tieni premuto un messaggio, «Altro…» e poi «Importante».</div>';
+}
+/* tutte le chat (dalle impostazioni) */
+async function tuttiImportanti(){
+  pannelloSinistra('Messaggi importanti', '<div id="impTutti"><div class="vuoto-lista">Carico…</div></div>', false);
+  const l = await messaggiImportanti(null);
+  const L = el('impTutti'); if(!L) return;
+  L.innerHTML = l.length ? l.map(m => rigaImportante(m, true)).join('') : '<div class="vuoto-lista">Nessun messaggio importante.</div>';
+}
+async function apriImportante(id, conv){
+  chiudiPannelloSinistra();
+  if(S.aperta !== conv) await apriConv(conv);
+  if(suTelefono() && infoAperta) chiudiInfo();
+  vaiAMessaggio(id);
+}
+
+/* ======================= VIA ======================= */
 avvia();
 
 })();

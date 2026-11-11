@@ -3,7 +3,7 @@
    la copia in cache serve solo quando sei offline. I DATI non stanno qui:
    vivono nel database e nella memoria del browser, quindi un aggiornamento
    dell'app non può cancellarli. */
-const CACHE = 'foss-guscio-v70';
+const CACHE = 'foss-guscio-v71';
 const GUSCIO = ['./', './index.html', './manifest.json',
                 './icone/icona-192-v2.png', './icone/icona-512-v2.png'];
 
@@ -66,7 +66,8 @@ self.addEventListener('push', e=>{
   e.waitUntil(self.registration.showNotification(String(d.titolo || 'FOSS'), {
     body: String(d.testo || ''),
     tag,
-    renotify: !d.silenzioso,          // una notifica che si somma aggiorna quella di prima senza suonare
+    renotify: !d.silenzioso && !d.muto,   // una notifica che si somma aggiorna quella di prima senza suonare
+    silent: !!d.muto,                     // FOSS.chat: un messaggio mandato «senza suono»
     icon: './icone/icona-192-v2.png',
     data: {url: d.url || './', nid: tag.indexOf('foss-') === 0 ? tag.slice(5) : ''}
   }));
@@ -88,7 +89,8 @@ self.addEventListener('notificationclick', e=>{
   /* un messaggio di FOSS.chat: apro (o porto davanti) la finestra della chat */
   if(/\/chat\.html/.test(url)){
     e.waitUntil(self.clients.matchAll({type:'window', includeUncontrolled:true}).then(lista=>{
-      const chat = lista.find(c=>{ try{ return new URL(c.url).pathname.endsWith('/chat.html'); }catch(_){ return false; } });
+      /* il server a volte toglie il «.html»: la chat aperta puo' essere /chat o /chat.html */
+      const chat = lista.find(c=>{ try{ return /\/chat(\.html)?$/.test(new URL(c.url).pathname); }catch(_){ return false; } });
       if(chat){ chat.postMessage({tipo:'apri', url}); return chat.focus ? chat.focus().catch(()=>{}) : null; }
       return self.clients.openWindow ? self.clients.openWindow(url) : null;
     }));
