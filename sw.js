@@ -3,7 +3,7 @@
    la copia in cache serve solo quando sei offline. I DATI non stanno qui:
    vivono nel database e nella memoria del browser, quindi un aggiornamento
    dell'app non può cancellarli. */
-const CACHE = 'foss-guscio-v69';
+const CACHE = 'foss-guscio-v70';
 const GUSCIO = ['./', './index.html', './manifest.json',
                 './icone/icona-192-v2.png', './icone/icona-512-v2.png'];
 
@@ -32,7 +32,7 @@ self.addEventListener('fetch', e=>{
   const req = e.request;
   if(req.method === 'POST'){
     const u = new URL(req.url);
-    if(u.origin === location.origin && /\/chat\.html$/.test(u.pathname) && u.searchParams.has('condividi')) e.respondWith(riceviCondivisi(req));
+    if(u.origin === location.origin && /\/chat(\.html)?$/.test(u.pathname) && u.searchParams.has('condividi')) e.respondWith(riceviCondivisi(req));
     return;
   }
   if(req.method !== 'GET') return;
@@ -44,6 +44,9 @@ self.addEventListener('fetch', e=>{
   e.respondWith(
     /* una richiesta di navigazione non si puo' ricopiare con altre opzioni: chiedo l'indirizzo */
     (pagina ? fetch(req.url, {cache:'no-store', credentials:'same-origin'}) : fetch(req)).then(r=>{
+      /* il server a volte toglie il «.html» (chat.html -> chat) con un rinvio: Safari rifiuta
+         una pagina arrivata dal service worker dopo un rinvio, quindi la ricopio pulita */
+      if(r.redirected) r = new Response(r.body, {status: r.status, statusText: r.statusText, headers: r.headers});
       const copia = r.clone();
       caches.open(CACHE).then(c=>c.put(req, copia)).catch(()=>{});
       return r;
