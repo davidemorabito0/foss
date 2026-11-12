@@ -795,3 +795,46 @@ begin
 end $$;
 revoke execute on function public.chat_importa_annulla(uuid, uuid) from public, anon;
 grant execute on function public.chat_importa_annulla(uuid, uuid) to authenticated;
+
+-- ---------- FOSS.chat 2.3 ----------
+-- la chat con te stesso (appunti, prove): chat_apri_privata accetta anche te
+CREATE OR REPLACE FUNCTION public.chat_apri_privata(p_altro uuid)
+ RETURNS uuid LANGUAGE plpgsql SECURITY DEFINER SET search_path TO 'public'
+AS $function$
+declare v_io uuid := auth.uid(); v_k text; v_id uuid;
+begin
+  if v_io is null then raise exception 'serve l''accesso' using errcode = '42501'; end if;
+  if p_altro is null then raise exception 'persona non valida'; end if;
+  v_k := least(v_io::text, p_altro::text) || ':' || greatest(v_io::text, p_altro::text);
+  select id into v_id from chat_conversazioni where coppia = v_k;
+  if v_id is not null then
+    insert into chat_membri (conv_id, utente_id, ruolo) values (v_id, v_io, 'admin') on conflict do nothing;
+    return v_id;
+  end if;
+  if p_altro = v_io then
+    insert into chat_conversazioni (tipo, coppia, creata_da) values ('privata', v_k, v_io) returning id into v_id;
+    insert into chat_membri (conv_id, utente_id, ruolo) values (v_id, v_io, 'admin');
+    return v_id;
+  end if;
+  if not condividiamo_org(p_altro) then raise exception 'puoi scrivere solo a chi lavora con te' using errcode = '42501'; end if;
+  insert into chat_conversazioni (tipo, coppia, creata_da) values ('privata', v_k, v_io) returning id into v_id;
+  insert into chat_membri (conv_id, utente_id, ruolo) values (v_id, v_io, 'admin'), (v_id, p_altro, 'admin');
+  return v_id;
+end $function$;
+
+-- super notifica: un messaggio dell'amministratore mandato anche per email (funzione edge chat-supernotifica)
+create table if not exists public.chat_super_notifiche (
+  id uuid primary key default gen_random_uuid(),
+  msg_id uuid not null unique references public.chat_messaggi(id) on delete cascade,
+  conv_id uuid not null, da uuid not null, a uuid[] not null default '{}',
+  creata_il timestamptz not null default now()
+);
+alter table public.chat_super_notifiche enable row level security;
+revoke all on public.chat_super_notifiche from anon, authenticated;
+
+-- ---------- FOSS.chat 2.4 (idee di MSN) ----------
+-- messaggio personale e cornice della foto: stanno in profili.chat_cfg (frase, cornice) e li vedono gli altri
+-- In produzione chat_contatti() e chat_persone(uuid[]) restituiscono in piu':
+--   'frase',   left(coalesce(p.chat_cfg->>'frase', ''), 140)
+--   'cornice', case when coalesce(p.chat_cfg->>'cornice','') ~ '^[a-z]{1,20}$' then p.chat_cfg->>'cornice' else '' end
+-- (migrazione fosschat_frase_cornice)
