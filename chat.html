@@ -3,6 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover, interactive-widget=resizes-content">
+<script>try{if(navigator.standalone===true||matchMedia('(display-mode: standalone)').matches)document.documentElement.classList.add('da-icona')}catch(e){}</script>
 <meta name="description" content="FOSS.chat: la chat del tuo team su FOSS.">
 <meta name="robots" content="noindex">
 <meta name="theme-color" content="#111b21">
@@ -69,8 +70,15 @@
   color-scheme:light;
 }
 *{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
-html,body{margin:0;height:100%;height:var(--schermo,100%);position:fixed;top:0;left:0;right:0;width:100%;background:var(--app);color:var(--testo);font:400 var(--t)/1.35 var(--font);overflow:hidden;
+html,body{margin:0;background:var(--app);color:var(--testo);font:400 var(--t)/1.35 var(--font);
   -webkit-font-smoothing:antialiased;-webkit-text-size-adjust:100%;overscroll-behavior:none}
+html{height:100%}
+body{position:fixed;top:0;left:0;right:0;bottom:0;width:100%;overflow:hidden}
+/* iPhone, app aperta dall'icona (iOS 26): se la pagina e' piu' corta dello schermo, iOS la disegna
+   piu' corta della barra di stato e in basso resta una fascia vuota (bug WebKit 301108).
+   Una pagina alta almeno quanto lo schermo riceve lo schermo intero. */
+@media (display-mode: standalone){ html{min-height:min(100lvh, calc(100% + env(safe-area-inset-top)))} }
+html.da-icona{min-height:min(100lvh, calc(100% + env(safe-area-inset-top)))}
 button{font:inherit;color:inherit;background:none;border:0;padding:0;cursor:pointer}
 input,textarea{font:inherit;color:inherit}
 img{display:block}
@@ -80,7 +88,7 @@ svg{display:block}
 ::-webkit-scrollbar-thumb{background:rgba(134,150,160,.35);border-radius:3px}
 ::-webkit-scrollbar-track{background:transparent}
 
-#app{display:flex;height:100vh;height:var(--alto,var(--schermo,100%));width:100%;position:relative;overflow:hidden;background:var(--pannello)}
+#app{display:flex;height:100%;height:var(--alto,100%);width:100%;position:relative;overflow:hidden;background:var(--pannello)}
 
 /* ---------- colonna sottile (desktop) ---------- */
 .rail{width:64px;flex:none;background:var(--testa);border-right:1px solid var(--linea);display:flex;flex-direction:column;align-items:center;
@@ -730,7 +738,9 @@ svg{display:block}
   .filtri{padding:0 16px 8px}
   .filtro{height:34px;border-radius:17px;font-size:15px;background:var(--testa)!important}
   .filtro.on{background:color-mix(in srgb,var(--verde-ios) 20%,transparent)!important;color:var(--verde-ios)}
-  .lista{padding-bottom:calc(96px + env(safe-area-inset-bottom))}
+  /* le chat finiscono sopra la barra in basso: dietro ai tre tasti non si vede niente */
+  .lato{padding-bottom:calc(86px + env(safe-area-inset-bottom))}
+  .lista{padding-bottom:12px}
   .archivio-riga{height:56px;padding-left:34px}
   .archivio-riga span{font-size:17px;color:var(--testo-2)}
   .archivio-riga svg{color:var(--testo-2)}
@@ -1457,7 +1467,7 @@ const SUPA_KEY = 'sb_publishable_f5Kjp6NHT9yTxr1bhWJjhg_4y72V-Kj';
 const VAPID_PUBBLICA = 'BNlGbW4nZrXmx8DioKxnl7ubULVOr5_6CAKvpuQYoiXeObmxYAzGU6UrkExx2zu1hACmtRNDcpoMh_ARQ0GSmlw';
 /* il server dei file sul NAS (es. 'https://media.foss.team'). Vuoto = si usa Supabase. */
 const MEDIA_NAS = 'https://media.foss.team';
-const VERSIONE = 'chat-2.7.3';
+const VERSIONE = 'chat-2.7.4';
 /* i temi colore: gli stessi di FOSS. Il predefinito per tutti è Brand (blu e giallo). */
 const TEMI_COLORE = [
   {id:'brand',   nome:'Brand',    ds:'Navy e ambra, il predefinito', c:['#0D1926','#1A3149','#FFAD01']},
@@ -5748,16 +5758,8 @@ if('serviceWorker' in navigator){
 (function(){
   const vv = window.visualViewport; if(!vv) return;
   const adatta = () => {
-    /* v2.7.3: sull'iPhone aperta dall'icona la pagina «crede» di essere più corta dello schermo
-       (le manca l'altezza della barra di stato) e restava una fascia vuota in basso.
-       Misuro lo schermo vero e lo uso per tutta la pagina; con la tastiera aperta uso lo spazio sopra la tastiera. */
     const R = document.documentElement, h = Math.round(vv.height);
-    const icona = window.navigator.standalone === true || (window.matchMedia && matchMedia('(display-mode: standalone)').matches);
-    const verticale = window.innerHeight >= window.innerWidth;
-    const schermo = icona && /iPhone|iPad|iPod/.test(navigator.userAgent) && screen && screen.height
-      ? (verticale ? Math.max(screen.height, screen.width) : Math.min(screen.height, screen.width)) : 0;
-    const pieno = Math.max(window.innerHeight || 0, R.clientHeight || 0, schermo);
-    R.style.setProperty('--schermo', pieno + 'px');
+    const pieno = Math.max(window.innerHeight || 0, R.clientHeight || 0);
     if(pieno - h > 150) R.style.setProperty('--alto', h + 'px');
     else R.style.removeProperty('--alto');
     if(Math.abs(window.scrollY) > 0 || vv.offsetTop > 0) window.scrollTo(0, 0);

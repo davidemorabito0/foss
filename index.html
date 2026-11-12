@@ -3,6 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover">
+<script>try{if(navigator.standalone===true||matchMedia('(display-mode: standalone)').matches)document.documentElement.classList.add('da-icona')}catch(e){}</script>
 <meta name="description" content="FOSS è il gestionale dei tuoi progetti, dal brief alla consegna: lavori, task, commenti, file e calendario del team in un unico posto.">
 <link rel="canonical" href="https://foss.team/">
 <meta property="og:type" content="website">
@@ -361,7 +362,13 @@
 *{box-sizing:border-box}
 /* il telefono non deve gonfiare i testi per conto suo: la pagina e' gia' disegnata per lo schermo piccolo */
 html{-webkit-text-size-adjust:100%;text-size-adjust:100%}
-html,body{height:100%;overflow:hidden;margin:0;max-width:100%}
+html,body{height:100%;margin:0;max-width:100%}
+body{overflow:hidden}
+html{overscroll-behavior:none}
+/* iPhone, app aperta dall'icona (iOS 26): una pagina piu' corta dello schermo viene disegnata
+   piu' corta della barra di stato e in basso resta una fascia vuota (bug WebKit 301108). */
+@media (display-mode: standalone){ html{min-height:min(100lvh, calc(100% + env(safe-area-inset-top)))} }
+html.da-icona{min-height:min(100lvh, calc(100% + env(safe-area-inset-top)))}
 img{max-width:100%}
 [hidden]{display:none!important}
 body{
@@ -9222,7 +9229,9 @@ function misuraNav(){
   if(!suTelefono()){ document.documentElement.style.setProperty('--nav-h','0px'); return; }
   const tb = el('tabbar'), vs = el('viewswitch');
   const n = (tb && !tb.hidden) ? tb : ((vs && !vs.hidden) ? vs : null);
-  document.documentElement.style.setProperty('--nav-h', (n? n.offsetHeight + (n===tb? 20 : 0) : 0)+'px');
+  /* la barra staccata dal fondo: il contenuto finisce sopra di lei (margine sotto + bordo del telefono + 10px di aria) */
+  const sotto = n===tb ? (parseFloat(getComputedStyle(tb).bottom) || 0) + 10 : 0;
+  document.documentElement.style.setProperty('--nav-h', (n? Math.ceil(n.offsetHeight + sotto) : 0)+'px');
 }
 let timerNav = null;
 window.addEventListener('resize', ()=>{
@@ -10139,7 +10148,7 @@ function cartaModelli(){
    Come si fa tutto, capitolo per capitolo: dai primi passi alle cose per chi
    organizza un team. Si cerca per parola (anche senza accenti); in fondo c'e'
    il tasto per segnalare quello che manca o non funziona. */
-const VERSIONE = 'v72';
+const VERSIONE = 'v73';
 const LIVELLI_GUIDA = {base:'Per cominciare', medio:'Tutti i giorni', esperto:'Per chi organizza', aiuto:'Se qualcosa non va'};
 const GUIDA = [
 {id:'primi-passi', liv:'base', ic:'spark', t:'Primi passi', s:'Cos’è FOSS e come ci si muove', v:[
