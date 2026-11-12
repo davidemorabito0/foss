@@ -43,10 +43,11 @@
   --verde:#00a884; --verde-forte:#008069; --verde-chiaro:#25d366; --blu-spunta:#53bdeb;
   --rosso:#ea0038; --ambra:#FFAD01;
   --verde-ios:#21c063; --cit-mio:#06cf9c;
-  --r:8px; --t:14.2px;
+  --r:8px; --tk:1; --t:calc(14.2px * var(--tk));
 }
-:root[data-testo="piccolo"]{ --t:13px }
-:root[data-testo="grande"]{ --t:16.5px }
+/* dimensione del testo scelta nelle impostazioni: vale su computer e telefono */
+:root[data-testo="piccolo"]{ --tk:.88 }
+:root[data-testo="grande"]{ --tk:1.2 }
 :root[data-tema="scuro"]{
   --app:#0c1317; --pannello:#111b21; --testa:#202c33; --sfondo-chat:#0b141a;
   --mio:#005c4b; --suo:#202c33; --testo:#e9edef; --testo-2:#8696a0; --testo-3:#667781;
@@ -133,10 +134,10 @@ svg{display:block}
   border-bottom:1px solid var(--linea)}
 .riga:last-child .corpo{border-bottom-color:transparent}
 .riga .r1,.riga .r2{display:flex;align-items:center;gap:6px;min-width:0}
-.riga .nome{flex:1;min-width:0;font-size:17px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;color:var(--testo)}
+.riga .nome{flex:1;min-width:0;font-size:calc(17px * var(--tk));white-space:nowrap;overflow:hidden;text-overflow:ellipsis;color:var(--testo)}
 .riga .ora{font-size:12px;color:var(--testo-2);flex:none}
 .riga .ora.nuovo{color:var(--badge)}
-.riga .anteprima{flex:1;min-width:0;font-size:14px;color:var(--testo-2);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;display:flex;align-items:center;gap:3px;margin-top:2px}
+.riga .anteprima{flex:1;min-width:0;font-size:calc(14px * var(--tk));color:var(--testo-2);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;display:flex;align-items:center;gap:3px;margin-top:2px}
 .riga .anteprima svg{width:16px;height:16px;flex:none}
 .riga .anteprima .sp{flex:none}
 .riga .anteprima .tx{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
@@ -350,7 +351,7 @@ svg{display:block}
 .campo .ib{width:42px;height:42px;border-radius:8px}
 .campo .ib svg{width:24px;height:24px}
 .testo-in{flex:1;min-width:0;max-height:140px;min-height:42px;border:0;outline:0;background:transparent;resize:none;padding:11px 6px 10px 4px;
-  font-size:15px;line-height:20px;overflow-y:auto;white-space:pre-wrap;word-wrap:break-word}
+  font-size:calc(15px * var(--tk));line-height:1.34;overflow-y:auto;white-space:pre-wrap;word-wrap:break-word}
 .testo-in::placeholder{color:var(--testo-2)}
 .manda{width:42px;height:42px;border-radius:50%;display:grid;place-items:center;flex:none;color:var(--icona);position:relative}
 .manda.pieno{background:var(--pieno);color:var(--su-pieno)}
@@ -713,7 +714,7 @@ svg{display:block}
     --pannello:#fff; --testa:#f6f6f6; --hover:#f2f2f7; --scelta:#ebebf0; --campo:#fff; --linea:#e5e5ea; --mio:#dcf8c6; --suo:#fff; --badge:#21c063; --badge-testo:#fff; --pieno:#21c063; --su-pieno:#fff;
     --sistema:rgba(255,255,255,.92); --sistema-testo:#111; --icona:#111;
   }
-  #app{--t:17px}
+  #app{--t:calc(17px * var(--tk))}
   /* elenco */
   .lato-testa{display:none}
   .ios-testa{display:block;padding:calc(8px + env(safe-area-inset-top)) 16px 0;flex:none}
@@ -739,11 +740,11 @@ svg{display:block}
   .riga.on{background:transparent}
   .riga .av{width:56px;height:56px;font-size:20px}
   .riga .corpo{padding:12px 16px 12px 0;margin-left:14px;justify-content:flex-start;min-height:84px}
-  .riga .nome{font-size:17.5px;font-weight:600}
+  .riga .nome{font-size:calc(17.5px * var(--tk));font-weight:600}
   .riga .ora{font-size:15px}
   .riga .ora.nuovo{color:var(--verde-ios)}
   .riga .r2{align-items:flex-start}
-  .riga .anteprima{font-size:15.5px;line-height:1.3;white-space:normal;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;margin-top:3px}
+  .riga .anteprima{font-size:calc(15.5px * var(--tk));line-height:1.3;white-space:normal;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;margin-top:3px}
   .riga .anteprima .sp,.riga .anteprima svg{display:inline-block;vertical-align:-3px;margin-right:3px}
   .riga .anteprima .tx{white-space:normal;display:inline}
   .riga .icone{padding-top:4px}
@@ -806,7 +807,7 @@ svg{display:block}
   .msg.ultimo .bolla:not(.sticker):not(.solo-emoji)::after{content:"";position:absolute;bottom:0;width:13px;height:17px;background:inherit;pointer-events:none}
   .msg.ultimo.mio .bolla:not(.sticker):not(.solo-emoji)::after{right:-7px;clip-path:path("M0 0C1 9 5 14 13 17H0Z")}
   .msg.ultimo.suo .bolla:not(.sticker):not(.solo-emoji)::after{left:-7px;clip-path:path("M13 0C12 9 8 14 0 17H13Z")}
-  .bolla .testo{font-size:17px;line-height:1.3}
+  .bolla .testo{font-size:var(--t);line-height:1.3}
   .meta{font-size:12.5px;margin:10px 0 -4px 12px}
   :root[data-tema="scuro"] .meta{color:rgba(255,255,255,.6)}
   :root[data-tema="scuro"] .msg.mio .meta{color:rgba(255,255,255,.62)}
@@ -841,7 +842,7 @@ svg{display:block}
   #allegaB svg{width:30px;height:30px}
   .campo{border-radius:22px;min-height:44px;background:var(--campo);margin:0;align-items:center;border:.5px solid rgba(255,255,255,.08)}
   :root[data-tema="chiaro"] .campo{border-color:#d6d6db}
-  .testo-in{font-size:17px;padding:11px 4px 11px 16px;min-height:44px}
+  .testo-in{font-size:calc(17px * var(--tk));padding:11px 4px 11px 16px;min-height:44px}
   .stk-b{display:grid}
   .campo .ib{width:44px;height:44px;color:var(--testo)}
   .cam-b{display:grid;width:44px;height:44px;color:var(--testo)}
@@ -1281,7 +1282,7 @@ input,textarea,[contenteditable="true"]{-webkit-user-select:text;user-select:tex
 
 /* ---------- computer: a tutto schermo e con le proporzioni di WhatsApp ---------- */
 @media (min-width:900px){
-  #app{--t:14.6px}
+  #app{--t:calc(14.6px * var(--tk))}
   .lato{width:32%;min-width:360px;max-width:520px}
   .lato-testa{height:64px;padding:0 12px 0 20px}
   .lato-testa h1{font-size:23px}
@@ -1302,7 +1303,7 @@ input,textarea,[contenteditable="true"]{-webkit-user-select:text;user-select:tex
     box-shadow:0 1px 3px rgba(11,20,26,.18)}
   :root[data-tema="scuro"] .barra-scrivi{background:#242f36}
   .campo{background:transparent;margin:0;min-height:44px;align-items:center}
-  .testo-in{font-size:15.5px;padding:12px 6px 12px 4px}
+  .testo-in{font-size:calc(15.5px * var(--tk));padding:12px 6px 12px 4px}
   .barra-scrivi > .ib, .barra-scrivi .allega-wrap > .ib{width:44px;height:44px}
   .rispondi-a{background:var(--campo);border-radius:18px 18px 0 0;margin:0 0 -8px;padding:8px 10px 14px 16px}
   :root[data-tema="scuro"] .rispondi-a{background:#242f36}
@@ -1353,9 +1354,9 @@ input,textarea,[contenteditable="true"]{-webkit-user-select:text;user-select:tex
 :root[data-colori="sabbia"][data-tema="chiaro"]{--app:#E2DACE;--pannello:#F0EBE3;--testa:#E9E2D8;--sfondo-chat:#E2DACE;--mio:#F0DDC9;--suo:#F0EBE3;--testo:#2A2318;--testo-2:#5C5142;--testo-3:#8C8172;--linea:#DFD8CC;--hover:#e6e1d9;--scelta:#DAD1C3;--campo:#F0EBE3;--icona:#5C5142;--menu:#F0EBE3;--badge:#B4632A;--badge-testo:#000000;--pieno:#B4632A;--su-pieno:#000000;--sistema:#F0EBE3;--sistema-testo:#5C5142;--citazione:#e2ddd5;--citazione-mio:#e8ccb3;--link:#8E4C1D;--verde:#B4632A;--verde-forte:#8E4C1D;--verde-chiaro:#B4632A;--verde-ios:#B4632A;--su-verde:#000000;--cit-mio:#B4632A}
 :root[data-colori="idea"][data-tema="scuro"]{--app:#152548;--pannello:#1C2E57;--testa:#223562;--sfondo-chat:#152548;--mio:#394d77;--suo:#223562;--testo:#EDEBDE;--testo-2:#B3B9CC;--testo-3:#8089A6;--linea:#213358;--hover:#223562;--scelta:#2B416F;--campo:#223562;--icona:#B3B9CC;--menu:#223562;--badge:#E0588F;--badge-testo:#1D0713;--pieno:#E0588F;--su-pieno:#1D0713;--sistema:#1C2E57;--sistema-testo:#B3B9CC;--citazione:#30426b;--citazione-mio:#314266;--link:#F48DB3;--verde:#E0588F;--verde-forte:#be4b7a;--verde-chiaro:#E0588F;--verde-ios:#E0588F;--su-verde:#1D0713;--cit-mio:#E0588F}
 :root[data-colori="idea"][data-tema="chiaro"]{--app:#E4E1D2;--pannello:#F0EEE3;--testa:#E9E6DA;--sfondo-chat:#E4E1D2;--mio:#ead9d6;--suo:#F0EEE3;--testo:#223D7C;--testo-2:#465C91;--testo-3:#7A86A6;--linea:#DFDBCC;--hover:#e6e5de;--scelta:#DCD8C8;--campo:#F0EEE3;--icona:#465C91;--menu:#F0EEE3;--badge:#C2437A;--badge-testo:#FFFFFF;--pieno:#C2437A;--su-pieno:#FFFFFF;--sistema:#F0EEE3;--sistema-testo:#465C91;--citazione:#e2e2dc;--citazione-mio:#e4c4c9;--link:#9A2B56;--verde:#C2437A;--verde-forte:#9A2B56;--verde-chiaro:#C2437A;--verde-ios:#C2437A;--su-verde:#ffffff;--cit-mio:#C2437A}
-:root[data-colori="limoni"][data-tema="scuro"]{--app:#132571;--pannello:#192E80;--testa:#1F3489;--sfondo-chat:#132571;--mio:#35478d;--suo:#1F3489;--testo:#FAEFAF;--testo-2:#D6CFA6;--testo-3:#9F9EA0;--linea:#1D3184;--hover:#1F3489;--scelta:#283F97;--campo:#1F3489;--icona:#D6CFA6;--menu:#1F3489;--badge:#C83934;--badge-testo:#FFF6CF;--pieno:#C83934;--su-pieno:#FFF6CF;--sistema:#192E80;--sistema-testo:#D6CFA6;--citazione:#2e418c;--citazione-mio:#2e3d79;--link:#FF9D8E;--verde:#FF9D8E;--verde-forte:#d98579;--verde-chiaro:#FF9D8E;--verde-ios:#FF9D8E;--su-verde:#000000;--cit-mio:#FF9D8E}
-:root[data-colori="limoni"][data-tema="chiaro"]{--app:#F6ECC1;--pannello:#FFF8DF;--testa:#FBF2D1;--sfondo-chat:#F6ECC1;--mio:#F4D3BE;--suo:#FFF8DF;--testo:#152A79;--testo-2:#3F4D8A;--testo-3:#7A80A2;--linea:#EFE5BD;--hover:#f3eeda;--scelta:#EFE2B3;--campo:#FFF8DF;--icona:#3F4D8A;--menu:#FFF8DF;--badge:#C73D3A;--badge-testo:#FFF8DF;--pieno:#C73D3A;--su-pieno:#FFF8DF;--sistema:#FFF8DF;--sistema-testo:#3F4D8A;--citazione:#efead8;--citazione-mio:#eebeac;--link:#A72E2B;--verde:#C73D3A;--verde-forte:#A72E2B;--verde-chiaro:#C73D3A;--verde-ios:#C73D3A;--su-verde:#ffffff;--cit-mio:#C73D3A}
-:root[data-colori="autunno"][data-tema="scuro"]{--app:#743832;--pannello:#81413A;--testa:#8A4840;--sfondo-chat:#743832;--mio:#95584f;--suo:#8A4840;--testo:#F8EBD7;--testo-2:#ECD2BD;--testo-3:#D3AC97;--linea:#8A4943;--hover:#8A4840;--scelta:#945047;--campo:#8A4840;--icona:#ECD2BD;--menu:#8A4840;--badge:#EDA95C;--badge-testo:#3A1510;--pieno:#EDA95C;--su-pieno:#3A1510;--sistema:#81413A;--sistema-testo:#ECD2BD;--citazione:#92534b;--citazione-mio:#804c44;--link:#FAC788;--verde:#EDA95C;--verde-forte:#c9904e;--verde-chiaro:#EDA95C;--verde-ios:#EDA95C;--su-verde:#3A1510;--cit-mio:#EDA95C}
+:root[data-colori="limoni"][data-tema="scuro"]{--app:#121810;--pannello:#1A2216;--testa:#232D1D;--sfondo-chat:#121810;--mio:#3a4530;--suo:#232D1D;--testo:#F6F2D4;--testo-2:#CBC9A4;--testo-3:#8F9175;--linea:#283220;--hover:#232D1D;--scelta:#2C3824;--campo:#232D1D;--icona:#CBC9A4;--menu:#232D1D;--badge:#F5D130;--badge-testo:#262200;--pieno:#F5D130;--su-pieno:#262200;--sistema:#1A2216;--sistema-testo:#CBC9A4;--citazione:#323b2a;--citazione-mio:#323b29;--link:#FFE266;--verde:#F5D130;--verde-forte:#d0b229;--verde-chiaro:#F5D130;--verde-ios:#F5D130;--su-verde:#262200;--cit-mio:#F5D130}
+:root[data-colori="limoni"][data-tema="chiaro"]{--app:#FBF5D2;--pannello:#FFFDF0;--testa:#FFF7D0;--sfondo-chat:#FBF5D2;--mio:#FFF0A0;--suo:#FFFDF0;--testo:#2C3712;--testo-2:#56602E;--testo-3:#888B62;--linea:#F1E7B6;--hover:#f4f3e5;--scelta:#F4E8A8;--campo:#FFFDF0;--icona:#56602E;--menu:#FFFDF0;--badge:#F4CC1E;--badge-testo:#2C2700;--pieno:#F4CC1E;--su-pieno:#2C2700;--sistema:#FFFDF0;--sistema-testo:#56602E;--citazione:#f0efe0;--citazione-mio:#fdeb8e;--link:#5B7C16;--verde:#5B7C16;--verde-forte:#5B7C16;--verde-chiaro:#5B7C16;--verde-ios:#5B7C16;--su-verde:#ffffff;--cit-mio:#5B7C16}
+:root[data-colori="autunno"][data-tema="scuro"]{--app:#1E1411;--pannello:#2A1C17;--testa:#35241E;--sfondo-chat:#1E1411;--mio:#4e3a31;--suo:#35241E;--testo:#F6E7D2;--testo-2:#CDB49C;--testo-3:#9C8572;--linea:#3A2820;--hover:#35241E;--scelta:#412D25;--campo:#35241E;--icona:#CDB49C;--menu:#35241E;--badge:#E39A4F;--badge-testo:#2A140A;--pieno:#E39A4F;--su-pieno:#2A140A;--sistema:#2A1C17;--sistema-testo:#CDB49C;--citazione:#43322b;--citazione-mio:#43322a;--link:#F2B676;--verde:#E39A4F;--verde-forte:#c18343;--verde-chiaro:#E39A4F;--verde-ios:#E39A4F;--su-verde:#2A140A;--cit-mio:#E39A4F}
 :root[data-colori="autunno"][data-tema="chiaro"]{--app:#F0E1CA;--pannello:#FAF2E4;--testa:#F5EAD8;--sfondo-chat:#F0E1CA;--mio:#F4E0C5;--suo:#FAF2E4;--testo:#6E2F28;--testo-2:#875246;--testo-3:#A5806F;--linea:#EADBC4;--hover:#f3e8db;--scelta:#E8D6BC;--campo:#FAF2E4;--icona:#875246;--menu:#FAF2E4;--badge:#DD964B;--badge-testo:#4A1C14;--pieno:#DD964B;--su-pieno:#4A1C14;--sistema:#FAF2E4;--sistema-testo:#875246;--citazione:#f0e4d7;--citazione-mio:#f1d6b4;--link:#91500F;--verde:#91500F;--verde-forte:#91500F;--verde-chiaro:#91500F;--verde-ios:#91500F;--su-verde:#ffffff;--cit-mio:#91500F}
 :root[data-colori="bloom"][data-tema="scuro"]{--app:#22102A;--pannello:#2C1635;--testa:#361C40;--sfondo-chat:#22102A;--mio:#4f3255;--suo:#361C40;--testo:#EDD8B4;--testo-2:#C3AB9E;--testo-3:#8F7787;--linea:#341B3E;--hover:#361C40;--scelta:#43254E;--campo:#361C40;--icona:#C3AB9E;--menu:#361C40;--badge:#E07E46;--badge-testo:#22102A;--pieno:#E07E46;--su-pieno:#22102A;--sistema:#2C1635;--sistema-testo:#C3AB9E;--citazione:#432948;--citazione-mio:#442b49;--link:#F3A676;--verde:#E07E46;--verde-forte:#be6b3c;--verde-chiaro:#E07E46;--verde-ios:#E07E46;--su-verde:#22102A;--cit-mio:#E07E46}
 :root[data-colori="bloom"][data-tema="chiaro"]{--app:#EBD3AF;--pannello:#F6E8CF;--testa:#F1DEC0;--sfondo-chat:#EBD3AF;--mio:#EFD1B2;--suo:#F6E8CF;--testo:#3B1F45;--testo-2:#614766;--testo-3:#8C7480;--linea:#E6CFAB;--hover:#eddec8;--scelta:#E3C8A0;--campo:#F6E8CF;--icona:#614766;--menu:#F6E8CF;--badge:#D1733D;--badge-testo:#2A1030;--pieno:#D1733D;--su-pieno:#2A1030;--sistema:#F6E8CF;--sistema-testo:#614766;--citazione:#e9dac5;--citazione-mio:#ebc4a2;--link:#94441A;--verde:#94441A;--verde-forte:#94441A;--verde-chiaro:#94441A;--verde-ios:#94441A;--su-verde:#ffffff;--cit-mio:#94441A}
@@ -1368,6 +1369,43 @@ input,textarea,[contenteditable="true"]{-webkit-user-select:text;user-select:tex
 .colore-tema .pall3 i{width:20px;height:20px;border-radius:50%;box-shadow:inset 0 0 0 1px rgba(127,127,127,.35)}
 .colore-tema b{font-size:14px;font-weight:600;color:var(--testo)}
 .colore-tema span{font-size:12px;color:var(--testo-2);line-height:1.25}
+/* ---------- 2.4: le idee di MSN ---------- */
+/* la cornice della foto (un anello staccato dalla foto, visibile a tutti) */
+.av[class*="cr-"]{overflow:visible}
+.av[class*="cr-"] img{border-radius:50%}
+.av.cr-oro{box-shadow:0 0 0 2px var(--pannello),0 0 0 4.5px #E8B730,0 0 12px 3px rgba(232,183,48,.45)}
+.av.cr-argento{box-shadow:0 0 0 2px var(--pannello),0 0 0 4.5px #C9D2DB,0 0 10px 2px rgba(220,230,240,.35)}
+.av.cr-neon{box-shadow:0 0 0 2px var(--pannello),0 0 0 4px #22E1FF,0 0 14px 4px rgba(34,225,255,.65)}
+.av.cr-fuoco{box-shadow:0 0 0 2px var(--pannello),0 0 0 4px #FFB000,0 0 0 6.5px #FF4D00,0 0 14px 4px rgba(255,77,0,.5)}
+.av.cr-arcobaleno{box-shadow:0 0 0 2px var(--pannello),0 0 0 3.6px #FF4D4D,0 0 0 5.2px #FFC93C,0 0 0 6.8px #4CD964,0 0 0 8.4px #3EA6FF}
+.av.cr-rosa{box-shadow:0 0 0 2px var(--pannello),0 0 0 4px #FF8FC7,0 0 0 6px var(--pannello),0 0 0 7.5px #FFC2E1}
+.av.cr-smeraldo{box-shadow:0 0 0 2px var(--pannello),0 0 0 4.5px #2ED19A,0 0 12px 3px rgba(46,209,154,.45)}
+.av.cr-viola{box-shadow:0 0 0 2px var(--pannello),0 0 0 4.5px #9B6BFF,0 0 12px 3px rgba(155,107,255,.5)}
+.cornici{display:grid;grid-template-columns:repeat(auto-fill,minmax(78px,1fr));gap:6px;padding:4px 16px 16px}
+.cornice-b{display:flex;flex-direction:column;align-items:center;gap:9px;padding:12px 4px 8px;border-radius:12px;border:1.5px solid transparent;font-size:12.5px;color:var(--testo-2)}
+.cornice-b:hover{background:var(--hover)}
+.cornice-b.on{border-color:var(--verde);color:var(--testo)}
+.cornice-av{display:grid;place-items:center;width:62px;height:62px}
+/* messaggio personale */
+.frase-campo{display:flex;align-items:center;gap:8px;margin:0 20px 6px;padding:0 12px;border-radius:10px;background:var(--campo)}
+.frase-campo input{flex:1;min-width:0;border:0;outline:0;background:transparent;color:var(--testo);font:inherit;font-size:15px;padding:11px 0}
+.frase-campo span{font-size:12px;color:var(--testo-3)}
+.profilo-big .frase-big{font-style:italic;color:var(--testo);opacity:.85;margin:6px 24px 0;font-size:15px;line-height:1.35}
+/* «è appena entrato» */
+#entrati{position:fixed;right:18px;bottom:22px;z-index:95;display:flex;flex-direction:column;gap:8px;align-items:flex-end;pointer-events:none}
+.entrato{pointer-events:auto;display:flex;align-items:center;gap:12px;width:300px;max-width:calc(100vw - 32px);padding:12px 14px;border-radius:14px;text-align:left;
+  background:var(--menu);color:var(--testo);box-shadow:0 10px 30px rgba(0,0,0,.35),inset 0 0 0 1px var(--linea);
+  transform:translateY(16px);opacity:0;transition:transform .35s cubic-bezier(.2,1.2,.4,1),opacity .3s}
+.entrato.dentro{transform:none;opacity:1}
+.entrato .av{width:44px;height:44px;flex:none}
+.entrato .et{display:flex;flex-direction:column;min-width:0;line-height:1.25}
+.entrato .et b{font-size:15px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.entrato .et span{font-size:13px;color:var(--verde)}
+.entrato .et i{font-size:12.5px;color:var(--testo-2);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;margin-top:2px}
+@media (max-width:899px){ #entrati{left:12px;right:12px;bottom:auto;top:calc(10px + env(safe-area-inset-top));align-items:stretch} .entrato{width:auto;max-width:none;transform:translateY(-16px)} }
+/* sfondo animato: dietro ai messaggi */
+.sfondo-vivo{position:absolute;inset:0;width:100%;height:100%;pointer-events:none;z-index:0}
+.opz.vivi{flex-wrap:wrap}
 </style>
 </head>
 <body>
@@ -1387,7 +1425,7 @@ const SUPA_KEY = 'sb_publishable_f5Kjp6NHT9yTxr1bhWJjhg_4y72V-Kj';
 const VAPID_PUBBLICA = 'BNlGbW4nZrXmx8DioKxnl7ubULVOr5_6CAKvpuQYoiXeObmxYAzGU6UrkExx2zu1hACmtRNDcpoMh_ARQ0GSmlw';
 /* il server dei file sul NAS (es. 'https://media.foss.team'). Vuoto = si usa Supabase. */
 const MEDIA_NAS = 'https://media.foss.team';
-const VERSIONE = 'chat-2.1';
+const VERSIONE = 'chat-2.4';
 /* i temi colore: gli stessi di FOSS. Il predefinito per tutti è Brand (blu e giallo). */
 const TEMI_COLORE = [
   {id:'brand',   nome:'Brand',    ds:'Navy e ambra, il predefinito', c:['#0D1926','#1A3149','#FFAD01']},
@@ -1395,8 +1433,8 @@ const TEMI_COLORE = [
   {id:'nebbia',  nome:'Nebbia',   ds:'Chiaro e morbido',             c:['#DCE2E8','#EDF1F4','#2F7D8C']},
   {id:'sabbia',  nome:'Sabbia',   ds:'Caldo e naturale',             c:['#E4DDD2','#F1ECE4','#B4632A']},
   {id:'idea',    nome:'Idea',     ds:'Carta e inchiostro',           c:['#E4E1D2','#223D7C','#C2437A']},
-  {id:'limoni',  nome:'Limoni',   ds:'Vivace e solare',              c:['#132571','#FAEFAF','#C83934']},
-  {id:'autunno', nome:'Autunno',  ds:'Caldo e accogliente',          c:['#743832','#F8EBD7','#EDA95C']},
+  {id:'limoni',  nome:'Limoni',   ds:'Giallo limone e verde foglia', c:['#121810','#FFF0A0','#F5D130']},
+  {id:'autunno', nome:'Autunno',  ds:'Marrone scuro e arancio',      c:['#1E1411','#35241E','#E39A4F']},
   {id:'bloom',   nome:'Bloom',    ds:'Morbido e grafico',            c:['#EBD3AF','#3B1F45','#D1733D']}
 ];
 const MAX_SUPA = 50 * 1024 * 1024;
@@ -1482,6 +1520,7 @@ function memoria(k, v){
 
 /* ---------- icone (disegnate per FOSS.chat) ---------- */
 const I = {
+  mail:'<rect x="3" y="5" width="18" height="14" rx="2.5"/><path d="m3.5 6.5 8.5 6.5 8.5-6.5"/>',
   nuova:'<path d="M19 3H5a2 2 0 0 0-2 2v11a2 2 0 0 0 2 2h3v3l4-3h7a2 2 0 0 0 2-2V5a2 2 0 0 0-2-2z"/><path d="M12 7.5v6M9 10.5h6"/>',
   menu:'<circle cx="12" cy="5.5" r="1.4" fill="currentColor" stroke="none"/><circle cx="12" cy="12" r="1.4" fill="currentColor" stroke="none"/><circle cx="12" cy="18.5" r="1.4" fill="currentColor" stroke="none"/>',
   cerca:'<circle cx="10.5" cy="10.5" r="6.5"/><path d="m20 20-4.8-4.8"/>',
@@ -1624,7 +1663,7 @@ const S = {
   vista: 'chat',            // chat | archiviate
   risposta: null,
   bozze: memoria('bozze') || {},
-  cfg: Object.assign({tema:'sistema', colori:'brand', invio:true, suoni:true, sfondo:'', doodle:true, testo:'medio'}, memoria('cfg') || {}),
+  cfg: Object.assign({tema:'sistema', colori:'brand', frase:'', cornice:'', vivo:'', entrati:true, invio:true, suoni:true, sfondo:'', doodle:true, testo:'medio'}, memoria('cfg') || {}),
   sticker: [], gif: [],
   effettoScelto: null,      // {bolla, schermo, anim}
   visti: new Set(memoria('effetti_visti') || []),
@@ -1660,9 +1699,13 @@ function iniziali(t){
   return ((p[0] || '?')[0] + (p.length > 1 ? p[p.length - 1][0] : '')).toUpperCase();
 }
 function fotoSicura(u){ return typeof u === 'string' && /^(https:\/\/|data:image\/(png|jpe?g|webp|gif);base64,)/i.test(u) ? u : ''; }
+/* v2.4: la cornice della foto, scelta da ognuno (si vede a tutti) */
+const CORNICI = [{id:'oro', nome:'Oro'}, {id:'argento', nome:'Argento'}, {id:'neon', nome:'Neon'}, {id:'fuoco', nome:'Fuoco'},
+  {id:'arcobaleno', nome:'Arcobaleno'}, {id:'rosa', nome:'Rosa'}, {id:'smeraldo', nome:'Smeraldo'}, {id:'viola', nome:'Viola'}];
 function avatar(id, cls, conOnline, stile){
   const p = S.persone.get(id) || {}, f = fotoSicura(p.foto);
-  return '<span class="av '+(cls||'')+'" style="background:'+(f ? 'transparent' : colore(id))+';'+(stile||'')+'">'+
+  const cr = /(^|\s)cr-/.test(cls || '') ? '' : (p.cornice && CORNICI.some(x => x.id === p.cornice) ? ' cr-' + p.cornice : '');
+  return '<span class="av '+(cls||'')+cr+'" style="background:'+(f ? 'transparent' : colore(id))+';'+(stile||'')+'">'+
     (f ? '<img src="'+esc(f)+'" alt="" loading="lazy" onerror="this.remove()">' : svg('persona', 1.6))+
     (conOnline && S.online.has(id) ? '<i class="online"></i>' : '')+'</span>';
 }
@@ -1686,7 +1729,7 @@ function nomeConv(c){
   if(!c) return '';
   if(c.tipo === 'gruppo') return c.nome || 'Gruppo';
   const a = altro(c);
-  return a === S.io ? nomeDi(S.io) + ' (tu)' : nomeDi(a);
+  return a === S.io ? nomeLungo(S.io) + ' (tu)' : nomeDi(a);
 }
 
 /* ---------- avvisi brevi ---------- */
@@ -1716,6 +1759,10 @@ function suono(tipo){
     audioCtx = audioCtx || new (window.AudioContext || window.webkitAudioContext)();
     const t = audioCtx.currentTime, o = audioCtx.createOscillator(), g = audioCtx.createGain();
     o.connect(g); g.connect(audioCtx.destination);
+    if(tipo === 'entrato'){   /* tre note che salgono, come quando un amico entrava su MSN */
+      o.type = 'triangle'; [523, 659, 784].forEach((f, i) => o.frequency.setValueAtTime(f, t + i * .11));
+      g.gain.setValueAtTime(.0001, t); g.gain.exponentialRampToValueAtTime(.08, t + .02); g.gain.setValueAtTime(.08, t + .3); g.gain.exponentialRampToValueAtTime(.0001, t + .55);
+      o.start(t); o.stop(t + .56); return; }
     if(tipo === 'invio'){ o.frequency.setValueAtTime(880, t); o.frequency.exponentialRampToValueAtTime(1320, t + .08); g.gain.setValueAtTime(.05, t); g.gain.exponentialRampToValueAtTime(.0001, t + .14); o.start(t); o.stop(t + .15); }
     else { o.type = 'sine'; o.frequency.setValueAtTime(660, t); o.frequency.setValueAtTime(990, t + .09); g.gain.setValueAtTime(.0001, t); g.gain.exponentialRampToValueAtTime(.09, t + .02);
            g.gain.exponentialRampToValueAtTime(.0001, t + .32); o.start(t); o.stop(t + .33); }
@@ -1825,6 +1872,7 @@ async function caricaProfilo(){
                        foto: data && data.foto_url, ruolo: (data && data.ruolo) || ''});
   const c = data && data.chat_cfg;
   if(c && typeof c === 'object'){ Object.assign(S.cfg, c); memoria('cfg', S.cfg); applicaTema(); }
+  aggiornaMe();
 }
 async function caricaPersone(extra){
   const [a, b] = await Promise.all([
@@ -1835,6 +1883,7 @@ async function caricaPersone(extra){
   S.contatti = [];
   (a.data || []).forEach(p => { S.persone.set(p.id, p); S.contatti.push(p.id); });
   (b.data || []).forEach(p => { if(!S.persone.has(p.id) || p.id !== S.io) S.persone.set(p.id, Object.assign(S.persone.get(p.id) || {}, p)); });
+  aggiornaMe();
 }
 async function caricaElenco(){
   const {data, error} = await sb.rpc('chat_elenco');
@@ -1985,7 +2034,44 @@ function statoSpunte(m, c){
 
 /* ---------- tempo reale ---------- */
 let canaleDb = null, canaleOnline = null, canaleScrive = null;
+/* v2.2: il tempo reale si rimette in piedi da solo. Se il collegamento cade (telefono in tasca,
+   scheda in secondo piano, rete che cambia, accesso rinnovato) ricreo i canali e rimetto in pari
+   la chat, senza dover ricaricare la pagina. */
+let tRiavvio = null, tentativiRiavvio = 0, giroCanali = 0, avviatoIl = 0;
+function chiudiCanali(){
+  giroCanali++;
+  [canaleDb, canaleOnline, canaleScrive].forEach(c => { if(c) try{ sb.removeChannel(c); }catch(e){} });
+  canaleDb = canaleOnline = canaleScrive = null;
+}
+function riavviaTempoReale(subito){
+  clearTimeout(tRiavvio);
+  const attesa = subito ? 0 : Math.min(30000, 1500 * Math.pow(2, tentativiRiavvio++));
+  tRiavvio = setTimeout(() => { chiudiCanali(); avviaTempoReale(); }, attesa);
+}
+function canaliVivi(){
+  if(canaleDb && canaleDb.state === 'joining' && Date.now() - avviatoIl < 12000) return true;   /* si sta collegando */
+  return !!(canaleDb && canaleDb.state === 'joined' && sb.realtime && sb.realtime.isConnected && sb.realtime.isConnected());
+}
+/* torni sulla chat, la rete torna, o ogni tanto: controllo il collegamento e rimetto in pari */
+const firmaElenco = l => l.map(c => c.id + ':' + ((c.ultimo && c.ultimo.id) || '') + ':' + (c.non_lette || 0)).sort().join('|');
+async function controllaTempoReale(periodico){
+  if(!S.pronti) return;
+  if(!canaliVivi()){ riavviaTempoReale(true); recupera(); return; }
+  if(!periodico){ recupera(); return; }
+  /* collegamento in piedi: controllo leggero, rimetto in pari solo se manca qualcosa */
+  try{
+    const {data, error} = await sb.rpc('chat_elenco');
+    if(error) return;
+    if(firmaElenco(data || []) !== firmaElenco(Array.from(S.convs.values()))) recupera();
+  }catch(e){}
+}
 function avviaTempoReale(){
+  const giro = ++giroCanali; avviatoIl = Date.now();
+  const st0 = st => {
+    if(giro !== giroCanali) return;   /* un canale vecchio che ho chiuso io: non conta */
+    if(st === 'SUBSCRIBED'){ tentativiRiavvio = 0; if(S.pronti) recupera(); }
+    else if(st === 'CHANNEL_ERROR' || st === 'TIMED_OUT' || st === 'CLOSED') riavviaTempoReale();
+  };
   canaleDb = sb.channel('fosschat-db')
     .on('postgres_changes', {event: 'INSERT', schema: 'public', table: 'chat_messaggi'}, p => arrivaMessaggio(p.new))
     .on('postgres_changes', {event: 'UPDATE', schema: 'public', table: 'chat_messaggi'}, p => cambiaMessaggio(p.new))
@@ -1996,14 +2082,16 @@ function avviaTempoReale(){
     .on('postgres_changes', {event: '*', schema: 'public', table: 'chat_programmati'}, p => cambiaProgrammato(p))
     .on('postgres_changes', {event: 'UPDATE', schema: 'public', table: 'progetti'}, p => lavoroCambiato(p.new && p.new.id))
     .on('postgres_changes', {event: '*', schema: 'public', table: 'elementi'}, p => { const r = p.new && p.new.progetto_id ? p.new : p.old; if(r && (!r.tipo || r.tipo === 'evento' || r.tipo === 'voce')) lavoroCambiato(r.progetto_id); })
-    .subscribe(st => { if(st === 'SUBSCRIBED' && S.pronti) recupera(); });
+    .subscribe(st0);
 
   canaleOnline = sb.channel('fosschat-online', {config: {presence: {key: S.io}}});
   canaleOnline.on('presence', {event: 'sync'}, () => {
     const st = canaleOnline.presenceState();
+    const prima = S.online;
     S.online = new Set(Object.keys(st));
+    notaEntrati(prima, S.online);
     aggiornaTestaConv(); disegnaListaPresto();
-  }).subscribe(async st => { if(st === 'SUBSCRIBED') try{ await canaleOnline.track({id: S.io, dal: Date.now()}); }catch(e){} });
+  }).subscribe(async st => { if(st === 'SUBSCRIBED') onlinePronto = Date.now(); if(st === 'SUBSCRIBED') try{ await canaleOnline.track({id: S.io, dal: Date.now()}); }catch(e){} });
 
   canaleScrive = sb.channel('fosschat-scrive');
   canaleScrive.on('broadcast', {event: 'scrive'}, ({payload}) => {
@@ -2027,7 +2115,13 @@ function chiScrive(conv){
   return r;
 }
 /* dopo una disconnessione rimetto in pari l'elenco e la chat aperta */
-async function recupera(){
+let recuperoInCorso = null;
+function recupera(){
+  if(recuperoInCorso) return recuperoInCorso;
+  recuperoInCorso = recuperaOra().finally(() => { recuperoInCorso = null; });
+  return recuperoInCorso;
+}
+async function recuperaOra(){
   try{
     await caricaElenco();
     if(S.aperta && S.convs.has(S.aperta)){
@@ -2207,6 +2301,7 @@ function applicaTema(){
   document.documentElement.setAttribute('data-tema', t);
   const col = TEMI_COLORE.some(x => x.id === S.cfg.colori) ? S.cfg.colori : 'brand';
   document.documentElement.setAttribute('data-colori', col);
+  try{ if(VV.cv) leggiColoriVivo(); }catch(e){}
   document.documentElement.setAttribute('data-testo', S.cfg.testo || 'medio');
   const scuro = t === 'scuro';
   document.documentElement.style.setProperty('--doodle-img', S.cfg.doodle === false ? 'none' : doodle(scuro));
@@ -2282,7 +2377,7 @@ function disegnaLista(){
   let v = S.vista === 'archiviate' ? arch : tutte.filter(c => !c.archiviata);
   const bloccate = tutte.some(c => c.bloccata);
   /* filtri */
-  const F = [['tutte','Tutte'],['nonlette','Da leggere'],['gruppi','Gruppi']].concat(bloccate ? [['bloccate','Bloccate']] : []);
+  const F = [['tutte','Tutte'],['nonlette','Da leggere'],['gruppi','Gruppi']].concat(bloccate ? [['bloccate','Private']] : []);
   if(S.filtro === 'bloccate' && !bloccate) S.filtro = 'tutte';
   el('filtri').innerHTML = S.vista === 'archiviate' ? '' : F.map(f => '<button class="filtro'+(S.filtro === f[0] ? ' on' : '')+'" data-a="filtro" data-f="'+f[0]+'">'+f[1]+'</button>').join('');
   if(S.filtro === 'nonlette') v = v.filter(c => c.non_lette > 0 || c._nonLetta);
@@ -2337,7 +2432,7 @@ function rigaHTML(c){
   if(sc.length){
     ant = '<span class="scrive">'+(c.tipo === 'gruppo' ? esc(nomeDi(sc[0].id)) + ' ' : '')+(sc[0].cosa === 'registra' ? 'sta registrando un vocale…' : 'sta scrivendo…')+'</span>';
   } else if(c.bloccata){
-    ant = svg('lucchetto', 1.8) + '<span class="tx">Chat bloccata</span>';
+    ant = svg('lucchetto', 1.8) + '<span class="tx">Chat privata</span>';
   } else if(u){
     if(u.eliminato) ant = svg('vietato', 1.8) + '<span class="tx" style="font-style:italic">'+(u.autore === S.io ? 'Hai eliminato questo messaggio' : 'Questo messaggio è stato eliminato')+'</span>';
     else if(u.tipo === 'sistema') ant = '<span class="tx">'+esc(u.media && u.media.fissato ? (u.autore === S.io ? 'Hai fissato un messaggio' : nomeMsg(u) + ' ha fissato un messaggio') : (u.testo || ''))+'</span>';
@@ -2380,7 +2475,7 @@ function menuRiga(id, x, y){
       else { c._nonLetta = true; impostaMembro(c, {letto_fino: new Date(new Date(c.ultimo_il).getTime() - 1000).toISOString()}); }
       disegnaLista();
     }],
-    [c.bloccata ? 'Sblocca chat' : 'Blocca chat', c.bloccata ? 'lucchettoAperto' : 'lucchetto', () => alternaBlocco(c)],
+    [c.bloccata ? 'Togli privata' : 'Rendi privata', c.bloccata ? 'lucchettoAperto' : 'lucchetto', () => alternaBlocco(c)],
     null,
     c.tipo === 'gruppo' ? ['Esci dal gruppo', 'esci', () => esciGruppo(c), 'rosso'] : ['Elimina chat', 'cestino', () => eliminaChat(c), 'rosso'],
   ]);
@@ -2415,7 +2510,7 @@ async function apriConv(id, opz){
   const c = S.convs.get(id);
   if(!c){ if(S.pronti) toast('Questa chat non è più disponibile.'); return; }
   if(c.bloccata && !S.sbloccate.has(id)){
-    const ok = await chiediPin('Chat bloccata', 'Inserisci il codice per aprire «'+nomeConv(c)+'».');
+    const ok = await chiediPin('Chat privata', 'Inserisci il codice per aprire «'+nomeConv(c)+'».');
     if(!ok) return;
     S.sbloccate.add(id);
   }
@@ -2502,7 +2597,7 @@ function aggiornaTestaConv(){
     stato = c.tipo === 'gruppo' ? nomeDi(sc[0].id) + ' ' + cosa : cosa;
   } else if(c.tipo === 'privata'){
     const a = altro(c);
-    stato = S.online.has(a) ? 'online' : ultimoAccesso((S.persone.get(a) || {}).visto) || (S.persone.get(a) || {}).ruolo || '';
+    stato = a === S.io ? (fraseDi(S.io) || 'Messaggi a te stesso') : fraseDi(a) && !S.online.has(a) ? fraseDi(a) : S.online.has(a) ? 'online' + (fraseDi(a) ? ' · ' + fraseDi(a) : '') : ultimoAccesso((S.persone.get(a) || {}).visto) || (S.persone.get(a) || {}).ruolo || '';
   } else {
     const m = (c.membri || []).map(x => x.id).sort((a, b) => (a === S.io) - (b === S.io));
     stato = m.map(id => id === S.io ? 'Tu' : nomeDi(id)).join(', ');
@@ -4284,21 +4379,26 @@ async function codiceDimenticato(){
 async function alternaBlocco(c){
   if(!c.bloccata){
     if(!S.haPin){
-      const ok = await new Promise(r => conferma('Blocca questa chat', 'Per bloccare le chat serve un codice di 4 cifre: lo scegli adesso e vale per tutte le tue chat bloccate.', 'Scegli il codice', () => r(true), false, () => r(false)));
+      const ok = await new Promise(r => conferma('Rendi privata questa chat', 'Per rendere private le chat serve un codice di 4 cifre: lo scegli adesso e vale per tutte le tue chat private.', 'Scegli il codice', () => r(true), false, () => r(false)));
       if(!ok || !await impostaNuovoPin()) return;
+    } else {
+      /* v2.3: anche con il codice già scelto, per renderla privata te lo chiedo */
+      const pin = await chiediPin('Rendi privata', 'Inserisci il tuo codice per rendere privata «' + nomeConv(c) + '».');
+      if(!pin) return;
+      if(pin === 'rifatto') return alternaBlocco(c);
     }
     const {data, error} = await sb.rpc('chat_blocca', {p_conv: c.id, p_si: true});
-    if(error || data !== 'ok') return errore(error || data, 'Chat non bloccata');
+    if(error || data !== 'ok') return errore(error || data, 'Chat non resa privata');
     c.bloccata = true; S.sbloccate.add(c.id);
-    toast('Chat bloccata: per aprirla servirà il codice.');
+    toast('Chat privata: per aprirla servirà il codice.');
   } else {
-    const pin = await chiediPin('Sblocca la chat', 'Inserisci il codice per togliere il blocco a «' + nomeConv(c) + '».');
+    const pin = await chiediPin('Togli privata', 'Inserisci il codice per rendere di nuovo normale «' + nomeConv(c) + '».');
     if(!pin) return;
     if(pin === 'rifatto') return alternaBlocco(c);
     const {data, error} = await sb.rpc('chat_blocca', {p_conv: c.id, p_si: false, p_pin: pin});
     if(error || data !== 'ok') return errore(error || data, 'Blocco non tolto');
     c.bloccata = false;
-    toast('Blocco tolto.');
+    toast('La chat non è più privata.');
   }
   disegnaLista(); if(S.aperta === c.id) aggiornaTestaConv(); if(infoAperta === c.id) disegnaInfo();
 }
@@ -4347,7 +4447,7 @@ function richiudi(){
     S.sbloccate.delete(c.id);
     const id = c.id;
     chiudiConv();
-    if(!S.tutto) toast('La chat bloccata si è richiusa.', 'Riapri', () => apriConv(id));
+    if(!S.tutto) toast('La chat privata si è richiusa.', 'Riapri', () => apriConv(id));
   }
   S.sbloccate.clear();
   if(S.tutto && !bloccoTotaleAperto) bloccoTotale();
@@ -4397,9 +4497,10 @@ function nuovaChat(){
     const pp = S.contatti.filter(id => !q || nomeLungo(id).toLowerCase().includes(q) || ((S.persone.get(id) || {}).ruolo || '').toLowerCase().includes(q));
     el('pannelloSxC').innerHTML = '<div class="cerca" style="padding-top:10px"><label>'+svg('cerca')+'<input id="ncCerca" placeholder="Cerca un nome o un ruolo" value="'+esc(q)+'"></label></div>'+
       (q ? '' : '<button class="voce" data-a="nuovo-gruppo"><span class="ic-tondo">'+svg('gruppo')+'</span><span class="vc"><b>Nuovo gruppo</b></span></button>'+
+        '<button class="voce" data-a="scrivi-a" data-id="'+S.io+'">'+avatar(S.io, '', true)+'<span class="vc"><b>'+esc(nomeLungo(S.io))+' (tu)</b><span>Scrivi a te stesso: appunti, link, prove</span></span></button>'+
         '<div class="sez-t grigio" style="padding:20px 30px 10px">Il tuo team su FOSS</div>')+
       (pp.length ? pp.map(id => '<button class="voce" data-a="scrivi-a" data-id="'+id+'">'+avatar(id, '', true)+'<span class="vc"><b>'+esc(nomeLungo(id))+'</b><span>'+
-        esc(S.online.has(id) ? 'online' : (S.persone.get(id) || {}).ruolo || 'Nel tuo team')+'</span></span></button>').join('')
+        esc(fraseDi(id) || (S.online.has(id) ? 'online' : (S.persone.get(id) || {}).ruolo || 'Nel tuo team'))+'</span></span></button>').join('')
         : '<div class="vuoto-lista">'+(q ? 'Nessuno con questo nome.' : 'Nel tuo team non c’è ancora nessuno.<br>Invita i collaboratori da FOSS: appena entrano li trovi qui.')+'</div>');
     const i = el('ncCerca'); i.oninput = () => { const pos = i.selectionStart; disegna(i.value); const n = el('ncCerca'); n.focus(); n.setSelectionRange(pos, pos); };
   };
@@ -4409,7 +4510,9 @@ function nuovaChat(){
 async function scriviA(id){
   chiudiPannelloSinistra(); chiudiVelo();
   let conv = null;
-  S.convs.forEach(c => { if(c.tipo === 'privata' && altro(c) === id) conv = c.id; });
+  S.convs.forEach(c => { if(c.tipo !== 'privata') return;
+    const solo = (c.membri || []).every(m => m.id === S.io);
+    if(id === S.io ? solo : (!solo && altro(c) === id)) conv = c.id; });
   if(!conv){
     try{
       const {data, error} = await sb.rpc('chat_apri_privata', {p_altro: id});
@@ -4503,6 +4606,7 @@ async function disegnaInfo(){
   h += '<div class="blocco profilo-big">'+(gr ? '<span data-a="'+(true ? 'foto-gruppo' : '')+'" role="button" title="Cambia immagine">'+avatarConv(c)+'</span>' : avatar(a))+
     '<h3>'+esc(nomeConv(c))+(gr ? '<button class="ib" data-a="rinomina-gruppo" title="Cambia nome">'+svg('matita', 1.8)+'</button>' : '')+'</h3>'+
     '<p>'+(gr ? 'Gruppo · ' + (c.membri || []).length + ' partecipanti' : esc(p.ruolo || ''))+'</p>'+
+    (!gr && fraseDi(a) ? '<p class="frase-big">«'+esc(fraseDi(a))+'»</p>' : '')+
     (!gr ? '<p style="font-size:14px;margin-top:4px">'+esc(S.online.has(a) ? 'online' : ultimoAccesso(p.visto))+'</p>' : '')+'</div>';
   if(gr){
     h += '<div class="blocco"><div class="sez-t grigio" style="padding:16px 20px 6px;display:flex;align-items:center">Descrizione<span style="flex:1"></span>'+
@@ -4523,7 +4627,7 @@ async function disegnaInfo(){
   h += '<div class="blocco">'+
     '<button class="voce" data-a="crea-lavoro"><span class="ic-sem">'+svg('lavoro', 1.8)+'</span><span class="vc"><b>Crea un lavoro di FOSS</b><span>'+(gr ? 'Con la squadra di questo gruppo' : 'Con ' + esc(nomeDi(a)))+'</span></span></button>'+
     (!gr && a !== S.io ? '<button class="voce" data-a="colpetto" data-id="'+a+'"><span class="ic-sem">'+svg('mano', 1.8)+'</span><span class="vc"><b>Dai un colpetto</b><span>Per farti notare (anche col doppio tocco sulla foto)</span></span></button>' : '')+'</div>';
-  h += '<div class="blocco">'+toggle('silenziata', 'Silenzia notifiche', 'silenzia', c.silenziata)+toggle('bloccata', 'Chat bloccata con codice', 'lucchetto', c.bloccata)+
+  h += '<div class="blocco">'+toggle('silenziata', 'Silenzia notifiche', 'silenzia', c.silenziata)+toggle('bloccata', 'Chat privata con codice', 'lucchetto', c.bloccata)+
     toggle('fissata', 'Fissa in alto', 'fissa', c.fissata)+toggle('archiviata', 'Archiviata', 'archivio', c.archiviata)+'</div>';
   if(gr){
     const mm = (c.membri || []).slice().sort((x, y) => (x.id === S.io ? -1 : y.id === S.io ? 1 : 0) || (y.ruolo === 'admin') - (x.ruolo === 'admin') || nomeDi(x.id).localeCompare(nomeDi(y.id)));
@@ -4710,13 +4814,18 @@ function disegnaImpostazioni(){
   C.innerHTML =
     '<div class="blocco"><button class="voce" data-a="profilo" style="min-height:96px">'+avatar(S.io, '', false, 'width:82px;height:82px;font-size:30px')+
       '<span class="vc"><b style="font-size:18px">'+esc(nomeLungo(S.io))+'</b><span>'+esc(me.ruolo || 'Il tuo profilo FOSS')+'</span></span></button></div>'+
+    '<div class="blocco"><div class="sez-t">Come ti vedono gli altri</div>'+
+      '<div class="sez-t grigio" style="padding:4px 20px 8px">Messaggio personale</div>'+
+      '<div class="frase-campo"><input id="fraseIn" maxlength="140" placeholder="Una frase sotto il tuo nome (es. sul set fino alle 18)" value="'+esc(S.cfg.frase || '')+'"><span id="fraseN">'+(S.cfg.frase || '').length+'/140</span></div>'+
+      '<div class="sez-t grigio" style="padding:10px 20px 8px">Cornice della foto</div>'+corniciHTML()+'</div>'+
     '<div class="blocco"><div class="sez-t">Privacy e sicurezza</div>'+
       voce('proteggi-tutto', 'lucchetto', 'Proteggi FOSS.chat con un codice', 'Ogni volta che la apri ti chiede 4 cifre', interr(S.tutto))+
-      voce('cambia-pin', 'matita', S.haPin ? 'Cambia il codice' : 'Scegli il codice', S.haPin ? 'Lo stesso codice apre le chat bloccate' : 'Serve per bloccare le chat')+
+      voce('cambia-pin', 'matita', S.haPin ? 'Cambia il codice' : 'Scegli il codice', S.haPin ? 'Lo stesso codice apre le chat private' : 'Serve per rendere private le chat')+
       (S.haPin ? voce('pin-dimenticato', 'info', 'Ho dimenticato il codice', 'Lo cambi con la password di FOSS') : '')+'</div>'+
     '<div class="blocco"><div class="sez-t">Notifiche</div>'+
       voce('attiva-push', 'campana', 'Avvisi su questo dispositivo', 'Anche quando FOSS.chat è chiusa', '<span id="statoPush" style="font-size:13px;color:var(--testo-2)"></span>')+
-      voce('cfg-suoni', 'nuova', 'Suoni nella chat', 'Un suono quando arriva un messaggio', interr(S.cfg.suoni))+'</div>'+
+      voce('cfg-suoni', 'nuova', 'Suoni nella chat', 'Un suono quando arriva un messaggio', interr(S.cfg.suoni))+
+      voce('cfg-entrati', 'persona', 'Avvisami quando qualcuno entra', 'Un avviso in basso quando un collega apre FOSS.chat', interr(S.cfg.entrati !== false))+'</div>'+
     '<div class="blocco"><div class="sez-t">Chat</div>'+
       '<div class="sez-t grigio" style="padding:4px 20px 8px">Colori</div>'+
       '<div class="colori-griglia">'+TEMI_COLORE.map(x => '<button class="colore-tema'+((S.cfg.colori || 'brand') === x.id ? ' on' : '')+'" data-a="cfg" data-k="colori" data-v="'+x.id+'">'+
@@ -4728,6 +4837,7 @@ function disegnaImpostazioni(){
         '<button data-a="sfondo-colore">Un colore</button>'+(S.cfg.sfondoFoto ? '<button data-a="sfondo-togli">Togli la foto</button>' : '')+'</div>'+
       (S.cfg.sfondoFoto ? '<div class="opz" style="color:var(--testo-2);font-size:14px">Oscura la foto <input type="range" min="0" max="70" step="5" data-buio value="'+Math.round((S.cfg.sfondoBuio == null ? .25 : S.cfg.sfondoBuio) * 100)+'" style="flex:1;accent-color:var(--verde)"></div>' : '')+
       (S.cfg.sfondoFoto ? '' : voce('cfg-doodle', 'foto', 'Disegni sullo sfondo', 'Camere, ciak e gocce di FOSS', interr(S.cfg.doodle !== false)))+
+      '<div class="sez-t grigio" style="padding:4px 20px 8px">Sfondo animato</div>'+vivoHTML()+
       '<div style="padding:0 20px 12px;font-size:13px;color:var(--testo-2)">Ogni chat può avere il suo sfondo: aprila, tocca il nome in alto e scegli «Sfondo di questa chat».</div>'+
       voce('cfg-invio', 'manda', 'Invio manda il messaggio', 'Sulla tastiera del computer', interr(S.cfg.invio))+'</div>'+
     '<div class="blocco"><div class="sez-t">Messaggi</div>'+
@@ -4742,6 +4852,9 @@ function disegnaImpostazioni(){
       voce('foss', 'esci', 'Torna a FOSS', '')+'</div>'+
     '<div style="padding:18px 20px 40px;text-align:center;font-size:12.5px;color:var(--testo-3)">FOSS.chat · '+VERSIONE+'</div>';
   riempiAnteprimaSfondo();
+  const fi = el('fraseIn');
+  if(fi){ fi.oninput = () => { const n = el('fraseN'); if(n) n.textContent = fi.value.length + '/140'; };
+    fi.onchange = () => salvaFrase(fi.value); fi.onkeydown = e => { if(e.key === 'Enter'){ e.preventDefault(); fi.blur(); } }; }
   statoPush().then(s => { const n = el('statoPush'); if(n) n.textContent = {si: 'Attivi', no: 'Spenti', bloccati: 'Bloccati', 'ios-home': 'Da Home', 'no-supporto': 'Non disponibili'}[s] || ''; });
 }
 function gestisciRaccolta(tipo){
@@ -5020,6 +5133,7 @@ function sfondoPer(conv){
 }
 async function applicaSfondoConv(){
   const w = $('.msgs-wrap', el('conv')), M = el('msgs'); if(!w || !S.aperta) return;
+  avviaVivo();
   const conv = S.aperta, sf = sfondoPer(conv);
   w.style.backgroundColor = sf.c || '';
   w.classList.toggle('con-foto', !!sf.f);
@@ -5210,7 +5324,7 @@ document.addEventListener('click', async e => {
         c.tipo === 'privata' && altro(c) !== S.io ? [['Dai un colpetto', 'mano', () => colpetto(altro(c))]] : [], [
         null,
         [c.silenziata ? 'Riattiva notifiche' : 'Silenzia notifiche', c.silenziata ? 'campana' : 'silenzia', () => impostaMembro(c, {silenziata: !c.silenziata})],
-        [c.bloccata ? 'Sblocca chat' : 'Blocca chat', c.bloccata ? 'lucchettoAperto' : 'lucchetto', () => alternaBlocco(c)],
+        [c.bloccata ? 'Togli privata' : 'Rendi privata', c.bloccata ? 'lucchettoAperto' : 'lucchetto', () => alternaBlocco(c)],
         ['Svuota chat', 'vietato', svuotaChat],
         null,
         c.tipo === 'gruppo' ? ['Esci dal gruppo', 'esci', () => esciGruppo(c), 'rosso'] : ['Elimina chat', 'cestino', () => eliminaChat(c), 'rosso'],
@@ -5269,6 +5383,9 @@ document.addEventListener('click', async e => {
     case 'cfg-suoni': cambiaCfg('suoni', !S.cfg.suoni); disegnaImpostazioni(); break;
     case 'cfg-doodle': cambiaCfg('doodle', S.cfg.doodle === false); applicaTema(); disegnaImpostazioni(); { const M = el('msgs'); if(M) M.classList.toggle('niente-doodle', S.cfg.doodle === false); } break;
     case 'cfg-invio': cambiaCfg('invio', !S.cfg.invio); disegnaImpostazioni(); break;
+    case 'cfg-entrati': cambiaCfg('entrati', S.cfg.entrati === false); disegnaImpostazioni(); break;
+    case 'cornice': scegliCornice(t.dataset.v); break;
+    case 'vivo': cambiaCfg('vivo', t.dataset.v || ''); disegnaImpostazioni(); avviaVivo(); if(t.dataset.v) setTimeout(vivoScossa, 300); break;
     case 'gestisci-sticker': gestisciRaccolta('sticker'); break;
     case 'gestisci-gif': gestisciRaccolta('gif'); break;
     case 'info-file': foglio('Dove stanno i file', MEDIA_NAS
@@ -5424,7 +5541,7 @@ async function avvia(){
   ping(); setInterval(ping, 60000);
   setInterval(() => { aggiornaTestaConv(); }, 30000);
   document.addEventListener('visibilitychange', () => {
-    if(document.visibilityState === 'visible'){ ping(); scattaPromemoria(); pulisciAvvisi(); const c = S.aperta && S.convs.get(S.aperta); if(c && c.non_lette && vicinoAlFondo() && sbloccata(c)) segnaLetto(c.id); }
+    if(document.visibilityState === 'visible'){ controllaTempoReale(); ping(); scattaPromemoria(); pulisciAvvisi(); const c = S.aperta && S.convs.get(S.aperta); if(c && c.non_lette && vicinoAlFondo() && sbloccata(c)) segnaLetto(c.id); }
   });
   /* torni sulla finestra della chat (per esempio da un altro programma): la chat aperta diventa letta */
   window.addEventListener('focus', () => {
@@ -5432,7 +5549,10 @@ async function avvia(){
     const c = S.aperta && S.convs.get(S.aperta);
     if(c && c.non_lette && document.visibilityState === 'visible' && vicinoAlFondo() && sbloccata(c)) segnaLetto(c.id);
   });
-  window.addEventListener('online', recupera);
+  window.addEventListener('online', () => riavviaTempoReale(true));
+  window.addEventListener('pageshow', e => { if(e.persisted) controllaTempoReale(); });
+  /* rete di sicurezza: con la chat davanti controllo ogni 20 secondi che il collegamento sia vivo */
+  setInterval(() => { if(document.visibilityState === 'visible') controllaTempoReale(true); }, 20000);
   sveglia();
   sorveglianza();
   /* le persone cambiano nome o foto in FOSS: ogni tanto rileggo */
@@ -5440,7 +5560,11 @@ async function avvia(){
   if(!S.cfg.benvenuto) await benvenuto();
   seguiIndirizzo();
   prendiCondivisi();
-  sb.auth.onAuthStateChange((ev, ses) => { if(ev === 'SIGNED_OUT' || (ses && ses.user && ses.user.id !== S.io)) location.reload(); });
+  sb.auth.onAuthStateChange((ev, ses) => {
+    if(ev === 'SIGNED_OUT' || (ses && ses.user && ses.user.id !== S.io)){ location.reload(); return; }
+    /* accesso rinnovato: lo passo anche al tempo reale, sennò dopo un'ora smette di arrivare */
+    if(ev === 'TOKEN_REFRESHED' && ses && ses.access_token){ try{ sb.realtime.setAuth(ses.access_token); }catch(e){} if(!canaliVivi()) riavviaTempoReale(true); }
+  });
 }
 if('serviceWorker' in navigator){
   window.addEventListener('load', () => { navigator.serviceWorker.register('sw.js').catch(() => {}); });
@@ -5506,6 +5630,9 @@ function vociMessaggio(m, c){
   if(!colp) p.push(['Inoltra', 'inoltra', () => inoltra([m])]);
   p.push(['Elimina', 'cestino', () => eliminaMessaggio(m), 'rosso']);
 
+  /* v2.3: la super notifica (solo l'amministratore di FOSS): il messaggio arriva anche per email */
+  if(mio && S.adminFoss && !colp && !m._stato && m.tipo !== 'sistema' && (c.membri || []).some(x => x.id !== S.io))
+    a.push(['Super notifica', 'mail', () => superNotifica(m, c)]);
   if(!colp) a.push(S.importanti.has(m.id) ? ['Non più importante', 'stellaPiena', () => importante(m, false)] : ['Importante', 'stella', () => importante(m, true)]);
   if(!colp) a.push(S.promemoria.has(m.id) ? ['Togli il promemoria', 'sveglia', () => togliPromemoria(m)] : ['Ricordamelo', 'sveglia', () => ricordamelo(m)]);
   if(mio) a.push(['Info', 'info', () => infoMessaggio(m)]);
@@ -5527,6 +5654,7 @@ function testataMenu(m, c){
     const altri = (c.membri || []).filter(x => x.id !== S.io);
     if(st === 'invio') r.push(['orologio', 'In invio…']);
     else if(st === 'errore') r.push(['info', 'Non inviato']);
+    else if(!altri.length) r.push(['spunta', 'Salvato nella chat con te']);
     else if(c.tipo === 'gruppo'){
       const t = new Date(m.creato_il).getTime();
       const n = altri.filter(x => new Date(x.letto).getTime() >= t).length;
@@ -6780,7 +6908,7 @@ async function colpetto(a){
   const c = S.convs.get(S.aperta); if(!c || !a || a === S.io) return;
   if(!(c.membri || []).some(x => x.id === a)){ toast(nomeDi(a) + ' non è in questa chat.'); return; }
   const m = nuovoLocale('colpetto', {media: {a}, risponde_a: null});
-  mettiInLista(m);
+  mettiInLista(m); vivoScossa();
   try{ navigator.vibrate && navigator.vibrate(20); }catch(e){}
   try{ await salvaMessaggio(m); segnaVisto(m.id); }
   catch(e){
@@ -6793,6 +6921,7 @@ function colpettoRicevuto(m, guardo){
   const c = S.convs.get(m.conv_id); if(!c || !sbloccata(c)) return;
   try{ navigator.vibrate && navigator.vibrate([25, 70, 25]); }catch(e){}
   if(m.conv_id === S.aperta){
+    vivoScossa();
     const cv = el('conv'); if(cv){ cv.classList.remove('colpito'); void cv.offsetWidth; cv.classList.add('colpito'); setTimeout(() => cv.classList.remove('colpito'), 900); }
   } else if(!c.silenziata) toast('👋 ' + nomeMsg(m) + ' ti ha dato un colpetto' + (c.tipo === 'gruppo' ? ' in «' + nomeConv(c) + '»' : ''), 'Apri', () => apriConv(c.id));
   setTimeout(() => segnaVisto(m.id), 3000);
@@ -7292,6 +7421,199 @@ function arrivaImportato(m){
     if(S.aperta === conv) waRicarica(conv);
     else S.msgs.delete(conv);
   }, 1500));
+}
+
+/* ---------- SUPER NOTIFICA ----------
+   Solo per l'amministratore di FOSS: un tuo messaggio arriva anche per email
+   a tutte le persone della chat. Una volta sola per messaggio. */
+function superNotifica(m, c){
+  const n = (c.membri || []).filter(x => x.id !== S.io).length;
+  conferma('Super notifica', 'Il messaggio arriva anche per email ' + (n === 1 ? 'a ' + nomeDi(altro(c)) : 'alle ' + n + ' persone della chat') + '. Si può mandare una volta sola.', 'Manda la mail', async () => {
+    toast('Mando la super notifica…');
+    try{
+      const {data, error} = await sb.functions.invoke('chat-supernotifica', {body: {messaggio: m.id}});
+      if(error){
+        let d = null; try{ d = await error.context.json(); }catch(e){}
+        const k = d && d.errore;
+        if(k === 'gia') return toast('La super notifica per questo messaggio è già partita.');
+        if(k === 'troppi') return toast('Hai mandato troppe super notifiche oggi: riprova domani.');
+        if(k === 'admin') return toast('La super notifica è solo per l’amministratore di FOSS.');
+        throw error;
+      }
+      const ok = (data && data.inviate || []).length;
+      toast(ok ? 'Super notifica mandata per email a ' + (ok === 1 ? '1 persona' : ok + ' persone') + '.' : 'Nessuna email mandata: nessuno della chat ha un indirizzo valido.');
+    }catch(e){ errore(e, 'Super notifica non mandata'); }
+  });
+}
+
+/* ======================= FOSS.chat 2.4: le idee di MSN =======================
+   1) messaggio personale sotto il nome   2) «è appena entrato»
+   3) la cornice della foto (ognuno la sua)   4) sfondi animati che reagiscono al colpetto */
+
+/* ---------- 1. messaggio personale ---------- */
+function fraseDi(id){ const p = S.persone.get(id); return (p && (p.frase || '').trim()) || ''; }
+function aggiornaMe(){
+  const me = S.persone.get(S.io); if(!me) return;
+  me.frase = (S.cfg.frase || '').trim().slice(0, 140);
+  me.cornice = CORNICI.some(x => x.id === S.cfg.cornice) ? S.cfg.cornice : '';
+}
+function salvaFrase(v){
+  v = String(v || '').replace(/\s+/g, ' ').trim().slice(0, 140);
+  if(v === (S.cfg.frase || '')) return;
+  cambiaCfg('frase', v); aggiornaMe();
+  toast(v ? 'Messaggio personale salvato' : 'Messaggio personale tolto');
+  disegnaListaPresto(); aggiornaTestaConv();
+}
+
+/* ---------- 3. la cornice della foto ---------- */
+function scegliCornice(id){
+  cambiaCfg('cornice', id === 'nessuna' ? '' : id); aggiornaMe();
+  disegnaImpostazioni(); disegnaListaPresto(); aggiornaTestaConv();
+  document.querySelectorAll('#railMe').forEach(b => { b.innerHTML = avatar(S.io); });
+}
+function corniciHTML(){
+  const mia = S.cfg.cornice || '';
+  return '<div class="cornici">'+[{id:'nessuna', nome:'Nessuna'}].concat(CORNICI).map(x =>
+    '<button class="cornice-b'+((x.id === 'nessuna' ? !mia : mia === x.id) ? ' on' : '')+'" data-a="cornice" data-v="'+x.id+'">'+
+      '<span class="cornice-av">'+avatar(S.io, 'cr-' + x.id, false, 'width:46px;height:46px')+'</span>'+
+      '<span>'+esc(x.nome)+'</span></button>').join('')+'</div>';
+}
+
+/* ---------- 2. «è appena entrato» ---------- */
+let onlinePronto = 0;              // da quando ascolto: i primi secondi non conto chi c'era già
+const entratoIl = new Map();       // una volta ogni 15 minuti per persona
+function conosco(id){
+  if(S.contatti.includes(id)) return true;
+  let si = false; S.convs.forEach(c => { if(!si && (c.membri || []).some(m => m.id === id)) si = true; });
+  return si;
+}
+function notaEntrati(prima, ora){
+  if(!onlinePronto || Date.now() - onlinePronto < 6000 || S.cfg.entrati === false) return;
+  ora.forEach(id => {
+    if(id === S.io || prima.has(id) || !conosco(id)) return;
+    const t = entratoIl.get(id) || 0; if(Date.now() - t < 15 * 60000) return;
+    entratoIl.set(id, Date.now());
+    mostraEntrato(id);
+  });
+}
+function mostraEntrato(id){
+  let box = el('entrati');
+  if(!box){ box = document.createElement('div'); box.id = 'entrati'; document.body.appendChild(box); }
+  const f = fraseDi(id);
+  const n = document.createElement('button');
+  n.className = 'entrato'; n.dataset.a = 'scrivi-a'; n.dataset.id = id;
+  n.innerHTML = avatar(id, '', false)+'<span class="et"><b>'+esc(nomeLungo(id))+'</b><span>è appena entrato</span>'+(f ? '<i>'+esc(f)+'</i>' : '')+'</span>';
+  box.appendChild(n);
+  while(box.children.length > 3) box.firstChild.remove();
+  suono('entrato');
+  requestAnimationFrame(() => n.classList.add('dentro'));
+  setTimeout(() => { n.classList.remove('dentro'); setTimeout(() => n.remove(), 400); }, 5500);
+}
+
+/* ---------- 4. sfondi animati ---------- */
+const VIVI = [
+  {id:'', nome:'Nessuno'}, {id:'bolle', nome:'Bolle'}, {id:'stelle', nome:'Stelle'},
+  {id:'neve', nome:'Neve'}, {id:'lucciole', nome:'Lucciole'}, {id:'coriandoli', nome:'Coriandoli'}
+];
+const VV = {tipo: '', cv: null, ctx: null, p: [], w: 0, h: 0, raf: 0, ultimo: 0, scossa: 0, ro: null, colori: null};
+function vivoScelto(){ return VIVI.some(x => x.id && x.id === S.cfg.vivo) ? S.cfg.vivo : ''; }
+function fermaVivo(){
+  cancelAnimationFrame(VV.raf); VV.raf = 0;
+  if(VV.ro) try{ VV.ro.disconnect(); }catch(e){}
+  VV.ro = null;
+  if(VV.cv) VV.cv.remove();
+  VV.cv = null; VV.ctx = null; VV.p = []; VV.tipo = '';
+}
+function avviaVivo(){
+  const w = $('.msgs-wrap', el('conv'));
+  const tipo = vivoScelto();
+  if(!w || !tipo){ fermaVivo(); return; }
+  if(VV.cv && VV.cv.parentNode === w && VV.tipo === tipo){ leggiColoriVivo(); return; }
+  fermaVivo();
+  const cv = document.createElement('canvas'); cv.className = 'sfondo-vivo'; cv.setAttribute('aria-hidden', 'true');
+  w.insertBefore(cv, w.firstChild);
+  VV.cv = cv; VV.ctx = cv.getContext('2d'); VV.tipo = tipo;
+  leggiColoriVivo(); misuraVivo();
+  try{ VV.ro = new ResizeObserver(misuraVivo); VV.ro.observe(w); }catch(e){}
+  VV.ultimo = 0; VV.raf = requestAnimationFrame(passoVivo);
+}
+function leggiColoriVivo(){
+  const s = getComputedStyle(document.documentElement);
+  VV.colori = {acc: s.getPropertyValue('--verde').trim() || '#FFAD01', testo: s.getPropertyValue('--testo').trim() || '#fff',
+    scuro: document.documentElement.getAttribute('data-tema') === 'scuro'};
+}
+function misuraVivo(){
+  if(!VV.cv) return;
+  const r = VV.cv.parentNode.getBoundingClientRect(), d = Math.min(2, window.devicePixelRatio || 1);
+  VV.w = Math.max(1, r.width); VV.h = Math.max(1, r.height);
+  VV.cv.width = Math.round(VV.w * d); VV.cv.height = Math.round(VV.h * d);
+  VV.ctx.setTransform(d, 0, 0, d, 0, 0);
+  const n = {bolle: 26, stelle: 70, neve: 60, lucciole: 22, coriandoli: 46}[VV.tipo] || 30;
+  const area = Math.min(1.6, (VV.w * VV.h) / (900 * 700));
+  VV.p = Array.from({length: Math.max(10, Math.round(n * area))}, () => nuovaParticella(true));
+}
+const rnd = (a, b) => a + Math.random() * (b - a);
+function nuovaParticella(ovunque){
+  const W = VV.w, H = VV.h, t = VV.tipo;
+  if(t === 'bolle') return {x: rnd(0, W), y: ovunque ? rnd(0, H) : H + 20, r: rnd(4, 18), vx: rnd(-.15, .15), vy: rnd(-.6, -.25), f: rnd(0, 6.28)};
+  if(t === 'stelle') return {x: rnd(0, W), y: rnd(0, H), r: rnd(.6, 1.8), vx: rnd(-.05, .05), vy: rnd(-.03, .03), f: rnd(0, 6.28), v: rnd(.01, .04)};
+  if(t === 'neve') return {x: rnd(0, W), y: ovunque ? rnd(0, H) : -10, r: rnd(1, 3.4), vx: rnd(-.3, .3), vy: rnd(.3, 1.1), f: rnd(0, 6.28)};
+  if(t === 'lucciole') return {x: rnd(0, W), y: rnd(0, H), r: rnd(1.5, 3), vx: rnd(-.3, .3), vy: rnd(-.3, .3), f: rnd(0, 6.28), v: rnd(.02, .05)};
+  const pal = ['#FFAD01', '#FF5E7E', '#3EA6FF', '#4CD964', '#B27BFF', '#FFD84D'];
+  return {x: rnd(0, W), y: ovunque ? rnd(0, H) : -10, r: rnd(3, 6), vx: rnd(-.4, .4), vy: rnd(.4, 1.2), f: rnd(0, 6.28), v: rnd(-.08, .08), c: pal[Math.floor(Math.random() * pal.length)]};
+}
+/* il colpetto: lo sfondo fa un salto (come i «dynamic backgrounds» di MSN col trillo) */
+function vivoScossa(){
+  if(!VV.cv) return;
+  VV.scossa = 1;
+  const cx = VV.w / 2, cy = VV.h / 2;
+  VV.p.forEach(p => { const dx = p.x - cx, dy = p.y - cy, d = Math.hypot(dx, dy) || 1; p.vx += dx / d * rnd(2, 5); p.vy += dy / d * rnd(2, 5); });
+  if(!VV.raf) VV.raf = requestAnimationFrame(passoVivo);
+}
+const fermo = () => window.matchMedia && matchMedia('(prefers-reduced-motion: reduce)').matches;
+function passoVivo(ts){
+  VV.raf = 0;
+  if(!VV.cv || !VV.cv.isConnected) return fermaVivo();
+  if(document.visibilityState !== 'visible'){ VV.raf = requestAnimationFrame(passoVivo); return; }
+  if(ts - VV.ultimo < 32){ VV.raf = requestAnimationFrame(passoVivo); return; }   // ~30 al secondo
+  VV.ultimo = ts;
+  const g = VV.ctx, W = VV.w, H = VV.h, C = VV.colori, t = VV.tipo, s = VV.scossa;
+  g.clearRect(0, 0, W, H);
+  if(s > .02){ g.fillStyle = C.acc; g.globalAlpha = s * .12; g.fillRect(0, 0, W, H); g.globalAlpha = 1; }
+  VV.p.forEach((p, i) => {
+    p.f += .02;
+    if(t === 'bolle'){ p.x += p.vx + Math.sin(p.f) * .25; p.y += p.vy; if(p.y < -30) VV.p[i] = nuovaParticella(false);
+      g.beginPath(); g.arc(p.x, p.y, p.r, 0, 6.283); g.strokeStyle = C.acc; g.globalAlpha = .28; g.lineWidth = 1.4; g.stroke();
+      g.beginPath(); g.arc(p.x - p.r * .35, p.y - p.r * .35, p.r * .22, 0, 6.283); g.fillStyle = C.testo; g.globalAlpha = .18; g.fill(); }
+    else if(t === 'stelle'){ p.x += p.vx; p.y += p.vy; const a = .25 + .55 * (.5 + .5 * Math.sin(p.f * (p.v * 50)));
+      g.beginPath(); g.arc(p.x, p.y, p.r, 0, 6.283); g.fillStyle = i % 5 ? C.testo : C.acc; g.globalAlpha = a * (C.scuro ? 1 : .6); g.fill(); }
+    else if(t === 'neve'){ p.x += p.vx + Math.sin(p.f) * .3; p.y += p.vy; if(p.y > H + 10) VV.p[i] = nuovaParticella(false);
+      g.beginPath(); g.arc(p.x, p.y, p.r, 0, 6.283); g.fillStyle = C.scuro ? '#ffffff' : C.acc; g.globalAlpha = C.scuro ? .55 : .35; g.fill(); }
+    else if(t === 'lucciole'){ p.vx += rnd(-.03, .03); p.vy += rnd(-.03, .03); p.vx *= .98; p.vy *= .98; p.x += p.vx; p.y += p.vy;
+      const a = .35 + .5 * (.5 + .5 * Math.sin(p.f * (p.v * 40)));
+      const gr = g.createRadialGradient(p.x, p.y, 0, p.x, p.y, p.r * 6); gr.addColorStop(0, C.acc); gr.addColorStop(1, 'rgba(0,0,0,0)');
+      g.globalAlpha = a * .5; g.fillStyle = gr; g.fillRect(p.x - p.r * 6, p.y - p.r * 6, p.r * 12, p.r * 12);
+      g.globalAlpha = a; g.beginPath(); g.arc(p.x, p.y, p.r * .7, 0, 6.283); g.fillStyle = C.acc; g.fill(); }
+    else { p.x += p.vx + Math.sin(p.f) * .4; p.y += p.vy; p.f += p.v; if(p.y > H + 10) VV.p[i] = nuovaParticella(false);
+      g.save(); g.translate(p.x, p.y); g.rotate(p.f); g.fillStyle = p.c; g.globalAlpha = .5; g.fillRect(-p.r / 2, -p.r / 4, p.r, p.r / 2); g.restore(); }
+    // rientrano dai bordi
+    if(p.x < -40) p.x = W + 30; else if(p.x > W + 40) p.x = -30;
+    if((t === 'stelle' || t === 'lucciole') && (p.y < -40 || p.y > H + 40)) p.y = (p.y + H) % H;
+    // dopo il colpetto rallentano piano piano
+    if(s > .02 || Math.abs(p.vx) > 2 || Math.abs(p.vy) > 2){ p.vx *= .93; p.vy *= .93;
+      if(t === 'bolle' && p.vy > -.25) p.vy = Math.min(p.vy, -.25 + (p.vy + .25) * .9);
+      if((t === 'neve' || t === 'coriandoli') && p.vy < .3) p.vy += .05; }
+  });
+  g.globalAlpha = 1;
+  VV.scossa = s * .94;
+  if(fermo() && VV.scossa < .02) return;   // movimento ridotto: un fotogramma e basta
+  VV.raf = requestAnimationFrame(passoVivo);
+}
+document.addEventListener('visibilitychange', () => { if(document.visibilityState === 'visible' && VV.cv && !VV.raf) VV.raf = requestAnimationFrame(passoVivo); });
+function vivoHTML(){
+  const mio = vivoScelto();
+  return '<div class="opz vivi">'+VIVI.map(x => '<button class="'+(mio === x.id ? 'on' : '')+'" data-a="vivo" data-v="'+x.id+'">'+esc(x.nome)+'</button>').join('')+'</div>'+
+    '<div style="padding:0 20px 12px;font-size:13px;color:var(--testo-2)">Si muove dietro ai messaggi e fa un salto quando arriva un colpetto.</div>';
 }
 
 /* ======================= VIA ======================= */

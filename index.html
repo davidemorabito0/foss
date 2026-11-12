@@ -3624,15 +3624,21 @@ button.pf-p:hover{background:var(--surface-2);border-radius:10px}
   .ht-t .q{font-size:13.5px;font-weight:600;color:var(--amber-ink);flex:none}
   .ht-t.urg .q{color:var(--alert)}
   .ht-t .chi .av{width:30px;height:30px;font-size:11px}
-  /* la barra in basso: quattro posti, staccata e arrotondata */
-  .tabbar{left:8px;right:8px;bottom:calc(6px + env(safe-area-inset-bottom,0px));border:1px solid var(--line);border-radius:26px;
-    padding:6px 6px;box-shadow:0 10px 30px rgba(0,0,0,.28);background:color-mix(in srgb,var(--surface) 92%,transparent);
-    -webkit-backdrop-filter:blur(14px);backdrop-filter:blur(14px)}
-  .tabbar .tb{padding:7px 2px 6px}
-  .tabbar .tb svg{width:24px;height:24px}
-  .tabbar .tb .lb{font-size:11px}
-  .tabbar .tb.on{color:var(--text)}
-  .tabbar .tb.on .ic{color:var(--amber)}
+  /* la barra in basso: tre posti, come in FOSS.chat (pillola staccata, la voce attiva evidenziata) */
+  .tabbar{left:14px;right:14px;bottom:calc(10px + env(safe-area-inset-bottom,0px));height:66px;border-radius:33px;
+    padding:5px;gap:4px;border:none;box-shadow:0 8px 30px rgba(0,0,0,.35),inset 0 0 0 .5px rgba(255,255,255,.12);
+    background:color-mix(in srgb,var(--surface-2) 82%,transparent);-webkit-backdrop-filter:blur(20px) saturate(1.6);backdrop-filter:blur(20px) saturate(1.6)}
+  :root[data-theme="light"] .tabbar{box-shadow:0 8px 30px rgba(0,0,0,.15),inset 0 0 0 .5px rgba(0,0,0,.08)}
+  .tabbar .tb{padding:0;border-radius:28px;justify-content:center;gap:3px;color:var(--text)}
+  .tabbar .tb svg{width:27px;height:27px}
+  .tabbar .tb .ic{width:28px;height:28px}
+  .tabbar .tb .lb{font-size:11.5px;font-weight:600;color:var(--text)}
+  .tabbar .tb.on{background:rgba(120,120,128,.32)}
+  :root[data-theme="light"] .tabbar .tb.on{background:rgba(120,120,128,.16)}
+  .tabbar .tb.on .ic{color:var(--text)}
+  .tabbar .tb:active{background:rgba(120,120,128,.24)}
+  .tabbar .tb-av .av{width:28px;height:28px;font-size:11px;border:none}
+  .tabbar .tb .n{top:-6px;right:-12px;min-width:20px;height:20px;border-radius:10px;background:var(--amber);color:var(--on-amber);font-size:12px;border:none;padding:0 5px}
 }
 </style>
 
@@ -6402,24 +6408,17 @@ function renderTabbar(){
   const dentro = state.schermo==='progetto' || state.schermo==='gate';
   n.hidden = !suTelefono() || dentro;
   if(n.hidden){ n.innerHTML = ''; return; }
-  const mie = contaMie();
+  /* v72: tre posti, come in FOSS.chat: Home, Chat, Profilo */
+  const conChat = cloudAttivo() && !state.ospite;
   const T = [
-    {k:'casa',     l:'Home',     ic:'casa'},
-    {k:'progetti', l:'Progetti', ic:'cartella'},
-    {k:'mie',      l:'Task',     ic:'spunta', n:mie},
-    {k:'note',     l:'Note',     ic:'pen'},
-    {k:'profilo',  l:'Profilo',  ic:'user'}
-  ];
-  const attivo =
-    (state.schermo==='profilo' || state.schermo==='guida' || state.schermo==='team') ? 'profilo' :
-    state.schermo==='calendario' ? 'lavori' :
-    state.schermo==='mie'     ? 'mie' :
-    state.schermo==='spazi'   ? 'casa' :
-    (state.schermo==='home' && state.vista==='note') ? 'note' :
-    state.schermo==='home' ? 'progetti' : '';
+    {k:'casa',    l:'Home',    ic:svg('casa')},
+    conChat ? {k:'chat', l:'Chat', ic:svg('chat'), n:(chatNuova() ? 0 : chatNonLette), cls:' tb-chat'} : null,
+    {k:'profilo', l:'Profilo', ic:'<span class="tb-av">'+av(U(state.utente)||{}, 'sm')+'</span>'}
+  ].filter(Boolean);
+  const attivo = (state.schermo==='profilo' || state.schermo==='guida' || state.schermo==='team') ? 'profilo' : 'casa';
   n.innerHTML = T.map(t=>
-    '<button class="tb'+(attivo===t.k?' on':'')+'" data-action="tab-tel" data-k="'+t.k+'">'+
-      '<span class="ic">'+svg(t.ic)+(t.n? '<span class="n">'+(t.n>9?'9+':t.n)+'</span>':'')+'</span>'+
+    '<button class="tb'+(t.cls||'')+(attivo===t.k?' on':'')+'" data-action="tab-tel" data-k="'+t.k+'">'+
+      '<span class="ic">'+t.ic+(t.n? '<span class="n">'+(t.n>99?'99+':t.n)+'</span>':'')+'</span>'+
       '<span class="lb">'+t.l+'</span></button>').join('');
 }
 
@@ -6715,7 +6714,9 @@ async function contaChat(){
     const {data, error} = await sb.rpc('chat_non_lette');
     if(error) return;
     const n = +data || 0;
-    if(n !== chatNonLette){ chatNonLette = n; document.querySelectorAll('.hm-chat, .ht-chat, #chatTopBtn').forEach(b => { const x = b.querySelector('.n, .ht-n'); if(x) x.remove();
+    if(n !== chatNonLette){ chatNonLette = n;
+      document.querySelectorAll('.tb-chat .ic').forEach(b => { const x = b.querySelector('.n'); if(x) x.remove(); if(n && !chatNuova()) b.insertAdjacentHTML('beforeend', '<span class="n">'+(n > 99 ? '99+' : n)+'</span>'); });
+      document.querySelectorAll('.hm-chat, .ht-chat, #chatTopBtn').forEach(b => { const x = b.querySelector('.n, .ht-n'); if(x) x.remove();
       if(n && !chatNuova()) b.insertAdjacentHTML('beforeend', b.classList.contains('hm-chat') ? '<b class="n">'+(n > 99 ? '99+' : n)+'</b>' : '<i class="ht-n">'+(n > 9 ? '9+' : n)+'</i>'); }); }
   }catch(e){}
 }
@@ -9221,7 +9222,7 @@ function misuraNav(){
   if(!suTelefono()){ document.documentElement.style.setProperty('--nav-h','0px'); return; }
   const tb = el('tabbar'), vs = el('viewswitch');
   const n = (tb && !tb.hidden) ? tb : ((vs && !vs.hidden) ? vs : null);
-  document.documentElement.style.setProperty('--nav-h', (n? n.offsetHeight + (n===tb? 12 : 0) : 0)+'px');
+  document.documentElement.style.setProperty('--nav-h', (n? n.offsetHeight + (n===tb? 20 : 0) : 0)+'px');
 }
 let timerNav = null;
 window.addEventListener('resize', ()=>{
@@ -10138,7 +10139,7 @@ function cartaModelli(){
    Come si fa tutto, capitolo per capitolo: dai primi passi alle cose per chi
    organizza un team. Si cerca per parola (anche senza accenti); in fondo c'e'
    il tasto per segnalare quello che manca o non funziona. */
-const VERSIONE = 'v71';
+const VERSIONE = 'v72';
 const LIVELLI_GUIDA = {base:'Per cominciare', medio:'Tutti i giorni', esperto:'Per chi organizza', aiuto:'Se qualcosa non va'};
 const GUIDA = [
 {id:'primi-passi', liv:'base', ic:'spark', t:'Primi passi', s:'Cos’è FOSS e come ci si muove', v:[
@@ -12428,6 +12429,7 @@ document.addEventListener('click', function(e){
       else if(k==='mie'){ state.schermo='mie'; mieAppena.clear(); }
       else if(k==='cerca'){ state.schermo='cerca'; state.mettiFuoco = true; }
       else if(k==='profilo'){ if(state.schermo!=='profilo') state.push = null; state.schermo='profilo'; }
+      else if(k==='chat'){ apriChat(); break; }
       render(); break; }
 
     case 'indietro-tel':{
