@@ -1425,7 +1425,7 @@ const SUPA_KEY = 'sb_publishable_f5Kjp6NHT9yTxr1bhWJjhg_4y72V-Kj';
 const VAPID_PUBBLICA = 'BNlGbW4nZrXmx8DioKxnl7ubULVOr5_6CAKvpuQYoiXeObmxYAzGU6UrkExx2zu1hACmtRNDcpoMh_ARQ0GSmlw';
 /* il server dei file sul NAS (es. 'https://media.foss.team'). Vuoto = si usa Supabase. */
 const MEDIA_NAS = 'https://media.foss.team';
-const VERSIONE = 'chat-2.4';
+const VERSIONE = 'chat-2.5';
 /* i temi colore: gli stessi di FOSS. Il predefinito per tutti è Brand (blu e giallo). */
 const TEMI_COLORE = [
   {id:'brand',   nome:'Brand',    ds:'Navy e ambra, il predefinito', c:['#0D1926','#1A3149','#FFAD01']},
@@ -1753,10 +1753,37 @@ function errore(e, cosa){
 
 /* ---------- suoni (generati, niente file) ---------- */
 let audioCtx = null;
+/* v2.5: il trillo (colpetto) si sente forte anche dal computer, dove non c'è vibrazione:
+   un ronzio che vibra, tre colpi, e un campanello sopra. Passa da un limitatore, così è forte ma non gracchia. */
+function suonoTrillo(ac){
+  const t0 = ac.currentTime + .02;
+  const lim = ac.createDynamicsCompressor(); lim.threshold.value = -6; lim.knee.value = 4; lim.ratio.value = 12; lim.attack.value = .002; lim.release.value = .12;
+  const tot = ac.createGain(); tot.gain.value = .9; lim.connect(tot); tot.connect(ac.destination);
+  for(let k = 0; k < 3; k++){                       // tre «brrr» uno dopo l'altro
+    const t = t0 + k * .26;
+    const o = ac.createOscillator(), o2 = ac.createOscillator(), g = ac.createGain(), trem = ac.createOscillator(), tg = ac.createGain();
+    o.type = 'square'; o2.type = 'sawtooth';
+    o.frequency.setValueAtTime(190, t); o.frequency.linearRampToValueAtTime(150, t + .2);
+    o2.frequency.setValueAtTime(293, t); o2.frequency.linearRampToValueAtTime(230, t + .2);
+    trem.type = 'square'; trem.frequency.value = 38; tg.gain.value = .35;   // la vibrazione
+    trem.connect(tg); tg.connect(g.gain);
+    g.gain.setValueAtTime(.0001, t); g.gain.exponentialRampToValueAtTime(.55, t + .012); g.gain.setValueAtTime(.55, t + .16); g.gain.exponentialRampToValueAtTime(.0001, t + .22);
+    o.connect(g); o2.connect(g); g.connect(lim);
+    [o, o2, trem].forEach(x => { x.start(t); x.stop(t + .23); });
+  }
+  const tc = t0 + .8;                                // il campanello finale
+  [1318, 1976].forEach((f, i) => {
+    const o = ac.createOscillator(), g = ac.createGain(); o.type = 'triangle'; o.frequency.value = f;
+    g.gain.setValueAtTime(.0001, tc); g.gain.exponentialRampToValueAtTime(i ? .25 : .5, tc + .01); g.gain.exponentialRampToValueAtTime(.0001, tc + .7);
+    o.connect(g); g.connect(lim); o.start(tc); o.stop(tc + .72);
+  });
+}
 function suono(tipo){
   if(!S.cfg.suoni) return;
   try{
     audioCtx = audioCtx || new (window.AudioContext || window.webkitAudioContext)();
+    if(audioCtx.state === 'suspended') audioCtx.resume();
+    if(tipo === 'trillo') return suonoTrillo(audioCtx);
     const t = audioCtx.currentTime, o = audioCtx.createOscillator(), g = audioCtx.createGain();
     o.connect(g); g.connect(audioCtx.destination);
     if(tipo === 'entrato'){   /* tre note che salgono, come quando un amico entrava su MSN */
@@ -2157,7 +2184,7 @@ function arrivaMessaggio(m){
     else {
       c.non_lette = (c.non_lette || 0) + 1;
       if(menz) c.menzioni = (c.menzioni || 0) + 1;
-      if((!c.silenziata || menz) && !muto && (m.tipo !== 'colpetto' || m.media.a === S.io)) suono('arrivo');
+      if((!c.silenziata || menz) && !muto && m.tipo !== 'colpetto') suono('arrivo');
     }
     if(m.tipo === 'colpetto' && m.media && m.media.a === S.io) colpettoRicevuto(m, guardo);
     aggiornaTitolo();
@@ -6920,6 +6947,7 @@ async function colpetto(a){
 function colpettoRicevuto(m, guardo){
   const c = S.convs.get(m.conv_id); if(!c || !sbloccata(c)) return;
   try{ navigator.vibrate && navigator.vibrate([25, 70, 25]); }catch(e){}
+  if(!c.silenziata) suono('trillo');
   if(m.conv_id === S.aperta){
     vivoScossa();
     const cv = el('conv'); if(cv){ cv.classList.remove('colpito'); void cv.offsetWidth; cv.classList.add('colpito'); setTimeout(() => cv.classList.remove('colpito'), 900); }
