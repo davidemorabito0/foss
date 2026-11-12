@@ -146,7 +146,7 @@ da capo (`arrivaImportato`).
 ## 5. Avvisi e notifiche
 
 - **Service worker** `sw.js`, cache `foss-guscio-vNN`. A ogni pubblicazione che tocca la chat o FOSS
-  si **alza il numero** (oggi v76, alzato dalla chat del gestionale).
+  si **alza il numero** (oggi v81).
 - Il SW non mostra l'avviso se la chat è già aperta e in primo piano (`chatDavanti()`; su
   Safari non è affidabile, quindi lì l'avviso arriva sempre).
 - **Nel browser:** numero nel titolo della scheda e avvisi a comparsa in basso (stile WhatsApp
@@ -238,3 +238,22 @@ L'elenco completo è nel `README.md` del sito, sezioni «FOSS.chat» e «FOSS.ch
 - Si consegna solo a lavoro finito e provato, con le prove positive. Niente consegne a metà.
 - Detta a voce: gli errori di trascrizione si interpretano dal contesto.
 - File in chat solo se li chiede. Sul suo PC si toccano solo le cartelle che ha collegato.
+
+---
+
+## 11. Aggiornamenti dopo il passaggio (chat del gestionale, 11-12 novembre 2026)
+
+- **2.1 Temi colore di FOSS** (`colori` in `profili.chat_cfg`, predefinito `brand`): regole `:root[data-colori=…][data-tema=…]` in fondo a `chat.css`, generate dai temi del sito (Autunno e Limoni ritoccati solo nella chat: Autunno marrone scuro, Limoni giallo limone e verde foglia). Variabili nuove: `--pieno`/`--su-pieno` (tasti pieni), `--verde-ios`, `--cit-mio`, `--su-verde`. Il visore si chiude toccando fuori dalla foto.
+- **2.2 Tempo reale che si ricollega da solo** (`02-dati.js`: `riavviaTempoReale`, `controllaTempoReale`, `canaliVivi`): al ritorno sulla chat, quando torna la rete, su errore del canale, al rinnovo dell'accesso e con un controllo leggero ogni 20 s. Prova: `prova15.py`.
+- **2.3** (`prova16.py`):
+  - grandezza del testo: moltiplicatore `--tk` (vale anche sul telefono, lista e campo di scrittura);
+  - «Rendi privata» / «Togli privata» (era «Blocca chat»): chiede sempre il codice;
+  - **Super notifica** (solo `e_admin_foss`): menu del messaggio → Altro → Super notifica. Funzione edge `chat-supernotifica` (`sviluppo/edge/supernotifica/`), tabella `chat_super_notifiche` (una volta per messaggio, 20 al giorno). Usa `RESEND_API_KEY` come `avvisa-email`;
+  - chat con te stesso: `chat_apri_privata(te stesso)` crea una privata con un solo membro (coppia `io:io`); in «Nuova chat» c'è «Nome (tu)».
+- FOSS v72: barra in basso del telefono a tre voci (Home, Chat, Profilo) come quella della chat.
+- **2.4 Idee di MSN** (`js/24-msn.js`, `prova17.py`):
+  - messaggio personale (`chat_cfg.frase`, 140 caratteri): sotto il nome in testata, in «Nuova chat» e nelle info;
+  - cornice della foto a scelta (`chat_cfg.cornice`, elenco `CORNICI` in `01-base.js`, classi `.av.cr-*`), la vedono tutti: `chat_contatti`/`chat_persone` restituiscono `frase` e `cornice`;
+  - «è appena entrato»: avviso in basso (in alto sul telefono) con suono quando un collega entra, una volta ogni 15 minuti per persona (`notaEntrati`, si spegne in Impostazioni);
+  - sfondi animati (`chat_cfg.vivo`: bolle, stelle, neve, lucciole, coriandoli) su canvas dietro ai messaggi; col colpetto fanno un salto (`vivoScossa`). Fermi con «riduci movimento».
+
