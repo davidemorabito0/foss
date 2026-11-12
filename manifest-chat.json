@@ -1,0 +1,54 @@
+{
+  "id": "./chat.html",
+  "name": "FOSS.chat",
+  "short_name": "FOSS.chat",
+  "description": "La chat del tuo team su FOSS.",
+  "lang": "it",
+  "start_url": "./chat.html",
+  "scope": "./",
+  "display": "standalone",
+  "orientation": "any",
+  "background_color": "#0D1926",
+  "theme_color": "#0D1926",
+  "icons": [
+    {
+      "src": "chat-icona-192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "chat-icona-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "chat-icona-180.png",
+      "sizes": "180x180",
+      "type": "image/png",
+      "purpose": "any"
+    }
+  ],
+  "share_target": {
+    "action": "./chat.html?condividi=1",
+    "method": "POST",
+    "enctype": "multipart/form-data",
+    "params": {
+      "title": "title",
+      "text": "text",
+      "url": "url",
+      "files": [
+        {
+          "name": "file",
+          "accept": [
+            "image/*",
+            "video/*",
+            "audio/*",
+            "application/pdf"
+          ]
+        }
+      ]
+    }
+  }
+}
