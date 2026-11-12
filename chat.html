@@ -69,7 +69,7 @@
   color-scheme:light;
 }
 *{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
-html,body{margin:0;height:100%;position:fixed;inset:0;width:100%;background:var(--app);color:var(--testo);font:400 var(--t)/1.35 var(--font);overflow:hidden;
+html,body{margin:0;height:100%;height:var(--schermo,100%);position:fixed;top:0;left:0;right:0;width:100%;background:var(--app);color:var(--testo);font:400 var(--t)/1.35 var(--font);overflow:hidden;
   -webkit-font-smoothing:antialiased;-webkit-text-size-adjust:100%;overscroll-behavior:none}
 button{font:inherit;color:inherit;background:none;border:0;padding:0;cursor:pointer}
 input,textarea{font:inherit;color:inherit}
@@ -80,7 +80,7 @@ svg{display:block}
 ::-webkit-scrollbar-thumb{background:rgba(134,150,160,.35);border-radius:3px}
 ::-webkit-scrollbar-track{background:transparent}
 
-#app{display:flex;height:100vh;height:var(--alto,100%);width:100%;position:relative;overflow:hidden;background:var(--pannello)}
+#app{display:flex;height:100vh;height:var(--alto,var(--schermo,100%));width:100%;position:relative;overflow:hidden;background:var(--pannello)}
 
 /* ---------- colonna sottile (desktop) ---------- */
 .rail{width:64px;flex:none;background:var(--testa);border-right:1px solid var(--linea);display:flex;flex-direction:column;align-items:center;
@@ -1457,7 +1457,7 @@ const SUPA_KEY = 'sb_publishable_f5Kjp6NHT9yTxr1bhWJjhg_4y72V-Kj';
 const VAPID_PUBBLICA = 'BNlGbW4nZrXmx8DioKxnl7ubULVOr5_6CAKvpuQYoiXeObmxYAzGU6UrkExx2zu1hACmtRNDcpoMh_ARQ0GSmlw';
 /* il server dei file sul NAS (es. 'https://media.foss.team'). Vuoto = si usa Supabase. */
 const MEDIA_NAS = 'https://media.foss.team';
-const VERSIONE = 'chat-2.7.1';
+const VERSIONE = 'chat-2.7.3';
 /* i temi colore: gli stessi di FOSS. Il predefinito per tutti è Brand (blu e giallo). */
 const TEMI_COLORE = [
   {id:'brand',   nome:'Brand',    ds:'Navy e ambra, il predefinito', c:['#0D1926','#1A3149','#FFAD01']},
@@ -3376,16 +3376,17 @@ async function avviaRegistrazione(e){
   let bloccata = false, annullata = false, rilasciata = false;
   const suPrima = () => { rilasciata = true; };
   document.addEventListener('pointerup', suPrima, {once: true});
-  let stream;
+  let stream, ac0 = null;
+  try{ ac0 = new (window.AudioContext || window.webkitAudioContext)(); }catch(_){}
   /* v2.7.1: per registrare l'audio del telefono deve essere in modalità «registra» (con «di contorno» l'iPhone nega il microfono) */
   try{ if(navigator.audioSession) navigator.audioSession.type = 'play-and-record'; }catch(_){}
   try{ stream = await navigator.mediaDevices.getUserMedia({audio: {echoCancellation: true, noiseSuppression: true}}); }
-  catch(err){ document.removeEventListener('pointerup', suPrima); audioDiContorno(); spiegaMicrofono(err); return; }
+  catch(err){ document.removeEventListener('pointerup', suPrima); try{ ac0 && ac0.close(); }catch(_){} audioDiContorno(); spiegaMicrofono(err); return; }
   const tipo = formatoAudio();
   const rec = new MediaRecorder(stream, tipo ? {mimeType: tipo, audioBitsPerSecond: 48000} : undefined);
   const pezzi = [], livelli = [];
   let ac, an, buf;
-  try{ ac = new (window.AudioContext || window.webkitAudioContext)(); const src = ac.createMediaStreamSource(stream); an = ac.createAnalyser(); an.fftSize = 512; src.connect(an); buf = new Uint8Array(an.fftSize); }catch(err){}
+  try{ ac = ac0 || new (window.AudioContext || window.webkitAudioContext)(); if(ac.state !== 'running') ac.resume().catch(() => {}); const src = ac.createMediaStreamSource(stream); an = ac.createAnalyser(); an.fftSize = 512; src.connect(an); buf = new Uint8Array(an.fftSize); }catch(err){}
   rec.ondataavailable = ev => { if(ev.data && ev.data.size) pezzi.push(ev.data); };
   reg = {rec, stream, pezzi, livelli, inizio: Date.now(), ac};
   rec.start(250);
@@ -3445,18 +3446,43 @@ function fineRegistrazione(manda){
     if(durata < 0.8){ toast('Tieni premuto per registrare un vocale.'); return; }
     const tipo = (r.rec.mimeType || 'audio/webm').split(';')[0];
     const blob = new Blob(r.pezzi, {type: tipo});
-    const n = 48, lv = r.livelli, onda = [];
-    const picco = Math.max(.05, ...lv);
-    for(let i = 0; i < n; i++){
-      const a = Math.floor(i * lv.length / n), b = Math.max(a + 1, Math.floor((i + 1) * lv.length / n));
-      let m = 0; for(let j = a; j < b; j++) m = Math.max(m, lv[j] || 0);
-      onda.push(String.fromCharCode(65 + Math.round(Math.min(1, m / picco) * 31)));
-    }
+    /* v2.7.2: l'onda la calcolo dal file registrato (sempre giusta); se non si può, dai livelli presi durante la registrazione */
+    const daFile = await ondaDalFile(blob);
+    const onda = daFile || ondaDaLivelli(r.livelli);
     inviaPreparato(S.aperta, 'vocale', {blob, ext: tipo.includes('mp4') ? 'm4a' : tipo.includes('ogg') ? 'ogg' : 'webm',
-      media: {dur: Math.round(durata * 10) / 10, onda: onda.join(''), mime: tipo, dim: blob.size}});
+      media: {dur: Math.round(durata * 10) / 10, onda, mime: tipo, dim: blob.size}});
   };
   try{ r.rec.stop(); }catch(e){ r.stream.getTracks().forEach(t => t.stop()); disegnaScrivi(); }
 }
+
+function ondaDaLivelli(lv){
+  const n = 48, onda = [], picco = Math.max(.05, ...lv);
+  for(let i = 0; i < n; i++){
+    const a = Math.floor(i * lv.length / n), b = Math.max(a + 1, Math.floor((i + 1) * lv.length / n));
+    let m = 0; for(let j = a; j < b; j++) m = Math.max(m, lv[j] || 0);
+    onda.push(String.fromCharCode(65 + Math.round(Math.min(1, m / picco) * 31)));
+  }
+  return onda.join('');
+}
+async function ondaDalFile(blob){
+  try{
+    const C = window.OfflineAudioContext || window.webkitOfflineAudioContext;
+    const ctx = C ? new C(1, 2, 44100) : new (window.AudioContext || window.webkitAudioContext)();
+    const ab = await blob.arrayBuffer();
+    const buf = await new Promise((ok, ko) => { const p = ctx.decodeAudioData(ab, ok, ko); if(p && p.then) p.then(ok, ko); });
+    const d = buf.getChannelData(0), n = 48, out = [];
+    let picco = 0; const v = [];
+    for(let i = 0; i < n; i++){
+      const a = Math.floor(i * d.length / n), b = Math.floor((i + 1) * d.length / n);
+      let s = 0, k = 0; for(let j = a; j < b; j += 16){ s += d[j] * d[j]; k++; }
+      const rms = Math.sqrt(s / Math.max(1, k)); v.push(rms); picco = Math.max(picco, rms);
+    }
+    if(picco < 1e-4) return null;
+    v.forEach(x => out.push(String.fromCharCode(65 + Math.round(Math.min(1, Math.pow(x / picco, .8)) * 31))));
+    return out.join('');
+  }catch(e){ return null; }
+}
+const ondaPiatta = s => !s || /^[A-D]+$/.test(s);
 
 /* ---------- riproduzione dei vocali ---------- */
 let audio = null, audioId = null, velocita = 1;
@@ -3468,7 +3494,11 @@ async function suonaVocale(id){
     audio.addEventListener('timeupdate', disegnaAvanzamento);
     audio.addEventListener('ended', () => { const fatto = audioId; disegnaAvanzamento(true); audioId = null; prossimoVocale(fatto); if(!audioId) audioDiContorno(); });
     audio.addEventListener('pause', () => { disegnaAvanzamento(); setTimeout(() => { if(audio.paused) audioDiContorno(); }, 400); });
-    audio.addEventListener('play', () => disegnaAvanzamento());
+    audio.addEventListener('play', () => { disegnaAvanzamento(); scorriPallino(); });
+    audio.addEventListener('loadedmetadata', () => {   /* i vocali registrati nel browser a volte dicono «durata infinita» */
+      const mm = audioId && trovaMsg(S.aperta, audioId);
+      if(audio.duration === Infinity && !(mm && mm.media && mm.media.dur)){ const t = audio.currentTime; audio.currentTime = 1e101; audio.addEventListener('timeupdate', function una(){ audio.removeEventListener('timeupdate', una); audio.currentTime = t; }); }
+    });
     audio.addEventListener('error', () => { const id2 = audioId; audioId = null; disegnaAvanzamento(); if(id2) mediaNonArriva(id2); });
   }
   if(audioId === id){ if(audio.paused) audio.play().catch(() => {}); else audio.pause(); return; }
@@ -3478,6 +3508,7 @@ async function suonaVocale(id){
   audioId = id; audio.src = u; audio.playbackRate = velocita;
   try{ if(navigator.audioSession) navigator.audioSession.type = 'playback'; }catch(e){}
   try{ await audio.play(); }catch(e){ if(e && e.name !== 'AbortError') toast(m.media && m.media.url ? 'Il server dei media sembra offline.' : 'Non riesco a riprodurre il vocale.'); }
+  if(ondaPiatta((m.media || {}).onda)) ridisegnaOnda(m, u);
   const a = memoria('ascoltati') || {}; a[id] = 1; const k = Object.keys(a); if(k.length > 500) k.slice(0, k.length - 500).forEach(x => delete a[x]); memoria('ascoltati', a);
   const mic = $('.vocale[data-voc="'+id+'"] .mic'); if(mic) mic.className = 'mic ascoltato';
 }
@@ -3488,6 +3519,22 @@ function prossimoVocale(id){
   const a = memoria('ascoltati') || {};
   if(n && n.tipo === 'vocale' && n.autore !== S.io && !a[n.id] && !n.eliminato) suonaVocale(n.id);
 }
+let rafPallino = 0;
+function scorriPallino(){
+  cancelAnimationFrame(rafPallino);
+  const passo = () => { if(!audio || audio.paused || !audioId){ rafPallino = 0; return; } disegnaAvanzamento(); rafPallino = requestAnimationFrame(passo); };
+  rafPallino = requestAnimationFrame(passo);
+}
+/* i vocali vecchi con l'onda piatta: la ricalcolo dal file mentre lo ascolti (solo sullo schermo) */
+async function ridisegnaOnda(m, u){
+  try{
+    const r = await fetch(u); const o = await ondaDalFile(await r.blob()); if(!o) return;
+    m.media.onda = o;
+    const v = $('.vocale[data-voc="'+m.id+'"] .barre'); if(!v) return;
+    v.innerHTML = ondaDa(o).map(x => '<i style="height:'+Math.max(10, x * 100)+'%"></i>').join('');
+    disegnaAvanzamento();
+  }catch(e){}
+}
 function disegnaAvanzamento(finito, quale){
   const id = quale || audioId; if(!id) return;
   const v = $('.vocale[data-voc="'+id+'"]'); if(!v) return;
@@ -3495,7 +3542,10 @@ function disegnaAvanzamento(finito, quale){
   v.classList.toggle('va', audioId === id && !finito);
   const b = v.querySelector('.vp'); if(b) b.innerHTML = svg(va ? 'pausa' : 'play');
   const vel = v.querySelector('.vel'); if(vel) vel.textContent = String(velocita).replace('.', ',') + '×';
-  const d = audio && isFinite(audio.duration) && audio.duration ? audio.duration : ((trovaMsg(S.aperta, id) || {}).media || {}).dur || 1;
+  /* v2.7.2: i vocali registrati sull'iPhone a volte dichiarano una durata sbagliata (enorme o infinita):
+     se non torna con quella salvata quando l'abbiamo registrato, vale quella salvata */
+  const salvata = +(((trovaMsg(S.aperta, id) || {}).media || {}).dur) || 0, dich = audio && isFinite(audio.duration) ? audio.duration : 0;
+  const d = salvata && (!dich || Math.abs(dich - salvata) > Math.max(1.5, salvata * .25)) ? salvata : (dich || salvata || 1);
   const p = finito || audioId !== id ? 0 : Math.min(1, (audio.currentTime || 0) / d);
   const barre = v.querySelectorAll('.barre i'); const k = Math.round(p * barre.length);
   barre.forEach((x, i) => x.classList.toggle('su', i < k));
@@ -5698,17 +5748,25 @@ if('serviceWorker' in navigator){
 (function(){
   const vv = window.visualViewport; if(!vv) return;
   const adatta = () => {
-    const h = Math.round(vv.height), pieno = document.documentElement.clientHeight || window.innerHeight;
-    /* v2.6: sull'iPhone aperta dall'icona, visualViewport è più corta dello schermo (toglie la barra di stato)
-       e lasciava una fascia vuota in basso. Accorcio la chat solo quando c'è davvero la tastiera. */
-    if(pieno - h > 120) document.documentElement.style.setProperty('--alto', h + 'px');
-    else document.documentElement.style.removeProperty('--alto');
+    /* v2.7.3: sull'iPhone aperta dall'icona la pagina «crede» di essere più corta dello schermo
+       (le manca l'altezza della barra di stato) e restava una fascia vuota in basso.
+       Misuro lo schermo vero e lo uso per tutta la pagina; con la tastiera aperta uso lo spazio sopra la tastiera. */
+    const R = document.documentElement, h = Math.round(vv.height);
+    const icona = window.navigator.standalone === true || (window.matchMedia && matchMedia('(display-mode: standalone)').matches);
+    const verticale = window.innerHeight >= window.innerWidth;
+    const schermo = icona && /iPhone|iPad|iPod/.test(navigator.userAgent) && screen && screen.height
+      ? (verticale ? Math.max(screen.height, screen.width) : Math.min(screen.height, screen.width)) : 0;
+    const pieno = Math.max(window.innerHeight || 0, R.clientHeight || 0, schermo);
+    R.style.setProperty('--schermo', pieno + 'px');
+    if(pieno - h > 150) R.style.setProperty('--alto', h + 'px');
+    else R.style.removeProperty('--alto');
     if(Math.abs(window.scrollY) > 0 || vv.offsetTop > 0) window.scrollTo(0, 0);
     const app = el('app'); if(app) app.style.transform = vv.offsetTop ? 'translateY(' + vv.offsetTop + 'px)' : '';
     const M = el('msgs');
     if(M && M._eraInFondo !== false) M.scrollTop = M.scrollHeight;
   };
   vv.addEventListener('resize', adatta); vv.addEventListener('scroll', adatta);
+  window.addEventListener('resize', adatta); window.addEventListener('orientationchange', () => setTimeout(adatta, 300));
   document.addEventListener('focusin', e => { if(e.target.id === 'testoIn'){ const M = el('msgs'); if(M) M._eraInFondo = vicinoAlFondo(); setTimeout(adatta, 60); setTimeout(adatta, 350); } });
   document.addEventListener('focusout', () => setTimeout(adatta, 120));
   adatta();
