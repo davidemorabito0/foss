@@ -80,7 +80,7 @@ svg{display:block}
 ::-webkit-scrollbar-thumb{background:rgba(134,150,160,.35);border-radius:3px}
 ::-webkit-scrollbar-track{background:transparent}
 
-#app{display:flex;height:100vh;height:var(--alto,100dvh);width:100%;position:relative;overflow:hidden;background:var(--pannello)}
+#app{display:flex;height:100vh;height:var(--alto,100%);width:100%;position:relative;overflow:hidden;background:var(--pannello)}
 
 /* ---------- colonna sottile (desktop) ---------- */
 .rail{width:64px;flex:none;background:var(--testa);border-right:1px solid var(--linea);display:flex;flex-direction:column;align-items:center;
@@ -1406,6 +1406,36 @@ input,textarea,[contenteditable="true"]{-webkit-user-select:text;user-select:tex
 /* sfondo animato: dietro ai messaggi */
 .sfondo-vivo{position:absolute;inset:0;width:100%;height:100%;pointer-events:none;z-index:0}
 .opz.vivi{flex-wrap:wrap}
+/* ---------- 2.6: colori del gruppo ---------- */
+#conv.con-stile .msg.mio .bolla{color:var(--testo-mio,var(--testo))}
+#conv.con-stile .msg.mio .bolla .ora,#conv.con-stile .msg.mio .bolla .meta{color:var(--testo-mio-2,var(--testo-2))}
+.foglio.largo{width:min(620px,calc(100vw - 24px));max-height:calc(100dvh - 40px);overflow:auto}
+.cg-t{font-size:14px;font-weight:600;margin:14px 0 8px;color:var(--testo)}
+.cg-t span{font-weight:400;color:var(--testo-2);font-size:13px;margin-left:6px}
+.cg-opz{padding:0 0 4px}
+.colore.libero{position:relative;display:grid;place-items:center;font-size:20px;color:var(--testo-2);border:1.5px dashed var(--testo-3);background:transparent;overflow:hidden;cursor:pointer}
+.colore.libero input{position:absolute;inset:0;opacity:0;cursor:pointer}
+.cg-pal{display:grid;grid-template-columns:repeat(auto-fill,minmax(104px,1fr));gap:8px}
+.cg-p{height:78px;border-radius:12px;background-size:120px;border:2px solid transparent;display:flex;flex-direction:column;justify-content:flex-end;align-items:flex-start;padding:7px 8px;text-align:left;box-shadow:inset 0 0 0 1px rgba(127,127,127,.25)}
+.cg-p.on{border-color:var(--verde);box-shadow:0 0 0 2px var(--verde)}
+.cg-p b{font-size:12px;font-weight:600;padding:2px 7px;border-radius:8px;background:rgba(0,0,0,.55);color:#fff}
+.cg-pc{display:flex;gap:3px;margin-bottom:5px}
+.cg-pc i{width:12px;height:12px;border-radius:50%;box-shadow:0 0 0 1.5px rgba(0,0,0,.25)}
+.cg-ant{margin-top:16px;border-radius:12px;padding:16px;background-size:240px;display:flex;flex-direction:column;gap:8px;position:relative;box-shadow:inset 0 0 0 1px var(--linea)}
+.cg-ant .sf-bolla{max-width:75%}
+.cg-tasto{align-self:flex-end;font-size:13px;font-weight:700;padding:7px 14px;border-radius:16px}
+.cg-mini{display:flex;gap:4px;margin-left:auto}
+.cg-mini i{width:16px;height:16px;border-radius:50%;box-shadow:0 0 0 1px rgba(127,127,127,.4)}
+.voce[disabled]{opacity:.7;cursor:default}
+/* ---------- 2.7: riprova ---------- */
+.riprova-b{display:flex;align-items:center;gap:6px;margin:4px 2px 0 auto;padding:5px 11px;border-radius:14px;font-size:12.5px;color:var(--rosso);
+  background:color-mix(in srgb,var(--rosso) 12%,var(--pannello));box-shadow:0 1px .5px rgba(11,20,26,.13)}
+.msg.suo .riprova-b{margin-left:2px;margin-right:auto}
+.riprova-b svg{width:15px;height:15px}
+.riprova-b b{font-weight:700}
+.media-carica[data-a]{cursor:pointer}
+.msg:has(.riprova-b){flex-wrap:wrap}
+.msg .a-capo{flex-basis:100%;height:0}
 </style>
 </head>
 <body>
@@ -1425,7 +1455,7 @@ const SUPA_KEY = 'sb_publishable_f5Kjp6NHT9yTxr1bhWJjhg_4y72V-Kj';
 const VAPID_PUBBLICA = 'BNlGbW4nZrXmx8DioKxnl7ubULVOr5_6CAKvpuQYoiXeObmxYAzGU6UrkExx2zu1hACmtRNDcpoMh_ARQ0GSmlw';
 /* il server dei file sul NAS (es. 'https://media.foss.team'). Vuoto = si usa Supabase. */
 const MEDIA_NAS = 'https://media.foss.team';
-const VERSIONE = 'chat-2.5';
+const VERSIONE = 'chat-2.7';
 /* i temi colore: gli stessi di FOSS. Il predefinito per tutti è Brand (blu e giallo). */
 const TEMI_COLORE = [
   {id:'brand',   nome:'Brand',    ds:'Navy e ambra, il predefinito', c:['#0D1926','#1A3149','#FFAD01']},
@@ -1752,7 +1782,16 @@ function errore(e, cosa){
 }
 
 /* ---------- suoni (generati, niente file) ---------- */
-let audioCtx = null;
+let audioCtx = null, tSpegniAudio = null;
+/* v2.7: i suoni della chat si mescolano alla musica (Spotify ecc.) senza abbassarla né fermarla.
+   Su iPhone diciamo al telefono che sono suoni «di contorno»; e il motore audio si spegne
+   appena finito, così non tiene occupato l'audio del telefono. */
+function audioDiContorno(){ try{ if(navigator.audioSession) navigator.audioSession.type = 'ambient'; }catch(e){} }
+audioDiContorno();
+function spegniAudioPresto(dopo){
+  clearTimeout(tSpegniAudio);
+  tSpegniAudio = setTimeout(() => { try{ if(audioCtx && audioCtx.state === 'running') audioCtx.suspend(); }catch(e){} }, dopo || 1500);
+}
 /* v2.5: il trillo (colpetto) si sente forte anche dal computer, dove non c'è vibrazione:
    un ronzio che vibra, tre colpi, e un campanello sopra. Passa da un limitatore, così è forte ma non gracchia. */
 function suonoTrillo(ac){
@@ -1782,7 +1821,9 @@ function suono(tipo){
   if(!S.cfg.suoni) return;
   try{
     audioCtx = audioCtx || new (window.AudioContext || window.webkitAudioContext)();
+    audioDiContorno();
     if(audioCtx.state === 'suspended') audioCtx.resume();
+    spegniAudioPresto(tipo === 'trillo' ? 2500 : 1200);
     if(tipo === 'trillo') return suonoTrillo(audioCtx);
     const t = audioCtx.currentTime, o = audioCtx.createOscillator(), g = audioCtx.createGain();
     o.connect(g); g.connect(audioCtx.destination);
@@ -1842,16 +1883,16 @@ async function token(){
   const {data} = await sb.auth.getSession();
   return data && data.session ? data.session.access_token : '';
 }
-function caricaFile(path, blob, avanza){
+function caricaFile(path, blob, avanza, ctrl){
   /* prima il NAS dello studio; se non risponde (spento, senza rete) il file va su Supabase come prima */
-  if(!MEDIA_NAS) return inviaFile(path, blob, avanza, false);
-  return inviaFile(path, blob, avanza, true).catch(e => {
-    if(!e || !e.rete || blob.size > MAX_SUPA) throw e;
+  if(!MEDIA_NAS) return inviaFile(path, blob, avanza, false, ctrl);
+  return inviaFile(path, blob, avanza, true, ctrl).catch(e => {
+    if(!e || !e.rete || e.annullato || blob.size > MAX_SUPA) throw e;
     if(avanza) avanza(0);
-    return inviaFile(path, blob, avanza, false);
+    return inviaFile(path, blob, avanza, false, ctrl);
   });
 }
-function inviaFile(path, blob, avanza, nas){
+function inviaFile(path, blob, avanza, nas, ctrl){
   return new Promise(async (ok, ko) => {
     let tk = '';
     try{ tk = await token(); }catch(e){}
@@ -1864,9 +1905,15 @@ function inviaFile(path, blob, avanza, nas){
     if(!nas){ xhr.setRequestHeader('apikey', SUPA_KEY); xhr.setRequestHeader('x-upsert', 'false'); }
     xhr.setRequestHeader('Content-Type', blob.type || 'application/octet-stream');
     xhr.setRequestHeader('Cache-Control', 'max-age=31536000');
-    xhr.upload.onprogress = e => { if(e.lengthComputable && avanza) avanza(e.loaded / e.total); };
-    const errore = (m, rete) => { const e = new Error(m); e.rete = !!rete; ko(e); };
+    /* v2.7: se il caricamento resta fermo 45 secondi lo interrompo (così puoi riprovare), e lo puoi fermare tu */
+    let mosso = Date.now(), finito = false, mano = false;
+    xhr.upload.onprogress = e => { mosso = Date.now(); if(e.lengthComputable && avanza) avanza(e.loaded / e.total); };
+    const veglia = setInterval(() => { if(!finito && Date.now() - mosso > 45000){ finito = true; xhr.abort(); errore('Il caricamento si è fermato', nas); } }, 5000);
+    if(ctrl) ctrl.ferma = () => { mano = true; xhr.abort(); };
+    const errore = (m, rete) => { finito = true; clearInterval(veglia); const e = new Error(m); e.rete = !!rete; e.annullato = mano; ko(e); };
+    xhr.onabort = () => { if(mano) errore('Invio annullato', false); };
     xhr.onload = () => {
+      finito = true; clearInterval(veglia);
       if(xhr.status >= 200 && xhr.status < 300){
         let r = {}; try{ r = JSON.parse(xhr.responseText || '{}'); }catch(e){}
         if(nas && !(r.url && /^https:\/\//.test(r.url))) return errore('Il server dei media non ha risposto bene', true);
@@ -2257,8 +2304,8 @@ function cambiaMembro(p){
 }
 function cambiaConv(n){
   const c = S.convs.get(n.id); if(!c) return;
-  ['nome','descrizione','foto','ultimo_il'].forEach(k => { c[k] = n[k]; });
-  if(n.id === S.aperta) aggiornaTestaConv();
+  ['nome','descrizione','foto','ultimo_il','stile'].forEach(k => { c[k] = n[k]; });
+  if(n.id === S.aperta){ aggiornaTestaConv(); applicaSfondoConv(); }
   disegnaListaPresto();
   if(infoAperta === n.id) disegnaInfo();
 }
@@ -2738,7 +2785,8 @@ function bollaHTML(m, c, primo, mio, gr){
   const polvere = md.bolla === 'inchiostro' ? '<span class="polvere"><canvas data-polvere="1"></canvas></span>' : '';
   return '<div class="'+bcls+eff+'"'+(md.bolla === 'inchiostro' ? ' data-a="svela"' : '')+'>'+menu+autore+cit+corpo+
     (m.tipo === 'sticker' || bcls.includes('solo-media') || bcls.includes('solo-emoji') ? meta(m, c, mio) : (m.tipo === 'vocale' ? '' : meta(m, c, mio)))+
-    polvere+reazioniHTML(m.id)+'</div>';
+    polvere+reazioniHTML(m.id)+'</div>'+
+    (m._stato === 'errore' ? '<span class="a-capo"></span><button class="riprova-b" data-a="riprova" data-id="'+m.id+'">'+svg('aggiorna', 2)+'<span>Non inviato · <b>Riprova</b></span></button>' : '');
 }
 function meta(m, c, mio){
   const md = m.media || {};
@@ -2824,7 +2872,7 @@ function mediaBoxHTML(m){
   const [w, h] = dimensioniMedia(md);
   const st = 'width:'+w+'px;height:'+h+'px';
   const mini = md.mini ? '<img class="mini" src="'+esc(md.mini)+'" alt="">' : '';
-  const carica = m._avanza != null ? '<div class="media-carica">'+anelloHTML(m._avanza)+'</div>' : '';
+  const carica = m._avanza != null ? '<div class="media-carica" data-a="annulla-carica" data-id="'+m.id+'" title="Tocca per fermare">'+anelloHTML(m._avanza)+'</div>' : '';
   const errore = m._stato === 'errore' ? '<div class="media-carica"><button class="anello" data-a="riprova" data-id="'+m.id+'" title="Riprova">'+svg('aggiorna')+'</button></div>' : '';
   if(m.tipo === 'video'){
     if(md.gif) return '<div class="media-box" style="'+st+'" data-a="vedi" data-id="'+m.id+'">'+mini+
@@ -2854,7 +2902,7 @@ function classeDoc(ext){
 }
 function docHTML(m){
   const md = m.media || {}, ext = estensione(md.nome);
-  const carica = m._avanza != null ? '<span class="sc">'+'<span class="giro" style="border-color:rgba(134,150,160,.3);border-top-color:var(--verde)"></span></span>' : '<span class="sc">'+svg('scarica')+'</span>';
+  const carica = m._avanza != null ? '<span class="sc" data-a="annulla-carica" data-id="'+m.id+'">'+'<span class="giro" style="border-color:rgba(134,150,160,.3);border-top-color:var(--verde)"></span></span>' : '<span class="sc">'+svg('scarica')+'</span>';
   return '<button class="doc" data-a="apri-doc" data-id="'+m.id+'"><span class="ic '+classeDoc(ext)+'">'+esc((ext || 'file').toUpperCase().slice(0, 4))+'</span>'+
     '<span class="nm"><b>'+esc(md.nome || 'Documento')+'</b><span>'+[ext.toUpperCase(), fmtDim(md.dim)].filter(Boolean).join(' · ')+'</span></span>'+carica+'</button>'+
     (md.did ? '<div class="testo didascalia">'+formatta(md.did)+'</div>' : '');
@@ -3247,12 +3295,22 @@ async function mandaTesto(opz){
   catch(e){ m._stato = 'errore'; ridisegnaMessaggio(m.id); errore(e, 'Messaggio non inviato'); }
 }
 async function riprova(id){
-  const c = S.convs.get(S.aperta); const m = c && trovaMsg(c.id, id); if(!m) return;
+  const c = S.convs.get(S.aperta); const m = c && trovaMsg(c.id, id); if(!m || m._stato !== 'errore') return;
   if(m._file){ return inviaFilePronto(m, m._file); }
   m._stato = 'invio'; ridisegnaMessaggio(id);
   try{ await salvaMessaggio(m); }catch(e){ m._stato = 'errore'; ridisegnaMessaggio(id); errore(e, 'Messaggio non inviato'); }
 }
 
+/* torna la rete: riprovo da solo i messaggi rimasti indietro */
+function riprovaTutti(){
+  S.msgs.forEach(st => (st.lista || []).filter(m => m._stato === 'errore' && m.autore === S.io).slice(0, 10).forEach(m => {
+    if(m.conv_id === S.aperta) riprova(m.id);
+  }));
+}
+function annullaCaricamento(id){
+  const c = S.convs.get(S.aperta); const m = c && trovaMsg(c.id, id);
+  if(m && m._ctrl && m._ctrl.ferma) m._ctrl.ferma();
+}
 /* un file pronto (gia' compresso): lo carico con la barra e poi mando il messaggio */
 async function inviaPreparato(conv, tipo, p, extra){
   const c = S.convs.get(conv); if(!c) return;
@@ -3265,19 +3323,21 @@ async function inviaFilePronto(m, p){
   m._stato = 'invio'; m._avanza = 0; ridisegnaMessaggio(m.id);
   const path = m.conv_id + '/' + uuid() + '.' + (p.ext || 'bin');
   let ultimo = 0;
+  m._ctrl = {};
   try{
     const r = await caricaFile(path, p.blob, v => {
       m._avanza = v; const t = Date.now(); if(t - ultimo < 120) return; ultimo = t;
       const n = $('.msg[data-id="'+m.id+'"] .media-carica'); if(n) n.innerHTML = anelloHTML(v);
-    });
+    }, m._ctrl);
     const locale = m.media.locale;
     if(r.path){ m.media.path = r.path; firme.set(r.path, {url: locale, scade: Date.now() + 864e5}); }
     if(r.url){ m.media.url = r.url; }
     delete m._avanza;
     await salvaMessaggio(m);
-    delete m._file;
+    delete m._file; delete m._ctrl;
   }catch(e){
-    m._stato = 'errore'; delete m._avanza; ridisegnaMessaggio(m.id);
+    m._stato = 'errore'; delete m._avanza; delete m._ctrl; ridisegnaMessaggio(m.id);
+    if(e && e.annullato){ toast('Invio annullato: tocca «Riprova» quando vuoi.'); return; }
     errore(e, /server dei media/i.test(e && e.message) ? '' : 'File non inviato');
     if(/server dei media/i.test(e && e.message)) toast('Il server dei media sembra offline: il file non è partito.');
   }
@@ -3358,7 +3418,7 @@ function fineRegistrazione(manda){
   clearInterval(r.giro);
   const durata = (Date.now() - r.inizio) / 1000;
   r.rec.onstop = async () => {
-    r.stream.getTracks().forEach(t => t.stop());
+    r.stream.getTracks().forEach(t => t.stop()); audioDiContorno();
     try{ r.ac && r.ac.close(); }catch(e){}
     disegnaScrivi();
     if(!manda) return;
@@ -3386,8 +3446,8 @@ async function suonaVocale(id){
   if(!audio){
     audio = new Audio(); audio.preload = 'auto';
     audio.addEventListener('timeupdate', disegnaAvanzamento);
-    audio.addEventListener('ended', () => { const fatto = audioId; disegnaAvanzamento(true); audioId = null; prossimoVocale(fatto); });
-    audio.addEventListener('pause', () => disegnaAvanzamento());
+    audio.addEventListener('ended', () => { const fatto = audioId; disegnaAvanzamento(true); audioId = null; prossimoVocale(fatto); if(!audioId) audioDiContorno(); });
+    audio.addEventListener('pause', () => { disegnaAvanzamento(); setTimeout(() => { if(audio.paused) audioDiContorno(); }, 400); });
     audio.addEventListener('play', () => disegnaAvanzamento());
     audio.addEventListener('error', () => { const id2 = audioId; audioId = null; disegnaAvanzamento(); if(id2) mediaNonArriva(id2); });
   }
@@ -3396,6 +3456,7 @@ async function suonaVocale(id){
   if(!u){ mediaNonArriva(id); return; }
   if(audioId){ const vecchio = audioId; audioId = null; disegnaAvanzamento(false, vecchio); }
   audioId = id; audio.src = u; audio.playbackRate = velocita;
+  try{ if(navigator.audioSession) navigator.audioSession.type = 'playback'; }catch(e){}
   try{ await audio.play(); }catch(e){ if(e && e.name !== 'AbortError') toast(m.media && m.media.url ? 'Il server dei media sembra offline.' : 'Non riesco a riprodurre il vocale.'); }
   const a = memoria('ascoltati') || {}; a[id] = 1; const k = Object.keys(a); if(k.length > 500) k.slice(0, k.length - 500).forEach(x => delete a[x]); memoria('ascoltati', a);
   const mic = $('.vocale[data-voc="'+id+'"] .mic'); if(mic) mic.className = 'mic ascoltato';
@@ -4649,8 +4710,11 @@ async function disegnaInfo(){
     '<button class="voce" data-a="info-importanti"><span class="ic-sem">'+svg('stella', 1.8)+'</span><span class="vc"><b>Messaggi importanti</b><span>Quelli che hai segnato con la stella</span></span><span class="freccia-d">'+svg('avanti', 2)+'</span></button>'+
     (nFis ? '<button class="voce" data-a="fissati-lista"><span class="ic-sem">'+svg('spillo', 1.8)+'</span><span class="vc"><b>Messaggi fissati</b><span>'+nFis+(nFis === 1 ? ' messaggio' : ' messaggi')+'</span></span><span class="freccia-d">'+svg('avanti', 2)+'</span></button>' : '')+
     (nProg ? '<button class="voce" data-a="programmati"><span class="ic-sem">'+svg('programma', 1.8)+'</span><span class="vc"><b>Messaggi programmati</b><span>'+nProg+' in attesa</span></span><span class="freccia-d">'+svg('avanti', 2)+'</span></button>' : '')+
+    (gr ? '<button class="voce" data-a="colori-gruppo"'+(puoiColori(c) ? '' : ' disabled')+'><span class="ic-sem">'+svg('sfondo', 1.8)+'</span><span class="vc"><b>Colori del gruppo</b><span>'+
+      (stileDi(c) ? 'Scelti per tutti' : 'Quelli di ognuno')+(puoiColori(c) ? ' · li scegli tu' : ' · li sceglie chi ha creato il gruppo')+'</span></span>'+
+      (stileDi(c) ? '<span class="cg-mini">'+[stileDi(c).primario, stileDi(c).secondario].filter(Boolean).map(x => '<i style="background:'+x+'"></i>').join('')+'</span>' : '')+'</button>' : '')+
     '<button class="voce" data-a="sfondo-chat"><span class="ic-sem">'+svg('sfondo', 1.8)+'</span><span class="vc"><b>Sfondo di questa chat</b><span>'+
-      (sfondoPer(c.id).proprio ? 'Personalizzato' : 'Come le altre chat')+'</span></span></button></div>';
+      (sfondoPer(c.id).proprio ? 'Personalizzato (solo per te)' : (gr && stileDi(c) && stileDi(c).palette ? 'Quello del gruppo' : 'Come le altre chat'))+'</span></span></button></div>';
   h += '<div class="blocco">'+
     '<button class="voce" data-a="crea-lavoro"><span class="ic-sem">'+svg('lavoro', 1.8)+'</span><span class="vc"><b>Crea un lavoro di FOSS</b><span>'+(gr ? 'Con la squadra di questo gruppo' : 'Con ' + esc(nomeDi(a)))+'</span></span></button>'+
     (!gr && a !== S.io ? '<button class="voce" data-a="colpetto" data-id="'+a+'"><span class="ic-sem">'+svg('mano', 1.8)+'</span><span class="vc"><b>Dai un colpetto</b><span>Per farti notare (anche col doppio tocco sulla foto)</span></span></button>' : '')+'</div>';
@@ -5160,11 +5224,16 @@ function sfondoPer(conv){
 }
 async function applicaSfondoConv(){
   const w = $('.msgs-wrap', el('conv')), M = el('msgs'); if(!w || !S.aperta) return;
-  avviaVivo();
+  applicaStileGruppo();
   const conv = S.aperta, sf = sfondoPer(conv);
-  w.style.backgroundColor = sf.c || '';
-  w.classList.toggle('con-foto', !!sf.f);
-  if(M) M.classList.toggle('niente-doodle', S.cfg.doodle === false || !!sf.f);
+  /* v2.6: la palette del gruppo vale per tutti (salvo uno sfondo che ti sei scelto tu per questa chat) */
+  const st = stileDi(S.convs.get(conv)), pal = !sf.proprio && st && st.palette ? sfondoPalette(st.palette) : null;
+  if(M){ M.style.backgroundImage = pal ? pal.img : ''; M.style.backgroundSize = pal ? '240px' : ''; }
+  w.style.backgroundColor = pal ? pal.fondo : (sf.c || '');
+  w.classList.toggle('con-foto', !pal && !!sf.f);
+  if(M) M.classList.toggle('niente-doodle', !pal && (S.cfg.doodle === false || !!sf.f));
+  if(pal){ w.style.backgroundImage = ''; w.style.setProperty('--buio', '0'); avviaVivo(); return; }
+  avviaVivo();
   w.style.setProperty('--buio', sf.f ? String(S.cfg.sfondoBuio == null ? .25 : S.cfg.sfondoBuio) : '0');
   if(sf.f){
     const u = await urlFirmata(sf.f);
@@ -5380,6 +5449,7 @@ document.addEventListener('click', async e => {
     case 'vel-voc': velocita = velocita === 1 ? 1.5 : velocita === 1.5 ? 2 : 1; if(audio) audio.playbackRate = velocita; disegnaAvanzamento(); break;
     case 'ricarica-media': { const c = S.convs.get(S.aperta); const m = c && trovaMsg(c.id, id); if(m && m.media && m.media.path) firme.delete(m.media.path); ridisegnaMessaggio(id); break; }
     case 'riprova': riprova(id); break;
+    case 'annulla-carica': annullaCaricamento(id); break;
     case 'svela': svela(t); break;
     case 'rianima': { const an = t.dataset.anim; t.classList.remove('anim-' + an); void t.offsetWidth; t.classList.add('anim-' + an); break; }
     case 'annulla-risposta': S.risposta = null; disegnaScrivi(); break;
@@ -5412,6 +5482,7 @@ document.addEventListener('click', async e => {
     case 'cfg-invio': cambiaCfg('invio', !S.cfg.invio); disegnaImpostazioni(); break;
     case 'cfg-entrati': cambiaCfg('entrati', S.cfg.entrati === false); disegnaImpostazioni(); break;
     case 'cornice': scegliCornice(t.dataset.v); break;
+    case 'colori-gruppo': scegliColoriGruppo(infoAperta || S.aperta); break;
     case 'vivo': cambiaCfg('vivo', t.dataset.v || ''); disegnaImpostazioni(); avviaVivo(); if(t.dataset.v) setTimeout(vivoScossa, 300); break;
     case 'gestisci-sticker': gestisciRaccolta('sticker'); break;
     case 'gestisci-gif': gestisciRaccolta('gif'); break;
@@ -5576,7 +5647,7 @@ async function avvia(){
     const c = S.aperta && S.convs.get(S.aperta);
     if(c && c.non_lette && document.visibilityState === 'visible' && vicinoAlFondo() && sbloccata(c)) segnaLetto(c.id);
   });
-  window.addEventListener('online', () => riavviaTempoReale(true));
+  window.addEventListener('online', () => { riavviaTempoReale(true); setTimeout(riprovaTutti, 1500); });
   window.addEventListener('pageshow', e => { if(e.persisted) controllaTempoReale(); });
   /* rete di sicurezza: con la chat davanti controllo ogni 20 secondi che il collegamento sia vivo */
   setInterval(() => { if(document.visibilityState === 'visible') controllaTempoReale(true); }, 20000);
@@ -5607,8 +5678,11 @@ if('serviceWorker' in navigator){
 (function(){
   const vv = window.visualViewport; if(!vv) return;
   const adatta = () => {
-    const h = Math.round(vv.height);
-    document.documentElement.style.setProperty('--alto', h + 'px');
+    const h = Math.round(vv.height), pieno = document.documentElement.clientHeight || window.innerHeight;
+    /* v2.6: sull'iPhone aperta dall'icona, visualViewport è più corta dello schermo (toglie la barra di stato)
+       e lasciava una fascia vuota in basso. Accorcio la chat solo quando c'è davvero la tastiera. */
+    if(pieno - h > 120) document.documentElement.style.setProperty('--alto', h + 'px');
+    else document.documentElement.style.removeProperty('--alto');
     if(Math.abs(window.scrollY) > 0 || vv.offsetTop > 0) window.scrollTo(0, 0);
     const app = el('app'); if(app) app.style.transform = vv.offsetTop ? 'translateY(' + vv.offsetTop + 'px)' : '';
     const M = el('msgs');
@@ -6935,7 +7009,7 @@ async function colpetto(a){
   const c = S.convs.get(S.aperta); if(!c || !a || a === S.io) return;
   if(!(c.membri || []).some(x => x.id === a)){ toast(nomeDi(a) + ' non è in questa chat.'); return; }
   const m = nuovoLocale('colpetto', {media: {a}, risponde_a: null});
-  mettiInLista(m); vivoScossa();
+  mettiInLista(m); vivoScossa(); suono('trillo');   /* lo senti anche tu, come su MSN */
   try{ navigator.vibrate && navigator.vibrate(20); }catch(e){}
   try{ await salvaMessaggio(m); segnaVisto(m.id); }
   catch(e){
@@ -7643,6 +7717,138 @@ function vivoHTML(){
   return '<div class="opz vivi">'+VIVI.map(x => '<button class="'+(mio === x.id ? 'on' : '')+'" data-a="vivo" data-v="'+x.id+'">'+esc(x.nome)+'</button>').join('')+'</div>'+
     '<div style="padding:0 20px 12px;font-size:13px;color:var(--testo-2)">Si muove dietro ai messaggi e fa un salto quando arriva un colpetto.</div>';
 }
+
+/* ======================= FOSS.chat 2.6: i colori del gruppo =======================
+   Chi crea il gruppo sceglie il colore primario (tasti, link, accenti), il secondario
+   (le bolle dei propri messaggi, per tutti) e una delle 10 palette di dettagli dello sfondo.
+   Valgono per tutti i partecipanti, sopra al tema di ognuno. */
+const PALETTE = [
+  {id:'notte',    nome:'Notte',    fondo:'#121A2F', c:['#FFD166', '#7C83FD', '#96BAFF', '#F1F5F9']},
+  {id:'mare',     nome:'Mare',     fondo:'#0B3142', c:['#2EC4B6', '#CBF3F0', '#FFBF69', '#FF9F1C']},
+  {id:'bosco',    nome:'Bosco',    fondo:'#16241B', c:['#7FB069', '#E6AA68', '#CA3C25', '#F4E8C1']},
+  {id:'tramonto', nome:'Tramonto', fondo:'#2B1B2F', c:['#FF6B6B', '#FFD93D', '#FF9A8B', '#C084FC']},
+  {id:'cinema',   nome:'Cinema',   fondo:'#141414', c:['#E50914', '#F5C518', '#FFFFFF', '#8A8A8A']},
+  {id:'neon',     nome:'Neon',     fondo:'#0D0221', c:['#FF2A6D', '#05D9E8', '#D1F7FF', '#F9C80E']},
+  {id:'agrumi',   nome:'Agrumi',   fondo:'#FFF6E0', c:['#F59E0B', '#16A34A', '#EA580C', '#FACC15']},
+  {id:'pastello', nome:'Pastello', fondo:'#F6EFFA', c:['#F9A8D4', '#A5B4FC', '#86EFAC', '#FDE68A']},
+  {id:'sabbia',   nome:'Sabbia',   fondo:'#EFE6D8', c:['#C2410C', '#0E7490', '#A16207', '#57534E']},
+  {id:'ghiaccio', nome:'Ghiaccio', fondo:'#E8F1F8', c:['#0EA5E9', '#6366F1', '#94A3B8', '#22D3EE']}
+];
+const COLORI_GRUPPO = ['#FFAD01', '#FF6B6B', '#E50914', '#FF2A6D', '#C084FC', '#7C83FD', '#3EA6FF', '#2EC4B6', '#22C55E', '#7FB069', '#F59E0B', '#94A3B8'];
+const COLORI_BOLLE = ['#1A3149', '#123524', '#2A1F3D', '#3B2A20', '#4A1F2A', '#0B3142', '#2B2B2B', '#FFF3D6', '#DCF8C6', '#E0E7FF', '#FCE7F3', '#FFFFFF'];
+
+/* lo sfondo di una palette: piccoli dettagli disegnati (cerchi, anelli, triangoli, croci, onde, stelle) ripetuti */
+function sfondoPalette(id){
+  const p = PALETTE.find(x => x.id === id); if(!p) return null;
+  const col = i => p.c[i % p.c.length];
+  const pezzi = [
+    [22, 30, 'cerchio'], [96, 18, 'croce'], [170, 40, 'anello'], [214, 102, 'triangolo'], [140, 98, 'onda'],
+    [52, 92, 'stella'], [18, 160, 'triangolo'], [80, 150, 'anello'], [150, 172, 'cerchio'], [210, 196, 'croce'],
+    [110, 220, 'stella'], [40, 214, 'onda'], [190, 140, 'cerchio'], [120, 60, 'triangolo']
+  ];
+  const forma = (x, y, f, c, k) => {
+    const r = `transform="rotate(${(k * 37) % 360} ${x} ${y})"`;
+    if(f === 'cerchio') return `<circle cx="${x}" cy="${y}" r="4.5" fill="${c}"/>`;
+    if(f === 'anello') return `<circle cx="${x}" cy="${y}" r="7" fill="none" stroke="${c}" stroke-width="2.4"/>`;
+    if(f === 'croce') return `<path ${r} d="M${x - 6} ${y}h12M${x} ${y - 6}v12" stroke="${c}" stroke-width="2.6" stroke-linecap="round"/>`;
+    if(f === 'triangolo') return `<path ${r} d="M${x} ${y - 7}l7 12h-14z" fill="none" stroke="${c}" stroke-width="2.2" stroke-linejoin="round"/>`;
+    if(f === 'onda') return `<path ${r} d="M${x - 12} ${y}q4-6 8 0t8 0t8 0" fill="none" stroke="${c}" stroke-width="2.4" stroke-linecap="round"/>`;
+    return `<path ${r} d="M${x} ${y - 7}l2.1 4.6 5 .5-3.8 3.3 1.1 4.9-4.4-2.6-4.4 2.6 1.1-4.9-3.8-3.3 5-.5z" fill="${c}"/>`;
+  };
+  const svgT = `<svg xmlns="http://www.w3.org/2000/svg" width="240" height="240"><g opacity=".55">${pezzi.map(([x, y, f], k) => forma(x, y, f, col(k), k)).join('')}</g></svg>`;
+  return {fondo: p.fondo, img: 'url("data:image/svg+xml;charset=utf-8,' + encodeURIComponent(svgT) + '")'};
+}
+/* colori leggibili: testo chiaro o scuro a seconda dello sfondo */
+function luce(h){ const n = parseInt(h.slice(1), 16), c = [n >> 16, n >> 8 & 255, n & 255].map(v => { v /= 255; return v <= .03928 ? v / 12.92 : Math.pow((v + .055) / 1.055, 2.4); });
+  return .2126 * c[0] + .7152 * c[1] + .0722 * c[2]; }
+function sopra(h){ return luce(h) > .36 ? '#111111' : '#FFFFFF'; }
+function stileDi(c){ return c && c.tipo === 'gruppo' && c.stile && typeof c.stile === 'object' ? c.stile : null; }
+function puoiColori(c){
+  if(!c || c.tipo !== 'gruppo') return false;
+  if(c.creata_da === S.io) return true;
+  const creatoreC_e = (c.membri || []).some(m => m.id === c.creata_da);
+  return !creatoreC_e && c.ruolo === 'admin';
+}
+/* applica i colori del gruppo alla conversazione aperta */
+function applicaStileGruppo(){
+  const cv = el('conv'); if(!cv) return;
+  const c = S.convs.get(S.aperta), st = stileDi(c);
+  const v = ['--pieno', '--su-pieno', '--verde', '--verde-forte', '--verde-chiaro', '--verde-ios', '--su-verde', '--link', '--cit-mio', '--mio', '--testo-mio', '--testo-mio-2'];
+  v.forEach(k => cv.style.removeProperty(k));
+  cv.classList.toggle('con-stile', !!st);
+  if(!st) return;
+  if(st.primario){
+    const p = st.primario, su = sopra(p);
+    [['--pieno', p], ['--su-pieno', su], ['--verde', p], ['--verde-forte', p], ['--verde-chiaro', p], ['--verde-ios', p], ['--su-verde', su], ['--link', p], ['--cit-mio', p]]
+      .forEach(([k, x]) => cv.style.setProperty(k, x));
+  }
+  if(st.secondario){
+    const s = st.secondario, t = sopra(s);
+    cv.style.setProperty('--mio', s); cv.style.setProperty('--testo-mio', t);
+    cv.style.setProperty('--testo-mio-2', t === '#FFFFFF' ? 'rgba(255,255,255,.68)' : 'rgba(0,0,0,.55)');
+  }
+}
+/* la scheda per scegliere: primario, secondario, palette */
+function scegliColoriGruppo(convId){
+  const c = S.convs.get(convId); if(!c || !puoiColori(c)) return;
+  const st = Object.assign({}, stileDi(c) || {});
+  const tondo = (gruppo, col, on) => '<button class="colore'+(on ? ' on' : '')+'" data-g="'+gruppo+'" data-col="'+col+'" style="background:'+col+'"></button>';
+  const html = () =>
+    '<div class="cg">'+
+    '<div class="cg-t">Colore primario <span>tasti, link e accenti</span></div><div class="opz cg-opz">'+
+      COLORI_GRUPPO.map(x => tondo('primario', x, (st.primario || '').toLowerCase() === x.toLowerCase())).join('')+
+      '<label class="colore libero" title="Un altro colore"><input type="color" data-g="primario" value="'+(st.primario || '#ffad01')+'">+</label></div>'+
+    '<div class="cg-t">Colore secondario <span>le bolle dei messaggi di ognuno</span></div><div class="opz cg-opz">'+
+      COLORI_BOLLE.map(x => tondo('secondario', x, (st.secondario || '').toLowerCase() === x.toLowerCase())).join('')+
+      '<label class="colore libero" title="Un altro colore"><input type="color" data-g="secondario" value="'+(st.secondario || '#1a3149')+'">+</label></div>'+
+    '<div class="cg-t">Dettagli dello sfondo</div><div class="cg-pal">'+
+      PALETTE.map(p => { const s = sfondoPalette(p.id);
+        return '<button class="cg-p'+(st.palette === p.id ? ' on' : '')+'" data-pal="'+p.id+'" style="background-color:'+s.fondo+';background-image:'+s.img.replace(/"/g, '&quot;')+'">'+
+          '<span class="cg-pc">'+p.c.map(x => '<i style="background:'+x+'"></i>').join('')+'</span><b>'+esc(p.nome)+'</b></button>'; }).join('')+'</div>'+
+    '<div class="cg-ant" id="cgAnt"><div class="sf-bolla suo">Domani alle 9 sul set?</div><div class="sf-bolla mio">Ci sono! Porto le luci 🎬</div><span class="cg-tasto">Invia</span></div>'+
+    '</div>';
+  const ant = v => {
+    const a = $('#cgAnt', v); if(!a) return;
+    const s = st.palette ? sfondoPalette(st.palette) : null;
+    a.style.backgroundColor = s ? s.fondo : 'var(--sfondo-chat)'; a.style.backgroundImage = s ? s.img : 'var(--doodle-img)';
+    const mio = $('.sf-bolla.mio', a); if(st.secondario){ mio.style.background = st.secondario; mio.style.color = sopra(st.secondario); } else { mio.style.background = ''; mio.style.color = ''; }
+    const t = $('.cg-tasto', a); t.style.background = st.primario || 'var(--pieno)'; t.style.color = st.primario ? sopra(st.primario) : 'var(--su-pieno)';
+  };
+  const v = foglio('Colori del gruppo', html(), [
+    ['Annulla'],
+    stileDi(c) ? ['Togli i colori', () => salvaColoriGruppo(c, null)] : null,
+    ['Salva per tutti', () => salvaColoriGruppo(c, st), 'pieno']
+  ].filter(Boolean));
+  v.querySelector('.foglio').classList.add('largo');
+  const fc = v.querySelector('.foglio-c');
+  fc.addEventListener('click', e => {
+    const b = e.target.closest('[data-col]'), p = e.target.closest('[data-pal]');
+    if(b){ const g = b.dataset.g; st[g] = st[g] === b.dataset.col ? null : b.dataset.col;
+      $$('[data-g="'+g+'"][data-col]', fc).forEach(x => x.classList.toggle('on', x.dataset.col === st[g])); }
+    if(p){ st.palette = st.palette === p.dataset.pal ? null : p.dataset.pal; $$('[data-pal]', fc).forEach(x => x.classList.toggle('on', x.dataset.pal === st.palette)); }
+    ant(v);
+  });
+  fc.addEventListener('input', e => {
+    const i = e.target.closest('input[type=color]'); if(!i) return;
+    st[i.dataset.g] = i.value; $$('[data-g="'+i.dataset.g+'"][data-col]', fc).forEach(x => x.classList.remove('on')); ant(v);
+  });
+  ant(v);
+}
+async function salvaColoriGruppo(c, st){
+  const pulito = st ? Object.fromEntries(Object.entries(st).filter(([, x]) => x)) : null;
+  try{
+    const {error} = await sb.rpc('chat_stile_gruppo', {p_conv: c.id, p_stile: pulito && Object.keys(pulito).length ? pulito : null});
+    if(error) throw error;
+    c.stile = pulito && Object.keys(pulito).length ? pulito : null;
+    applicaSfondoConv(); if(infoAperta) disegnaInfo();
+    toast(c.stile ? 'Colori del gruppo salvati: li vedono tutti' : 'Colori del gruppo tolti');
+  }catch(e){ errore(e, 'Colori non salvati'); }
+}
+/* il suono: i browser lo tengono spento finché non tocchi la pagina. Al primo tocco preparo il motore
+   come «audio di contorno» (non ferma la musica) e lo rimetto subito a riposo */
+['pointerdown', 'keydown', 'touchstart'].forEach(ev => document.addEventListener(ev, function sblocca(){
+  try{ audioDiContorno(); if(!audioCtx){ audioCtx = new (window.AudioContext || window.webkitAudioContext)(); spegniAudioPresto(300); } }catch(e){}
+}, {passive: true, once: true}));
 
 /* ======================= VIA ======================= */
 avvia();
