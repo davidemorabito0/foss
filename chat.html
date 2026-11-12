@@ -1436,6 +1436,8 @@ input,textarea,[contenteditable="true"]{-webkit-user-select:text;user-select:tex
 .media-carica[data-a]{cursor:pointer}
 .msg:has(.riprova-b){flex-wrap:wrap}
 .msg .a-capo{flex-basis:100%;height:0}
+.passi{margin:0;padding-left:22px;line-height:1.55}
+.passi li{margin:3px 0}
 </style>
 </head>
 <body>
@@ -1455,7 +1457,7 @@ const SUPA_KEY = 'sb_publishable_f5Kjp6NHT9yTxr1bhWJjhg_4y72V-Kj';
 const VAPID_PUBBLICA = 'BNlGbW4nZrXmx8DioKxnl7ubULVOr5_6CAKvpuQYoiXeObmxYAzGU6UrkExx2zu1hACmtRNDcpoMh_ARQ0GSmlw';
 /* il server dei file sul NAS (es. 'https://media.foss.team'). Vuoto = si usa Supabase. */
 const MEDIA_NAS = 'https://media.foss.team';
-const VERSIONE = 'chat-2.7';
+const VERSIONE = 'chat-2.7.1';
 /* i temi colore: gli stessi di FOSS. Il predefinito per tutti è Brand (blu e giallo). */
 const TEMI_COLORE = [
   {id:'brand',   nome:'Brand',    ds:'Navy e ambra, il predefinito', c:['#0D1926','#1A3149','#FFAD01']},
@@ -3344,6 +3346,22 @@ async function inviaFilePronto(m, p){
 }
 
 /* ---------- registrazione dei vocali ---------- */
+/* il microfono è negato: spiego dove si sblocca, a seconda del dispositivo */
+function spiegaMicrofono(err){
+  const nome = err && err.name;
+  if(nome === 'NotFoundError' || nome === 'OverconstrainedError'){ toast('Non trovo nessun microfono collegato.'); return; }
+  if(nome === 'NotReadableError'){ toast('Il microfono è occupato da un’altra app (una chiamata?). Chiudila e riprova.'); return; }
+  const ios = /iPhone|iPad|iPod/.test(navigator.userAgent) || (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1);
+  const icona = window.matchMedia && matchMedia('(display-mode: standalone)').matches || navigator.standalone;
+  const passi = ios
+    ? '<ol class="passi"><li>Apri <b>Impostazioni</b> dell’iPhone</li><li>Vai in <b>App</b> → <b>Safari</b> (in fondo alla lista)</li>'+
+      '<li>Tocca <b>Microfono</b> e scegli <b>Consenti</b> (o «Chiedi»)</li>'+
+      (icona ? '<li>Chiudi del tutto FOSS.chat (scorri via dall’elenco delle app aperte) e riaprila dall’icona</li>' : '<li>Torna qui e ricarica la pagina</li>')+'</ol>'
+    : /Android/.test(navigator.userAgent)
+      ? '<ol class="passi"><li>Tocca il lucchetto accanto all’indirizzo (o tieni premuta l’icona dell’app → <b>Info app</b>)</li><li><b>Autorizzazioni</b> → <b>Microfono</b> → <b>Consenti</b></li><li>Torna qui e riprova</li></ol>'
+      : '<ol class="passi"><li>Clicca il lucchetto a sinistra dell’indirizzo in alto</li><li>Accanto a <b>Microfono</b> scegli <b>Consenti</b></li><li>Ricarica la pagina e riprova</li></ol>';
+  foglio('Serve il microfono', '<p style="margin:0 0 10px">Per registrare i vocali FOSS.chat deve poter usare il microfono, ma adesso è bloccato. Si sblocca così:</p>'+passi, [['Ho capito', null, 'pieno']]);
+}
 let reg = null;
 function formatoAudio(){
   const f = ['audio/mp4;codecs=mp4a.40.2', 'audio/mp4', 'audio/webm;codecs=opus', 'audio/webm', 'audio/ogg;codecs=opus'];
@@ -3359,8 +3377,10 @@ async function avviaRegistrazione(e){
   const suPrima = () => { rilasciata = true; };
   document.addEventListener('pointerup', suPrima, {once: true});
   let stream;
+  /* v2.7.1: per registrare l'audio del telefono deve essere in modalità «registra» (con «di contorno» l'iPhone nega il microfono) */
+  try{ if(navigator.audioSession) navigator.audioSession.type = 'play-and-record'; }catch(_){}
   try{ stream = await navigator.mediaDevices.getUserMedia({audio: {echoCancellation: true, noiseSuppression: true}}); }
-  catch(err){ document.removeEventListener('pointerup', suPrima); toast('Serve il permesso di usare il microfono.'); return; }
+  catch(err){ document.removeEventListener('pointerup', suPrima); audioDiContorno(); spiegaMicrofono(err); return; }
   const tipo = formatoAudio();
   const rec = new MediaRecorder(stream, tipo ? {mimeType: tipo, audioBitsPerSecond: 48000} : undefined);
   const pezzi = [], livelli = [];
