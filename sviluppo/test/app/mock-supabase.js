@@ -9,7 +9,7 @@
   const db = {
     profili: [
       {id: D, nome: 'Davide', cognome: 'Morabito', nickname: 'davidemorabito', foto_url: null, ruolo: 'Regia · Montaggio', tema: 'dark', cfg: {}, chat_cfg: (window.__CFG || {}).chat || {}},
-      {id: MO, nome: 'Monica', cognome: 'Mancini', nickname: 'Momo', foto_url: null, ruolo: 'Operatrice video'},
+      {id: MO, nome: 'Monica', cognome: 'Mancini', nickname: 'Momo', foto_url: null, ruolo: 'Operatrice video', chat_cfg: window.__MSN ? {frase: 'Sul set fino alle 18 🎬', cornice: 'oro'} : null},
       {id: AN, nome: 'Antonio', cognome: 'Del Latte', nickname: '', foto_url: null, ruolo: 'Fonico'},
       {id: SE, nome: 'Sergio', cognome: 'Pellino', nickname: '', foto_url: null, ruolo: 'Colorist'},
     ],
@@ -71,10 +71,11 @@
   storage.set(G1 + '/v.m4a', new Blob([new Uint8Array(100)], {type: 'audio/mp4'}));
 
   /* ---- tempo reale ---- */
-  const canali = [];
+  const canali = [], staccato = {v: false};
   function emetti(table, eventType, nuovo, vecchio){
     setTimeout(() => canali.forEach(ch => ch.h.forEach(h => {
       if(h.tipo !== 'postgres_changes') return;
+      if(ch.state !== 'joined' || staccato.v) return;   /* collegamento caduto: l'evento si perde */
       if(h.f.table !== table) return;
       if(h.f.event !== '*' && h.f.event !== eventType) return;
       /* RLS: vedo solo le conversazioni di cui faccio parte */
@@ -86,8 +87,9 @@
   }
   function Canale(nome){ this.nome = nome; this.h = []; this.stato = {}; canali.push(this); }
   Canale.prototype.on = function(tipo, f, cb){ this.h.push({tipo, f, cb}); return this; };
-  Canale.prototype.subscribe = function(cb){ setTimeout(() => cb && cb('SUBSCRIBED'), 10); return this; };
-  Canale.prototype.presenceState = function(){ return {[io]: [{}], [MO]: [{}]}; };
+  Canale.prototype.subscribe = function(cb){ this.cb = cb; this.state = 'joining'; setTimeout(() => { if(staccato.v){ this.state = 'errored'; cb && cb('CHANNEL_ERROR'); return; } this.state = 'joined'; cb && cb('SUBSCRIBED'); }, 10); return this; };
+  const presenti = new Set([io, MO]);
+  Canale.prototype.presenceState = function(){ const o = {}; presenti.forEach(id => { o[id] = [{}]; }); return o; };
   Canale.prototype.track = async function(){ setTimeout(() => this.h.filter(x => x.tipo === 'presence').forEach(x => x.cb()), 20); };
   Canale.prototype.send = async function(){ return 'ok'; };
 
@@ -183,7 +185,8 @@
     }
   };
 
-  const persona = p => ({id: p.id, nome: (p.nome + ' ' + p.cognome).trim(), nick: p.nickname || '', foto: p.foto_url, ruolo: p.ruolo, visto: (db.chat_presenza.find(v => v.utente_id === p.id) || {}).visto_il});
+  const persona = p => ({id: p.id, nome: (p.nome + ' ' + p.cognome).trim(), nick: p.nickname || '', foto: p.foto_url, ruolo: p.ruolo, visto: (db.chat_presenza.find(v => v.utente_id === p.id) || {}).visto_il,
+    frase: ((p.chat_cfg || {}).frase || '').slice(0, 140), cornice: /^[a-z]{1,20}$/.test((p.chat_cfg || {}).cornice || '') ? p.chat_cfg.cornice : ''});
   const sistema = (c, t) => { const r = {id: uid(), conv_id: c, autore: io, tipo: 'sistema', testo: t, media: null, risponde_a: null, creato_il: ora(), eliminato: false}; db.chat_messaggi.push(r); emetti('chat_messaggi', 'INSERT', r); };
   const nomeP = id => { const p = db.profili.find(x => x.id === id); return p ? (p.nickname || p.nome) : 'Qualcuno'; };
   const RPC = {
@@ -228,7 +231,7 @@
     chat_apri_privata: a => {
       const k = [io, a.p_altro].sort().join(':');
       let c = db.chat_conversazioni.find(x => x.coppia === k);
-      if(!c){ c = {id: uid(), tipo: 'privata', nome: null, descrizione: '', foto: null, coppia: k, creata_da: io, creata_il: ora(), ultimo_il: ora()}; db.chat_conversazioni.push(c); mem(c.id, io, 'admin'); mem(c.id, a.p_altro, 'admin'); }
+      if(!c){ c = {id: uid(), tipo: 'privata', nome: null, descrizione: '', foto: null, coppia: k, creata_da: io, creata_il: ora(), ultimo_il: ora()}; db.chat_conversazioni.push(c); mem(c.id, io, 'admin'); if(a.p_altro !== io) mem(c.id, a.p_altro, 'admin'); }
       return c.id;
     },
     chat_crea_gruppo: a => { const c = {id: uid(), tipo: 'gruppo', nome: a.p_nome, descrizione: a.p_descrizione || '', foto: null, creata_da: io, creata_il: ora(), ultimo_il: ora()}; db.chat_conversazioni.push(c);
@@ -326,21 +329,37 @@
       onAuthStateChange: () => ({data: {subscription: {unsubscribe(){}}}}),
     },
     from: t => new Q(t),
-    rpc: async (n, a) => { await new Promise(r => setTimeout(r, 20)); if(!RPC[n]) return {data: null, error: {message: 'rpc ' + n}}; try{ return {data: RPC[n](a || {}), error: null}; }catch(e){ return {data: null, error: {message: String(e)}}; } },
+    rpc: async (n, a) => { window.__rpcConta = window.__rpcConta || {}; window.__rpcConta[n] = (window.__rpcConta[n] || 0) + 1; await new Promise(r => setTimeout(r, 20)); if(!RPC[n]) return {data: null, error: {message: 'rpc ' + n}}; try{ return {data: RPC[n](a || {}), error: null}; }catch(e){ return {data: null, error: {message: String(e)}}; } },
     storage: {from: () => ({
       createSignedUrl: async p => { const b = storage.get(p); if(!b) return {data: null, error: {message: 'Object not found'}}; return {data: {signedUrl: URL.createObjectURL(b)}, error: null}; },
       copy: async (a, b) => { if(!storage.has(a)) return {error: {message: 'not found'}}; storage.set(b, storage.get(a)); return {error: null}; },
       remove: async p => { p.forEach(x => storage.delete(x)); return {error: null}; },
     })},
     functions: {invoke: async (n, o) => { await new Promise(r => setTimeout(r, 60)); window.__gifChiamate = (window.__gifChiamate||[]).concat([o && o.body]);
+      if(n === 'chat-supernotifica'){ window.__super = (window.__super || []).concat([o.body.messaggio]);
+        const m = db.chat_messaggi.find(x => x.id === o.body.messaggio);
+        if(window.__super.filter(x => x === o.body.messaggio).length > 1) return {data: null, error: {message: 'gia', context: {json: async () => ({errore: 'gia'})}}};
+        return {data: {inviate: db.chat_membri.filter(x => x.conv_id === m.conv_id && x.utente_id !== io).map(x => x.utente_id), saltate: []}, error: null}; }
       if(n !== 'gif') return {data: null, error: {message: 'no'}};
       const q = (o.body && o.body.q) || ''; const off = (o.body && o.body.offset) || 0;
       const lista = Array.from({length: 24}, (_, i) => ({id: 'g' + q + (off + i), anteprima: 'https://media.giphy.test/media/x/a.gif', mp4: 'https://media.giphy.test/media/x/a.mp4', w: 200, h: 150 + (i % 3) * 30, titolo: q + ' ' + (off + i)}));
       return {data: {lista, prossimo: off + 24, fine: off >= 48}, error: null}; }},
     channel: n => new Canale(n),
+    removeChannel: async ch => { const i = canali.indexOf(ch); if(i >= 0) canali.splice(i, 1); ch.state = 'closed'; window.__chiusi = (window.__chiusi || 0) + 1; setTimeout(() => ch.cb && ch.cb('CLOSED'), 5); return 'ok'; },
+    realtime: {isConnected: () => !staccato.v, setAuth(){}},
   };
   /* aiutanti per le prove */
   window.__mock = {db, storage, MO, AN, D, C1, G1,
+    /* il collegamento cade in silenzio (telefono in tasca) e poi torna */
+    cade(){ staccato.v = true; canali.forEach(ch => { ch.state = 'errored'; }); },
+    cadeRumoroso(){ staccato.v = true; canali.slice().forEach(ch => { ch.state = 'errored'; ch.cb && ch.cb('CHANNEL_ERROR'); }); },
+    torna(){ staccato.v = false; },
+    canaliAperti: () => canali.filter(c => c.state === 'joined').length,
+    entra(id){ presenti.add(id); canali.forEach(ch => ch.h.filter(x => x.tipo === 'presence').forEach(x => x.cb())); },
+    esce(id){ presenti.delete(id); canali.forEach(ch => ch.h.filter(x => x.tipo === 'presence').forEach(x => x.cb())); },
+    stati: () => canali.map(c => c.nome + ':' + c.state).join(' '),
+    arrivaZitto(conv, autore, testo){ const r = {id: uid(), conv_id: conv, autore, tipo: 'testo', testo, media: null, risponde_a: null, creato_il: ora(), eliminato: false};
+      db.chat_messaggi.push(r); db.chat_conversazioni.find(c => c.id === conv).ultimo_il = r.creato_il; return r.id; },
     arriva(conv, autore, testo, extra){ const r = Object.assign({id: uid(), conv_id: conv, autore, tipo: 'testo', testo, media: null, risponde_a: null, creato_il: ora(), eliminato: false}, extra || {});
       db.chat_messaggi.push(r); db.chat_conversazioni.find(c => c.id === conv).ultimo_il = r.creato_il; emetti('chat_messaggi', 'INSERT', r); return r.id; },
     legge(conv, chi){ const m = db.chat_membri.find(x => x.conv_id === conv && x.utente_id === chi); m.letto_fino = m.ricevuto_fino = ora(); emetti('chat_membri', 'UPDATE', Object.assign({}, m)); },
