@@ -310,6 +310,20 @@ vero(/non valid/.test(await errore(D, `select chat_importa($1, $2, $3::jsonb)`, 
 ri = await imp(D, C1, tanti.slice(0, 500));
 vero(ri[0].n === 500, 'privata: 500 in un colpo');
 
+console.log('— 2.3: chat con te stesso, super notifica');
+const io1 = (await come(D, 'select chat_apri_privata($1) as id', [D]))[0].id;
+vero(!!io1, 'chat con te: creata');
+vero((await q('select count(*)::int n from chat_membri where conv_id = $1', [io1]))[0].n === 1, 'chat con te: un solo membro');
+vero((await come(D, 'select chat_apri_privata($1) as id', [D]))[0].id === io1, 'chat con te: la seconda volta è la stessa');
+await azzeraPush();
+const mi = (await ins(D, io1, 'testo', 'appunto per me', null))[0];
+vero(!!mi && (await push()).length === 0, 'chat con te: scrivo e nessun avviso parte');
+vero(!!(await come(D, 'select chat_apri_privata($1) as id', [M]))[0].id, 'privata con un collega: ancora ok');
+vero(/lavora con te/.test(await errore(D, 'select chat_apri_privata($1)', [X]) || ''), 'privata con chi non lavora con te: rifiutata');
+{ let r; try{ r = await come(D, 'select * from chat_super_notifiche'); }catch(e){ r = []; }
+  vero(r.length === 0, 'super notifiche: nessuno le legge dall\'app');
+  vero(!!(await errore(D, 'insert into chat_super_notifiche (msg_id, conv_id, da) values ($1, $2, $3)', [mi.id, io1, D])), 'super notifiche: nessuno le scrive dall\'app'); }
+
 console.log('');
 console.log(ok + ' prove riuscite, ' + ko + ' fallite');
 process.exit(ko ? 1 : 0);

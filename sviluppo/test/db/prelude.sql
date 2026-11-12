@@ -131,3 +131,6 @@ grant select, insert, update, delete on all tables in schema public to authentic
 
 create table public.admin_foss (utente_id uuid primary key, email text);
 create function public.e_admin_foss() returns boolean language sql stable security definer set search_path = public as $$ select exists (select 1 from admin_foss where utente_id = auth.uid()) $$;
+-- (FOSS) due persone che lavorano nella stessa organizzazione
+create or replace function public.condividiamo_org(p uuid) returns boolean language sql stable security definer set search_path to 'public' as $$
+  select exists (select 1 from membri_org a join membri_org b on a.org_id = b.org_id where a.utente_id = auth.uid() and b.utente_id = p); $$;
