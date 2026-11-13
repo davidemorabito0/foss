@@ -79,10 +79,7 @@ fn decodifica_base64(s: &str) -> Option<Vec<u8>> {
 
 pub fn prepara(app: &AppHandle) {
     #[cfg(target_os = "macos")]
-    {
-        // gli avvisi escono col nome e l'icona di FOSS (riesce quando l'app e' installata)
-        let _ = mac_notification_sys::set_application(&app.config().identifier);
-    }
+    mac::prepara(app);
     #[cfg(not(target_os = "macos"))]
     let _ = app;
 }
@@ -121,29 +118,101 @@ pub fn mostra(app: &AppHandle, a: Avviso) {
 
 #[cfg(target_os = "macos")]
 fn manda(app: &AppHandle, titolo: &str, testo: &str, icona: Option<PathBuf>, suono: bool, dove: Dove) {
-    use mac_notification_sys::{Notification, NotificationResponse};
-    use std::sync::atomic::{AtomicUsize, Ordering};
-    // ogni avviso aspetta il clic in un suo filo: oltre 40 in attesa non aspetto piu'
-    static IN_ATTESA: AtomicUsize = AtomicUsize::new(0);
-    let aspetto = IN_ATTESA.fetch_add(1, Ordering::SeqCst) < 40;
-    let ic = icona.map(|p| p.to_string_lossy().to_string());
-    let mut n = Notification::new();
-    n.title(titolo).message(testo).wait_for_click(aspetto);
-    if !aspetto {
-        n.asynchronous(true);
+    mac::manda(app, titolo, testo, icona, suono, dove);
+}
+
+/// Mac: avvisi del Centro notifiche con un «delegato» nostro. Ogni avviso ha un
+/// identificativo; quando lo clicchi il Mac ce lo restituisce e da li' sappiamo dove portarti
+/// (la chat e il messaggio, la notifica di FOSS, il file scaricato).
+#[cfg(target_os = "macos")]
+#[allow(deprecated)]
+mod mac {
+    use super::*;
+    use objc2::rc::{Allocated, Retained};
+    use objc2::runtime::{AnyClass, AnyObject, NSObject, NSObjectProtocol, ProtocolObject};
+    use objc2::{define_class, msg_send, AnyThread};
+    use objc2_foundation::{NSString, NSUserNotification, NSUserNotificationCenter, NSUserNotificationCenterDelegate, NSUserNotificationDefaultSoundName};
+    use std::collections::HashMap;
+    use std::sync::atomic::{AtomicU64, Ordering};
+    use std::sync::{Mutex, OnceLock};
+
+    static APP: OnceLock<AppHandle> = OnceLock::new();
+    static DOVE: OnceLock<Mutex<HashMap<String, Dove>>> = OnceLock::new();
+    static CONTA: AtomicU64 = AtomicU64::new(1);
+    fn mappa() -> &'static Mutex<HashMap<String, Dove>> {
+        DOVE.get_or_init(|| Mutex::new(HashMap::new()))
     }
-    if suono {
-        n.default_sound();
+
+    define_class!(
+        #[unsafe(super(NSObject))]
+        #[name = "FossDelegatoAvvisi"]
+        struct Delegato;
+
+        unsafe impl NSObjectProtocol for Delegato {}
+
+        unsafe impl NSUserNotificationCenterDelegate for Delegato {
+            #[unsafe(method(userNotificationCenter:didActivateNotification:))]
+            fn attivato(&self, centro: &NSUserNotificationCenter, avviso: &NSUserNotification) {
+                let id = avviso.identifier().map(|s| s.to_string()).unwrap_or_default();
+                centro.removeDeliveredNotification(avviso);
+                let dove = mappa().lock().unwrap().remove(&id);
+                if let Some(app) = APP.get() {
+                    registra(app, "clic_avviso_mac", json!({"id": id, "trovato": dove.is_some()}));
+                    if let Some(d) = dove {
+                        let a = app.clone();
+                        std::thread::spawn(move || crate::vai_a(&a, &d));
+                    }
+                }
+            }
+        }
+    );
+
+    pub fn prepara(app: &AppHandle) {
+        let _ = APP.set(app.clone());
+        let _ = app.run_on_main_thread(|| {
+            let this = Delegato::alloc().set_ivars(());
+            let d: Retained<Delegato> = unsafe { msg_send![super(this), init] };
+            let centro = NSUserNotificationCenter::defaultUserNotificationCenter();
+            unsafe { centro.setDelegate(Some(ProtocolObject::from_ref(&*d))) };
+            // il Centro notifiche non lo tiene: lo teniamo vivo per sempre
+            std::mem::forget(d);
+        });
     }
-    if let Some(p) = &ic {
-        n.app_icon(p);
+
+    fn immagine(p: &std::path::Path) -> Option<Retained<AnyObject>> {
+        let cls = AnyClass::get(c"NSImage")?;
+        let percorso = NSString::from_str(&p.to_string_lossy());
+        unsafe {
+            let a: Allocated<AnyObject> = msg_send![cls, alloc];
+            msg_send![a, initWithContentsOfFile: &*percorso]
+        }
     }
-    let r = n.send();
-    IN_ATTESA.fetch_sub(1, Ordering::SeqCst);
-    match r {
-        Ok(NotificationResponse::Click) | Ok(NotificationResponse::ActionButton(_)) => crate::vai_a(app, &dove),
-        Ok(_) => {}
-        Err(e) => registra(app, "avviso_errore", json!(e.to_string())),
+
+    pub fn manda(app: &AppHandle, titolo: &str, testo: &str, icona: Option<PathBuf>, suono: bool, dove: Dove) {
+        let id = format!("foss-{}-{}", std::process::id(), CONTA.fetch_add(1, Ordering::Relaxed));
+        {
+            let mut m = mappa().lock().unwrap();
+            if m.len() > 500 {
+                m.clear();
+            }
+            m.insert(id.clone(), dove);
+        }
+        let (t, x) = (titolo.to_string(), testo.to_string());
+        let _ = app.run_on_main_thread(move || {
+            let n = NSUserNotification::new();
+            n.setIdentifier(Some(&NSString::from_str(&id)));
+            n.setTitle(Some(&NSString::from_str(&t)));
+            n.setInformativeText(Some(&NSString::from_str(&x)));
+            if suono {
+                n.setSoundName(Some(unsafe { NSUserNotificationDefaultSoundName }));
+            }
+            // la foto di chi scrive al posto dell'icona (come WhatsApp)
+            if let Some(img) = icona.as_deref().and_then(immagine) {
+                let chiave = NSString::from_str("_identityImage");
+                let _: () = unsafe { msg_send![&*n, setValue: &*img, forKey: &*chiave] };
+            }
+            NSUserNotificationCenter::defaultUserNotificationCenter().deliverNotification(&n);
+        });
     }
 }
 

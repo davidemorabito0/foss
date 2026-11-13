@@ -336,7 +336,8 @@ browser prova ad aprire l'app e mostra «Ti ho aperto FOSS nell'app» con «Cont
 
 ### Avvisi, icona, avvio
 
-- Mac: avvisi con `mac-notification-sys` (il clic arriva all'app). Windows: avvisi «toast» con
+- Mac: avvisi del Centro notifiche con un delegato nostro (`avvisi.rs`, modulo `mac`): ogni avviso ha un
+  identificativo, il clic lo restituisce e da li' l'app sa dove portarti. Windows: avvisi «toast» con
   `tauri-winrt-notification`, nome app `team.foss.app` (lo registra l'installer). Su Windows il clic da
   Centro notifiche, molto dopo, può solo aprire l'app.
 - Chiudere la finestra la nasconde: l'app resta nella barra in alto (Mac) o vicino all'orologio
@@ -378,4 +379,6 @@ certificato: SmartScreen → «Ulteriori informazioni» → «Esegui comunque».
    Variabili: `FOSS_SITO` (solo `http://localhost`), `FOSS_PROVA` (registro), `FOSS_PROVA_JS` (script di
    prova messo nel ponte), `FOSS_PROVA_AVVISI_VERI=1` (mostra anche gli avvisi veri).
 3. Le prove della chat nel browser (sezione 6) devono restare tutte come prima.
+   Su GitHub il controllo `.github/workflows/controllo-app.yml` costruisce l'app per Mac, fa le stesse 39
+   prove e lascia l'app da provare negli «Artifacts»; per Windows controlla che si costruisca.
 4. Costruzione completa sul Mac: `TAURI_SIGNING_PRIVATE_KEY="$(cat <chiave>)" cargo tauri build`.

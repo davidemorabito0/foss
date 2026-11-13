@@ -1,0 +1,57 @@
+# Controllo dell'app per computer, senza pubblicare niente: a ogni modifica di desktop/
+# costruisce l'app per Mac (e la prova con FOSS e la chat finti: sviluppo/test/desktop) e
+# controlla che quella per Windows si costruisca. L'app per Mac da provare resta per 7 giorni
+# tra gli «Artifacts» della pagina del controllo.
+name: Controllo app per computer
+
+on:
+  workflow_dispatch:
+  push:
+    branches: [main]
+    paths: ['desktop/**', 'sviluppo/test/desktop/**', '.github/workflows/controllo-app.yml']
+
+jobs:
+  mac:
+    runs-on: macos-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+      - uses: dtolnay/rust-toolchain@stable
+        with:
+          targets: aarch64-apple-darwin,x86_64-apple-darwin
+      - uses: swatinem/rust-cache@v2
+        with:
+          workspaces: 'desktop/src-tauri -> target'
+      - name: Strumenti di Tauri
+        run: npm install -g @tauri-apps/cli@2
+      - name: Costruisci (Intel e Apple Silicon)
+        working-directory: desktop
+        env:
+          TAURI_SIGNING_PRIVATE_KEY: ${{ secrets.TAURI_SIGNING_PRIVATE_KEY }}
+          TAURI_SIGNING_PRIVATE_KEY_PASSWORD: ${{ secrets.TAURI_SIGNING_PRIVATE_KEY_PASSWORD }}
+        run: tauri build --debug --target universal-apple-darwin --bundles app
+      - name: Prove dell'app (39 controlli)
+        run: python3 sviluppo/test/desktop/prova_app.py desktop/src-tauri/target/universal-apple-darwin/debug/bundle/macos/FOSS.app/Contents/MacOS/foss-desktop
+      - name: App da provare
+        if: always()
+        run: cd desktop/src-tauri/target/universal-apple-darwin/debug/bundle/macos && ditto -c -k --keepParent FOSS.app FOSS-mac-prova.zip
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: FOSS-mac-prova
+          path: desktop/src-tauri/target/universal-apple-darwin/debug/bundle/macos/FOSS-mac-prova.zip
+          retention-days: 7
+
+  windows:
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: dtolnay/rust-toolchain@stable
+      - uses: swatinem/rust-cache@v2
+        with:
+          workspaces: 'desktop/src-tauri -> target'
+      - name: Controlla che si costruisca
+        working-directory: desktop/src-tauri
+        run: cargo build
