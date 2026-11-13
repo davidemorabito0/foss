@@ -1,5 +1,5 @@
 /* Prova dell'app per computer: lo script lo mette l'app dentro il ponte (FOSS_PROVA_JS)
-   in tutte e tre le pagine (foss, chat, impostazioni). Usa il Supabase finto, mai quello vero.
+   in tutte e due le pagine (foss e chat). Usa il Supabase finto, mai quello vero.
    Ogni passo scrive nel registro della prova; prova_app.py controlla i risultati. */
 var P = {
   log: function(passo, ok, info){ invoca('prova', {dati: {passo: passo, ok: !!ok, info: info == null ? '' : String(info).slice(0, 300)}}); },
@@ -16,6 +16,10 @@ if(VISTA === 'chat' && !LOCALE) (async function(){
   await P.aspetta(1500);
   var M = window.__mock;
   P.log('chat caricata', !!document.querySelector('.riga'), document.title);
+  /* di serie FOSS e la chat sono separate (una alla volta); per le prove le affianco */
+  var imp0 = await invoca('impostazioni');
+  P.log('di serie FOSS e chat separate', imp0.modo === 'pieno' && imp0.lato === 'destra', JSON.stringify(imp0));
+  await invoca('imposta', {chiave: 'modo', valore: 'accanto'}); await P.aspetta(300);
 
   /* 1. finestra chiusa: i messaggi arrivano come avvisi di sistema */
   await P.fai('nascondi'); await P.aspetta(600);
@@ -165,18 +169,29 @@ if(VISTA === 'foss' && !LOCALE) (async function(){
   await P.aspetta(3500);
   await invoca('imposta', {chiave: 'notifiche', valore: true});
 
-  /* 10. le impostazioni */
-  await P.fai('scorciatoia', {k: 'impostazioni'}); await P.aspetta(2500);
+  /* 10. le impostazioni: il tasto accanto alla foto del profilo apre il pannellino */
+  var tasto = document.getElementById('fdAppBtn'), me = document.getElementById('meBtn');
+  P.log('tasto dell’app accanto alla foto del profilo', tasto && me && tasto.nextElementSibling === me, tasto && tasto.className);
+  await P.fai('scorciatoia', {k: 'impostazioni'}); await P.aspetta(900);
+  var pan = document.getElementById('fdPannello');
+  P.log('⌘, apre il pannellino sotto il tasto', pan && /FOSS per computer/.test(pan.textContent) && /Affiancate/.test(pan.textContent) && /Dove sta la chat/.test(pan.textContent), pan && pan.textContent.slice(0, 120));
+  var sep = pan && pan.querySelector('.fp-scelta[data-k="modo"] button[data-v="pieno"]');
+  if(sep) sep.click(); await P.aspetta(700);
   await P.fai('stato'); await P.aspetta(300);
+  pan = document.getElementById('fdPannello');
+  P.log('dal pannellino: Separate', pan && !/Dove sta la chat/.test(pan.textContent) && pan.querySelector('.fp-scelta[data-k="modo"] .on').dataset.v === 'pieno', pan && pan.textContent.slice(0, 160));
+  var aff = pan && pan.querySelector('.fp-scelta[data-k="modo"] button[data-v="accanto"]');
+  if(aff) aff.click(); await P.aspetta(700);
+  var nasc = document.querySelector('#fdPannello .fp-scelta[data-k="lato"] button[data-v="nascosta"]');
+  if(nasc) nasc.click(); await P.aspetta(700);
+  await P.fai('stato'); await P.aspetta(300);
+  var dx = document.querySelector('#fdPannello .fp-scelta[data-k="lato"] button[data-v="destra"]');
+  if(dx) dx.click(); await P.aspetta(700);
+  await P.fai('stato'); await P.aspetta(300);
+  document.body.dispatchEvent(new MouseEvent('click', {bubbles: true}));
+  await P.aspetta(300);
+  P.log('clic fuori: il pannellino si chiude', !document.getElementById('fdPannello'), '');
   P.log('fine', true, '');
   await P.fai('esci');
 })();
 
-if(VISTA === 'impostazioni') (function(){
-  window.addEventListener('load', function(){
-    setTimeout(function(){
-      var t = document.body.innerText;
-      P.log('finestra impostazioni', /Avvia FOSS all’accensione/.test(t) && /Versione 1\.0\.0|versione 1\.0\.1/.test(t) && /⌘K|Ctrl\+K/.test(t), t.slice(0, 160).replace(/\n+/g, ' | '));
-    }, 900);
-  });
-})();

@@ -301,11 +301,12 @@ accesso. Il sito per il resto del team non cambia.
 
 ### Com'è fatta
 
-- Una finestra con **due pagine**: FOSS (pagina «foss») e la chat (pagina «chat»). Si possono avere
+- Una finestra con **due pagine**: FOSS (pagina «foss») e la chat (pagina «chat»). **Di serie sono separate**
+  (una alla volta; dalla 1.0.3, anche per chi aveva l'app: `schema` 2 in `impostazioni.json`). Si possono avere
   **affiancate** (chat a destra o a sinistra: `lato`) oppure **una alla volta a tutta finestra** (`modo = pieno`,
   `davanti` = quale si vede): il tasto FOSS.chat di FOSS porta alla chat, il logo/tasto FOSS della chat riporta
   a FOSS, ⌘1/⌘2 (Ctrl+1/2) scelgono, ⌘J scambia, ⌘\ passa da affiancate a una alla volta. Si sceglie anche
-  nelle impostazioni dell'app e dal menu dell'icona (`disponi`, `porta_davanti`, `cambia_modo`, `cambia_lato` in `lib.rs`).
+  nel pannellino dell'app e dal menu dell'icona (`disponi`, `porta_davanti`, `cambia_modo`, `cambia_lato` in `lib.rs`).
   Affiancate: la chat si allarga/stringe tirando il suo bordo verso FOSS, si nasconde con
   ⌘J/Ctrl+J o con la linguetta «›» (o «‹») sul bordo, si riapre col tasto FOSS.chat di FOSS.
 - Partono da `desktop/locale/avvio.html`, che aspetta la rete e poi apre il sito.
@@ -321,8 +322,13 @@ accesso. Il sito per il resto del team non cambia.
   col numero, menu del Mac (FOSS, Modifica, Vista, Finestra).
 - Prima dell'accesso la chat mostra «entra prima in FOSS»: il ponte della chat controlla ogni 2 s se compare la sessione
   di Supabase (`sb-…-auth-token` nel localStorage, comune alle due colonne) e allora ricarica la chat.
-- `desktop/locale/impostazioni.html`: impostazioni dell'app (avvio automatico, avvisi, chat accanto,
-  prova avviso, collega il browser, versione e aggiornamenti, scorciatoie).
+- **Impostazioni dell'app**: un tasto in FOSS in alto a destra, subito a sinistra della foto del profilo
+  (`#fdAppBtn`, messo dal ponte prima di `#meBtn`), apre un pannellino sotto il tasto (`#fdPannello`): FOSS e la
+  chat separate/affiancate, lato della chat (sinistra, destra, nascosta), avvio all'accensione, avvisi, prova
+  avviso, collega il browser, versione e aggiornamento. ⌘, (Ctrl+,) e «Impostazioni…» del menu aprono lo stesso
+  pannellino (`apri_impostazioni` → messaggio `impostazioni` al ponte). Niente finestre a parte.
+- Sul Mac l'avviso compare anche con FOSS in primo piano (il delegato risponde sì a `shouldPresentNotification`):
+  quando mandarlo lo decide `avvisi::mostra`, che lo salta se la pagina giusta è già davanti a te.
 - Icone: sorgenti in `desktop/grafica/` (`icona.svg` dal logo di FOSS), file finali in `src-tauri/icons/`
   (`cargo tauri icon desktop/grafica/icona-1024.png -o desktop/src-tauri/icons`).
 

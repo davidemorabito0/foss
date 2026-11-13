@@ -86,7 +86,9 @@
       case 'aggiornamento-progresso': progresso(+d.pct); break;
       case 'aggiornamento-errore': erroreAggiornamento(String(d.testo || '')); break;
       case 'disposizione': disposizione(d); break;
+      case 'impostazioni': if(window.__fossPannello) window.__fossPannello.apri(); break;
     }
+    if(window.__fossPannello) try{ window.__fossPannello.evento(d); }catch(e){}
     if(typeof window.__fossDesktopEvento === 'function') try{ window.__fossDesktopEvento(d); }catch(e){}
   };
   function vaiHash(h){
@@ -146,6 +148,32 @@
       '#fdManiglia.a-destra{left:auto;right:0}' +
       '#fdManiglia.a-destra::before{left:auto;right:0}' +
       '#fdManiglia.a-destra button{left:auto;right:4px;border-radius:8px 0 0 8px}' +
+      '#fdAppBtn.on{background:var(--surface-2,#1A3149);color:var(--text,#E9F0F8)}' +
+      '#fdPannello{position:fixed;z-index:2147483643;width:300px;max-width:calc(100vw - 16px);max-height:calc(100vh - 70px);overflow:auto;padding:8px 8px 10px;' +
+        'background:var(--surface,#13263A);color:var(--text,#E9F0F8);border:1px solid var(--line,#25415E);border-radius:14px;box-shadow:var(--shadow,0 10px 34px rgba(0,0,0,.42));' +
+        'font:13.5px/1.4 -apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif;animation:fpSu .14s ease-out}' +
+      '@keyframes fpSu{from{opacity:0;transform:translateY(-4px)}to{opacity:1;transform:none}}' +
+      '#fdPannello button{font:inherit;color:inherit;cursor:pointer}' +
+      '#fdPannello .fp-t{display:flex;align-items:baseline;justify-content:space-between;padding:4px 6px 8px}' +
+      '#fdPannello .fp-t b{font-size:14.5px}#fdPannello .fp-t span{color:var(--mute,#6A8299);font-size:12px}' +
+      '#fdPannello .fp-sez{color:var(--dim,#9BB0C6);font-size:11.5px;font-weight:600;text-transform:uppercase;letter-spacing:.04em;padding:8px 6px 6px}' +
+      '#fdPannello .fp-scelta{display:flex;gap:3px;padding:3px;background:var(--surface-2,#1A3149);border-radius:10px;margin:0 2px}' +
+      '#fdPannello .fp-scelta button{flex:1;border:0;background:none;border-radius:8px;padding:7px 4px;font-weight:600;font-size:12.5px;color:var(--dim,#9BB0C6)}' +
+      '#fdPannello .fp-scelta button.on{background:var(--surface,#13263A);color:var(--text,#E9F0F8);box-shadow:0 1px 3px rgba(0,0,0,.25),inset 0 0 0 1px var(--amber,#FFAD01)}' +
+      '#fdPannello .fp-nota{color:var(--mute,#6A8299);font-size:12px;padding:6px 6px 2px}' +
+      '#fdPannello .fp-linea{height:1px;background:var(--line-soft,#1B3149);margin:10px 4px}' +
+      '#fdPannello .fp-riga{display:flex;align-items:center;gap:10px;width:100%;border:0;background:none;text-align:left;padding:7px 6px;border-radius:9px}' +
+      '#fdPannello .fp-riga:hover{background:var(--surface-2,#1A3149)}' +
+      '#fdPannello .fp-riga > span:first-child{flex:1;min-width:0}#fdPannello .fp-riga b{display:block;font-weight:600}' +
+      '#fdPannello .fp-riga i{display:block;font-style:normal;color:var(--mute,#6A8299);font-size:12px}' +
+      '#fdPannello .fp-interr{width:34px;height:20px;border-radius:10px;background:var(--surface-3,#21405C);position:relative;flex:none;transition:background .15s}' +
+      '#fdPannello .fp-interr::after{content:"";position:absolute;top:2px;left:2px;width:16px;height:16px;border-radius:50%;background:#fff;transition:left .15s}' +
+      '#fdPannello .fp-interr.on{background:var(--ok,#3FBF8F)}#fdPannello .fp-interr.on::after{left:16px}' +
+      '#fdPannello .fp-tasti{display:flex;gap:6px;padding:6px 4px 0}' +
+      '#fdPannello .fp-tasti button,#fdPannello .fp-agg button{flex:1;border:1px solid var(--line,#25415E);background:var(--surface-2,#1A3149);border-radius:9px;padding:7px 8px;font-weight:600;font-size:12.5px}' +
+      '#fdPannello .fp-agg{display:flex;align-items:center;gap:8px;padding:0 4px}#fdPannello .fp-agg span{flex:1;color:var(--mute,#6A8299);font-size:12px}#fdPannello .fp-agg button{flex:none}' +
+      '#fdPannello .fp-aggiorna{display:flex;align-items:center;justify-content:center;gap:8px;width:calc(100% - 8px);margin:0 4px;border:0;border-radius:10px;padding:9px;background:var(--amber,#FFAD01);color:var(--on-amber,#1A1305);font-weight:700}' +
+      '#fdPannello .fp-aggiorna span{display:grid;width:18px;height:18px}#fdPannello .fp-aggiorna svg{width:18px;height:18px}' +
       'html.fd-tiro,html.fd-tiro *{cursor:col-resize!important;user-select:none!important}';
     (document.head || document.documentElement).appendChild(s);
   });
@@ -371,6 +399,93 @@
     var b = document.getElementById('fdAggiorna');
     if(b){ b.classList.remove('va'); b.style.removeProperty('--pc'); b.innerHTML = FRECCIA; }
     if(t) nota(t);
+  }
+
+  /* ---------- FOSS: il tasto delle impostazioni dell'app, accanto alla foto del profilo ----------
+     Apre un pannellino sotto il tasto (come i menu di FOSS): FOSS e la chat separate o affiancate,
+     dove sta la chat, avvio all'accensione, avvisi, prova, browser collegato, aggiornamenti. */
+  if(VISTA === 'foss'){
+    var ICONA_APP = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4.5" width="18" height="15" rx="2.5"/><path d="M14.5 4.5v15"/></svg>';
+    var PANN = null, IMP = null;
+    var mettiTasto = function(){
+      var me = document.getElementById('meBtn');
+      if(!me || !me.parentNode || document.getElementById('fdAppBtn')) return;
+      var b = document.createElement('button');
+      b.id = 'fdAppBtn'; b.className = 'iconbtn'; b.type = 'button'; b.innerHTML = ICONA_APP;
+      b.title = 'FOSS per computer: FOSS e chat, avvisi, aggiornamenti';
+      b.setAttribute('aria-label', 'Impostazioni di FOSS per computer');
+      b.addEventListener('click', function(e){ e.stopPropagation(); if(PANN) chiudiPannello(); else apriPannello(); });
+      me.parentNode.insertBefore(b, me);
+    };
+    pronto(function(){ mettiTasto(); setInterval(mettiTasto, 1500); });
+    var chiudiPannello = function(){ if(PANN){ PANN.remove(); PANN = null; } var b = document.getElementById('fdAppBtn'); if(b) b.classList.remove('on'); };
+    var posiziona = function(){
+      var b = document.getElementById('fdAppBtn'); if(!PANN) return;
+      if(!b){ PANN.style.top = '56px'; PANN.style.right = '12px'; return; }
+      var r = b.getBoundingClientRect();
+      PANN.style.top = Math.round(r.bottom + 8) + 'px';
+      PANN.style.right = Math.max(8, Math.round(window.innerWidth - r.right - 4)) + 'px';
+    };
+    var e2 = function(t){ var d = document.createElement('div'); d.textContent = t; return d.innerHTML; };
+    var disegna = function(){
+      if(!PANN || !IMP) return;
+      var s = IMP, pieno = s.modo === 'pieno', lato = !s.chat_accanto ? 'nascosta' : (s.lato === 'sinistra' ? 'sinistra' : 'destra');
+      var m = s.os === 'mac' ? '⌘' : 'Ctrl+';
+      var scelta = function(k, voci, ora){ return '<div class="fp-scelta" data-k="' + k + '">' + voci.map(function(v){ return '<button type="button" data-v="' + v[0] + '"' + (v[0] === ora ? ' class="on"' : '') + '>' + v[1] + '</button>'; }).join('') + '</div>'; };
+      var interr = function(k, t, x){ return '<button type="button" class="fp-riga" data-i="' + k + '"><span><b>' + t + '</b><i>' + x + '</i></span><span class="fp-interr' + (s[k] ? ' on' : '') + '"></span></button>'; };
+      PANN.innerHTML =
+        '<div class="fp-t"><b>FOSS per computer</b><span>versione ' + e2(s.versione || '') + '</span></div>' +
+        '<div class="fp-sez">FOSS e la chat</div>' +
+        scelta('modo', [['pieno', 'Separate'], ['accanto', 'Affiancate']], pieno ? 'pieno' : 'accanto') +
+        '<div class="fp-nota">' + (pieno ? 'Una alla volta, a tutta finestra: passi dall’una all’altra col tasto FOSS.chat e col logo di FOSS (' + m + '1 · ' + m + '2).'
+                                          : 'Insieme nella stessa finestra: allarghi la chat tirando il suo bordo.') + '</div>' +
+        (pieno ? '' : '<div class="fp-sez">Dove sta la chat</div>' + scelta('lato', [['sinistra', 'A sinistra'], ['destra', 'A destra'], ['nascosta', 'Nascosta']], lato)) +
+        '<div class="fp-linea"></div>' +
+        interr('avvio', 'Avvia all’accensione', 'Parte da sola, chiusa ' + (s.os === 'mac' ? 'nella barra in alto' : 'vicino all’orologio')) +
+        interr('notifiche', 'Avvisi sul computer', 'Chat, task assegnate, menzioni, scadenze') +
+        '<div class="fp-tasti"><button type="button" data-f="prova">Prova un avviso</button><button type="button" data-f="collega">Collega il browser</button></div>' +
+        '<div class="fp-linea"></div>' +
+        (s.nuova ? '<button type="button" class="fp-aggiorna" data-f="aggiorna"><span>' + FRECCIA + '</span>Aggiorna alla versione ' + e2(s.nuova) + '</button>'
+                 : '<div class="fp-agg"><span id="fpAggT">FOSS controlla da solo gli aggiornamenti</span><button type="button" data-f="controlla">Controlla</button></div>');
+      posiziona();
+    };
+    var carica = function(){ return api.impostazioni().then(function(s){ IMP = s; disegna(); }); };
+    var apriPannello = function(){
+      chiudiPannello();
+      PANN = document.createElement('div'); PANN.id = 'fdPannello'; PANN.setAttribute('role', 'dialog'); PANN.setAttribute('aria-label', 'FOSS per computer');
+      PANN.innerHTML = '<div class="fp-t"><b>FOSS per computer</b></div>';
+      document.body.appendChild(PANN); posiziona();
+      var b = document.getElementById('fdAppBtn'); if(b) b.classList.add('on');
+      PANN.addEventListener('click', function(e){
+        e.stopPropagation();
+        var t = e.target.closest ? e.target.closest('button') : null; if(!t) return;
+        var g = t.parentNode && t.parentNode.dataset ? t.parentNode.dataset.k : '';
+        if(g === 'modo') api.imposta('modo', t.dataset.v).then(function(s){ IMP = s; disegna(); });
+        else if(g === 'lato'){
+          var v = t.dataset.v;
+          (v === 'nascosta' ? api.imposta('chat_accanto', false) : api.imposta('lato', v).then(function(){ return api.imposta('chat_accanto', true); }))
+            .then(function(s){ IMP = s; disegna(); });
+        }
+        else if(t.dataset.i) api.imposta(t.dataset.i, !IMP[t.dataset.i]).then(function(s){ IMP = s; disegna(); });
+        else if(t.dataset.f === 'prova'){ api.provaAvviso(); nota('Ti mando un avviso di prova…'); }
+        else if(t.dataset.f === 'collega'){ api.collegaBrowser(true); nota('Ti apro FOSS nel browser per collegarlo all’app.'); }
+        else if(t.dataset.f === 'controlla'){ var x = document.getElementById('fpAggT'); if(x) x.textContent = 'Controllo…'; api.cercaAggiornamenti(); }
+        else if(t.dataset.f === 'aggiorna'){ t.disabled = true; t.lastChild.textContent = 'Aggiorno…'; api.aggiorna().catch(function(){}); }
+      });
+      carica();
+    };
+    document.addEventListener('click', function(e){ if(PANN && !PANN.contains(e.target)) chiudiPannello(); }, true);
+    document.addEventListener('keydown', function(e){ if(PANN && e.key === 'Escape') chiudiPannello(); }, true);
+    window.addEventListener('resize', posiziona);
+    window.__fossPannello = {apri: function(){ pronto(function(){ mettiTasto(); apriPannello(); }); },
+      evento: function(d){
+        if(!PANN) return;
+        var x = document.getElementById('fpAggT');
+        if(d.tipo === 'aggiornato' && x) x.textContent = 'Hai già l’ultima versione (' + (d.versione || '') + ').';
+        else if(d.tipo === 'aggiornamento-errore' && x) x.textContent = d.testo || 'Non riesco a controllare adesso.';
+        else if(d.tipo === 'aggiornamento') carica();
+        else if(d.tipo === 'aggiornamento-progresso'){ var a = PANN.querySelector('.fp-aggiorna'); if(a){ a.disabled = true; a.lastChild.textContent = d.pct >= 0 ? 'Aggiorno… ' + d.pct + '%' : 'Aggiorno…'; } }
+      }};
   }
 
   /* ---------- FOSS: le scadenze del giorno, una volta al giorno (dalle 9) ---------- */

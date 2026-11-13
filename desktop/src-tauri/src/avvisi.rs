@@ -97,7 +97,15 @@ pub fn mostra(app: &AppHandle, a: Avviso) {
     if a.dove.file.is_empty() {
         if let Some(w) = app.get_window("main") {
             let davanti = w.is_focused().unwrap_or(false) && w.is_visible().unwrap_or(false) && !w.is_minimized().unwrap_or(false);
-            let in_vista = a.dove.vista != "chat" || st.cfg.lock().unwrap().chat_accanto;
+            let in_vista = {
+                let c = st.cfg.lock().unwrap();
+                if c.modo == "pieno" {
+                    // una alla volta: si vede solo quella davanti
+                    c.davanti == (if a.dove.vista == "chat" { "chat" } else { "foss" })
+                } else {
+                    a.dove.vista != "chat" || c.chat_accanto
+                }
+            };
             if davanti && in_vista {
                 registra(app, "avviso_saltato", json!({"titolo": titolo}));
                 return;
@@ -151,6 +159,13 @@ mod mac {
         unsafe impl NSObjectProtocol for Delegato {}
 
         unsafe impl NSUserNotificationCenterDelegate for Delegato {
+            /// Di serie il Mac non mostra gli avvisi dell'app che hai davanti: decidiamo noi quando
+            /// mandarli (mostra() li salta se stai gia' guardando quella pagina), quindi qui sempre si'.
+            #[unsafe(method(userNotificationCenter:shouldPresentNotification:))]
+            fn presenta(&self, _centro: &NSUserNotificationCenter, _avviso: &NSUserNotification) -> bool {
+                true
+            }
+
             #[unsafe(method(userNotificationCenter:didActivateNotification:))]
             fn attivato(&self, centro: &NSUserNotificationCenter, avviso: &NSUserNotification) {
                 let id = avviso.identifier().map(|s| s.to_string()).unwrap_or_default();

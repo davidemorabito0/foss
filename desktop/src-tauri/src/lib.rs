@@ -71,6 +71,8 @@ pub struct Cfg {
     pub davanti: String,
     /// gia' fatto al primo avvio: avvio automatico acceso e browser collegato
     pub primo_avvio_fatto: bool,
+    /// versione delle impostazioni: 2 = FOSS e chat separate di serie (dalla 1.0.3)
+    pub schema: u32,
 }
 impl Default for Cfg {
     fn default() -> Self {
@@ -79,9 +81,10 @@ impl Default for Cfg {
             larghezza_chat: 430.0,
             notifiche: true,
             lato: "destra".into(),
-            modo: "accanto".into(),
+            modo: "pieno".into(),
             davanti: "foss".into(),
             primo_avvio_fatto: false,
+            schema: 2,
         }
     }
 }
@@ -592,7 +595,7 @@ pub fn cerca_aggiornamento(app: &AppHandle, a_mano: bool) {
                 registra(&app, "aggiornamento", json!(v));
                 *app.state::<Stato>().update.lock().unwrap() = Some(up);
                 *app.state::<Stato>().nuova_versione.lock().unwrap() = Some(v.clone());
-                for q in ["foss", "chat", "impostazioni"] {
+                for q in ["foss", "chat"] {
                     al_ponte(&app, q, json!({"tipo": "aggiornamento", "versione": v}));
                 }
                 vassoio::aggiorna_menu(&app);
@@ -600,13 +603,13 @@ pub fn cerca_aggiornamento(app: &AppHandle, a_mano: bool) {
             Ok(None) => {
                 registra(&app, "aggiornamento", Value::Null);
                 if a_mano {
-                    al_ponte(&app, "impostazioni", json!({"tipo": "aggiornato", "versione": app.package_info().version.to_string()}));
+                    al_ponte(&app, "foss", json!({"tipo": "aggiornato", "versione": app.package_info().version.to_string()}));
                 }
             }
             Err(e) => {
                 registra(&app, "aggiornamento_errore", json!(e));
                 if a_mano {
-                    al_ponte(&app, "impostazioni", json!({"tipo": "aggiornamento-errore", "testo": "Non riesco a controllare adesso: riprova più tardi."}));
+                    al_ponte(&app, "foss", json!({"tipo": "aggiornamento-errore", "testo": "Non riesco a controllare adesso: riprova più tardi."}));
                 }
             }
         }
@@ -637,7 +640,7 @@ pub async fn installa_aggiornamento(app: AppHandle) -> Result<(), String> {
                 let pct = totale.filter(|t| *t > 0).map(|t| (fatti * 100 / t) as i64).unwrap_or(-1);
                 if pct != ultimo {
                     ultimo = pct;
-                    for q in ["foss", "chat", "impostazioni"] {
+                    for q in ["foss", "chat"] {
                         al_ponte(&a, q, json!({"tipo": "aggiornamento-progresso", "pct": pct}));
                     }
                 }
@@ -652,7 +655,7 @@ pub async fn installa_aggiornamento(app: AppHandle) -> Result<(), String> {
         }
         Err(e) => {
             *st.aggiornando.lock().unwrap() = false;
-            for q in ["foss", "chat", "impostazioni"] {
+            for q in ["foss", "chat"] {
                 al_ponte(&app, q, json!({"tipo": "aggiornamento-errore", "testo": "L’aggiornamento non è riuscito: riprova tra poco."}));
             }
             // si riprova al prossimo controllo
@@ -897,23 +900,12 @@ fn prova(app: AppHandle, dati: Value) {
 
 // ---------------------------------------------------------------- impostazioni
 
+/// Le impostazioni dell'app stanno in un pannellino dentro FOSS, sotto il tasto accanto alla
+/// foto del profilo (lo disegna il ponte): niente finestre in mezzo allo schermo.
 pub fn apri_impostazioni(app: &AppHandle) {
-    if let Some(w) = app.get_webview_window("impostazioni") {
-        let _ = w.unminimize();
-        let _ = w.show();
-        let _ = w.set_focus();
-        return;
-    }
-    let st = app.state::<Stato>();
-    let script = ponte_per(&st, "impostazioni");
-    let _ = tauri::WebviewWindowBuilder::new(app, "impostazioni", WebviewUrl::App(PathBuf::from("impostazioni.html")))
-        .title("Impostazioni di FOSS")
-        .inner_size(460.0, 820.0)
-                .minimizable(false)
-        .maximizable(false)
-        .center()
-        .initialization_script(script)
-        .build();
+    mostra_finestra(app);
+    porta_davanti(app, "foss");
+    al_ponte(app, "foss", json!({"tipo": "impostazioni"}));
 }
 
 // ---------------------------------------------------------------- avvio
@@ -942,7 +934,6 @@ pub fn run() {
                     | tauri_plugin_window_state::StateFlags::POSITION
                     | tauri_plugin_window_state::StateFlags::MAXIMIZED,
             )
-            .with_denylist(&["impostazioni"])
             .build());
 
     #[cfg(target_os = "macos")]
@@ -960,7 +951,17 @@ pub fn run() {
         .setup(|app| {
             let h = app.handle().clone();
             let file_cfg = h.path().app_config_dir().unwrap_or_else(|_| std::env::temp_dir()).join("impostazioni.json");
-            let cfg: Cfg = fs::read(&file_cfg).ok().and_then(|b| serde_json::from_slice(&b).ok()).unwrap_or_default();
+            let mut cfg: Cfg = fs::read(&file_cfg).ok().and_then(|b| serde_json::from_slice(&b).ok()).unwrap_or_default();
+            // dalla 1.0.3 FOSS e la chat partono separate (una alla volta): vale anche per chi aveva gia' l'app
+            if cfg.schema < 2 {
+                cfg.modo = "pieno".into();
+                cfg.davanti = "foss".into();
+                cfg.schema = 2;
+                if let Some(d) = file_cfg.parent() {
+                    let _ = fs::create_dir_all(d);
+                }
+                let _ = fs::write(&file_cfg, serde_json::to_vec_pretty(&cfg).unwrap_or_default());
+            }
             let prova = std::env::var("FOSS_PROVA").ok().map(PathBuf::from);
             let sito = sito_di_prova().unwrap_or_else(|| Url::parse(SITO).unwrap());
             app.manage(Stato {
@@ -980,12 +981,12 @@ pub fn run() {
             let origine = format!("{}://{}", sito.scheme(), sito.host_str().unwrap_or(""))
                 + &sito.port().map(|p| format!(":{p}")).unwrap_or_default();
             let mut cap = CapabilityBuilder::new("sito").remote(format!("{origine}/*")).webviews(["foss", "chat"]);
-            let mut loc = CapabilityBuilder::new("locale").local(true).webviews(["foss", "chat", "impostazioni"]);
+            let mut loc = CapabilityBuilder::new("locale").local(true).webviews(["foss", "chat"]);
             for c in COMANDI {
                 cap = cap.permission(format!("allow-{}", c.replace('_', "-")));
                 loc = loc.permission(format!("allow-{}", c.replace('_', "-")));
             }
-            loc = loc.windows(["main", "impostazioni"]);
+            loc = loc.windows(["main"]);
             cap = cap.windows(["main"]);
             app.add_capability(cap)?;
             app.add_capability(loc)?;
