@@ -1,0 +1,134 @@
+<!doctype html>
+<html lang="it">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Impostazioni di FOSS</title>
+<!-- Le impostazioni dell'app per computer (quelle di FOSS e della chat restano nel sito). -->
+<style>
+  :root{
+    color-scheme:light dark;
+    --sfondo:#F4F6F9; --carta:#FFFFFF; --testo:#0D1926; --piano:#5B6B7D; --riga:rgba(13,25,38,.09);
+    --accento:#FFAD01; --spento:#C9D1DA; --pieno:#0D1926; --su-pieno:#fff;
+  }
+  @media (prefers-color-scheme: dark){
+    :root{ --sfondo:#0D1926; --carta:#13263A; --testo:#E8EEF7; --piano:#9FB0C3; --riga:rgba(232,238,247,.09); --spento:#33475C; --pieno:#FFAD01; --su-pieno:#0D1926; }
+  }
+  *{box-sizing:border-box}
+  html,body{margin:0;background:var(--sfondo);color:var(--testo);font:14px/1.45 -apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif;-webkit-user-select:none;user-select:none}
+  main{padding:22px 22px 18px}
+  h1{font-size:19px;margin:0 0 2px;font-weight:700;letter-spacing:-.01em}
+  .sub{color:var(--piano);margin:0 0 16px;font-size:13px}
+  .gruppo{background:var(--carta);border-radius:14px;padding:2px 14px;margin-bottom:14px;box-shadow:0 1px 0 var(--riga)}
+  .riga{display:flex;align-items:center;gap:12px;padding:12px 0;border-bottom:1px solid var(--riga)}
+  .riga:last-child{border-bottom:0}
+  .tx{flex:1;min-width:0}
+  .tx b{display:block;font-weight:600}
+  .tx span{display:block;color:var(--piano);font-size:12.5px}
+  .interr{position:relative;width:42px;height:25px;border-radius:13px;background:var(--spento);border:0;cursor:pointer;flex:none;transition:background .15s;padding:0}
+  .interr::after{content:"";position:absolute;top:3px;left:3px;width:19px;height:19px;border-radius:50%;background:#fff;box-shadow:0 1px 3px rgba(0,0,0,.3);transition:left .15s}
+  .interr[aria-checked="true"]{background:#34C759}
+  .interr[aria-checked="true"]::after{left:20px}
+  button.tasto{border:0;border-radius:9px;padding:7px 12px;font:600 13px inherit;font-family:inherit;cursor:pointer;background:var(--riga);color:var(--testo);flex:none}
+  button.tasto.pieno{background:var(--pieno);color:var(--su-pieno)}
+  button.tasto:disabled{opacity:.5;cursor:default}
+  .agg{display:flex;align-items:center;gap:10px}
+  .freccia{width:30px;height:30px;border-radius:50%;background:#0D1926;color:#FFAD01;display:grid;place-items:center;flex:none;border:1.5px solid rgba(255,173,1,.55)}
+  .freccia svg{width:17px;height:17px}
+  .tasti{display:grid;grid-template-columns:auto 1fr;gap:6px 12px;padding:12px 0;font-size:13px}
+  kbd{font:600 12px ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;background:var(--riga);border-radius:6px;padding:2px 7px;justify-self:start}
+  .piede{color:var(--piano);font-size:12px;text-align:center;margin-top:4px}
+</style>
+</head>
+<body>
+<main>
+  <h1>Impostazioni</h1>
+  <p class="sub">Valgono per l’app FOSS su questo computer.</p>
+
+  <div class="gruppo">
+    <div class="riga">
+      <div class="tx"><b>Avvia FOSS all’accensione</b><span>Parte da sola, chiusa nella barra in alto (Mac) o vicino all’orologio (Windows)</span></div>
+      <button class="interr" role="switch" aria-checked="false" data-k="avvio" aria-label="Avvia FOSS all’accensione"></button>
+    </div>
+    <div class="riga">
+      <div class="tx"><b>Avvisi sul computer</b><span>Messaggi della chat, task assegnate, menzioni e scadenze, anche a finestra chiusa</span></div>
+      <button class="interr" role="switch" aria-checked="false" data-k="notifiche" aria-label="Avvisi sul computer"></button>
+    </div>
+    <div class="riga">
+      <div class="tx"><b>Chat accanto a FOSS</b><span>FOSS.chat nella colonna a destra</span></div>
+      <button class="interr" role="switch" aria-checked="false" data-k="chat_accanto" aria-label="Chat accanto a FOSS"></button>
+    </div>
+    <div class="riga">
+      <div class="tx"><b>Prova gli avvisi</b><span>Ne arriva uno di prova</span></div>
+      <button class="tasto" id="provaAvviso">Prova</button>
+    </div>
+  </div>
+
+  <div class="gruppo">
+    <div class="riga">
+      <div class="tx"><b>Link di FOSS dal browser</b><span>I link foss.team aperti nel browser passano all’app</span></div>
+      <button class="tasto" id="collega">Collega</button>
+    </div>
+  </div>
+
+  <div class="gruppo">
+    <div class="riga">
+      <div class="tx agg" id="statoAgg"><div><b>Versione <span id="ver">—</span></b><span id="aggTesto">FOSS controlla da solo gli aggiornamenti a ogni avvio</span></div></div>
+      <button class="tasto" id="aggTasto">Controlla</button>
+    </div>
+    <div class="tasti" id="tasti"></div>
+  </div>
+  <p class="piede">Le impostazioni della chat e di FOSS (tema, suoni, avvisi per tipo) restano nelle loro pagine.</p>
+</main>
+<script>
+(function(){
+  var D = window.fossDesktop;
+  if(!D){ document.body.textContent = 'Questa pagina funziona solo dentro l’app FOSS.'; return; }
+  var FRECCIA = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><path d="M12 19V5"/><path d="m5 12 7-7 7 7"/></svg>';
+  var $ = function(s){ return document.querySelector(s); };
+  var nuova = null;
+  function mostra(s){
+    if(!s) return;
+    document.querySelectorAll('.interr').forEach(function(b){ b.setAttribute('aria-checked', s[b.dataset.k] ? 'true' : 'false'); });
+    $('#ver').textContent = s.versione;
+    var mac = s.os === 'mac', m = mac ? '⌘' : 'Ctrl+';
+    $('#tasti').innerHTML = [[m + 'K', 'Cerca in FOSS'], [m + 'N', 'Nuova task nel progetto aperto'], [m + 'J', 'Mostra o nascondi la chat'], [m + ',', 'Queste impostazioni'], [m + 'R', 'Ricarica']]
+      .map(function(r){ return '<kbd>' + r[0] + '</kbd><span>' + r[1] + '</span>'; }).join('');
+    if(s.nuova) pronta(s.nuova);
+  }
+  function pronta(v){
+    nuova = v;
+    $('#statoAgg').innerHTML = '<div class="freccia">' + FRECCIA + '</div><div><b>È pronta la versione ' + v + '</b><span>Si installa in pochi secondi, poi FOSS si riapre</span></div>';
+    var t = $('#aggTasto'); t.textContent = 'Aggiorna'; t.classList.add('pieno'); t.disabled = false;
+  }
+  document.querySelectorAll('.interr').forEach(function(b){
+    b.addEventListener('click', function(){
+      var si = b.getAttribute('aria-checked') !== 'true';
+      b.setAttribute('aria-checked', si ? 'true' : 'false');
+      D.imposta(b.dataset.k, si).then(mostra);
+    });
+  });
+  $('#provaAvviso').addEventListener('click', function(){ D.provaAvviso(); });
+  $('#collega').addEventListener('click', function(){
+    D.collegaBrowser(true);
+    this.textContent = 'Aperto nel browser'; this.disabled = true;
+    var b = this; setTimeout(function(){ b.textContent = 'Collega'; b.disabled = false; }, 6000);
+  });
+  $('#aggTasto').addEventListener('click', function(){
+    var t = this;
+    if(nuova){ t.disabled = true; t.textContent = 'Aggiorno…'; D.aggiorna().catch(function(){ t.disabled = false; t.textContent = 'Riprova'; }); return; }
+    t.disabled = true; t.textContent = 'Controllo…';
+    D.cercaAggiornamenti();
+    setTimeout(function(){ if(!nuova && t.textContent === 'Controllo…'){ t.disabled = false; t.textContent = 'Controlla'; } }, 15000);
+  });
+  window.__fossDesktopEvento = function(d){
+    if(d.tipo === 'aggiornamento') pronta(d.versione);
+    else if(d.tipo === 'aggiornato'){ $('#aggTesto').textContent = 'Hai già l’ultima versione.'; var t = $('#aggTasto'); t.disabled = false; t.textContent = 'Controlla'; }
+    else if(d.tipo === 'aggiornamento-errore'){ $('#aggTesto').textContent = d.testo || 'Non riesco a controllare adesso.'; var t2 = $('#aggTasto'); t2.disabled = false; t2.textContent = nuova ? 'Riprova' : 'Controlla'; }
+    else if(d.tipo === 'aggiornamento-progresso'){ var t3 = $('#aggTasto'); t3.disabled = true; t3.textContent = d.pct >= 0 ? d.pct + '%' : 'Aggiorno…'; }
+  };
+  D.impostazioni().then(mostra);
+})();
+</script>
+</body>
+</html>

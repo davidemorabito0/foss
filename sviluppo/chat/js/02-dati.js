@@ -393,6 +393,8 @@ function arrivaMessaggio(m){
       c.non_lette = (c.non_lette || 0) + 1;
       if(menz) c.menzioni = (c.menzioni || 0) + 1;
       if((!c.silenziata || menz) && !muto && m.tipo !== 'colpetto') suono('arrivo');
+      /* app per computer: l'avviso di sistema (a finestra chiusa o mentre lavori in FOSS) */
+      if((!c.silenziata || menz) && m.tipo !== 'colpetto') avvisoDesktop(m, c, {muto});
     }
     if(m.tipo === 'colpetto' && m.media && m.media.a === S.io) colpettoRicevuto(m, guardo);
     aggiornaTitolo();

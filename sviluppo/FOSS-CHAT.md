@@ -274,3 +274,106 @@ L'elenco completo è nel `README.md` del sito, sezioni «FOSS.chat» e «FOSS.ch
 - La chat ha il suo manifest `manifest-chat.json` (id e start_url `./chat.html`, nome FOSS.chat, icone `chat-icona-*.png` nella radice, condivisione da altre app). `manifest.json` di FOSS ha ora `"id": "./"`.
 - Prima la chat usava il manifest di FOSS (start_url `./`) e l'icona aperta portava a FOSS.
 - Sorgente dell'icona: `sviluppo/chat/chat-icona.svg` (il LOGO della chat).
+
+---
+
+## 12. App per computer (Mac e Windows) — cartella `desktop/`
+
+Dal 13 novembre 2026 FOSS ha un'app per Mac e Windows fatta con **Tauri 2**. Non contiene una
+copia del sito: apre le pagine pubblicate (`https://foss.team/` e `https://foss.team/chat.html`),
+quindi **ogni pubblicazione del sito arriva subito anche all'app**. Stesso database, stesso
+accesso. Il sito per il resto del team non cambia.
+
+### Com'è fatta
+
+- Una finestra con **due pagine affiancate**: a sinistra FOSS (pagina «foss»), a destra la chat
+  (pagina «chat»). La chat si allarga/stringe tirando il suo bordo sinistro, si nasconde con
+  ⌘J/Ctrl+J o con la linguetta «›» sul bordo, si riapre col tasto FOSS.chat di FOSS.
+- Partono da `desktop/locale/avvio.html`, che aspetta la rete e poi apre il sito.
+- In cima a entrambe l'app mette il **ponte** `desktop/src-tauri/src/ponte.js` (prima di ogni altro
+  script). Il ponte: definisce `window.fossDesktop`; manda nel browser i link esterni e porta
+  FOSS↔chat nella colonna giusta (`window.open`, link, `location`); prende il numero dei non letti
+  da `navigator.setAppBadge` (quello che la chat già calcola in `aggiornaTitolo`); in FOSS gestisce
+  i file trascinati, le scadenze del giorno e la **freccia gialla dell'aggiornamento** (in basso a destra).
+- `src-tauri/src/lib.rs`: finestra, disposizione delle due colonne, navigazione, download (cartella
+  Download + avviso), aggiornamenti, comandi che le pagine possono chiamare (elenco `COMANDI`, uguale a
+  `build.rs`; solo le pagine del sito li possono chiamare). `avvisi.rs`: avvisi di sistema col clic che
+  porta al punto giusto. `vassoio.rs`: icona nella barra dei menu (Mac) / vicino all'orologio (Windows)
+  col numero, menu del Mac (FOSS, Modifica, Vista, Finestra).
+- `desktop/locale/impostazioni.html`: impostazioni dell'app (avvio automatico, avvisi, chat accanto,
+  prova avviso, collega il browser, versione e aggiornamenti, scorciatoie).
+- Icone: sorgenti in `desktop/grafica/` (`icona.svg` dal logo di FOSS), file finali in `src-tauri/icons/`
+  (`cargo tauri icon desktop/grafica/icona-1024.png -o desktop/src-tauri/icons`).
+
+### Il patto tra sito e app (non rinominare senza aggiornare `ponte.js`)
+
+- **`window.fossDesktop`** esiste solo nell'app. Nel sito si usa solo così: `if(window.fossDesktop) ...`.
+  `avviso({titolo, testo, foto, hash, notifica, azione, suono, vista})`, `attenzione()` (il trillo:
+  icona che salta/lampeggia), `impostazioni()`, `imposta(k, v)`, `aggiorna()`, `collegaBrowser()`, `mostraChat()`.
+- **`window.fossApp`** (in `index.html`, blocco «APP PER COMPUTER» in fondo allo script): `pronto()`,
+  `cerca()` (⌘K), `nuovaTask()` (⌘N; risponde `ok` / `serve-progetto` / `non-puoi`), `dove()`,
+  `allega(files)` (usa `allegaAlLavoro`), `apriNotifica(id)` (come la campanella), `apriMie()`, `scadenze()`.
+- Agganci nel sito: `index.html` → `<script src="apri-app.js">` nel `<head>`, `avvisoSulComputer` chiamato da
+  `arrivaNotifica`, stato `'desktop'` in `statoPush`/`rigaAvvisi`. Chat → `head.html` (`apri-app.js`),
+  `js/26-desktop.js` (`avvisoDesktop`), chiamate in `02-dati.js` (`arrivaMessaggio`), `20-colpetto.js`,
+  `19-tempo.js` (promemoria), stato `'desktop'` in `10-pannelli.js`.
+- Gli avvisi della chat seguono le stesse regole del suono: niente se la chat è silenziata (salvo
+  menzioni), niente se stai guardando quella chat; nelle chat protette col codice niente testo.
+  FOSS manda tutte le notifiche della campanella (non durante «silenzia», salvo menzioni e tag).
+  Con la finestra davanti e la pagina in vista l'avviso di sistema non parte (la pagina lo mostra già).
+
+### Link di foss.team aperti nell'app
+
+Il sistema non permette a un'app di «prendersi» i link `https://`. Quindi: l'app registra `foss://`
+(`foss://apri?u=<indirizzo foss.team>`), e `apri-app.js` (nel sito) passa il link all'app **solo nei
+browser collegati**: al primo avvio l'app apre `https://foss.team/#app-collega` nel browser
+predefinito, che si segna `localStorage.foss_app_pc = '1'`. Da lì ogni pagina di FOSS aperta in quel
+browser prova ad aprire l'app e mostra «Ti ho aperto FOSS nell'app» con «Continua nel browser»
+(vale per la scheda) e «Non aprire più i link nell'app». `?browser=1` resta nel browser.
+`#app-scollega` scollega. Sul telefono e nell'app `apri-app.js` non fa nulla.
+
+### Avvisi, icona, avvio
+
+- Mac: avvisi con `mac-notification-sys` (il clic arriva all'app). Windows: avvisi «toast» con
+  `tauri-winrt-notification`, nome app `team.foss.app` (lo registra l'installer). Su Windows il clic da
+  Centro notifiche, molto dopo, può solo aprire l'app.
+- Chiudere la finestra la nasconde: l'app resta nella barra in alto (Mac) o vicino all'orologio
+  (Windows) e continua a ricevere. Si esce da «Esci da FOSS» (menu dell'icona o ⌘Q).
+- Avvio automatico acceso al primo avvio (parte nascosta, `--nascosta`); si spegne dalle impostazioni o
+  dal menu dell'icona. Su Windows le pagine nascoste restano sveglie con gli argomenti di WebView2 in
+  `lib.rs` (audio senza tocco, niente rallentamento in secondo piano).
+- Microfono/fotocamera: concessi solo alle pagine di FOSS; testi per il Mac in `src-tauri/Info.plist`.
+
+### Aggiornamenti dell'app
+
+- A ogni avvio (e ogni 6 ore) l'app legge
+  `https://github.com/davidemorabito0/foss/releases/latest/download/latest.json`. Se c'è una versione
+  nuova compare la **freccia gialla**: un clic scarica, installa e riapre l'app (anche dal menu
+  dell'icona e dalle impostazioni).
+- Gli aggiornamenti sono firmati: la chiave pubblica sta in `tauri.conf.json`, la **privata** solo nel
+  segreto GitHub `TAURI_SIGNING_PRIVATE_KEY` (e nella copia di Davide). Se si perde, le app installate
+  non accettano più aggiornamenti: serve una chiave nuova e reinstallare a mano.
+- Le modifiche al sito NON richiedono una versione nuova dell'app. Serve solo quando cambia `desktop/`.
+
+### Pubblicare una versione nuova dell'app
+
+`.github/workflows/app-desktop.yml`: con un tag `vX.Y.Z` (oppure GitHub → Actions → «App per computer» →
+Run workflow → numero di versione) costruisce `.dmg` (Mac universale, Intel e Apple Silicon) e
+`-setup.exe` (Windows), li mette in **Releases** e scrive `latest.json` alla fine. Il numero di versione
+lo scrive il workflow in `tauri.conf.json`/`Cargo.toml`: in `main` può restare quello vecchio.
+Firma Apple facoltativa (segreti `APPLE_*`, vedi in cima al workflow): senza, al primo avvio sul Mac
+l'app va autorizzata in Impostazioni di Sistema → Privacy e sicurezza → «Apri comunque». Windows senza
+certificato: SmartScreen → «Ulteriori informazioni» → «Esegui comunque».
+
+### Come si prova (obbligatorio prima di consegnare)
+
+1. Strumenti: Rust (`rustup`) e `cargo install tauri-cli --version "^2"`.
+2. `cd desktop/src-tauri && cargo build`, poi dalla radice `python3 sviluppo/test/desktop/prova_app.py`:
+   apre l'app vera con FOSS e la chat **finti** (server `sviluppo/test/desktop/server.py` sulla porta
+   8124: al posto di supabase-js mette `../app/mock-supabase.js` + `mock-foss.js`) e controlla 39 cose
+   (avvisi chat/FOSS e clic, gruppo silenziato e @tutti, trillo, numero, colonna della chat, link,
+   ⌘K/⌘N, file trascinati, scadenze, freccia di aggiornamento, avvisi spenti, impostazioni).
+   Variabili: `FOSS_SITO` (solo `http://localhost`), `FOSS_PROVA` (registro), `FOSS_PROVA_JS` (script di
+   prova messo nel ponte), `FOSS_PROVA_AVVISI_VERI=1` (mostra anche gli avvisi veri).
+3. Le prove della chat nel browser (sezione 6) devono restare tutte come prima.
+4. Costruzione completa sul Mac: `TAURI_SIGNING_PRIVATE_KEY="$(cat <chiave>)" cargo tauri build`.

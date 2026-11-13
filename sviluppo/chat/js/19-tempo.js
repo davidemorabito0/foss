@@ -155,6 +155,7 @@ async function scattaPromemoria(){
     if(!m || m.eliminato) continue;
     const c = S.convs.get(x.conv_id);
     suono('arrivo');
+    avvisoDesktop(m, c, {promemoria: true});
     const chi = m.autore === S.io ? 'Tu' : nomeMsg(m);
     toast('⏰ ' + chi + ': ' + testoAnteprima(m).slice(0, 80), 'Apri', async () => { if(c){ await apriConv(c.id); vaiAMessaggio(id); } });
   }

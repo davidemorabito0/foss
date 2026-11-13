@@ -30,6 +30,7 @@
     .then(function(){ location.replace(dove); }, function(){});
 })();
 </script>
+<script src="apri-app.js"></script>
 <title>FOSS</title>
 <link rel="manifest" href="manifest.json">
 <link rel="icon" href="favicon.ico?v=45" sizes="48x48">
@@ -8971,6 +8972,7 @@ function arrivaNotifica(r, appenaNata){
   if(b && n.nuova){ b.classList.remove('pop'); void b.offsetWidth; b.classList.add('pop'); }
   if(state.drawer) renderDrawer();
   if(appenaNata && n.nuova && NOTIFICA_FORTE[r.tipo]) accodaForte(n);
+  if(appenaNata && n.nuova && window.fossDesktop) avvisoSulComputer(r);
 }
 /* v68: il box a schermo intero non si perde piu'. Se arriva mentre l'app e' chiusa o in
    secondo piano, o mentre c'e' gia' un altro box, aspetta il suo turno; i tag passano anche
@@ -9700,6 +9702,9 @@ function rigaAvvisi(){
     case 'ios-home':
       sotto = 'Sull\u2019iPhone arrivano solo all\u2019app sulla schermata Home: in Safari tocca Condividi \u2192 \u00abAggiungi alla schermata Home\u00bb, '+
               'apri FOSS da l\u00ec e torna qui. Serve iOS 16.4 o successivo.';
+      break;
+    case 'desktop':
+      sotto = 'Arrivano dall\u2019app FOSS per computer, anche a finestra chiusa. Si spengono dalle sue impostazioni.';
       break;
     case 'no-supporto':
       sotto = suIOS() ? 'Questo iPhone non li supporta: serve iOS 16.4 o successivo.'
@@ -15433,6 +15438,7 @@ function nomeDispositivo(){
   return cosa + (br ? ' \u00b7 ' + br : '');
 }
 async function statoPush(){
+  if(window.fossDesktop) return 'desktop';
   if(!sb || !utenteCloud) return 'no-supporto';
   if(suIOS() && !aTuttoSchermo()) return 'ios-home';
   if(!pushPossibile()) return 'no-supporto';
@@ -16082,6 +16088,62 @@ if('serviceWorker' in navigator){
     if(location.hash === h) applicaIndirizzo(); else location.hash = h;
   });
 }
+/* ============ APP PER COMPUTER (cartella desktop/ del repository) ============
+   L'app per Mac e Windows carica questa stessa pagina e le mette accanto FOSS.chat.
+   window.fossDesktop esiste solo li' (lo mette l'app); window.fossApp e' quello che l'app
+   chiede a FOSS: scorciatoie, clic sugli avvisi, file trascinati, scadenze del giorno.
+   Nel browser nessuno la chiama: il sito resta identico. */
+function avvisoSulComputer(r){
+  try{
+    if(!r || r.tipo === 'prova') return;
+    /* «silenzia» della campanella: passano solo le menzioni e i tag, come per il box grande */
+    if(Date.now() < (state.snoozeFino || 0) && !TAG_FORTI[r.tipo]) return;
+    const d = r.dati || {};
+    const div = document.createElement('div'); div.innerHTML = testoNotifica(r.tipo, d);
+    window.fossDesktop.avviso({vista:'foss', notifica:r.id, titolo:titoloNotifica(r.tipo, d), testo:div.textContent || '', suono:true});
+  }catch(e){}
+}
+function scadenzePerAvviso(){
+  if(!utenteCloud || !cloudPronto) return null;
+  const voci = vociInScadenza();
+  const giorni = v => {
+    if(v.i && v.i.d){ const [yy, mm, dd] = String(v.i.d).split('-').map(Number); const g = Math.round((new Date(yy, mm-1, dd) - OGGI)/86400000); if(!isNaN(g)) return g; }
+    return v.g;
+  };
+  const oggi = [], domani = [], scadute = [];
+  voci.forEach(v=>{ const g = giorni(v); if(g < 0) scadute.push(v); else if(g === 0) oggi.push(v); else if(g === 1) domani.push(v); });
+  if(!oggi.length && !domani.length && !scadute.length) return null;
+  const nomi = l => l.slice(0, 2).map(v=>'«'+v.i.t+'»').join(', ') + (l.length > 2 ? ' e altre '+(l.length-2) : '');
+  const pezzi = [];
+  if(oggi.length) pezzi.push((oggi.length === 1 ? '1 cosa scade oggi: ' : oggi.length+' cose scadono oggi: ')+nomi(oggi));
+  if(domani.length) pezzi.push((domani.length === 1 ? '1 domani' : domani.length+' domani'));
+  if(scadute.length) pezzi.push((scadute.length === 1 ? '1 è già scaduta' : scadute.length+' sono già scadute'));
+  return {titolo: oggi.length ? 'Scadenze di oggi' : 'Scadenze', testo: pezzi.join(' · ')};
+}
+window.fossApp = Object.freeze({
+  pronto(){ return !!(utenteCloud && cloudPronto && state.schermo !== 'gate'); },
+  cerca(){ chiudiCtx(); state.drawer = false; state.schermo = 'cerca'; state.mettiFuoco = true; render(); },
+  nuovaTask(){
+    const b = state.schermo === 'progetto' ? document.querySelector('[data-action="nuova-task"]') : null;
+    if(b){ b.click(); return 'ok'; }
+    return state.schermo === 'progetto' && PROJ() ? 'non-puoi' : 'serve-progetto';
+  },
+  dove(){ const p = state.schermo === 'progetto' ? PROJ() : null; return p ? {id:p.id, progetto:p.nome} : null; },
+  allega(files){
+    const p = state.schermo === 'progetto' ? PROJ() : null;
+    if(!p) return 'serve-progetto';
+    if(!puoAllegare(p)) return 'non-puoi';
+    const l = Array.from(files || []);
+    (async ()=>{ for(const f of l) await allegaAlLavoro(p.id, f); })();
+    return l.length;
+  },
+  apriNotifica(id){
+    const n = state.notifiche.find(x=>x.db===id);
+    if(n){ apriNotifica(n); render(); }
+  },
+  apriMie(){ chiudiCtx(); state.drawer = false; state.schermo = 'mie'; mieAppena.clear(); render(); },
+  scadenze(){ return scadenzePerAvviso(); }
+});
 try{
   if(window.claude && window.claude.hot && window.claude.hot.snapshot) window.claude.hot.snapshot(()=>({state}));
   if(window.claude && window.claude.hot && window.claude.hot.ready) window.claude.hot.ready(start);

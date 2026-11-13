@@ -1,0 +1,68 @@
+{
+  "$schema": "https://schema.tauri.app/config/2",
+  "productName": "FOSS",
+  "version": "1.0.0",
+  "identifier": "team.foss.app",
+  "build": {
+    "frontendDist": "../locale"
+  },
+  "app": {
+    "windows": [],
+    "security": {
+      "csp": null
+    },
+    "macOSPrivateApi": false
+  },
+  "bundle": {
+    "active": true,
+    "targets": ["app", "dmg", "nsis"],
+    "createUpdaterArtifacts": true,
+    "publisher": "FOSS",
+    "copyright": "FOSS",
+    "category": "Productivity",
+    "shortDescription": "FOSS e FOSS.chat sul computer",
+    "longDescription": "FOSS, il gestionale di produzione, con la chat del team accanto. Avvisi, icona nella barra e aggiornamenti automatici.",
+    "icon": [
+      "icons/32x32.png",
+      "icons/128x128.png",
+      "icons/128x128@2x.png",
+      "icons/icon.icns",
+      "icons/icon.ico"
+    ],
+    "macOS": {
+      "minimumSystemVersion": "11.0",
+      "signingIdentity": "-",
+      "entitlements": "Entitlements.plist",
+      "dmg": {
+        "windowSize": { "width": 600, "height": 380 },
+        "appPosition": { "x": 170, "y": 190 },
+        "applicationFolderPosition": { "x": 430, "y": 190 }
+      }
+    },
+    "windows": {
+      "webviewInstallMode": { "type": "downloadBootstrapper" },
+      "nsis": {
+        "languages": ["Italian"],
+        "installMode": "currentUser",
+        "displayLanguageSelector": false,
+        "startMenuFolder": "FOSS"
+      }
+    }
+  },
+  "plugins": {
+    "updater": {
+      "pubkey": "dW50cnVzdGVkIGNvbW1lbnQ6IG1pbmlzaWduIHB1YmxpYyBrZXk6IDU4ODEwQzhFM0RFNDM3NUMKUldSY04rUTlqZ3lCV0tmT0VnUm1GczNNNTM4a0dUZTZTcWZHRHVVSlZrbmQ3RGFvZldPUDgwNloK",
+      "endpoints": [
+        "https://github.com/davidemorabito0/foss/releases/latest/download/latest.json"
+      ],
+      "windows": {
+        "installMode": "passive"
+      }
+    },
+    "deep-link": {
+      "desktop": {
+        "schemes": ["foss"]
+      }
+    }
+  }
+}

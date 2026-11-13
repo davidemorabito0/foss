@@ -378,7 +378,7 @@ function disegnaImpostazioni(){
   const fi = el('fraseIn');
   if(fi){ fi.oninput = () => { const n = el('fraseN'); if(n) n.textContent = fi.value.length + '/140'; };
     fi.onchange = () => salvaFrase(fi.value); fi.onkeydown = e => { if(e.key === 'Enter'){ e.preventDefault(); fi.blur(); } }; }
-  statoPush().then(s => { const n = el('statoPush'); if(n) n.textContent = {si: 'Attivi', no: 'Spenti', bloccati: 'Bloccati', 'ios-home': 'Da Home', 'no-supporto': 'Non disponibili'}[s] || ''; });
+  statoPush().then(s => { const n = el('statoPush'); if(n) n.textContent = {si: 'Attivi', no: 'Spenti', bloccati: 'Bloccati', 'ios-home': 'Da Home', 'no-supporto': 'Non disponibili', desktop: 'Dall’app'}[s] || ''; });
 }
 function gestisciRaccolta(tipo){
   const lista = tipo === 'gif' ? S.gif : S.sticker;
@@ -414,6 +414,7 @@ function profilo(){
 function chiaveServer(){ const b = atob(VAPID_PUBBLICA.replace(/-/g, '+').replace(/_/g, '/')); const u = new Uint8Array(b.length); for(let i = 0; i < b.length; i++) u[i] = b.charCodeAt(i); return u; }
 function registrazioneSW(){ if(!('serviceWorker' in navigator)) return Promise.resolve(null); return Promise.race([navigator.serviceWorker.ready, new Promise(ok => setTimeout(() => ok(null), 5000))]); }
 async function statoPush(){
+  if(suComputer()) return 'desktop';
   if(suIOS() && !aTuttoSchermo()) return 'ios-home';
   if(!('serviceWorker' in navigator) || !('PushManager' in window) || !('Notification' in window)) return 'no-supporto';
   if(Notification.permission === 'denied') return 'bloccati';
@@ -430,6 +431,7 @@ function nomeDispositivo(){
 async function attivaPush(){
   const st = await statoPush();
   if(st === 'si'){ toast('Gli avvisi sono già attivi su questo dispositivo.'); return; }
+  if(st === 'desktop'){ toast('Nell’app per computer gli avvisi arrivano da soli: si spengono dalle sue impostazioni.'); return; }
   if(st === 'ios-home'){ foglio('Avvisi su iPhone e iPad', 'Su iPhone gli avvisi arrivano solo se FOSS è sulla schermata Home: in Safari tocca Condividi → «Aggiungi alla schermata Home», apri FOSS da lì e attiva gli avvisi.', [['Ho capito']]); return; }
   if(st === 'no-supporto'){ toast('Questo browser non riceve avvisi.'); return; }
   if(st === 'bloccati'){ toast('Gli avvisi sono bloccati nelle impostazioni del browser.'); return; }

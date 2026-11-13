@@ -28,6 +28,7 @@ function colpettoRicevuto(m, guardo){
   const c = S.convs.get(m.conv_id); if(!c || !sbloccata(c)) return;
   try{ navigator.vibrate && navigator.vibrate([25, 70, 25]); }catch(e){}
   if(!c.silenziata) suono('trillo');
+  if(!c.silenziata && !guardo) avvisoDesktop(m, c, {colpetto: true});
   if(m.conv_id === S.aperta){
     vivoScossa();
     const cv = el('conv'); if(cv){ cv.classList.remove('colpito'); void cv.offsetWidth; cv.classList.add('colpito'); setTimeout(() => cv.classList.remove('colpito'), 900); }

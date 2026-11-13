@@ -1,0 +1,179 @@
+# FOSS per computer: costruisce l'installer per Mac (.dmg) e per Windows (.exe) e li
+# pubblica nella pagina Releases del repository, insieme al file che l'app legge per
+# aggiornarsi da sola (latest.json).
+#
+# Parte in due modi:
+#  - con un tag di versione: git tag v1.0.1 && git push origin v1.0.1
+#  - a mano: GitHub → Actions → «App per computer» → Run workflow → numero di versione
+#
+# Segreti (Settings → Secrets and variables → Actions):
+#  - TAURI_SIGNING_PRIVATE_KEY (obbligatorio): la chiave che firma gli aggiornamenti
+#  - APPLE_CERTIFICATE, APPLE_CERTIFICATE_PASSWORD, APPLE_SIGNING_IDENTITY, APPLE_ID,
+#    APPLE_PASSWORD, APPLE_TEAM_ID (facoltativi): firma e notarizzazione Apple.
+#    Se mancano, l'app per Mac esce senza firma Apple (al primo avvio va autorizzata).
+# Il codice dell'app sta in desktop/ (vedi sviluppo/FOSS-CHAT.md, sezione «App per computer»).
+
+name: App per computer
+
+on:
+  push:
+    tags: ['v*']
+  workflow_dispatch:
+    inputs:
+      versione:
+        description: 'Numero della nuova versione (per esempio 1.0.1)'
+        required: true
+
+permissions:
+  contents: write
+
+concurrency:
+  group: app-desktop-${{ github.ref }}
+  cancel-in-progress: false
+
+jobs:
+  versione:
+    runs-on: ubuntu-latest
+    outputs:
+      versione: ${{ steps.v.outputs.versione }}
+      tag: ${{ steps.v.outputs.tag }}
+    steps:
+      - id: v
+        shell: bash
+        env:
+          DA_MANO: ${{ inputs.versione }}
+        run: |
+          if [ "$GITHUB_EVENT_NAME" = "workflow_dispatch" ]; then V="$DA_MANO"; else V="$GITHUB_REF_NAME"; fi
+          V="${V#v}"
+          if ! echo "$V" | grep -Eq '^[0-9]+\.[0-9]+\.[0-9]+$'; then
+            echo "::error::Versione non valida: «$V». Serve un numero come 1.0.1"; exit 1
+          fi
+          echo "versione=$V" >> "$GITHUB_OUTPUT"
+          echo "tag=v$V" >> "$GITHUB_OUTPUT"
+
+  costruisci:
+    needs: versione
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - os: macos-latest
+            nome: Mac
+            args: --target universal-apple-darwin
+            rust: aarch64-apple-darwin,x86_64-apple-darwin
+          - os: windows-latest
+            nome: Windows
+            args: ''
+            rust: ''
+    name: ${{ matrix.nome }}
+    runs-on: ${{ matrix.os }}
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+
+      - uses: dtolnay/rust-toolchain@stable
+        with:
+          targets: ${{ matrix.rust }}
+
+      - uses: swatinem/rust-cache@v2
+        with:
+          workspaces: 'desktop/src-tauri -> target'
+
+      - name: Numero di versione nell'app
+        shell: bash
+        run: |
+          node -e '
+            const fs = require("fs"), v = process.argv[1];
+            const c = "desktop/src-tauri/tauri.conf.json", j = JSON.parse(fs.readFileSync(c, "utf8"));
+            j.version = v; fs.writeFileSync(c, JSON.stringify(j, null, 2) + "\n");
+            const t = "desktop/src-tauri/Cargo.toml";
+            fs.writeFileSync(t, fs.readFileSync(t, "utf8").replace(/^version = ".*"$/m, "version = \"" + v + "\""));
+          ' '${{ needs.versione.outputs.versione }}'
+
+      - name: Firma Apple (solo se ci sono i certificati)
+        if: runner.os == 'macOS'
+        shell: bash
+        env:
+          C: ${{ secrets.APPLE_CERTIFICATE }}
+          CP: ${{ secrets.APPLE_CERTIFICATE_PASSWORD }}
+          SI: ${{ secrets.APPLE_SIGNING_IDENTITY }}
+          AI: ${{ secrets.APPLE_ID }}
+          AP: ${{ secrets.APPLE_PASSWORD }}
+          AT: ${{ secrets.APPLE_TEAM_ID }}
+        run: |
+          if [ -n "$C" ] && [ -n "$SI" ]; then
+            {
+              echo "APPLE_CERTIFICATE=$C"
+              echo "APPLE_CERTIFICATE_PASSWORD=$CP"
+              echo "APPLE_SIGNING_IDENTITY=$SI"
+            } >> "$GITHUB_ENV"
+            if [ -n "$AI" ] && [ -n "$AP" ] && [ -n "$AT" ]; then
+              { echo "APPLE_ID=$AI"; echo "APPLE_PASSWORD=$AP"; echo "APPLE_TEAM_ID=$AT"; } >> "$GITHUB_ENV"
+            fi
+            echo "Firma Apple: attiva"
+          else
+            echo "Firma Apple: assente (l'app esce senza firma Apple)"
+          fi
+
+      - name: Strumenti di Tauri
+        run: npm install -g @tauri-apps/cli@2
+
+      - name: Costruisci e pubblica
+        uses: tauri-apps/tauri-action@v0
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          TAURI_SIGNING_PRIVATE_KEY: ${{ secrets.TAURI_SIGNING_PRIVATE_KEY }}
+          TAURI_SIGNING_PRIVATE_KEY_PASSWORD: ${{ secrets.TAURI_SIGNING_PRIVATE_KEY_PASSWORD }}
+        with:
+          projectPath: desktop
+          tauriScript: tauri
+          args: ${{ matrix.args }}
+          tagName: ${{ needs.versione.outputs.tag }}
+          releaseName: FOSS ${{ needs.versione.outputs.versione }}
+          releaseBody: |
+            **FOSS per computer, versione ${{ needs.versione.outputs.versione }}**
+
+            Da scaricare (in «Assets» qui sotto):
+            - **Mac**: il file che finisce con `.dmg`. Aprilo e trascina FOSS nella cartella Applicazioni.
+            - **Windows**: il file che finisce con `-setup.exe`. Aprilo e segui i passaggi.
+
+            Chi ha già l'app non deve scaricare niente: all'avvio compare la freccia gialla in basso a destra, un clic e si aggiorna.
+          releaseDraft: false
+          prerelease: false
+          includeUpdaterJson: false
+
+  aggiornamenti:
+    # il file che l'app legge per sapere se c'e' una versione nuova: lo scrivo alla fine,
+    # quando Mac e Windows hanno caricato tutto (cosi' non manca nessuno dei due)
+    needs: [versione, costruisci]
+    runs-on: ubuntu-latest
+    steps:
+      - name: Scrivi latest.json
+        shell: bash
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          TAG: ${{ needs.versione.outputs.tag }}
+          V: ${{ needs.versione.outputs.versione }}
+        run: |
+          set -e
+          mkdir r && cd r
+          gh release download "$TAG" -R "$GITHUB_REPOSITORY" -p '*.sig'
+          ls -la
+          MAC_SIG=$(ls *.app.tar.gz.sig | head -1)
+          WIN_SIG=$(ls *-setup.exe.sig | head -1)
+          [ -n "$MAC_SIG" ] && [ -n "$WIN_SIG" ] || { echo "::error::Mancano le firme degli aggiornamenti"; exit 1; }
+          BASE="https://github.com/$GITHUB_REPOSITORY/releases/download/$TAG"
+          node -e '
+            const fs = require("fs"); const [v, base, mac, win] = process.argv.slice(1);
+            const u = f => base + "/" + encodeURIComponent(f.replace(/\.sig$/, ""));
+            const m = {signature: fs.readFileSync(mac, "utf8").trim(), url: u(mac)};
+            const w = {signature: fs.readFileSync(win, "utf8").trim(), url: u(win)};
+            const j = {version: v, notes: "FOSS " + v, pub_date: new Date().toISOString(),
+                       platforms: {"darwin-x86_64": m, "darwin-aarch64": m, "windows-x86_64": w}};
+            fs.writeFileSync("latest.json", JSON.stringify(j, null, 2));
+            console.log(JSON.stringify(j, null, 2));
+          ' "$V" "$BASE" "$MAC_SIG" "$WIN_SIG"
+          gh release upload "$TAG" latest.json --clobber -R "$GITHUB_REPOSITORY"

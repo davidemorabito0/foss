@@ -140,6 +140,15 @@ Usa lo stesso account di FOSS: nessuna registrazione in più.
   reimportando la stessa chat non si doppia nulla, e l'importazione si può annullare
   (`chat_importa`, `chat_importa_annulla`; nel messaggio `media.importato`)
 
+## FOSS per computer (Mac e Windows)
+
+L'app per computer sta in `desktop/` (Tauri 2): una finestra con FOSS e la chat affiancate, avvisi di
+sistema anche a finestra chiusa, icona nella barra col numero da leggere, avvio all'accensione,
+file trascinati, link `foss://`, scorciatoie (⌘/Ctrl+K cerca, ⌘/Ctrl+N nuova task, ⌘/Ctrl+J chat) e
+aggiornamento automatico. Non copia il sito: apre `foss.team`, quindi ogni pubblicazione arriva
+anche all'app. Gli installer (`.dmg` e `-setup.exe`) si scaricano da **Releases** e li costruisce
+`.github/workflows/app-desktop.yml`. Dettagli in `sviluppo/FOSS-CHAT.md`, sezione 12.
+
 ## Pubblicazione su GitHub Pages
 
 1. Carica i file di questa cartella nel repository

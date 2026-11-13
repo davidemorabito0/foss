@@ -7,13 +7,14 @@
 <meta name="description" content="FOSS.chat: la chat del tuo team su FOSS.">
 <meta name="robots" content="noindex">
 <meta name="theme-color" content="#111b21">
-<link rel="manifest" href="manifest.json">
+<link rel="manifest" href="manifest-chat.json">
 <link rel="icon" href="icone/favicon.svg?v=45" type="image/svg+xml">
 <link rel="icon" href="icone/favicon-32.png?v=45" type="image/png" sizes="32x32">
-<link rel="apple-touch-icon" href="icone/apple-touch-icon-v2.png">
+<link rel="apple-touch-icon" href="chat-icona-180.png">
+<link rel="apple-touch-icon" sizes="180x180" href="chat-icona-180.png">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-<meta name="apple-mobile-web-app-title" content="FOSS">
+<meta name="apple-mobile-web-app-title" content="FOSS.chat">
 <meta name="mobile-web-app-capable" content="yes">
 <meta name="color-scheme" content="dark light">
 <script>
@@ -35,6 +36,7 @@
   }catch(e){ document.documentElement.setAttribute('data-tema', 'scuro'); }
 })();
 </script>
+<script src="apri-app.js"></script>
 <title>FOSS.chat</title>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.4/dist/umd/supabase.js"></script>
 <style>
@@ -1467,7 +1469,7 @@ const SUPA_KEY = 'sb_publishable_f5Kjp6NHT9yTxr1bhWJjhg_4y72V-Kj';
 const VAPID_PUBBLICA = 'BNlGbW4nZrXmx8DioKxnl7ubULVOr5_6CAKvpuQYoiXeObmxYAzGU6UrkExx2zu1hACmtRNDcpoMh_ARQ0GSmlw';
 /* il server dei file sul NAS (es. 'https://media.foss.team'). Vuoto = si usa Supabase. */
 const MEDIA_NAS = 'https://media.foss.team';
-const VERSIONE = 'chat-2.7.4';
+const VERSIONE = 'chat-2.8';
 /* i temi colore: gli stessi di FOSS. Il predefinito per tutti è Brand (blu e giallo). */
 const TEMI_COLORE = [
   {id:'brand',   nome:'Brand',    ds:'Navy e ambra, il predefinito', c:['#0D1926','#1A3149','#FFAD01']},
@@ -2244,6 +2246,8 @@ function arrivaMessaggio(m){
       c.non_lette = (c.non_lette || 0) + 1;
       if(menz) c.menzioni = (c.menzioni || 0) + 1;
       if((!c.silenziata || menz) && !muto && m.tipo !== 'colpetto') suono('arrivo');
+      /* app per computer: l'avviso di sistema (a finestra chiusa o mentre lavori in FOSS) */
+      if((!c.silenziata || menz) && m.tipo !== 'colpetto') avvisoDesktop(m, c, {muto});
     }
     if(m.tipo === 'colpetto' && m.media && m.media.a === S.io) colpettoRicevuto(m, guardo);
     aggiornaTitolo();
@@ -5026,7 +5030,7 @@ function disegnaImpostazioni(){
   const fi = el('fraseIn');
   if(fi){ fi.oninput = () => { const n = el('fraseN'); if(n) n.textContent = fi.value.length + '/140'; };
     fi.onchange = () => salvaFrase(fi.value); fi.onkeydown = e => { if(e.key === 'Enter'){ e.preventDefault(); fi.blur(); } }; }
-  statoPush().then(s => { const n = el('statoPush'); if(n) n.textContent = {si: 'Attivi', no: 'Spenti', bloccati: 'Bloccati', 'ios-home': 'Da Home', 'no-supporto': 'Non disponibili'}[s] || ''; });
+  statoPush().then(s => { const n = el('statoPush'); if(n) n.textContent = {si: 'Attivi', no: 'Spenti', bloccati: 'Bloccati', 'ios-home': 'Da Home', 'no-supporto': 'Non disponibili', desktop: 'Dall’app'}[s] || ''; });
 }
 function gestisciRaccolta(tipo){
   const lista = tipo === 'gif' ? S.gif : S.sticker;
@@ -5062,6 +5066,7 @@ function profilo(){
 function chiaveServer(){ const b = atob(VAPID_PUBBLICA.replace(/-/g, '+').replace(/_/g, '/')); const u = new Uint8Array(b.length); for(let i = 0; i < b.length; i++) u[i] = b.charCodeAt(i); return u; }
 function registrazioneSW(){ if(!('serviceWorker' in navigator)) return Promise.resolve(null); return Promise.race([navigator.serviceWorker.ready, new Promise(ok => setTimeout(() => ok(null), 5000))]); }
 async function statoPush(){
+  if(suComputer()) return 'desktop';
   if(suIOS() && !aTuttoSchermo()) return 'ios-home';
   if(!('serviceWorker' in navigator) || !('PushManager' in window) || !('Notification' in window)) return 'no-supporto';
   if(Notification.permission === 'denied') return 'bloccati';
@@ -5078,6 +5083,7 @@ function nomeDispositivo(){
 async function attivaPush(){
   const st = await statoPush();
   if(st === 'si'){ toast('Gli avvisi sono già attivi su questo dispositivo.'); return; }
+  if(st === 'desktop'){ toast('Nell’app per computer gli avvisi arrivano da soli: si spengono dalle sue impostazioni.'); return; }
   if(st === 'ios-home'){ foglio('Avvisi su iPhone e iPad', 'Su iPhone gli avvisi arrivano solo se FOSS è sulla schermata Home: in Safari tocca Condividi → «Aggiungi alla schermata Home», apri FOSS da lì e attiva gli avvisi.', [['Ho capito']]); return; }
   if(st === 'no-supporto'){ toast('Questo browser non riceve avvisi.'); return; }
   if(st === 'bloccati'){ toast('Gli avvisi sono bloccati nelle impostazioni del browser.'); return; }
@@ -7040,6 +7046,7 @@ async function scattaPromemoria(){
     if(!m || m.eliminato) continue;
     const c = S.convs.get(x.conv_id);
     suono('arrivo');
+    avvisoDesktop(m, c, {promemoria: true});
     const chi = m.autore === S.io ? 'Tu' : nomeMsg(m);
     toast('⏰ ' + chi + ': ' + testoAnteprima(m).slice(0, 80), 'Apri', async () => { if(c){ await apriConv(c.id); vaiAMessaggio(id); } });
   }
@@ -7102,6 +7109,7 @@ function colpettoRicevuto(m, guardo){
   const c = S.convs.get(m.conv_id); if(!c || !sbloccata(c)) return;
   try{ navigator.vibrate && navigator.vibrate([25, 70, 25]); }catch(e){}
   if(!c.silenziata) suono('trillo');
+  if(!c.silenziata && !guardo) avvisoDesktop(m, c, {colpetto: true});
   if(m.conv_id === S.aperta){
     vivoScossa();
     const cv = el('conv'); if(cv){ cv.classList.remove('colpito'); void cv.offsetWidth; cv.classList.add('colpito'); setTimeout(() => cv.classList.remove('colpito'), 900); }
@@ -7929,6 +7937,32 @@ async function salvaColoriGruppo(c, st){
 ['pointerdown', 'keydown', 'touchstart'].forEach(ev => document.addEventListener(ev, function sblocca(){
   try{ audioDiContorno(); if(!audioCtx){ audioCtx = new (window.AudioContext || window.webkitAudioContext)(); spegniAudioPresto(300); } }catch(e){}
 }, {passive: true, once: true}));
+
+/* ---------- App per computer (cartella desktop/ del repository) ----------
+   L'app per Mac e Windows mette questa chat accanto a FOSS. Li' esiste window.fossDesktop
+   (lo mette l'app prima della pagina): qui la chat gli chiede gli avvisi di sistema.
+   Il numero sull'icona arriva da solo (navigator.setAppBadge in aggiornaTitolo).
+   Nel browser window.fossDesktop non c'e' e queste funzioni non fanno nulla. */
+function suComputer(){ return !!window.fossDesktop; }
+/* o = {colpetto, promemoria, muto} */
+function avvisoDesktop(m, c, o){
+  if(!suComputer() || !m || !c) return;
+  o = o || {};
+  try{
+    const gruppo = c.tipo === 'gruppo', chi = m.autore === S.io ? 'Tu' : nomeMsg(m);
+    /* chat protetta col codice: niente testo, come sul telefono */
+    const riservata = !!c.bloccata && !S.sbloccate.has(c.id);
+    let titolo = gruppo ? nomeConv(c) : chi;
+    let testo = riservata ? 'Nuovo messaggio' : testoAnteprima(m);
+    if(gruppo && !riservata) testo = chi + ': ' + testo;
+    if(o.colpetto){ titolo = chi; testo = '👋 Ti ha mandato un trillo' + (gruppo ? ' in «' + nomeConv(c) + '»' : ''); }
+    if(o.promemoria){ titolo = '⏰ Promemoria' + (gruppo ? ' · ' + nomeConv(c) : ''); testo = riservata ? 'Un messaggio da rivedere' : chi + ': ' + testoAnteprima(m); }
+    const p = S.persone.get(m.autore) || {};
+    window.fossDesktop.avviso({vista: 'chat', titolo, testo, foto: riservata ? '' : fotoSicura(p.foto),
+                               hash: '#c=' + c.id + '&m=' + m.id, suono: false});
+    if(o.colpetto) window.fossDesktop.attenzione();
+  }catch(e){}
+}
 
 /* ======================= VIA ======================= */
 avvia();
