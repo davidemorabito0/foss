@@ -120,7 +120,7 @@ document.addEventListener('click', async e => {
         c.tipo === 'privata' && altro(c) !== S.io ? [['Dai un colpetto', 'mano', () => colpetto(altro(c))]] : [], [
         null,
         [c.silenziata ? 'Riattiva notifiche' : 'Silenzia notifiche', c.silenziata ? 'campana' : 'silenzia', () => impostaMembro(c, {silenziata: !c.silenziata})],
-        [c.bloccata ? 'Sblocca chat' : 'Blocca chat', c.bloccata ? 'lucchettoAperto' : 'lucchetto', () => alternaBlocco(c)],
+        [c.bloccata ? 'Togli privata' : 'Rendi privata', c.bloccata ? 'lucchettoAperto' : 'lucchetto', () => alternaBlocco(c)],
         ['Svuota chat', 'vietato', svuotaChat],
         null,
         c.tipo === 'gruppo' ? ['Esci dal gruppo', 'esci', () => esciGruppo(c), 'rosso'] : ['Elimina chat', 'cestino', () => eliminaChat(c), 'rosso'],
@@ -149,6 +149,7 @@ document.addEventListener('click', async e => {
     case 'vel-voc': velocita = velocita === 1 ? 1.5 : velocita === 1.5 ? 2 : 1; if(audio) audio.playbackRate = velocita; disegnaAvanzamento(); break;
     case 'ricarica-media': { const c = S.convs.get(S.aperta); const m = c && trovaMsg(c.id, id); if(m && m.media && m.media.path) firme.delete(m.media.path); ridisegnaMessaggio(id); break; }
     case 'riprova': riprova(id); break;
+    case 'annulla-carica': annullaCaricamento(id); break;
     case 'svela': svela(t); break;
     case 'rianima': { const an = t.dataset.anim; t.classList.remove('anim-' + an); void t.offsetWidth; t.classList.add('anim-' + an); break; }
     case 'annulla-risposta': S.risposta = null; disegnaScrivi(); break;
@@ -179,6 +180,10 @@ document.addEventListener('click', async e => {
     case 'cfg-suoni': cambiaCfg('suoni', !S.cfg.suoni); disegnaImpostazioni(); break;
     case 'cfg-doodle': cambiaCfg('doodle', S.cfg.doodle === false); applicaTema(); disegnaImpostazioni(); { const M = el('msgs'); if(M) M.classList.toggle('niente-doodle', S.cfg.doodle === false); } break;
     case 'cfg-invio': cambiaCfg('invio', !S.cfg.invio); disegnaImpostazioni(); break;
+    case 'cfg-entrati': cambiaCfg('entrati', S.cfg.entrati === false); disegnaImpostazioni(); break;
+    case 'cornice': scegliCornice(t.dataset.v); break;
+    case 'colori-gruppo': scegliColoriGruppo(infoAperta || S.aperta); break;
+    case 'vivo': cambiaCfg('vivo', t.dataset.v || ''); disegnaImpostazioni(); avviaVivo(); if(t.dataset.v) setTimeout(vivoScossa, 300); break;
     case 'gestisci-sticker': gestisciRaccolta('sticker'); break;
     case 'gestisci-gif': gestisciRaccolta('gif'); break;
     case 'info-file': foglio('Dove stanno i file', MEDIA_NAS
@@ -334,7 +339,7 @@ async function avvia(){
   ping(); setInterval(ping, 60000);
   setInterval(() => { aggiornaTestaConv(); }, 30000);
   document.addEventListener('visibilitychange', () => {
-    if(document.visibilityState === 'visible'){ ping(); scattaPromemoria(); pulisciAvvisi(); const c = S.aperta && S.convs.get(S.aperta); if(c && c.non_lette && vicinoAlFondo() && sbloccata(c)) segnaLetto(c.id); }
+    if(document.visibilityState === 'visible'){ controllaTempoReale(); ping(); scattaPromemoria(); pulisciAvvisi(); const c = S.aperta && S.convs.get(S.aperta); if(c && c.non_lette && vicinoAlFondo() && sbloccata(c)) segnaLetto(c.id); }
   });
   /* torni sulla finestra della chat (per esempio da un altro programma): la chat aperta diventa letta */
   window.addEventListener('focus', () => {
@@ -342,7 +347,10 @@ async function avvia(){
     const c = S.aperta && S.convs.get(S.aperta);
     if(c && c.non_lette && document.visibilityState === 'visible' && vicinoAlFondo() && sbloccata(c)) segnaLetto(c.id);
   });
-  window.addEventListener('online', recupera);
+  window.addEventListener('online', () => { riavviaTempoReale(true); setTimeout(riprovaTutti, 1500); });
+  window.addEventListener('pageshow', e => { if(e.persisted) controllaTempoReale(); });
+  /* rete di sicurezza: con la chat davanti controllo ogni 20 secondi che il collegamento sia vivo */
+  setInterval(() => { if(document.visibilityState === 'visible') controllaTempoReale(true); }, 20000);
   sveglia();
   sorveglianza();
   /* le persone cambiano nome o foto in FOSS: ogni tanto rileggo */
@@ -350,7 +358,11 @@ async function avvia(){
   if(!S.cfg.benvenuto) await benvenuto();
   seguiIndirizzo();
   prendiCondivisi();
-  sb.auth.onAuthStateChange((ev, ses) => { if(ev === 'SIGNED_OUT' || (ses && ses.user && ses.user.id !== S.io)) location.reload(); });
+  sb.auth.onAuthStateChange((ev, ses) => {
+    if(ev === 'SIGNED_OUT' || (ses && ses.user && ses.user.id !== S.io)){ location.reload(); return; }
+    /* accesso rinnovato: lo passo anche al tempo reale, sennò dopo un'ora smette di arrivare */
+    if(ev === 'TOKEN_REFRESHED' && ses && ses.access_token){ try{ sb.realtime.setAuth(ses.access_token); }catch(e){} if(!canaliVivi()) riavviaTempoReale(true); }
+  });
 }
 if('serviceWorker' in navigator){
   window.addEventListener('load', () => { navigator.serviceWorker.register('sw.js').catch(() => {}); });
@@ -366,14 +378,17 @@ if('serviceWorker' in navigator){
 (function(){
   const vv = window.visualViewport; if(!vv) return;
   const adatta = () => {
-    const h = Math.round(vv.height);
-    document.documentElement.style.setProperty('--alto', h + 'px');
+    const R = document.documentElement, h = Math.round(vv.height);
+    const pieno = Math.max(window.innerHeight || 0, R.clientHeight || 0);
+    if(pieno - h > 150) R.style.setProperty('--alto', h + 'px');
+    else R.style.removeProperty('--alto');
     if(Math.abs(window.scrollY) > 0 || vv.offsetTop > 0) window.scrollTo(0, 0);
     const app = el('app'); if(app) app.style.transform = vv.offsetTop ? 'translateY(' + vv.offsetTop + 'px)' : '';
     const M = el('msgs');
     if(M && M._eraInFondo !== false) M.scrollTop = M.scrollHeight;
   };
   vv.addEventListener('resize', adatta); vv.addEventListener('scroll', adatta);
+  window.addEventListener('resize', adatta); window.addEventListener('orientationchange', () => setTimeout(adatta, 300));
   document.addEventListener('focusin', e => { if(e.target.id === 'testoIn'){ const M = el('msgs'); if(M) M._eraInFondo = vicinoAlFondo(); setTimeout(adatta, 60); setTimeout(adatta, 350); } });
   document.addEventListener('focusout', () => setTimeout(adatta, 120));
   adatta();

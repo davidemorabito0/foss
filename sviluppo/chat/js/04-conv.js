@@ -8,7 +8,7 @@ async function apriConv(id, opz){
   const c = S.convs.get(id);
   if(!c){ if(S.pronti) toast('Questa chat non è più disponibile.'); return; }
   if(c.bloccata && !S.sbloccate.has(id)){
-    const ok = await chiediPin('Chat bloccata', 'Inserisci il codice per aprire «'+nomeConv(c)+'».');
+    const ok = await chiediPin('Chat privata', 'Inserisci il codice per aprire «'+nomeConv(c)+'».');
     if(!ok) return;
     S.sbloccate.add(id);
   }
@@ -95,7 +95,7 @@ function aggiornaTestaConv(){
     stato = c.tipo === 'gruppo' ? nomeDi(sc[0].id) + ' ' + cosa : cosa;
   } else if(c.tipo === 'privata'){
     const a = altro(c);
-    stato = S.online.has(a) ? 'online' : ultimoAccesso((S.persone.get(a) || {}).visto) || (S.persone.get(a) || {}).ruolo || '';
+    stato = a === S.io ? (fraseDi(S.io) || 'Messaggi a te stesso') : fraseDi(a) && !S.online.has(a) ? fraseDi(a) : S.online.has(a) ? 'online' + (fraseDi(a) ? ' · ' + fraseDi(a) : '') : ultimoAccesso((S.persone.get(a) || {}).visto) || (S.persone.get(a) || {}).ruolo || '';
   } else {
     const m = (c.membri || []).map(x => x.id).sort((a, b) => (a === S.io) - (b === S.io));
     stato = m.map(id => id === S.io ? 'Tu' : nomeDi(id)).join(', ');
@@ -209,7 +209,8 @@ function bollaHTML(m, c, primo, mio, gr){
   const polvere = md.bolla === 'inchiostro' ? '<span class="polvere"><canvas data-polvere="1"></canvas></span>' : '';
   return '<div class="'+bcls+eff+'"'+(md.bolla === 'inchiostro' ? ' data-a="svela"' : '')+'>'+menu+autore+cit+corpo+
     (m.tipo === 'sticker' || bcls.includes('solo-media') || bcls.includes('solo-emoji') ? meta(m, c, mio) : (m.tipo === 'vocale' ? '' : meta(m, c, mio)))+
-    polvere+reazioniHTML(m.id)+'</div>';
+    polvere+reazioniHTML(m.id)+'</div>'+
+    (m._stato === 'errore' ? '<span class="a-capo"></span><button class="riprova-b" data-a="riprova" data-id="'+m.id+'">'+svg('aggiorna', 2)+'<span>Non inviato · <b>Riprova</b></span></button>' : '');
 }
 function meta(m, c, mio){
   const md = m.media || {};
@@ -295,7 +296,7 @@ function mediaBoxHTML(m){
   const [w, h] = dimensioniMedia(md);
   const st = 'width:'+w+'px;height:'+h+'px';
   const mini = md.mini ? '<img class="mini" src="'+esc(md.mini)+'" alt="">' : '';
-  const carica = m._avanza != null ? '<div class="media-carica">'+anelloHTML(m._avanza)+'</div>' : '';
+  const carica = m._avanza != null ? '<div class="media-carica" data-a="annulla-carica" data-id="'+m.id+'" title="Tocca per fermare">'+anelloHTML(m._avanza)+'</div>' : '';
   const errore = m._stato === 'errore' ? '<div class="media-carica"><button class="anello" data-a="riprova" data-id="'+m.id+'" title="Riprova">'+svg('aggiorna')+'</button></div>' : '';
   if(m.tipo === 'video'){
     if(md.gif) return '<div class="media-box" style="'+st+'" data-a="vedi" data-id="'+m.id+'">'+mini+
@@ -325,7 +326,7 @@ function classeDoc(ext){
 }
 function docHTML(m){
   const md = m.media || {}, ext = estensione(md.nome);
-  const carica = m._avanza != null ? '<span class="sc">'+'<span class="giro" style="border-color:rgba(134,150,160,.3);border-top-color:var(--verde)"></span></span>' : '<span class="sc">'+svg('scarica')+'</span>';
+  const carica = m._avanza != null ? '<span class="sc" data-a="annulla-carica" data-id="'+m.id+'">'+'<span class="giro" style="border-color:rgba(134,150,160,.3);border-top-color:var(--verde)"></span></span>' : '<span class="sc">'+svg('scarica')+'</span>';
   return '<button class="doc" data-a="apri-doc" data-id="'+m.id+'"><span class="ic '+classeDoc(ext)+'">'+esc((ext || 'file').toUpperCase().slice(0, 4))+'</span>'+
     '<span class="nm"><b>'+esc(md.nome || 'Documento')+'</b><span>'+[ext.toUpperCase(), fmtDim(md.dim)].filter(Boolean).join(' · ')+'</span></span>'+carica+'</button>'+
     (md.did ? '<div class="testo didascalia">'+formatta(md.did)+'</div>' : '');

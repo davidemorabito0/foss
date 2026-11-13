@@ -10,7 +10,7 @@ const SUPA_KEY = 'sb_publishable_f5Kjp6NHT9yTxr1bhWJjhg_4y72V-Kj';
 const VAPID_PUBBLICA = 'BNlGbW4nZrXmx8DioKxnl7ubULVOr5_6CAKvpuQYoiXeObmxYAzGU6UrkExx2zu1hACmtRNDcpoMh_ARQ0GSmlw';
 /* il server dei file sul NAS (es. 'https://media.foss.team'). Vuoto = si usa Supabase. */
 const MEDIA_NAS = 'https://media.foss.team';
-const VERSIONE = 'chat-2.1';
+const VERSIONE = 'chat-2.7.5';
 /* i temi colore: gli stessi di FOSS. Il predefinito per tutti è Brand (blu e giallo). */
 const TEMI_COLORE = [
   {id:'brand',   nome:'Brand',    ds:'Navy e ambra, il predefinito', c:['#0D1926','#1A3149','#FFAD01']},
@@ -18,8 +18,8 @@ const TEMI_COLORE = [
   {id:'nebbia',  nome:'Nebbia',   ds:'Chiaro e morbido',             c:['#DCE2E8','#EDF1F4','#2F7D8C']},
   {id:'sabbia',  nome:'Sabbia',   ds:'Caldo e naturale',             c:['#E4DDD2','#F1ECE4','#B4632A']},
   {id:'idea',    nome:'Idea',     ds:'Carta e inchiostro',           c:['#E4E1D2','#223D7C','#C2437A']},
-  {id:'limoni',  nome:'Limoni',   ds:'Vivace e solare',              c:['#132571','#FAEFAF','#C83934']},
-  {id:'autunno', nome:'Autunno',  ds:'Caldo e accogliente',          c:['#743832','#F8EBD7','#EDA95C']},
+  {id:'limoni',  nome:'Limoni',   ds:'Giallo limone e verde foglia', c:['#121810','#FFF0A0','#F5D130']},
+  {id:'autunno', nome:'Autunno',  ds:'Marrone scuro e arancio',      c:['#1E1411','#35241E','#E39A4F']},
   {id:'bloom',   nome:'Bloom',    ds:'Morbido e grafico',            c:['#EBD3AF','#3B1F45','#D1733D']}
 ];
 const MAX_SUPA = 50 * 1024 * 1024;
@@ -105,6 +105,7 @@ function memoria(k, v){
 
 /* ---------- icone (disegnate per FOSS.chat) ---------- */
 const I = {
+  mail:'<rect x="3" y="5" width="18" height="14" rx="2.5"/><path d="m3.5 6.5 8.5 6.5 8.5-6.5"/>',
   nuova:'<path d="M19 3H5a2 2 0 0 0-2 2v11a2 2 0 0 0 2 2h3v3l4-3h7a2 2 0 0 0 2-2V5a2 2 0 0 0-2-2z"/><path d="M12 7.5v6M9 10.5h6"/>',
   menu:'<circle cx="12" cy="5.5" r="1.4" fill="currentColor" stroke="none"/><circle cx="12" cy="12" r="1.4" fill="currentColor" stroke="none"/><circle cx="12" cy="18.5" r="1.4" fill="currentColor" stroke="none"/>',
   cerca:'<circle cx="10.5" cy="10.5" r="6.5"/><path d="m20 20-4.8-4.8"/>',
@@ -247,7 +248,7 @@ const S = {
   vista: 'chat',            // chat | archiviate
   risposta: null,
   bozze: memoria('bozze') || {},
-  cfg: Object.assign({tema:'sistema', colori:'brand', invio:true, suoni:true, sfondo:'', doodle:true, testo:'medio'}, memoria('cfg') || {}),
+  cfg: Object.assign({tema:'sistema', colori:'brand', frase:'', cornice:'', vivo:'', entrati:true, invio:true, suoni:true, sfondo:'', doodle:true, testo:'medio'}, memoria('cfg') || {}),
   sticker: [], gif: [],
   effettoScelto: null,      // {bolla, schermo, anim}
   visti: new Set(memoria('effetti_visti') || []),
@@ -283,9 +284,13 @@ function iniziali(t){
   return ((p[0] || '?')[0] + (p.length > 1 ? p[p.length - 1][0] : '')).toUpperCase();
 }
 function fotoSicura(u){ return typeof u === 'string' && /^(https:\/\/|data:image\/(png|jpe?g|webp|gif);base64,)/i.test(u) ? u : ''; }
+/* v2.4: la cornice della foto, scelta da ognuno (si vede a tutti) */
+const CORNICI = [{id:'oro', nome:'Oro'}, {id:'argento', nome:'Argento'}, {id:'neon', nome:'Neon'}, {id:'fuoco', nome:'Fuoco'},
+  {id:'arcobaleno', nome:'Arcobaleno'}, {id:'rosa', nome:'Rosa'}, {id:'smeraldo', nome:'Smeraldo'}, {id:'viola', nome:'Viola'}];
 function avatar(id, cls, conOnline, stile){
   const p = S.persone.get(id) || {}, f = fotoSicura(p.foto);
-  return '<span class="av '+(cls||'')+'" style="background:'+(f ? 'transparent' : colore(id))+';'+(stile||'')+'">'+
+  const cr = /(^|\s)cr-/.test(cls || '') ? '' : (p.cornice && CORNICI.some(x => x.id === p.cornice) ? ' cr-' + p.cornice : '');
+  return '<span class="av '+(cls||'')+cr+'" style="background:'+(f ? 'transparent' : colore(id))+';'+(stile||'')+'">'+
     (f ? '<img src="'+esc(f)+'" alt="" loading="lazy" onerror="this.remove()">' : svg('persona', 1.6))+
     (conOnline && S.online.has(id) ? '<i class="online"></i>' : '')+'</span>';
 }
@@ -309,7 +314,7 @@ function nomeConv(c){
   if(!c) return '';
   if(c.tipo === 'gruppo') return c.nome || 'Gruppo';
   const a = altro(c);
-  return a === S.io ? nomeDi(S.io) + ' (tu)' : nomeDi(a);
+  return a === S.io ? nomeLungo(S.io) + ' (tu)' : nomeDi(a);
 }
 
 /* ---------- avvisi brevi ---------- */
@@ -332,13 +337,55 @@ function errore(e, cosa){
 }
 
 /* ---------- suoni (generati, niente file) ---------- */
-let audioCtx = null;
+let audioCtx = null, tSpegniAudio = null;
+/* v2.7: i suoni della chat si mescolano alla musica (Spotify ecc.) senza abbassarla né fermarla.
+   Su iPhone diciamo al telefono che sono suoni «di contorno»; e il motore audio si spegne
+   appena finito, così non tiene occupato l'audio del telefono. */
+function audioDiContorno(){ try{ if(navigator.audioSession) navigator.audioSession.type = 'ambient'; }catch(e){} }
+audioDiContorno();
+function spegniAudioPresto(dopo){
+  clearTimeout(tSpegniAudio);
+  tSpegniAudio = setTimeout(() => { try{ if(audioCtx && audioCtx.state === 'running') audioCtx.suspend(); }catch(e){} }, dopo || 1500);
+}
+/* v2.5: il trillo (colpetto) si sente forte anche dal computer, dove non c'è vibrazione:
+   un ronzio che vibra, tre colpi, e un campanello sopra. Passa da un limitatore, così è forte ma non gracchia. */
+function suonoTrillo(ac){
+  const t0 = ac.currentTime + .02;
+  const lim = ac.createDynamicsCompressor(); lim.threshold.value = -6; lim.knee.value = 4; lim.ratio.value = 12; lim.attack.value = .002; lim.release.value = .12;
+  const tot = ac.createGain(); tot.gain.value = .9; lim.connect(tot); tot.connect(ac.destination);
+  for(let k = 0; k < 3; k++){                       // tre «brrr» uno dopo l'altro
+    const t = t0 + k * .26;
+    const o = ac.createOscillator(), o2 = ac.createOscillator(), g = ac.createGain(), trem = ac.createOscillator(), tg = ac.createGain();
+    o.type = 'square'; o2.type = 'sawtooth';
+    o.frequency.setValueAtTime(190, t); o.frequency.linearRampToValueAtTime(150, t + .2);
+    o2.frequency.setValueAtTime(293, t); o2.frequency.linearRampToValueAtTime(230, t + .2);
+    trem.type = 'square'; trem.frequency.value = 38; tg.gain.value = .35;   // la vibrazione
+    trem.connect(tg); tg.connect(g.gain);
+    g.gain.setValueAtTime(.0001, t); g.gain.exponentialRampToValueAtTime(.55, t + .012); g.gain.setValueAtTime(.55, t + .16); g.gain.exponentialRampToValueAtTime(.0001, t + .22);
+    o.connect(g); o2.connect(g); g.connect(lim);
+    [o, o2, trem].forEach(x => { x.start(t); x.stop(t + .23); });
+  }
+  const tc = t0 + .8;                                // il campanello finale
+  [1318, 1976].forEach((f, i) => {
+    const o = ac.createOscillator(), g = ac.createGain(); o.type = 'triangle'; o.frequency.value = f;
+    g.gain.setValueAtTime(.0001, tc); g.gain.exponentialRampToValueAtTime(i ? .25 : .5, tc + .01); g.gain.exponentialRampToValueAtTime(.0001, tc + .7);
+    o.connect(g); g.connect(lim); o.start(tc); o.stop(tc + .72);
+  });
+}
 function suono(tipo){
   if(!S.cfg.suoni) return;
   try{
     audioCtx = audioCtx || new (window.AudioContext || window.webkitAudioContext)();
+    audioDiContorno();
+    if(audioCtx.state === 'suspended') audioCtx.resume();
+    spegniAudioPresto(tipo === 'trillo' ? 2500 : 1200);
+    if(tipo === 'trillo') return suonoTrillo(audioCtx);
     const t = audioCtx.currentTime, o = audioCtx.createOscillator(), g = audioCtx.createGain();
     o.connect(g); g.connect(audioCtx.destination);
+    if(tipo === 'entrato'){   /* tre note che salgono, come quando un amico entrava su MSN */
+      o.type = 'triangle'; [523, 659, 784].forEach((f, i) => o.frequency.setValueAtTime(f, t + i * .11));
+      g.gain.setValueAtTime(.0001, t); g.gain.exponentialRampToValueAtTime(.08, t + .02); g.gain.setValueAtTime(.08, t + .3); g.gain.exponentialRampToValueAtTime(.0001, t + .55);
+      o.start(t); o.stop(t + .56); return; }
     if(tipo === 'invio'){ o.frequency.setValueAtTime(880, t); o.frequency.exponentialRampToValueAtTime(1320, t + .08); g.gain.setValueAtTime(.05, t); g.gain.exponentialRampToValueAtTime(.0001, t + .14); o.start(t); o.stop(t + .15); }
     else { o.type = 'sine'; o.frequency.setValueAtTime(660, t); o.frequency.setValueAtTime(990, t + .09); g.gain.setValueAtTime(.0001, t); g.gain.exponentialRampToValueAtTime(.09, t + .02);
            g.gain.exponentialRampToValueAtTime(.0001, t + .32); o.start(t); o.stop(t + .33); }

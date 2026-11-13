@@ -256,4 +256,21 @@ L'elenco completo è nel `README.md` del sito, sezioni «FOSS.chat» e «FOSS.ch
   - cornice della foto a scelta (`chat_cfg.cornice`, elenco `CORNICI` in `01-base.js`, classi `.av.cr-*`), la vedono tutti: `chat_contatti`/`chat_persone` restituiscono `frase` e `cornice`;
   - «è appena entrato»: avviso in basso (in alto sul telefono) con suono quando un collega entra, una volta ogni 15 minuti per persona (`notaEntrati`, si spegne in Impostazioni);
   - sfondi animati (`chat_cfg.vivo`: bolle, stelle, neve, lucciole, coriandoli) su canvas dietro ai messaggi; col colpetto fanno un salto (`vivoScossa`). Fermi con «riduci movimento».
+- **2.5 Trillo** (colpetto): suono forte `suonoTrillo` (tre ronzii + campanello, con limitatore), lo sente chi lo riceve e chi lo manda; l'audio si sblocca al primo tocco sulla pagina.
+- **2.6 Colori del gruppo** (`js/25-stile.js`, `prova18.py`): colonna `chat_conversazioni.stile` = {primario, secondario, palette}; li cambia solo chi ha creato il gruppo (se è uscito, un amministratore) con `chat_stile_gruppo(conv, stile)`, che scrive anche il messaggio di sistema. `chat_elenco` restituisce `stile`. Primario = accenti e tasti, secondario = bolle dei propri messaggi, palette = una delle 10 (`PALETTE`) disegnate in SVG come sfondo. Valgono per tutti, sopra al tema; uno sfondo personale scelto per quella chat resta più forte.
+- **2.6.1** iPhone dall'icona: `--alto` (altezza della tastiera) si usa solo quando la tastiera c'è davvero; prima la pagina restava corta della barra di stato (`prova19.py`).
+- **2.7** (`prova20.py`): i suoni della chat sono «di contorno» (`navigator.audioSession.type = 'ambient'`, motore audio sospeso dopo ogni suono) e non fermano Spotify; i vocali usano `playback` mentre suonano. File non partiti: sotto la bolla «Non inviato · Riprova» (anche documenti e vocali), caricamento fermo per 45 s interrotto da solo, anello/giro toccabile per fermarlo, riprova automatica quando torna la rete.
+- **2.7.1** microfono: prima di `getUserMedia` la sessione audio passa a `play-and-record` (con `ambient` l'iPhone nega il microfono), poi torna `ambient`; se il microfono è negato, `spiegaMicrofono` mostra dove sbloccarlo (iPhone, Android, computer). Prova: `prova21.py`.
+- **2.7.2** vocali: il pallino scorre con `requestAnimationFrame`; la durata usata è quella salvata (`media.dur`) quando quella dichiarata dal file non torna (l'iPhone dichiara durate sbagliate); l'onda si calcola dal file registrato (`ondaDalFile`), e i vocali vecchi con onda piatta la ricalcolano mentre li ascolti. Prova: `prova22.py`.
+- **2.7.3** iPhone dall'icona (correzione vera della fascia vuota): la pagina crede di essere alta come lo schermo meno la barra di stato. `--schermo` = altezza vera (su iPhone in modalità icona `screen.height`), usata da html, body e #app; `--alto` solo con la tastiera aperta. Prova: `prova23.py` (con la versione vecchia fallisce: 873 invece di 932).
 
+### 2.7.4 / FOSS v73 — fascia vuota in basso sull'iPhone (app dall'icona)
+- Causa vera (iOS 26, bug WebKit 301108): se la pagina è più corta dello schermo, l'app aperta dall'icona viene disegnata più corta della barra di stato. Allungare la chat (2.7.3, `--schermo`) era sbagliato: iOS taglia comunque al bordo corto e le etichette della barra sparivano. Tolto.
+- Soluzione (frappe-ui #1284/#1289, verificata nel simulatore iOS 26.2): `html{min-height:min(100lvh, calc(100% + env(safe-area-inset-top)))}` solo dall'icona (`display-mode: standalone` o classe `html.da-icona` messa da uno script nel `<head>`). In chat `html` non è più `position:fixed` (solo `body`).
+- Le chat finiscono sopra la barra (`.lato` con spazio in basso); in FOSS `--nav-h` conta anche il bordo del telefono.
+- Prova: `sviluppo/test/app/prova24.py` (sostituisce prova23).
+
+### 2.7.5 — due icone separate sul telefono
+- La chat ha il suo manifest `manifest-chat.json` (id e start_url `./chat.html`, nome FOSS.chat, icone `chat-icona-*.png` nella radice, condivisione da altre app). `manifest.json` di FOSS ha ora `"id": "./"`.
+- Prima la chat usava il manifest di FOSS (start_url `./`) e l'icona aperta portava a FOSS.
+- Sorgente dell'icona: `sviluppo/chat/chat-icona.svg` (il LOGO della chat).

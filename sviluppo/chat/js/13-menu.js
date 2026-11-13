@@ -31,6 +31,9 @@ function vociMessaggio(m, c){
   if(!colp) p.push(['Inoltra', 'inoltra', () => inoltra([m])]);
   p.push(['Elimina', 'cestino', () => eliminaMessaggio(m), 'rosso']);
 
+  /* v2.3: la super notifica (solo l'amministratore di FOSS): il messaggio arriva anche per email */
+  if(mio && S.adminFoss && !colp && !m._stato && m.tipo !== 'sistema' && (c.membri || []).some(x => x.id !== S.io))
+    a.push(['Super notifica', 'mail', () => superNotifica(m, c)]);
   if(!colp) a.push(S.importanti.has(m.id) ? ['Non più importante', 'stellaPiena', () => importante(m, false)] : ['Importante', 'stella', () => importante(m, true)]);
   if(!colp) a.push(S.promemoria.has(m.id) ? ['Togli il promemoria', 'sveglia', () => togliPromemoria(m)] : ['Ricordamelo', 'sveglia', () => ricordamelo(m)]);
   if(mio) a.push(['Info', 'info', () => infoMessaggio(m)]);
@@ -52,6 +55,7 @@ function testataMenu(m, c){
     const altri = (c.membri || []).filter(x => x.id !== S.io);
     if(st === 'invio') r.push(['orologio', 'In invio…']);
     else if(st === 'errore') r.push(['info', 'Non inviato']);
+    else if(!altri.length) r.push(['spunta', 'Salvato nella chat con te']);
     else if(c.tipo === 'gruppo'){
       const t = new Date(m.creato_il).getTime();
       const n = altri.filter(x => new Date(x.letto).getTime() >= t).length;

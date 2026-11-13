@@ -5,6 +5,7 @@ function applicaTema(){
   document.documentElement.setAttribute('data-tema', t);
   const col = TEMI_COLORE.some(x => x.id === S.cfg.colori) ? S.cfg.colori : 'brand';
   document.documentElement.setAttribute('data-colori', col);
+  try{ if(VV.cv) leggiColoriVivo(); }catch(e){}
   document.documentElement.setAttribute('data-testo', S.cfg.testo || 'medio');
   const scuro = t === 'scuro';
   document.documentElement.style.setProperty('--doodle-img', S.cfg.doodle === false ? 'none' : doodle(scuro));
@@ -80,7 +81,7 @@ function disegnaLista(){
   let v = S.vista === 'archiviate' ? arch : tutte.filter(c => !c.archiviata);
   const bloccate = tutte.some(c => c.bloccata);
   /* filtri */
-  const F = [['tutte','Tutte'],['nonlette','Da leggere'],['gruppi','Gruppi']].concat(bloccate ? [['bloccate','Bloccate']] : []);
+  const F = [['tutte','Tutte'],['nonlette','Da leggere'],['gruppi','Gruppi']].concat(bloccate ? [['bloccate','Private']] : []);
   if(S.filtro === 'bloccate' && !bloccate) S.filtro = 'tutte';
   el('filtri').innerHTML = S.vista === 'archiviate' ? '' : F.map(f => '<button class="filtro'+(S.filtro === f[0] ? ' on' : '')+'" data-a="filtro" data-f="'+f[0]+'">'+f[1]+'</button>').join('');
   if(S.filtro === 'nonlette') v = v.filter(c => c.non_lette > 0 || c._nonLetta);
@@ -135,7 +136,7 @@ function rigaHTML(c){
   if(sc.length){
     ant = '<span class="scrive">'+(c.tipo === 'gruppo' ? esc(nomeDi(sc[0].id)) + ' ' : '')+(sc[0].cosa === 'registra' ? 'sta registrando un vocale…' : 'sta scrivendo…')+'</span>';
   } else if(c.bloccata){
-    ant = svg('lucchetto', 1.8) + '<span class="tx">Chat bloccata</span>';
+    ant = svg('lucchetto', 1.8) + '<span class="tx">Chat privata</span>';
   } else if(u){
     if(u.eliminato) ant = svg('vietato', 1.8) + '<span class="tx" style="font-style:italic">'+(u.autore === S.io ? 'Hai eliminato questo messaggio' : 'Questo messaggio è stato eliminato')+'</span>';
     else if(u.tipo === 'sistema') ant = '<span class="tx">'+esc(u.media && u.media.fissato ? (u.autore === S.io ? 'Hai fissato un messaggio' : nomeMsg(u) + ' ha fissato un messaggio') : (u.testo || ''))+'</span>';
@@ -178,7 +179,7 @@ function menuRiga(id, x, y){
       else { c._nonLetta = true; impostaMembro(c, {letto_fino: new Date(new Date(c.ultimo_il).getTime() - 1000).toISOString()}); }
       disegnaLista();
     }],
-    [c.bloccata ? 'Sblocca chat' : 'Blocca chat', c.bloccata ? 'lucchettoAperto' : 'lucchetto', () => alternaBlocco(c)],
+    [c.bloccata ? 'Togli privata' : 'Rendi privata', c.bloccata ? 'lucchettoAperto' : 'lucchetto', () => alternaBlocco(c)],
     null,
     c.tipo === 'gruppo' ? ['Esci dal gruppo', 'esci', () => esciGruppo(c), 'rosso'] : ['Elimina chat', 'cestino', () => eliminaChat(c), 'rosso'],
   ]);

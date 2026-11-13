@@ -97,21 +97,26 @@ async function codiceDimenticato(){
 async function alternaBlocco(c){
   if(!c.bloccata){
     if(!S.haPin){
-      const ok = await new Promise(r => conferma('Blocca questa chat', 'Per bloccare le chat serve un codice di 4 cifre: lo scegli adesso e vale per tutte le tue chat bloccate.', 'Scegli il codice', () => r(true), false, () => r(false)));
+      const ok = await new Promise(r => conferma('Rendi privata questa chat', 'Per rendere private le chat serve un codice di 4 cifre: lo scegli adesso e vale per tutte le tue chat private.', 'Scegli il codice', () => r(true), false, () => r(false)));
       if(!ok || !await impostaNuovoPin()) return;
+    } else {
+      /* v2.3: anche con il codice già scelto, per renderla privata te lo chiedo */
+      const pin = await chiediPin('Rendi privata', 'Inserisci il tuo codice per rendere privata «' + nomeConv(c) + '».');
+      if(!pin) return;
+      if(pin === 'rifatto') return alternaBlocco(c);
     }
     const {data, error} = await sb.rpc('chat_blocca', {p_conv: c.id, p_si: true});
-    if(error || data !== 'ok') return errore(error || data, 'Chat non bloccata');
+    if(error || data !== 'ok') return errore(error || data, 'Chat non resa privata');
     c.bloccata = true; S.sbloccate.add(c.id);
-    toast('Chat bloccata: per aprirla servirà il codice.');
+    toast('Chat privata: per aprirla servirà il codice.');
   } else {
-    const pin = await chiediPin('Sblocca la chat', 'Inserisci il codice per togliere il blocco a «' + nomeConv(c) + '».');
+    const pin = await chiediPin('Togli privata', 'Inserisci il codice per rendere di nuovo normale «' + nomeConv(c) + '».');
     if(!pin) return;
     if(pin === 'rifatto') return alternaBlocco(c);
     const {data, error} = await sb.rpc('chat_blocca', {p_conv: c.id, p_si: false, p_pin: pin});
     if(error || data !== 'ok') return errore(error || data, 'Blocco non tolto');
     c.bloccata = false;
-    toast('Blocco tolto.');
+    toast('La chat non è più privata.');
   }
   disegnaLista(); if(S.aperta === c.id) aggiornaTestaConv(); if(infoAperta === c.id) disegnaInfo();
 }
@@ -160,7 +165,7 @@ function richiudi(){
     S.sbloccate.delete(c.id);
     const id = c.id;
     chiudiConv();
-    if(!S.tutto) toast('La chat bloccata si è richiusa.', 'Riapri', () => apriConv(id));
+    if(!S.tutto) toast('La chat privata si è richiusa.', 'Riapri', () => apriConv(id));
   }
   S.sbloccate.clear();
   if(S.tutto && !bloccoTotaleAperto) bloccoTotale();

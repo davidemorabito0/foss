@@ -144,12 +144,22 @@ async function mandaTesto(opz){
   catch(e){ m._stato = 'errore'; ridisegnaMessaggio(m.id); errore(e, 'Messaggio non inviato'); }
 }
 async function riprova(id){
-  const c = S.convs.get(S.aperta); const m = c && trovaMsg(c.id, id); if(!m) return;
+  const c = S.convs.get(S.aperta); const m = c && trovaMsg(c.id, id); if(!m || m._stato !== 'errore') return;
   if(m._file){ return inviaFilePronto(m, m._file); }
   m._stato = 'invio'; ridisegnaMessaggio(id);
   try{ await salvaMessaggio(m); }catch(e){ m._stato = 'errore'; ridisegnaMessaggio(id); errore(e, 'Messaggio non inviato'); }
 }
 
+/* torna la rete: riprovo da solo i messaggi rimasti indietro */
+function riprovaTutti(){
+  S.msgs.forEach(st => (st.lista || []).filter(m => m._stato === 'errore' && m.autore === S.io).slice(0, 10).forEach(m => {
+    if(m.conv_id === S.aperta) riprova(m.id);
+  }));
+}
+function annullaCaricamento(id){
+  const c = S.convs.get(S.aperta); const m = c && trovaMsg(c.id, id);
+  if(m && m._ctrl && m._ctrl.ferma) m._ctrl.ferma();
+}
 /* un file pronto (gia' compresso): lo carico con la barra e poi mando il messaggio */
 async function inviaPreparato(conv, tipo, p, extra){
   const c = S.convs.get(conv); if(!c) return;
@@ -162,25 +172,43 @@ async function inviaFilePronto(m, p){
   m._stato = 'invio'; m._avanza = 0; ridisegnaMessaggio(m.id);
   const path = m.conv_id + '/' + uuid() + '.' + (p.ext || 'bin');
   let ultimo = 0;
+  m._ctrl = {};
   try{
     const r = await caricaFile(path, p.blob, v => {
       m._avanza = v; const t = Date.now(); if(t - ultimo < 120) return; ultimo = t;
       const n = $('.msg[data-id="'+m.id+'"] .media-carica'); if(n) n.innerHTML = anelloHTML(v);
-    });
+    }, m._ctrl);
     const locale = m.media.locale;
     if(r.path){ m.media.path = r.path; firme.set(r.path, {url: locale, scade: Date.now() + 864e5}); }
     if(r.url){ m.media.url = r.url; }
     delete m._avanza;
     await salvaMessaggio(m);
-    delete m._file;
+    delete m._file; delete m._ctrl;
   }catch(e){
-    m._stato = 'errore'; delete m._avanza; ridisegnaMessaggio(m.id);
+    m._stato = 'errore'; delete m._avanza; delete m._ctrl; ridisegnaMessaggio(m.id);
+    if(e && e.annullato){ toast('Invio annullato: tocca «Riprova» quando vuoi.'); return; }
     errore(e, /server dei media/i.test(e && e.message) ? '' : 'File non inviato');
     if(/server dei media/i.test(e && e.message)) toast('Il server dei media sembra offline: il file non è partito.');
   }
 }
 
 /* ---------- registrazione dei vocali ---------- */
+/* il microfono è negato: spiego dove si sblocca, a seconda del dispositivo */
+function spiegaMicrofono(err){
+  const nome = err && err.name;
+  if(nome === 'NotFoundError' || nome === 'OverconstrainedError'){ toast('Non trovo nessun microfono collegato.'); return; }
+  if(nome === 'NotReadableError'){ toast('Il microfono è occupato da un’altra app (una chiamata?). Chiudila e riprova.'); return; }
+  const ios = /iPhone|iPad|iPod/.test(navigator.userAgent) || (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1);
+  const icona = window.matchMedia && matchMedia('(display-mode: standalone)').matches || navigator.standalone;
+  const passi = ios
+    ? '<ol class="passi"><li>Apri <b>Impostazioni</b> dell’iPhone</li><li>Vai in <b>App</b> → <b>Safari</b> (in fondo alla lista)</li>'+
+      '<li>Tocca <b>Microfono</b> e scegli <b>Consenti</b> (o «Chiedi»)</li>'+
+      (icona ? '<li>Chiudi del tutto FOSS.chat (scorri via dall’elenco delle app aperte) e riaprila dall’icona</li>' : '<li>Torna qui e ricarica la pagina</li>')+'</ol>'
+    : /Android/.test(navigator.userAgent)
+      ? '<ol class="passi"><li>Tocca il lucchetto accanto all’indirizzo (o tieni premuta l’icona dell’app → <b>Info app</b>)</li><li><b>Autorizzazioni</b> → <b>Microfono</b> → <b>Consenti</b></li><li>Torna qui e riprova</li></ol>'
+      : '<ol class="passi"><li>Clicca il lucchetto a sinistra dell’indirizzo in alto</li><li>Accanto a <b>Microfono</b> scegli <b>Consenti</b></li><li>Ricarica la pagina e riprova</li></ol>';
+  foglio('Serve il microfono', '<p style="margin:0 0 10px">Per registrare i vocali FOSS.chat deve poter usare il microfono, ma adesso è bloccato. Si sblocca così:</p>'+passi, [['Ho capito', null, 'pieno']]);
+}
 let reg = null;
 function formatoAudio(){
   const f = ['audio/mp4;codecs=mp4a.40.2', 'audio/mp4', 'audio/webm;codecs=opus', 'audio/webm', 'audio/ogg;codecs=opus'];
@@ -195,14 +223,17 @@ async function avviaRegistrazione(e){
   let bloccata = false, annullata = false, rilasciata = false;
   const suPrima = () => { rilasciata = true; };
   document.addEventListener('pointerup', suPrima, {once: true});
-  let stream;
+  let stream, ac0 = null;
+  try{ ac0 = new (window.AudioContext || window.webkitAudioContext)(); }catch(_){}
+  /* v2.7.1: per registrare l'audio del telefono deve essere in modalità «registra» (con «di contorno» l'iPhone nega il microfono) */
+  try{ if(navigator.audioSession) navigator.audioSession.type = 'play-and-record'; }catch(_){}
   try{ stream = await navigator.mediaDevices.getUserMedia({audio: {echoCancellation: true, noiseSuppression: true}}); }
-  catch(err){ document.removeEventListener('pointerup', suPrima); toast('Serve il permesso di usare il microfono.'); return; }
+  catch(err){ document.removeEventListener('pointerup', suPrima); try{ ac0 && ac0.close(); }catch(_){} audioDiContorno(); spiegaMicrofono(err); return; }
   const tipo = formatoAudio();
   const rec = new MediaRecorder(stream, tipo ? {mimeType: tipo, audioBitsPerSecond: 48000} : undefined);
   const pezzi = [], livelli = [];
   let ac, an, buf;
-  try{ ac = new (window.AudioContext || window.webkitAudioContext)(); const src = ac.createMediaStreamSource(stream); an = ac.createAnalyser(); an.fftSize = 512; src.connect(an); buf = new Uint8Array(an.fftSize); }catch(err){}
+  try{ ac = ac0 || new (window.AudioContext || window.webkitAudioContext)(); if(ac.state !== 'running') ac.resume().catch(() => {}); const src = ac.createMediaStreamSource(stream); an = ac.createAnalyser(); an.fftSize = 512; src.connect(an); buf = new Uint8Array(an.fftSize); }catch(err){}
   rec.ondataavailable = ev => { if(ev.data && ev.data.size) pezzi.push(ev.data); };
   reg = {rec, stream, pezzi, livelli, inizio: Date.now(), ac};
   rec.start(250);
@@ -255,25 +286,50 @@ function fineRegistrazione(manda){
   clearInterval(r.giro);
   const durata = (Date.now() - r.inizio) / 1000;
   r.rec.onstop = async () => {
-    r.stream.getTracks().forEach(t => t.stop());
+    r.stream.getTracks().forEach(t => t.stop()); audioDiContorno();
     try{ r.ac && r.ac.close(); }catch(e){}
     disegnaScrivi();
     if(!manda) return;
     if(durata < 0.8){ toast('Tieni premuto per registrare un vocale.'); return; }
     const tipo = (r.rec.mimeType || 'audio/webm').split(';')[0];
     const blob = new Blob(r.pezzi, {type: tipo});
-    const n = 48, lv = r.livelli, onda = [];
-    const picco = Math.max(.05, ...lv);
-    for(let i = 0; i < n; i++){
-      const a = Math.floor(i * lv.length / n), b = Math.max(a + 1, Math.floor((i + 1) * lv.length / n));
-      let m = 0; for(let j = a; j < b; j++) m = Math.max(m, lv[j] || 0);
-      onda.push(String.fromCharCode(65 + Math.round(Math.min(1, m / picco) * 31)));
-    }
+    /* v2.7.2: l'onda la calcolo dal file registrato (sempre giusta); se non si può, dai livelli presi durante la registrazione */
+    const daFile = await ondaDalFile(blob);
+    const onda = daFile || ondaDaLivelli(r.livelli);
     inviaPreparato(S.aperta, 'vocale', {blob, ext: tipo.includes('mp4') ? 'm4a' : tipo.includes('ogg') ? 'ogg' : 'webm',
-      media: {dur: Math.round(durata * 10) / 10, onda: onda.join(''), mime: tipo, dim: blob.size}});
+      media: {dur: Math.round(durata * 10) / 10, onda, mime: tipo, dim: blob.size}});
   };
   try{ r.rec.stop(); }catch(e){ r.stream.getTracks().forEach(t => t.stop()); disegnaScrivi(); }
 }
+
+function ondaDaLivelli(lv){
+  const n = 48, onda = [], picco = Math.max(.05, ...lv);
+  for(let i = 0; i < n; i++){
+    const a = Math.floor(i * lv.length / n), b = Math.max(a + 1, Math.floor((i + 1) * lv.length / n));
+    let m = 0; for(let j = a; j < b; j++) m = Math.max(m, lv[j] || 0);
+    onda.push(String.fromCharCode(65 + Math.round(Math.min(1, m / picco) * 31)));
+  }
+  return onda.join('');
+}
+async function ondaDalFile(blob){
+  try{
+    const C = window.OfflineAudioContext || window.webkitOfflineAudioContext;
+    const ctx = C ? new C(1, 2, 44100) : new (window.AudioContext || window.webkitAudioContext)();
+    const ab = await blob.arrayBuffer();
+    const buf = await new Promise((ok, ko) => { const p = ctx.decodeAudioData(ab, ok, ko); if(p && p.then) p.then(ok, ko); });
+    const d = buf.getChannelData(0), n = 48, out = [];
+    let picco = 0; const v = [];
+    for(let i = 0; i < n; i++){
+      const a = Math.floor(i * d.length / n), b = Math.floor((i + 1) * d.length / n);
+      let s = 0, k = 0; for(let j = a; j < b; j += 16){ s += d[j] * d[j]; k++; }
+      const rms = Math.sqrt(s / Math.max(1, k)); v.push(rms); picco = Math.max(picco, rms);
+    }
+    if(picco < 1e-4) return null;
+    v.forEach(x => out.push(String.fromCharCode(65 + Math.round(Math.min(1, Math.pow(x / picco, .8)) * 31))));
+    return out.join('');
+  }catch(e){ return null; }
+}
+const ondaPiatta = s => !s || /^[A-D]+$/.test(s);
 
 /* ---------- riproduzione dei vocali ---------- */
 let audio = null, audioId = null, velocita = 1;
@@ -283,9 +339,13 @@ async function suonaVocale(id){
   if(!audio){
     audio = new Audio(); audio.preload = 'auto';
     audio.addEventListener('timeupdate', disegnaAvanzamento);
-    audio.addEventListener('ended', () => { const fatto = audioId; disegnaAvanzamento(true); audioId = null; prossimoVocale(fatto); });
-    audio.addEventListener('pause', () => disegnaAvanzamento());
-    audio.addEventListener('play', () => disegnaAvanzamento());
+    audio.addEventListener('ended', () => { const fatto = audioId; disegnaAvanzamento(true); audioId = null; prossimoVocale(fatto); if(!audioId) audioDiContorno(); });
+    audio.addEventListener('pause', () => { disegnaAvanzamento(); setTimeout(() => { if(audio.paused) audioDiContorno(); }, 400); });
+    audio.addEventListener('play', () => { disegnaAvanzamento(); scorriPallino(); });
+    audio.addEventListener('loadedmetadata', () => {   /* i vocali registrati nel browser a volte dicono «durata infinita» */
+      const mm = audioId && trovaMsg(S.aperta, audioId);
+      if(audio.duration === Infinity && !(mm && mm.media && mm.media.dur)){ const t = audio.currentTime; audio.currentTime = 1e101; audio.addEventListener('timeupdate', function una(){ audio.removeEventListener('timeupdate', una); audio.currentTime = t; }); }
+    });
     audio.addEventListener('error', () => { const id2 = audioId; audioId = null; disegnaAvanzamento(); if(id2) mediaNonArriva(id2); });
   }
   if(audioId === id){ if(audio.paused) audio.play().catch(() => {}); else audio.pause(); return; }
@@ -293,7 +353,9 @@ async function suonaVocale(id){
   if(!u){ mediaNonArriva(id); return; }
   if(audioId){ const vecchio = audioId; audioId = null; disegnaAvanzamento(false, vecchio); }
   audioId = id; audio.src = u; audio.playbackRate = velocita;
+  try{ if(navigator.audioSession) navigator.audioSession.type = 'playback'; }catch(e){}
   try{ await audio.play(); }catch(e){ if(e && e.name !== 'AbortError') toast(m.media && m.media.url ? 'Il server dei media sembra offline.' : 'Non riesco a riprodurre il vocale.'); }
+  if(ondaPiatta((m.media || {}).onda)) ridisegnaOnda(m, u);
   const a = memoria('ascoltati') || {}; a[id] = 1; const k = Object.keys(a); if(k.length > 500) k.slice(0, k.length - 500).forEach(x => delete a[x]); memoria('ascoltati', a);
   const mic = $('.vocale[data-voc="'+id+'"] .mic'); if(mic) mic.className = 'mic ascoltato';
 }
@@ -304,6 +366,22 @@ function prossimoVocale(id){
   const a = memoria('ascoltati') || {};
   if(n && n.tipo === 'vocale' && n.autore !== S.io && !a[n.id] && !n.eliminato) suonaVocale(n.id);
 }
+let rafPallino = 0;
+function scorriPallino(){
+  cancelAnimationFrame(rafPallino);
+  const passo = () => { if(!audio || audio.paused || !audioId){ rafPallino = 0; return; } disegnaAvanzamento(); rafPallino = requestAnimationFrame(passo); };
+  rafPallino = requestAnimationFrame(passo);
+}
+/* i vocali vecchi con l'onda piatta: la ricalcolo dal file mentre lo ascolti (solo sullo schermo) */
+async function ridisegnaOnda(m, u){
+  try{
+    const r = await fetch(u); const o = await ondaDalFile(await r.blob()); if(!o) return;
+    m.media.onda = o;
+    const v = $('.vocale[data-voc="'+m.id+'"] .barre'); if(!v) return;
+    v.innerHTML = ondaDa(o).map(x => '<i style="height:'+Math.max(10, x * 100)+'%"></i>').join('');
+    disegnaAvanzamento();
+  }catch(e){}
+}
 function disegnaAvanzamento(finito, quale){
   const id = quale || audioId; if(!id) return;
   const v = $('.vocale[data-voc="'+id+'"]'); if(!v) return;
@@ -311,7 +389,10 @@ function disegnaAvanzamento(finito, quale){
   v.classList.toggle('va', audioId === id && !finito);
   const b = v.querySelector('.vp'); if(b) b.innerHTML = svg(va ? 'pausa' : 'play');
   const vel = v.querySelector('.vel'); if(vel) vel.textContent = String(velocita).replace('.', ',') + '×';
-  const d = audio && isFinite(audio.duration) && audio.duration ? audio.duration : ((trovaMsg(S.aperta, id) || {}).media || {}).dur || 1;
+  /* v2.7.2: i vocali registrati sull'iPhone a volte dichiarano una durata sbagliata (enorme o infinita):
+     se non torna con quella salvata quando l'abbiamo registrato, vale quella salvata */
+  const salvata = +(((trovaMsg(S.aperta, id) || {}).media || {}).dur) || 0, dich = audio && isFinite(audio.duration) ? audio.duration : 0;
+  const d = salvata && (!dich || Math.abs(dich - salvata) > Math.max(1.5, salvata * .25)) ? salvata : (dich || salvata || 1);
   const p = finito || audioId !== id ? 0 : Math.min(1, (audio.currentTime || 0) / d);
   const barre = v.querySelectorAll('.barre i'); const k = Math.round(p * barre.length);
   barre.forEach((x, i) => x.classList.toggle('su', i < k));

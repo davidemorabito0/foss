@@ -17,9 +17,10 @@ function nuovaChat(){
     const pp = S.contatti.filter(id => !q || nomeLungo(id).toLowerCase().includes(q) || ((S.persone.get(id) || {}).ruolo || '').toLowerCase().includes(q));
     el('pannelloSxC').innerHTML = '<div class="cerca" style="padding-top:10px"><label>'+svg('cerca')+'<input id="ncCerca" placeholder="Cerca un nome o un ruolo" value="'+esc(q)+'"></label></div>'+
       (q ? '' : '<button class="voce" data-a="nuovo-gruppo"><span class="ic-tondo">'+svg('gruppo')+'</span><span class="vc"><b>Nuovo gruppo</b></span></button>'+
+        '<button class="voce" data-a="scrivi-a" data-id="'+S.io+'">'+avatar(S.io, '', true)+'<span class="vc"><b>'+esc(nomeLungo(S.io))+' (tu)</b><span>Scrivi a te stesso: appunti, link, prove</span></span></button>'+
         '<div class="sez-t grigio" style="padding:20px 30px 10px">Il tuo team su FOSS</div>')+
       (pp.length ? pp.map(id => '<button class="voce" data-a="scrivi-a" data-id="'+id+'">'+avatar(id, '', true)+'<span class="vc"><b>'+esc(nomeLungo(id))+'</b><span>'+
-        esc(S.online.has(id) ? 'online' : (S.persone.get(id) || {}).ruolo || 'Nel tuo team')+'</span></span></button>').join('')
+        esc(fraseDi(id) || (S.online.has(id) ? 'online' : (S.persone.get(id) || {}).ruolo || 'Nel tuo team'))+'</span></span></button>').join('')
         : '<div class="vuoto-lista">'+(q ? 'Nessuno con questo nome.' : 'Nel tuo team non c’è ancora nessuno.<br>Invita i collaboratori da FOSS: appena entrano li trovi qui.')+'</div>');
     const i = el('ncCerca'); i.oninput = () => { const pos = i.selectionStart; disegna(i.value); const n = el('ncCerca'); n.focus(); n.setSelectionRange(pos, pos); };
   };
@@ -29,7 +30,9 @@ function nuovaChat(){
 async function scriviA(id){
   chiudiPannelloSinistra(); chiudiVelo();
   let conv = null;
-  S.convs.forEach(c => { if(c.tipo === 'privata' && altro(c) === id) conv = c.id; });
+  S.convs.forEach(c => { if(c.tipo !== 'privata') return;
+    const solo = (c.membri || []).every(m => m.id === S.io);
+    if(id === S.io ? solo : (!solo && altro(c) === id)) conv = c.id; });
   if(!conv){
     try{
       const {data, error} = await sb.rpc('chat_apri_privata', {p_altro: id});
@@ -123,6 +126,7 @@ async function disegnaInfo(){
   h += '<div class="blocco profilo-big">'+(gr ? '<span data-a="'+(true ? 'foto-gruppo' : '')+'" role="button" title="Cambia immagine">'+avatarConv(c)+'</span>' : avatar(a))+
     '<h3>'+esc(nomeConv(c))+(gr ? '<button class="ib" data-a="rinomina-gruppo" title="Cambia nome">'+svg('matita', 1.8)+'</button>' : '')+'</h3>'+
     '<p>'+(gr ? 'Gruppo · ' + (c.membri || []).length + ' partecipanti' : esc(p.ruolo || ''))+'</p>'+
+    (!gr && fraseDi(a) ? '<p class="frase-big">«'+esc(fraseDi(a))+'»</p>' : '')+
     (!gr ? '<p style="font-size:14px;margin-top:4px">'+esc(S.online.has(a) ? 'online' : ultimoAccesso(p.visto))+'</p>' : '')+'</div>';
   if(gr){
     h += '<div class="blocco"><div class="sez-t grigio" style="padding:16px 20px 6px;display:flex;align-items:center">Descrizione<span style="flex:1"></span>'+
@@ -138,12 +142,15 @@ async function disegnaInfo(){
     '<button class="voce" data-a="info-importanti"><span class="ic-sem">'+svg('stella', 1.8)+'</span><span class="vc"><b>Messaggi importanti</b><span>Quelli che hai segnato con la stella</span></span><span class="freccia-d">'+svg('avanti', 2)+'</span></button>'+
     (nFis ? '<button class="voce" data-a="fissati-lista"><span class="ic-sem">'+svg('spillo', 1.8)+'</span><span class="vc"><b>Messaggi fissati</b><span>'+nFis+(nFis === 1 ? ' messaggio' : ' messaggi')+'</span></span><span class="freccia-d">'+svg('avanti', 2)+'</span></button>' : '')+
     (nProg ? '<button class="voce" data-a="programmati"><span class="ic-sem">'+svg('programma', 1.8)+'</span><span class="vc"><b>Messaggi programmati</b><span>'+nProg+' in attesa</span></span><span class="freccia-d">'+svg('avanti', 2)+'</span></button>' : '')+
+    (gr ? '<button class="voce" data-a="colori-gruppo"'+(puoiColori(c) ? '' : ' disabled')+'><span class="ic-sem">'+svg('sfondo', 1.8)+'</span><span class="vc"><b>Colori del gruppo</b><span>'+
+      (stileDi(c) ? 'Scelti per tutti' : 'Quelli di ognuno')+(puoiColori(c) ? ' · li scegli tu' : ' · li sceglie chi ha creato il gruppo')+'</span></span>'+
+      (stileDi(c) ? '<span class="cg-mini">'+[stileDi(c).primario, stileDi(c).secondario].filter(Boolean).map(x => '<i style="background:'+x+'"></i>').join('')+'</span>' : '')+'</button>' : '')+
     '<button class="voce" data-a="sfondo-chat"><span class="ic-sem">'+svg('sfondo', 1.8)+'</span><span class="vc"><b>Sfondo di questa chat</b><span>'+
-      (sfondoPer(c.id).proprio ? 'Personalizzato' : 'Come le altre chat')+'</span></span></button></div>';
+      (sfondoPer(c.id).proprio ? 'Personalizzato (solo per te)' : (gr && stileDi(c) && stileDi(c).palette ? 'Quello del gruppo' : 'Come le altre chat'))+'</span></span></button></div>';
   h += '<div class="blocco">'+
     '<button class="voce" data-a="crea-lavoro"><span class="ic-sem">'+svg('lavoro', 1.8)+'</span><span class="vc"><b>Crea un lavoro di FOSS</b><span>'+(gr ? 'Con la squadra di questo gruppo' : 'Con ' + esc(nomeDi(a)))+'</span></span></button>'+
     (!gr && a !== S.io ? '<button class="voce" data-a="colpetto" data-id="'+a+'"><span class="ic-sem">'+svg('mano', 1.8)+'</span><span class="vc"><b>Dai un colpetto</b><span>Per farti notare (anche col doppio tocco sulla foto)</span></span></button>' : '')+'</div>';
-  h += '<div class="blocco">'+toggle('silenziata', 'Silenzia notifiche', 'silenzia', c.silenziata)+toggle('bloccata', 'Chat bloccata con codice', 'lucchetto', c.bloccata)+
+  h += '<div class="blocco">'+toggle('silenziata', 'Silenzia notifiche', 'silenzia', c.silenziata)+toggle('bloccata', 'Chat privata con codice', 'lucchetto', c.bloccata)+
     toggle('fissata', 'Fissa in alto', 'fissa', c.fissata)+toggle('archiviata', 'Archiviata', 'archivio', c.archiviata)+'</div>';
   if(gr){
     const mm = (c.membri || []).slice().sort((x, y) => (x.id === S.io ? -1 : y.id === S.io ? 1 : 0) || (y.ruolo === 'admin') - (x.ruolo === 'admin') || nomeDi(x.id).localeCompare(nomeDi(y.id)));
@@ -330,13 +337,18 @@ function disegnaImpostazioni(){
   C.innerHTML =
     '<div class="blocco"><button class="voce" data-a="profilo" style="min-height:96px">'+avatar(S.io, '', false, 'width:82px;height:82px;font-size:30px')+
       '<span class="vc"><b style="font-size:18px">'+esc(nomeLungo(S.io))+'</b><span>'+esc(me.ruolo || 'Il tuo profilo FOSS')+'</span></span></button></div>'+
+    '<div class="blocco"><div class="sez-t">Come ti vedono gli altri</div>'+
+      '<div class="sez-t grigio" style="padding:4px 20px 8px">Messaggio personale</div>'+
+      '<div class="frase-campo"><input id="fraseIn" maxlength="140" placeholder="Una frase sotto il tuo nome (es. sul set fino alle 18)" value="'+esc(S.cfg.frase || '')+'"><span id="fraseN">'+(S.cfg.frase || '').length+'/140</span></div>'+
+      '<div class="sez-t grigio" style="padding:10px 20px 8px">Cornice della foto</div>'+corniciHTML()+'</div>'+
     '<div class="blocco"><div class="sez-t">Privacy e sicurezza</div>'+
       voce('proteggi-tutto', 'lucchetto', 'Proteggi FOSS.chat con un codice', 'Ogni volta che la apri ti chiede 4 cifre', interr(S.tutto))+
-      voce('cambia-pin', 'matita', S.haPin ? 'Cambia il codice' : 'Scegli il codice', S.haPin ? 'Lo stesso codice apre le chat bloccate' : 'Serve per bloccare le chat')+
+      voce('cambia-pin', 'matita', S.haPin ? 'Cambia il codice' : 'Scegli il codice', S.haPin ? 'Lo stesso codice apre le chat private' : 'Serve per rendere private le chat')+
       (S.haPin ? voce('pin-dimenticato', 'info', 'Ho dimenticato il codice', 'Lo cambi con la password di FOSS') : '')+'</div>'+
     '<div class="blocco"><div class="sez-t">Notifiche</div>'+
       voce('attiva-push', 'campana', 'Avvisi su questo dispositivo', 'Anche quando FOSS.chat è chiusa', '<span id="statoPush" style="font-size:13px;color:var(--testo-2)"></span>')+
-      voce('cfg-suoni', 'nuova', 'Suoni nella chat', 'Un suono quando arriva un messaggio', interr(S.cfg.suoni))+'</div>'+
+      voce('cfg-suoni', 'nuova', 'Suoni nella chat', 'Un suono quando arriva un messaggio', interr(S.cfg.suoni))+
+      voce('cfg-entrati', 'persona', 'Avvisami quando qualcuno entra', 'Un avviso in basso quando un collega apre FOSS.chat', interr(S.cfg.entrati !== false))+'</div>'+
     '<div class="blocco"><div class="sez-t">Chat</div>'+
       '<div class="sez-t grigio" style="padding:4px 20px 8px">Colori</div>'+
       '<div class="colori-griglia">'+TEMI_COLORE.map(x => '<button class="colore-tema'+((S.cfg.colori || 'brand') === x.id ? ' on' : '')+'" data-a="cfg" data-k="colori" data-v="'+x.id+'">'+
@@ -348,6 +360,7 @@ function disegnaImpostazioni(){
         '<button data-a="sfondo-colore">Un colore</button>'+(S.cfg.sfondoFoto ? '<button data-a="sfondo-togli">Togli la foto</button>' : '')+'</div>'+
       (S.cfg.sfondoFoto ? '<div class="opz" style="color:var(--testo-2);font-size:14px">Oscura la foto <input type="range" min="0" max="70" step="5" data-buio value="'+Math.round((S.cfg.sfondoBuio == null ? .25 : S.cfg.sfondoBuio) * 100)+'" style="flex:1;accent-color:var(--verde)"></div>' : '')+
       (S.cfg.sfondoFoto ? '' : voce('cfg-doodle', 'foto', 'Disegni sullo sfondo', 'Camere, ciak e gocce di FOSS', interr(S.cfg.doodle !== false)))+
+      '<div class="sez-t grigio" style="padding:4px 20px 8px">Sfondo animato</div>'+vivoHTML()+
       '<div style="padding:0 20px 12px;font-size:13px;color:var(--testo-2)">Ogni chat può avere il suo sfondo: aprila, tocca il nome in alto e scegli «Sfondo di questa chat».</div>'+
       voce('cfg-invio', 'manda', 'Invio manda il messaggio', 'Sulla tastiera del computer', interr(S.cfg.invio))+'</div>'+
     '<div class="blocco"><div class="sez-t">Messaggi</div>'+
@@ -362,6 +375,9 @@ function disegnaImpostazioni(){
       voce('foss', 'esci', 'Torna a FOSS', '')+'</div>'+
     '<div style="padding:18px 20px 40px;text-align:center;font-size:12.5px;color:var(--testo-3)">FOSS.chat · '+VERSIONE+'</div>';
   riempiAnteprimaSfondo();
+  const fi = el('fraseIn');
+  if(fi){ fi.oninput = () => { const n = el('fraseN'); if(n) n.textContent = fi.value.length + '/140'; };
+    fi.onchange = () => salvaFrase(fi.value); fi.onkeydown = e => { if(e.key === 'Enter'){ e.preventDefault(); fi.blur(); } }; }
   statoPush().then(s => { const n = el('statoPush'); if(n) n.textContent = {si: 'Attivi', no: 'Spenti', bloccati: 'Bloccati', 'ios-home': 'Da Home', 'no-supporto': 'Non disponibili'}[s] || ''; });
 }
 function gestisciRaccolta(tipo){

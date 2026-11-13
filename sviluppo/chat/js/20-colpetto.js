@@ -15,7 +15,7 @@ async function colpetto(a){
   const c = S.convs.get(S.aperta); if(!c || !a || a === S.io) return;
   if(!(c.membri || []).some(x => x.id === a)){ toast(nomeDi(a) + ' non è in questa chat.'); return; }
   const m = nuovoLocale('colpetto', {media: {a}, risponde_a: null});
-  mettiInLista(m);
+  mettiInLista(m); vivoScossa(); suono('trillo');   /* lo senti anche tu, come su MSN */
   try{ navigator.vibrate && navigator.vibrate(20); }catch(e){}
   try{ await salvaMessaggio(m); segnaVisto(m.id); }
   catch(e){
@@ -27,7 +27,9 @@ async function colpetto(a){
 function colpettoRicevuto(m, guardo){
   const c = S.convs.get(m.conv_id); if(!c || !sbloccata(c)) return;
   try{ navigator.vibrate && navigator.vibrate([25, 70, 25]); }catch(e){}
+  if(!c.silenziata) suono('trillo');
   if(m.conv_id === S.aperta){
+    vivoScossa();
     const cv = el('conv'); if(cv){ cv.classList.remove('colpito'); void cv.offsetWidth; cv.classList.add('colpito'); setTimeout(() => cv.classList.remove('colpito'), 900); }
   } else if(!c.silenziata) toast('👋 ' + nomeMsg(m) + ' ti ha dato un colpetto' + (c.tipo === 'gruppo' ? ' in «' + nomeConv(c) + '»' : ''), 'Apri', () => apriConv(c.id));
   setTimeout(() => segnaVisto(m.id), 3000);

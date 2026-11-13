@@ -44,16 +44,16 @@ async function token(){
   const {data} = await sb.auth.getSession();
   return data && data.session ? data.session.access_token : '';
 }
-function caricaFile(path, blob, avanza){
+function caricaFile(path, blob, avanza, ctrl){
   /* prima il NAS dello studio; se non risponde (spento, senza rete) il file va su Supabase come prima */
-  if(!MEDIA_NAS) return inviaFile(path, blob, avanza, false);
-  return inviaFile(path, blob, avanza, true).catch(e => {
-    if(!e || !e.rete || blob.size > MAX_SUPA) throw e;
+  if(!MEDIA_NAS) return inviaFile(path, blob, avanza, false, ctrl);
+  return inviaFile(path, blob, avanza, true, ctrl).catch(e => {
+    if(!e || !e.rete || e.annullato || blob.size > MAX_SUPA) throw e;
     if(avanza) avanza(0);
-    return inviaFile(path, blob, avanza, false);
+    return inviaFile(path, blob, avanza, false, ctrl);
   });
 }
-function inviaFile(path, blob, avanza, nas){
+function inviaFile(path, blob, avanza, nas, ctrl){
   return new Promise(async (ok, ko) => {
     let tk = '';
     try{ tk = await token(); }catch(e){}
@@ -66,9 +66,15 @@ function inviaFile(path, blob, avanza, nas){
     if(!nas){ xhr.setRequestHeader('apikey', SUPA_KEY); xhr.setRequestHeader('x-upsert', 'false'); }
     xhr.setRequestHeader('Content-Type', blob.type || 'application/octet-stream');
     xhr.setRequestHeader('Cache-Control', 'max-age=31536000');
-    xhr.upload.onprogress = e => { if(e.lengthComputable && avanza) avanza(e.loaded / e.total); };
-    const errore = (m, rete) => { const e = new Error(m); e.rete = !!rete; ko(e); };
+    /* v2.7: se il caricamento resta fermo 45 secondi lo interrompo (così puoi riprovare), e lo puoi fermare tu */
+    let mosso = Date.now(), finito = false, mano = false;
+    xhr.upload.onprogress = e => { mosso = Date.now(); if(e.lengthComputable && avanza) avanza(e.loaded / e.total); };
+    const veglia = setInterval(() => { if(!finito && Date.now() - mosso > 45000){ finito = true; xhr.abort(); errore('Il caricamento si è fermato', nas); } }, 5000);
+    if(ctrl) ctrl.ferma = () => { mano = true; xhr.abort(); };
+    const errore = (m, rete) => { finito = true; clearInterval(veglia); const e = new Error(m); e.rete = !!rete; e.annullato = mano; ko(e); };
+    xhr.onabort = () => { if(mano) errore('Invio annullato', false); };
     xhr.onload = () => {
+      finito = true; clearInterval(veglia);
       if(xhr.status >= 200 && xhr.status < 300){
         let r = {}; try{ r = JSON.parse(xhr.responseText || '{}'); }catch(e){}
         if(nas && !(r.url && /^https:\/\//.test(r.url))) return errore('Il server dei media non ha risposto bene', true);
@@ -101,6 +107,7 @@ async function caricaProfilo(){
                        foto: data && data.foto_url, ruolo: (data && data.ruolo) || ''});
   const c = data && data.chat_cfg;
   if(c && typeof c === 'object'){ Object.assign(S.cfg, c); memoria('cfg', S.cfg); applicaTema(); }
+  aggiornaMe();
 }
 async function caricaPersone(extra){
   const [a, b] = await Promise.all([
@@ -111,6 +118,7 @@ async function caricaPersone(extra){
   S.contatti = [];
   (a.data || []).forEach(p => { S.persone.set(p.id, p); S.contatti.push(p.id); });
   (b.data || []).forEach(p => { if(!S.persone.has(p.id) || p.id !== S.io) S.persone.set(p.id, Object.assign(S.persone.get(p.id) || {}, p)); });
+  aggiornaMe();
 }
 async function caricaElenco(){
   const {data, error} = await sb.rpc('chat_elenco');
@@ -261,7 +269,44 @@ function statoSpunte(m, c){
 
 /* ---------- tempo reale ---------- */
 let canaleDb = null, canaleOnline = null, canaleScrive = null;
+/* v2.2: il tempo reale si rimette in piedi da solo. Se il collegamento cade (telefono in tasca,
+   scheda in secondo piano, rete che cambia, accesso rinnovato) ricreo i canali e rimetto in pari
+   la chat, senza dover ricaricare la pagina. */
+let tRiavvio = null, tentativiRiavvio = 0, giroCanali = 0, avviatoIl = 0;
+function chiudiCanali(){
+  giroCanali++;
+  [canaleDb, canaleOnline, canaleScrive].forEach(c => { if(c) try{ sb.removeChannel(c); }catch(e){} });
+  canaleDb = canaleOnline = canaleScrive = null;
+}
+function riavviaTempoReale(subito){
+  clearTimeout(tRiavvio);
+  const attesa = subito ? 0 : Math.min(30000, 1500 * Math.pow(2, tentativiRiavvio++));
+  tRiavvio = setTimeout(() => { chiudiCanali(); avviaTempoReale(); }, attesa);
+}
+function canaliVivi(){
+  if(canaleDb && canaleDb.state === 'joining' && Date.now() - avviatoIl < 12000) return true;   /* si sta collegando */
+  return !!(canaleDb && canaleDb.state === 'joined' && sb.realtime && sb.realtime.isConnected && sb.realtime.isConnected());
+}
+/* torni sulla chat, la rete torna, o ogni tanto: controllo il collegamento e rimetto in pari */
+const firmaElenco = l => l.map(c => c.id + ':' + ((c.ultimo && c.ultimo.id) || '') + ':' + (c.non_lette || 0)).sort().join('|');
+async function controllaTempoReale(periodico){
+  if(!S.pronti) return;
+  if(!canaliVivi()){ riavviaTempoReale(true); recupera(); return; }
+  if(!periodico){ recupera(); return; }
+  /* collegamento in piedi: controllo leggero, rimetto in pari solo se manca qualcosa */
+  try{
+    const {data, error} = await sb.rpc('chat_elenco');
+    if(error) return;
+    if(firmaElenco(data || []) !== firmaElenco(Array.from(S.convs.values()))) recupera();
+  }catch(e){}
+}
 function avviaTempoReale(){
+  const giro = ++giroCanali; avviatoIl = Date.now();
+  const st0 = st => {
+    if(giro !== giroCanali) return;   /* un canale vecchio che ho chiuso io: non conta */
+    if(st === 'SUBSCRIBED'){ tentativiRiavvio = 0; if(S.pronti) recupera(); }
+    else if(st === 'CHANNEL_ERROR' || st === 'TIMED_OUT' || st === 'CLOSED') riavviaTempoReale();
+  };
   canaleDb = sb.channel('fosschat-db')
     .on('postgres_changes', {event: 'INSERT', schema: 'public', table: 'chat_messaggi'}, p => arrivaMessaggio(p.new))
     .on('postgres_changes', {event: 'UPDATE', schema: 'public', table: 'chat_messaggi'}, p => cambiaMessaggio(p.new))
@@ -272,14 +317,16 @@ function avviaTempoReale(){
     .on('postgres_changes', {event: '*', schema: 'public', table: 'chat_programmati'}, p => cambiaProgrammato(p))
     .on('postgres_changes', {event: 'UPDATE', schema: 'public', table: 'progetti'}, p => lavoroCambiato(p.new && p.new.id))
     .on('postgres_changes', {event: '*', schema: 'public', table: 'elementi'}, p => { const r = p.new && p.new.progetto_id ? p.new : p.old; if(r && (!r.tipo || r.tipo === 'evento' || r.tipo === 'voce')) lavoroCambiato(r.progetto_id); })
-    .subscribe(st => { if(st === 'SUBSCRIBED' && S.pronti) recupera(); });
+    .subscribe(st0);
 
   canaleOnline = sb.channel('fosschat-online', {config: {presence: {key: S.io}}});
   canaleOnline.on('presence', {event: 'sync'}, () => {
     const st = canaleOnline.presenceState();
+    const prima = S.online;
     S.online = new Set(Object.keys(st));
+    notaEntrati(prima, S.online);
     aggiornaTestaConv(); disegnaListaPresto();
-  }).subscribe(async st => { if(st === 'SUBSCRIBED') try{ await canaleOnline.track({id: S.io, dal: Date.now()}); }catch(e){} });
+  }).subscribe(async st => { if(st === 'SUBSCRIBED') onlinePronto = Date.now(); if(st === 'SUBSCRIBED') try{ await canaleOnline.track({id: S.io, dal: Date.now()}); }catch(e){} });
 
   canaleScrive = sb.channel('fosschat-scrive');
   canaleScrive.on('broadcast', {event: 'scrive'}, ({payload}) => {
@@ -303,7 +350,13 @@ function chiScrive(conv){
   return r;
 }
 /* dopo una disconnessione rimetto in pari l'elenco e la chat aperta */
-async function recupera(){
+let recuperoInCorso = null;
+function recupera(){
+  if(recuperoInCorso) return recuperoInCorso;
+  recuperoInCorso = recuperaOra().finally(() => { recuperoInCorso = null; });
+  return recuperoInCorso;
+}
+async function recuperaOra(){
   try{
     await caricaElenco();
     if(S.aperta && S.convs.has(S.aperta)){
@@ -339,7 +392,7 @@ function arrivaMessaggio(m){
     else {
       c.non_lette = (c.non_lette || 0) + 1;
       if(menz) c.menzioni = (c.menzioni || 0) + 1;
-      if((!c.silenziata || menz) && !muto && (m.tipo !== 'colpetto' || m.media.a === S.io)) suono('arrivo');
+      if((!c.silenziata || menz) && !muto && m.tipo !== 'colpetto') suono('arrivo');
     }
     if(m.tipo === 'colpetto' && m.media && m.media.a === S.io) colpettoRicevuto(m, guardo);
     aggiornaTitolo();
@@ -412,8 +465,8 @@ function cambiaMembro(p){
 }
 function cambiaConv(n){
   const c = S.convs.get(n.id); if(!c) return;
-  ['nome','descrizione','foto','ultimo_il'].forEach(k => { c[k] = n[k]; });
-  if(n.id === S.aperta) aggiornaTestaConv();
+  ['nome','descrizione','foto','ultimo_il','stile'].forEach(k => { c[k] = n[k]; });
+  if(n.id === S.aperta){ aggiornaTestaConv(); applicaSfondoConv(); }
   disegnaListaPresto();
   if(infoAperta === n.id) disegnaInfo();
 }

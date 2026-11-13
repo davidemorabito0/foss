@@ -8,10 +8,16 @@ function sfondoPer(conv){
 }
 async function applicaSfondoConv(){
   const w = $('.msgs-wrap', el('conv')), M = el('msgs'); if(!w || !S.aperta) return;
+  applicaStileGruppo();
   const conv = S.aperta, sf = sfondoPer(conv);
-  w.style.backgroundColor = sf.c || '';
-  w.classList.toggle('con-foto', !!sf.f);
-  if(M) M.classList.toggle('niente-doodle', S.cfg.doodle === false || !!sf.f);
+  /* v2.6: la palette del gruppo vale per tutti (salvo uno sfondo che ti sei scelto tu per questa chat) */
+  const st = stileDi(S.convs.get(conv)), pal = !sf.proprio && st && st.palette ? sfondoPalette(st.palette) : null;
+  if(M){ M.style.backgroundImage = pal ? pal.img : ''; M.style.backgroundSize = pal ? '240px' : ''; }
+  w.style.backgroundColor = pal ? pal.fondo : (sf.c || '');
+  w.classList.toggle('con-foto', !pal && !!sf.f);
+  if(M) M.classList.toggle('niente-doodle', !pal && (S.cfg.doodle === false || !!sf.f));
+  if(pal){ w.style.backgroundImage = ''; w.style.setProperty('--buio', '0'); avviaVivo(); return; }
+  avviaVivo();
   w.style.setProperty('--buio', sf.f ? String(S.cfg.sfondoBuio == null ? .25 : S.cfg.sfondoBuio) : '0');
   if(sf.f){
     const u = await urlFirmata(sf.f);

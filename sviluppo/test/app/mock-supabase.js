@@ -20,7 +20,7 @@
   };
   const C1 = uid(), G1 = uid();
   db.chat_conversazioni.push({id: C1, tipo: 'privata', nome: null, descrizione: '', foto: null, coppia: 'x', creata_da: D, creata_il: fa(3000), ultimo_il: fa(5)});
-  db.chat_conversazioni.push({id: G1, tipo: 'gruppo', nome: 'Videoclip Il Merlo', descrizione: 'Riprese 13 ottobre', foto: null, creata_da: D, creata_il: fa(2000), ultimo_il: fa(2)});
+  db.chat_conversazioni.push({id: G1, tipo: 'gruppo', nome: 'Videoclip Il Merlo', descrizione: 'Riprese 13 ottobre', foto: null, creata_da: window.__G1_MO ? MO : D, creata_il: fa(2000), ultimo_il: fa(2), stile: window.__G1_STILE || null});
   const mem = (c, u, r, letto) => db.chat_membri.push({conv_id: c, utente_id: u, ruolo: r || 'membro', aggiunto_il: fa(3000), letto_fino: letto || ora(), ricevuto_fino: letto || ora(), silenziata: false, archiviata: false, fissata: false, svuotata_il: null, bloccata: false});
   mem(C1, D, 'admin', fa(30)); mem(C1, MO, 'admin', fa(1));
   mem(G1, D, 'admin', fa(10)); mem(G1, MO); mem(G1, AN, 'membro', fa(60));
@@ -228,6 +228,9 @@
         non_lette: msgs.filter(x => x.creato_il > m.letto_fino && x.autore !== io && x.tipo !== 'sistema').length,
         menzioni: msgs.filter(x => x.creato_il > m.letto_fino && x.autore !== io && x.tipo === 'testo' && x.media && (x.media.tutti || (x.media.menzioni || []).some(z => z.id === io))).length});
     }).sort((a, b) => (b.fissata - a.fissata) || (a.ultimo_il < b.ultimo_il ? 1 : -1)),
+    chat_stile_gruppo: a => { const c = db.chat_conversazioni.find(x => x.id === a.p_conv);
+      if(!c || c.creata_da !== io) throw 'i colori li sceglie chi ha creato il gruppo';
+      c.stile = a.p_stile; sistema(c.id, nomeP(io) + ' ha cambiato i colori del gruppo'); emetti('chat_conversazioni', 'UPDATE', Object.assign({}, c)); return null; },
     chat_apri_privata: a => {
       const k = [io, a.p_altro].sort().join(':');
       let c = db.chat_conversazioni.find(x => x.coppia === k);
@@ -313,9 +316,12 @@
   function FakeXHR(){ this.upload = {}; this.status = 0; this.responseText = ''; }
   FakeXHR.prototype.open = function(m, u){ this.u = u; };
   FakeXHR.prototype.setRequestHeader = function(){};
+  FakeXHR.prototype.abort = function(){ clearInterval(this.giro); this.fermo = true; this.onabort && this.onabort(); };
   FakeXHR.prototype.send = function(b){
+    if(window.__RETE_GIU){ setTimeout(() => { this.status = 0; this.onerror && this.onerror(); }, 80); return; }
+    if(window.__APPESO){ return; }
     const path = decodeURIComponent(this.u.split('/object/chat/')[1] || '');
-    let k = 0; const giro = setInterval(() => {
+    let k = 0; const giro = this.giro = setInterval(() => {
       k += .25; this.upload.onprogress && this.upload.onprogress({lengthComputable: true, loaded: k * b.size, total: b.size});
       if(k >= 1){ clearInterval(giro); storage.set(path, b); this.status = 200; this.responseText = JSON.stringify({Key: 'chat/' + path}); this.onload && this.onload(); }
     }, 120);

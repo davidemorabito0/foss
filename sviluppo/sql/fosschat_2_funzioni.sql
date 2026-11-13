@@ -838,3 +838,6 @@ revoke all on public.chat_super_notifiche from anon, authenticated;
 --   'frase',   left(coalesce(p.chat_cfg->>'frase', ''), 140)
 --   'cornice', case when coalesce(p.chat_cfg->>'cornice','') ~ '^[a-z]{1,20}$' then p.chat_cfg->>'cornice' else '' end
 -- (migrazione fosschat_frase_cornice)
+
+-- ---------- FOSS.chat 2.6: colori del gruppo (migrazione fosschat_stile_gruppo) ----------
+-- alter table chat_conversazioni add column stile jsonb;  chat_stile_gruppo(p_conv uuid, p_stile jsonb);  chat_elenco() restituisce 'stile'
