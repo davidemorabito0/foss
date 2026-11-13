@@ -85,6 +85,7 @@ vero(len(pieni) >= 4 and ok_pieno(pieni[1], 'chat'), 'una alla volta: ⌘2 porta
 vero(len(pieni) >= 4 and ok_pieno(pieni[2], 'foss'), 'una alla volta: un link di FOSS dalla chat riporta FOSS')
 vero(len(pieni) >= 4 and ok_pieno(pieni[3], 'chat'), 'una alla volta: ⌘J passa alla chat (%s)' % seq)
 vero(stati and stati[-1].get('modo') == 'accanto' and stati[-1].get('lato') == 'destra' and stati[-1]['chat'][0] > 0, 'di nuovo affiancate, chat a destra')
+vero(any('arrivano su questo computer' in a[1] for a in titoli), '«Prova un avviso» dal pannellino: l\'avviso parte (anche con FOSS davanti)')
 fuori = di('apri_fuori')
 vero('https://example.com/esterno' in fuori, 'window.open di un sito esterno va nel browser')
 vero('https://example.org/link' in fuori, 'link esterno con target=_blank va nel browser')

@@ -18,6 +18,8 @@ pub struct Avviso {
     pub icona: String,
     /// suono di sistema (la chat suona gia' da se', FOSS no)
     pub suono: bool,
+    /// parte anche se stai guardando la pagina (l'avviso di prova)
+    pub sempre: bool,
 }
 
 fn taglia(s: &str, n: usize) -> String {
@@ -94,7 +96,7 @@ pub fn mostra(app: &AppHandle, a: Avviso) {
         return;
     }
     // con la finestra davanti e la pagina in vista l'avviso lo mostra gia' la pagina (come il Mac)
-    if a.dove.file.is_empty() {
+    if a.dove.file.is_empty() && !a.sempre {
         if let Some(w) = app.get_window("main") {
             let davanti = w.is_focused().unwrap_or(false) && w.is_visible().unwrap_or(false) && !w.is_minimized().unwrap_or(false);
             let in_vista = {

@@ -840,6 +840,7 @@ fn prova_avviso(app: AppHandle) {
         titolo: "FOSS".into(),
         testo: "Gli avvisi arrivano su questo computer.".into(),
         dove: Dove { vista: "foss".into(), ..Default::default() },
+        sempre: true,
         ..Default::default()
     });
 }

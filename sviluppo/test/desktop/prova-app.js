@@ -187,6 +187,8 @@ if(VISTA === 'foss' && !LOCALE) (async function(){
   await P.fai('stato'); await P.aspetta(300);
   var dx = document.querySelector('#fdPannello .fp-scelta[data-k="lato"] button[data-v="destra"]');
   if(dx) dx.click(); await P.aspetta(700);
+  var pr = document.querySelector('#fdPannello [data-f="prova"]');
+  if(pr) pr.click(); await P.aspetta(800);
   await P.fai('stato'); await P.aspetta(300);
   document.body.dispatchEvent(new MouseEvent('click', {bubbles: true}));
   await P.aspetta(300);
