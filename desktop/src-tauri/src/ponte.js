@@ -109,7 +109,9 @@
     var c = /[#&]c=([0-9a-f-]{36})/.exec(h), m = /[#&]m=([0-9a-f-]{36})/.exec(h);
     var fai = function(n){
       if(typeof window.__fossChatRispondi === 'function'){ window.__fossChatRispondi(c && c[1], m && m[1], testo); return; }
-      if(n < 40) setTimeout(function(){ fai(n + 1); }, 250);
+      if(n < 40){ setTimeout(function(){ fai(n + 1); }, 250); return; }
+      /* la chat del sito non sa ancora rispondere (sito non aggiornato): non perdo la risposta in silenzio */
+      api.avviso({vista: 'chat', hash: h, titolo: 'Risposta non inviata', testo: '«' + testo.slice(0, 80) + '» non è partito: apri la chat e scrivilo lì.'});
     };
     if(c && testo) fai(0);
   }
