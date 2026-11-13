@@ -4,7 +4,7 @@
 use crate::{apri_impostazioni, cerca_aggiornamento, esegui_scorciatoia, installa_aggiornamento, mostra_finestra, Stato};
 use tauri::{
     image::Image,
-    menu::{CheckMenuItemBuilder, Menu, MenuBuilder, MenuItemBuilder},
+    menu::{CheckMenuItemBuilder, Menu, MenuBuilder, MenuItemBuilder, SubmenuBuilder},
     tray::{MouseButton, MouseButtonState, TrayIconBuilder, TrayIconEvent},
     AppHandle, Manager,
 };
@@ -31,7 +31,17 @@ fn menu_vassoio(app: &AppHandle) -> tauri::Result<Menu<tauri::Wry>> {
     if let Some(v) = nuova {
         m = m.item(&MenuItemBuilder::with_id("aggiorna", format!("⬆ Aggiorna FOSS alla versione {v}")).build(app)?).separator();
     }
-    m.item(&CheckMenuItemBuilder::with_id("avvio", "Avvia FOSS all’accensione").checked(avvio).build(app)?)
+    // «Non disturbare»: per un po', fino a domani, ogni giorno a orario
+    let sil = crate::in_silenzio(&c);
+    let silenzio = SubmenuBuilder::new(app, if sil { format!("☾ Non disturbare ({})", crate::silenzio_fino(&c)) } else { "Non disturbare".to_string() })
+        .item(&MenuItemBuilder::with_id("dnd-60", "Per 1 ora").build(app)?)
+        .item(&MenuItemBuilder::with_id("dnd-domani", "Fino a domani mattina").build(app)?)
+        .item(&CheckMenuItemBuilder::with_id("dnd-orario", format!("Ogni giorno dalle {} alle {}", c.silenzio_da, c.silenzio_a)).checked(c.silenzio_orario).build(app)?)
+        .separator()
+        .item(&MenuItemBuilder::with_id("dnd-via", "Riprendi gli avvisi").enabled(sil).build(app)?)
+        .build()?;
+    m.item(&silenzio)
+        .item(&CheckMenuItemBuilder::with_id("avvio", "Avvia FOSS all’accensione").checked(avvio).build(app)?)
         .item(&MenuItemBuilder::with_id("impostazioni", "Impostazioni…").build(app)?)
         .separator()
         .item(&MenuItemBuilder::with_id("esci", "Esci da FOSS").build(app)?)
@@ -91,6 +101,18 @@ pub fn menu_scelto(app: &AppHandle, id: &str) {
             aggiorna_menu(app);
         }
         "impostazioni" => apri_impostazioni(app),
+        "dnd-60" => crate::metti_pausa(app, "60"),
+        "dnd-domani" => crate::metti_pausa(app, "domani"),
+        "dnd-via" => crate::metti_pausa(app, "0"),
+        "dnd-orario" => {
+            let st = app.state::<Stato>();
+            {
+                let mut c = st.cfg.lock().unwrap();
+                c.silenzio_orario = !c.silenzio_orario;
+            }
+            st.salva();
+            crate::annuncia_silenzio(app, true);
+        }
         "cerca-aggiornamenti" => {
             apri_impostazioni(app);
             cerca_aggiornamento(app, true);
@@ -109,7 +131,7 @@ pub fn menu_scelto(app: &AppHandle, id: &str) {
 /// Il menu in alto sul Mac. Serve anche perche' copia, incolla e annulla funzionino.
 #[cfg(target_os = "macos")]
 pub fn menu_mac(app: &AppHandle) -> tauri::Result<Menu<tauri::Wry>> {
-    use tauri::menu::{PredefinedMenuItem, SubmenuBuilder};
+    use tauri::menu::PredefinedMenuItem;
     let foss = SubmenuBuilder::new(app, "FOSS")
         .item(&PredefinedMenuItem::about(app, Some("Informazioni su FOSS"), None)?)
         .separator()
@@ -163,15 +185,24 @@ pub fn menu_mac(app: &AppHandle) -> tauri::Result<Menu<tauri::Wry>> {
 /// sull'icona vicino all'orologio e sulla barra delle applicazioni (Windows).
 pub fn aggiorna_numero(app: &AppHandle, n: i64) {
     let testo = if n > 99 { "99+".to_string() } else { n.to_string() };
+    let sil = crate::in_silenzio(&app.state::<Stato>().cfg.lock().unwrap());
     if let Some(t) = app.tray_by_id("foss") {
-        let _ = t.set_tooltip(Some(match n {
+        let base = match n {
             0 => "FOSS".to_string(),
             1 => "FOSS — 1 chat da leggere".to_string(),
             _ => format!("FOSS — {testo} chat da leggere"),
-        }));
+        };
+        let _ = t.set_tooltip(Some(if sil { format!("{base} · non disturbare") } else { base }));
         #[cfg(target_os = "macos")]
         {
-            let _ = t.set_title(if n > 0 { Some(testo.clone()) } else { None });
+            // ☾ = «Non disturbare» attivo
+            let titolo = match (sil, n > 0) {
+                (true, true) => Some(format!("☾ {testo}")),
+                (true, false) => Some("☾".to_string()),
+                (false, true) => Some(testo.clone()),
+                (false, false) => None,
+            };
+            let _ = t.set_title(titolo);
         }
         #[cfg(not(target_os = "macos"))]
         {

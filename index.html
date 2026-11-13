@@ -2769,6 +2769,10 @@ button.all-apri:hover .nm{color:var(--amber-ink);text-decoration:underline}
 input.esca{position:absolute;left:-9999px;top:auto;width:1px;height:1px;opacity:0;pointer-events:none}
 img.rit{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;display:block;pointer-events:none;user-select:none;-webkit-user-drag:none}
 .hm-spc .cop{overflow:hidden}
+/* La copertina degli spazi: su Safari e nell'app per computer la scheda (un <button>) allinea i figli a
+   sinistra, la copertina vuota restava larga e alta zero e l'icona sopra veniva tagliata. Larghezza piena e
+   altezza dal padding (3,6 volte piu' larga che alta) funzionano ovunque. */
+.hm-spc .cop{align-self:stretch;width:100%;box-sizing:border-box;aspect-ratio:auto;height:0;padding-bottom:calc(100% / 3.6)}
 .hm-spc .cop .rit{z-index:0}
 .hm-spc .cop.con-foto::after{z-index:1}
 .hm-spc .cop .cop-b{z-index:2}

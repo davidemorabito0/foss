@@ -52,6 +52,7 @@
   }
 
   /* ---------- quello che il sito puo' chiedere all'app ---------- */
+  var SILENZIO = false;
   var api = {
     versione: VERSIONE, os: OS, vista: VISTA, sito: SITO,
     /* un avviso di sistema. o = {titolo, testo, foto, hash (chat), notifica (FOSS), azione, suono} */
@@ -59,7 +60,7 @@
       o = o || {};
       var dove = {vista: String(o.vista || VISTA), hash: String(o.hash || ''), notifica: String(o.notifica || ''), azione: String(o.azione || '')};
       return iconaDa(o.foto).then(function(ic){
-        return invoca('avviso', {a: {titolo: String(o.titolo || 'FOSS'), testo: String(o.testo || ''), dove: dove, icona: ic, suono: !!o.suono}});
+        return invoca('avviso', {a: {titolo: String(o.titolo || 'FOSS'), testo: String(o.testo || ''), dove: dove, icona: ic, suono: !!o.suono, risposta: !!o.risposta}});
       }).catch(function(){});
     },
     /* il trillo: l'icona dell'app salta (Mac) o lampeggia (Windows) */
@@ -70,7 +71,9 @@
     aggiorna: function(){ return invoca('aggiorna'); },
     collegaBrowser: function(si){ return invoca('collega_browser', {collega: si !== false}); },
     provaAvviso: function(){ return invoca('prova_avviso'); },
-    mostraChat: function(si){ return invoca('chat_mostra', {mostra: si == null ? null : !!si}); }
+    mostraChat: function(si){ return invoca('chat_mostra', {mostra: si == null ? null : !!si}); },
+    /* «Non disturbare» attivo: la chat non suona */
+    silenzio: function(){ return SILENZIO; }
   };
   try{ Object.defineProperty(window, 'fossDesktop', {value: Object.freeze(api), writable: false, configurable: false, enumerable: false}); }
   catch(e){ window.fossDesktop = api; }
@@ -87,6 +90,8 @@
       case 'aggiornamento-errore': erroreAggiornamento(String(d.testo || '')); break;
       case 'disposizione': disposizione(d); break;
       case 'impostazioni': if(window.__fossPannello) window.__fossPannello.apri(); break;
+      case 'silenzio': SILENZIO = !!d.attivo; break;
+      case 'rispondi': rispondiQui(String(d.hash || ''), String(d.testo || '')); break;
     }
     if(window.__fossPannello) try{ window.__fossPannello.evento(d); }catch(e){}
     if(typeof window.__fossDesktopEvento === 'function') try{ window.__fossDesktopEvento(d); }catch(e){}
@@ -97,6 +102,16 @@
     /* lo stesso indirizzo non farebbe nulla: prima lo tolgo, poi lo rimetto */
     if(location.hash === h) history.replaceState(null, '', location.pathname + location.search);
     location.hash = h;
+  }
+  /* una risposta scritta nell'avviso: la manda la chat (26-desktop.js), senza aprire niente */
+  function rispondiQui(h, testo){
+    if(VISTA !== 'chat') return;
+    var c = /[#&]c=([0-9a-f-]{36})/.exec(h), m = /[#&]m=([0-9a-f-]{36})/.exec(h);
+    var fai = function(n){
+      if(typeof window.__fossChatRispondi === 'function'){ window.__fossChatRispondi(c && c[1], m && m[1], testo); return; }
+      if(n < 40) setTimeout(function(){ fai(n + 1); }, 250);
+    };
+    if(c && testo) fai(0);
   }
   function apriInFoss(d){
     var A = window.fossApp;
@@ -170,6 +185,12 @@
       '#fdPannello .fp-interr::after{content:"";position:absolute;top:2px;left:2px;width:16px;height:16px;border-radius:50%;background:#fff;transition:left .15s}' +
       '#fdPannello .fp-interr.on{background:var(--ok,#3FBF8F)}#fdPannello .fp-interr.on::after{left:16px}' +
       '#fdPannello .fp-tasti{display:flex;gap:6px;padding:6px 4px 0}' +
+      '#fdPannello .fp-sez em{font-style:normal;text-transform:none;letter-spacing:0;color:var(--amber-ink,#FFAD01)}' +
+      '#fdPannello .fp-tasti .fp-riprendi{border-color:var(--amber,#FFAD01)}' +
+      '#fdPannello .fp-orario{cursor:default}#fdPannello .fp-orario:hover{background:none}' +
+      '#fdPannello .fp-orario i{display:flex;align-items:center;gap:5px;margin-top:3px}' +
+      '#fdPannello .fp-orario input{font:inherit;font-size:12.5px;color:var(--text,#E9F0F8);background:var(--surface-2,#1A3149);border:1px solid var(--line,#25415E);border-radius:7px;padding:2px 5px;color-scheme:dark light}' +
+      '#fdPannello button.fp-interr{border:0;padding:0}' +
       '#fdPannello .fp-tasti button,#fdPannello .fp-agg button{flex:1;border:1px solid var(--line,#25415E);background:var(--surface-2,#1A3149);border-radius:9px;padding:7px 8px;font-weight:600;font-size:12.5px}' +
       '#fdPannello .fp-agg{display:flex;align-items:center;gap:8px;padding:0 4px}#fdPannello .fp-agg span{flex:1;color:var(--mute,#6A8299);font-size:12px}#fdPannello .fp-agg button{flex:none}' +
       '#fdPannello .fp-aggiorna{display:flex;align-items:center;justify-content:center;gap:8px;width:calc(100% - 8px);margin:0 4px;border:0;border-radius:10px;padding:9px;background:var(--amber,#FFAD01);color:var(--on-amber,#1A1305);font-weight:700}' +
@@ -443,6 +464,13 @@
         '<div class="fp-linea"></div>' +
         interr('avvio', 'Avvia all’accensione', 'Parte da sola, chiusa ' + (s.os === 'mac' ? 'nella barra in alto' : 'vicino all’orologio')) +
         interr('notifiche', 'Avvisi sul computer', 'Chat, task assegnate, menzioni, scadenze') +
+        '<div class="fp-linea"></div>' +
+        '<div class="fp-sez">Non disturbare' + (s.silenzio ? ' <em>· attivo ' + e2(s.silenzio_fino || '') + '</em>' : '') + '</div>' +
+        '<div class="fp-tasti"><button type="button" data-f="pausa" data-v="60">Per 1 ora</button><button type="button" data-f="pausa" data-v="domani">Fino a domani</button>' +
+          (s.silenzio ? '<button type="button" data-f="pausa" data-v="0" class="fp-riprendi">Riprendi</button>' : '') + '</div>' +
+        '<div class="fp-riga fp-orario"><span><b>Ogni giorno</b><i>dalle <input type="time" data-o="silenzio_da" value="' + e2(s.silenzio_da || '20:00') + '"> alle <input type="time" data-o="silenzio_a" value="' + e2(s.silenzio_a || '08:00') + '"></i></span>' +
+          '<button type="button" class="fp-interr' + (s.silenzio_orario ? ' on' : '') + '" data-i="silenzio_orario" aria-label="Non disturbare ogni giorno"></button></div>' +
+        '<div class="fp-nota">Niente avvisi e niente suoni della chat; il numero sull’icona resta.</div>' +
         '<div class="fp-tasti"><button type="button" data-f="prova">Prova un avviso</button><button type="button" data-f="collega">Collega il browser</button></div>' +
         '<div class="fp-linea"></div>' +
         (s.nuova ? '<button type="button" class="fp-aggiorna" data-f="aggiorna"><span>' + FRECCIA + '</span>Aggiorna alla versione ' + e2(s.nuova) + '</button>'
@@ -467,10 +495,15 @@
             .then(function(s){ IMP = s; disegna(); });
         }
         else if(t.dataset.i) api.imposta(t.dataset.i, !IMP[t.dataset.i]).then(function(s){ IMP = s; disegna(); });
+        else if(t.dataset.f === 'pausa') api.imposta('pausa', t.dataset.v).then(function(s){ IMP = s; disegna(); if(s.silenzio) nota('Non disturbare: ' + (s.silenzio_fino || 'attivo') + '.'); else nota('Gli avvisi sono di nuovo attivi.'); });
         else if(t.dataset.f === 'prova'){ api.provaAvviso(); nota('Ti mando un avviso di prova…'); }
         else if(t.dataset.f === 'collega'){ api.collegaBrowser(true); nota('Ti apro FOSS nel browser per collegarlo all’app.'); }
         else if(t.dataset.f === 'controlla'){ var x = document.getElementById('fpAggT'); if(x) x.textContent = 'Controllo…'; api.cercaAggiornamenti(); }
         else if(t.dataset.f === 'aggiorna'){ t.disabled = true; t.lastChild.textContent = 'Aggiorno…'; api.aggiorna().catch(function(){}); }
+      });
+      PANN.addEventListener('change', function(e){
+        var o = e.target && e.target.dataset ? e.target.dataset.o : '';
+        if(o && /^\d{2}:\d{2}$/.test(e.target.value)) api.imposta(o, e.target.value).then(function(s){ IMP = s; disegna(); });
       });
       carica();
     };

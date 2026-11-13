@@ -280,6 +280,11 @@ L'elenco completo è nel `README.md` del sito, sezioni «FOSS.chat» e «FOSS.ch
   sull'altro). Mentre scorri compare una sola data in alto (`#dataFluttua`, `mostraDataFluttua` in
   `04-conv.js`), quella del primo messaggio che vedi, e sparisce da sola dopo 1,3 s (come WhatsApp).
 
+### FOSS — copertine degli spazi (13 novembre 2026)
+- In Safari e nell'app per computer l'icona degli spazi di lavoro nella Home era tagliata: la copertina (`.hm-spc .cop`) restava larga
+  e alta zero perche' la scheda (un `<button>`) allinea i figli a sinistra (`align-items:flex-start`). Ora ha
+  `width:100%` e l'altezza dal padding (`padding-bottom: calc(100% / 3.6)`), che funziona ovunque.
+
 ### 2.9 — stato: online, occupato, invisibile (`js/27-stato.js`)
 - Intorno alla foto di chi è online un cerchio **verde**; chi si è messo «occupato» un cerchio **rosso**
   (colori fissi, non del tema). Al posto del vecchio pallino. Con una cornice scelta, il cerchio va dentro la foto.
@@ -360,6 +365,15 @@ browser prova ad aprire l'app e mostra «Ti ho aperto FOSS nell'app» con «Cont
 `#app-scollega` scollega. Sul telefono e nell'app `apri-app.js` non fa nulla.
 
 ### Avvisi, icona, avvio
+
+- **Rispondi dall'avviso** (1.0.5): gli avvisi dei messaggi hanno il campo «Scrivi una risposta…» (Mac:
+  `setHasReplyButton`; Windows: avviso costruito a mano con `<input>` e «Invia»). La risposta va a `rispondi` →
+  ponte della chat (`rispondi`) → `window.__fossChatRispondi` in `26-desktop.js`, che la manda come un messaggio
+  normale (nei gruppi cita il messaggio) senza aprire la finestra.
+- **Non disturbare** (1.0.5): nel pannellino «Per 1 ora», «Fino a domani», «Riprendi» e «Ogni giorno dalle … alle …»
+  (`silenzio_orario`, `silenzio_da`, `silenzio_a`, `pausa_fino` in `impostazioni.json`; `in_silenzio`, `metti_pausa`,
+  `annuncia_silenzio` in `lib.rs`, controllato ogni 30 s). Niente avvisi e niente suoni della chat
+  (`fossDesktop.silenzio()` in `suono()` di `01-base.js`); il numero sull'icona resta; sul Mac accanto al numero c'è ☾.
 
 - I clic sui menu li gestisce un solo gestore (quello dell'icona, che in Tauri riceve tutti i menu): con due
   gestori ogni voce partiva due volte (⌘J apriva e richiudeva la chat).

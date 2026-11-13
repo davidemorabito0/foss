@@ -20,6 +20,8 @@ pub struct Avviso {
     pub suono: bool,
     /// parte anche se stai guardando la pagina (l'avviso di prova)
     pub sempre: bool,
+    /// si puo' rispondere scrivendo dentro l'avviso (messaggi della chat)
+    pub risposta: bool,
 }
 
 fn taglia(s: &str, n: usize) -> String {
@@ -95,6 +97,11 @@ pub fn mostra(app: &AppHandle, a: Avviso) {
         registra(app, "avviso_spento", json!({"titolo": titolo}));
         return;
     }
+    // «Non disturbare»: niente avvisi (il numero sull'icona invece si aggiorna)
+    if a.dove.file.is_empty() && !a.sempre && crate::in_silenzio(&st.cfg.lock().unwrap()) {
+        registra(app, "avviso_silenzio", json!({"titolo": titolo}));
+        return;
+    }
     // con la finestra davanti e la pagina in vista l'avviso lo mostra gia' la pagina (come il Mac)
     if a.dove.file.is_empty() && !a.sempre {
         if let Some(w) = app.get_window("main") {
@@ -114,7 +121,7 @@ pub fn mostra(app: &AppHandle, a: Avviso) {
             }
         }
     }
-    registra(app, "avviso", json!({"titolo": titolo, "testo": testo, "dove": a.dove, "icona": !a.icona.is_empty(), "suono": a.suono}));
+    registra(app, "avviso", json!({"titolo": titolo, "testo": testo, "dove": a.dove, "icona": !a.icona.is_empty(), "suono": a.suono, "risposta": a.risposta}));
     // nelle prove automatiche niente avvisi veri, a meno che non li chieda la prova
     if st.prova.is_some() && std::env::var("FOSS_PROVA_AVVISI_VERI").is_err() {
         return;
@@ -122,13 +129,13 @@ pub fn mostra(app: &AppHandle, a: Avviso) {
     let icona = salva_icona(&a.icona);
     let app2 = app.clone();
     let dove = a.dove.clone();
-    let suono = a.suono;
-    std::thread::spawn(move || manda(&app2, &titolo, &testo, icona, suono, dove));
+    let (suono, risposta) = (a.suono, a.risposta && a.dove.vista == "chat");
+    std::thread::spawn(move || manda(&app2, &titolo, &testo, icona, suono, risposta, dove));
 }
 
 #[cfg(target_os = "macos")]
-fn manda(app: &AppHandle, titolo: &str, testo: &str, icona: Option<PathBuf>, suono: bool, dove: Dove) {
-    mac::manda(app, titolo, testo, icona, suono, dove);
+fn manda(app: &AppHandle, titolo: &str, testo: &str, icona: Option<PathBuf>, suono: bool, risposta: bool, dove: Dove) {
+    mac::manda(app, titolo, testo, icona, suono, risposta, dove);
 }
 
 /// Mac: avvisi del Centro notifiche con un «delegato» nostro. Ogni avviso ha un
@@ -141,7 +148,10 @@ mod mac {
     use objc2::rc::{Allocated, Retained};
     use objc2::runtime::{AnyClass, AnyObject, NSObject, NSObjectProtocol, ProtocolObject};
     use objc2::{define_class, msg_send, AnyThread};
-    use objc2_foundation::{NSString, NSUserNotification, NSUserNotificationCenter, NSUserNotificationCenterDelegate, NSUserNotificationDefaultSoundName};
+    use objc2_foundation::{
+        NSString, NSUserNotification, NSUserNotificationActivationType, NSUserNotificationCenter, NSUserNotificationCenterDelegate,
+        NSUserNotificationDefaultSoundName,
+    };
     use std::collections::HashMap;
     use std::sync::atomic::{AtomicU64, Ordering};
     use std::sync::{Mutex, OnceLock};
@@ -173,11 +183,20 @@ mod mac {
                 let id = avviso.identifier().map(|s| s.to_string()).unwrap_or_default();
                 centro.removeDeliveredNotification(avviso);
                 let dove = mappa().lock().unwrap().remove(&id);
+                // risposta scritta nell'avviso: la manda la chat, la finestra resta dov'e'
+                let scritta = if avviso.activationType().0 == NSUserNotificationActivationType::Replied.0 {
+                    avviso.response().map(|r| r.string().to_string())
+                } else {
+                    None
+                };
                 if let Some(app) = APP.get() {
-                    registra(app, "clic_avviso_mac", json!({"id": id, "trovato": dove.is_some()}));
+                    registra(app, "clic_avviso_mac", json!({"id": id, "trovato": dove.is_some(), "risposta": scritta.is_some()}));
                     if let Some(d) = dove {
                         let a = app.clone();
-                        std::thread::spawn(move || crate::vai_a(&a, &d));
+                        match scritta {
+                            Some(t) => { std::thread::spawn(move || crate::rispondi(&a, &d, &t)); }
+                            None => { std::thread::spawn(move || crate::vai_a(&a, &d)); }
+                        }
                     }
                 }
             }
@@ -205,7 +224,7 @@ mod mac {
         }
     }
 
-    pub fn manda(app: &AppHandle, titolo: &str, testo: &str, icona: Option<PathBuf>, suono: bool, dove: Dove) {
+    pub fn manda(app: &AppHandle, titolo: &str, testo: &str, icona: Option<PathBuf>, suono: bool, risposta: bool, dove: Dove) {
         let id = format!("foss-{}-{}", std::process::id(), CONTA.fetch_add(1, Ordering::Relaxed));
         {
             let mut m = mappa().lock().unwrap();
@@ -223,6 +242,10 @@ mod mac {
             if suono {
                 n.setSoundName(Some(unsafe { NSUserNotificationDefaultSoundName }));
             }
+            if risposta {
+                n.setHasReplyButton(true);
+                n.setResponsePlaceholder(Some(&NSString::from_str("Scrivi una risposta…")));
+            }
             // la foto di chi scrive al posto dell'icona (come WhatsApp)
             if let Some(img) = icona.as_deref().and_then(immagine) {
                 let chiave = NSString::from_str("_identityImage");
@@ -233,27 +256,64 @@ mod mac {
     }
 }
 
+/// Windows: l'avviso (toast) costruito a mano, cosi' ha anche il campo per rispondere.
+/// Il clic porta al punto giusto; «Invia» manda la risposta senza aprire la finestra.
 #[cfg(windows)]
-fn manda(app: &AppHandle, titolo: &str, testo: &str, icona: Option<PathBuf>, suono: bool, dove: Dove) {
-    use tauri_winrt_notification::{IconCrop, Sound, Toast};
+fn manda(app: &AppHandle, titolo: &str, testo: &str, icona: Option<PathBuf>, suono: bool, risposta: bool, dove: Dove) {
+    use windows::core::{Interface, HSTRING};
+    use windows::Data::Xml::Dom::XmlDocument;
+    use windows::Foundation::{IPropertyValue, TypedEventHandler};
+    use windows::UI::Notifications::{ToastActivatedEventArgs, ToastNotification, ToastNotificationManager};
+    const POWERSHELL: &str = "{1AC14E77-02E7-4E5D-B744-2EB1AE5198B7}\\WindowsPowerShell\\v1.0\\powershell.exe";
+    let esc = |s: &str| s.replace('&', "&amp;").replace('<', "&lt;").replace('>', "&gt;").replace('"', "&quot;").replace('\'', "&apos;");
     // installata: gli avvisi portano il nome FOSS; in prova uso quello di PowerShell
-    let installata = std::env::current_exe()
-        .map(|p| !p.to_string_lossy().contains("\\target\\"))
-        .unwrap_or(true);
-    let id = if installata { app.config().identifier.clone() } else { Toast::POWERSHELL_APP_ID.to_string() };
-    let mut t = Toast::new(&id).title(titolo).text1(testo).sound(if suono { Some(Sound::Default) } else { None });
-    if let Some(p) = &icona {
-        t = t.icon(p, IconCrop::Circular, "");
-    }
-    let a2 = app.clone();
-    t = t.on_activated(move |_| {
-        crate::vai_a(&a2, &dove);
+    let installata = std::env::current_exe().map(|p| !p.to_string_lossy().contains("\\target\\")).unwrap_or(true);
+    let id = if installata { app.config().identifier.clone() } else { POWERSHELL.to_string() };
+    let foto = icona
+        .map(|p| format!(r#"<image placement="appLogoOverride" hint-crop="circle" src="{}"/>"#, esc(&p.to_string_lossy())))
+        .unwrap_or_default();
+    let audio = if suono { "" } else { r#"<audio silent="true"/>"# };
+    let azioni = if risposta {
+        r#"<actions><input id="testo" type="text" placeHolderContent="Scrivi una risposta…"/><action content="Invia" arguments="rispondi" hint-inputId="testo"/></actions>"#
+    } else {
+        ""
+    };
+    let xml = format!(
+        r#"<toast launch="apri"><visual><binding template="ToastGeneric"><text>{}</text><text>{}</text>{}</binding></visual>{}{}</toast>"#,
+        esc(titolo), esc(testo), foto, audio, azioni
+    );
+    let esito = (|| -> windows::core::Result<()> {
+        let doc = XmlDocument::new()?;
+        doc.LoadXml(&HSTRING::from(xml))?;
+        let toast = ToastNotification::CreateToastNotification(&doc)?;
+        let a2 = app.clone();
+        toast.Activated(&TypedEventHandler::<ToastNotification, windows::core::IInspectable>::new(move |_, args| {
+            let mut scritta: Option<String> = None;
+            if let Some(args) = &*args {
+                if let Ok(t) = args.cast::<ToastActivatedEventArgs>() {
+                    if t.Arguments().map(|x| x.to_string()).unwrap_or_default() == "rispondi" {
+                        if let Ok(v) = t.UserInput().and_then(|u| u.Lookup(&HSTRING::from("testo"))) {
+                            if let Ok(pv) = v.cast::<IPropertyValue>() {
+                                scritta = pv.GetString().ok().map(|x| x.to_string());
+                            }
+                        }
+                    }
+                }
+            }
+            registra(&a2, "clic_avviso_windows", json!({"risposta": scritta.is_some()}));
+            match scritta {
+                Some(t) => crate::rispondi(&a2, &dove, &t),
+                None => crate::vai_a(&a2, &dove),
+            }
+            Ok(())
+        }))?;
+        ToastNotificationManager::CreateToastNotifierWithId(&HSTRING::from(id))?.Show(&toast)?;
         Ok(())
-    });
-    if let Err(e) = t.show() {
+    })();
+    if let Err(e) = esito {
         registra(app, "avviso_errore", json!(e.to_string()));
     }
 }
 
 #[cfg(not(any(target_os = "macos", windows)))]
-fn manda(_app: &AppHandle, _t: &str, _x: &str, _i: Option<PathBuf>, _s: bool, _d: Dove) {}
+fn manda(_app: &AppHandle, _t: &str, _x: &str, _i: Option<PathBuf>, _s: bool, _r: bool, _d: Dove) {}

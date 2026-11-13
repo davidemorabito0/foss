@@ -73,6 +73,12 @@ pub struct Cfg {
     pub primo_avvio_fatto: bool,
     /// versione delle impostazioni: 2 = FOSS e chat separate di serie (dalla 1.0.3)
     pub schema: u32,
+    /// «Non disturbare» ogni giorno, dalle silenzio_da alle silenzio_a ("HH:MM")
+    pub silenzio_orario: bool,
+    pub silenzio_da: String,
+    pub silenzio_a: String,
+    /// «Non disturbare» per un po': fino a questo momento (secondi dal 1970, 0 = no)
+    pub pausa_fino: i64,
 }
 impl Default for Cfg {
     fn default() -> Self {
@@ -85,6 +91,10 @@ impl Default for Cfg {
             davanti: "foss".into(),
             primo_avvio_fatto: false,
             schema: 2,
+            silenzio_orario: false,
+            silenzio_da: "20:00".into(),
+            silenzio_a: "08:00".into(),
+            pausa_fino: 0,
         }
     }
 }
@@ -309,6 +319,113 @@ fn chat_mostra_interna(app: &AppHandle, mostra: Option<bool>, fuoco: bool) {
     registra(app, "chat_accanto", json!(ora));
 }
 
+// ---------------------------------------------------------------- non disturbare
+
+fn minuti(s: &str) -> Option<u32> {
+    let (h, m) = s.split_once(':')?;
+    let (h, m) = (h.trim().parse::<u32>().ok()?, m.trim().parse::<u32>().ok()?);
+    if h < 24 && m < 60 { Some(h * 60 + m) } else { None }
+}
+
+/// «Non disturbare» adesso? (per un po', oppure nell'orario di ogni giorno)
+pub fn in_silenzio(c: &Cfg) -> bool {
+    use chrono::Timelike;
+    let ora = chrono::Local::now();
+    if c.pausa_fino > ora.timestamp() {
+        return true;
+    }
+    if !c.silenzio_orario {
+        return false;
+    }
+    let (Some(da), Some(a)) = (minuti(&c.silenzio_da), minuti(&c.silenzio_a)) else { return false };
+    let adesso = ora.hour() * 60 + ora.minute();
+    if da == a {
+        false
+    } else if da < a {
+        adesso >= da && adesso < a
+    } else {
+        adesso >= da || adesso < a
+    }
+}
+
+/// Fino a quando dura il silenzio, detto come lo direbbe una persona («fino alle 8:00»).
+pub fn silenzio_fino(c: &Cfg) -> String {
+    if !in_silenzio(c) {
+        return String::new();
+    }
+    let ora = chrono::Local::now();
+    if c.pausa_fino > ora.timestamp() {
+        if let Some(t) = chrono::DateTime::from_timestamp(c.pausa_fino, 0) {
+            let t = t.with_timezone(&chrono::Local);
+            let giorno = if t.date_naive() == ora.date_naive() { "" } else { "domani " };
+            return format!("fino a {giorno}alle {}", t.format("%H:%M"));
+        }
+    }
+    format!("fino alle {}", c.silenzio_a)
+}
+
+/// Le pagine e l'icona devono sapere se c'e' silenzio (la chat non suona, l'icona mostra la luna).
+pub fn annuncia_silenzio(app: &AppHandle, sempre: bool) {
+    static ULTIMO: Mutex<Option<bool>> = Mutex::new(None);
+    let attivo = in_silenzio(&app.state::<Stato>().cfg.lock().unwrap());
+    {
+        let mut u = ULTIMO.lock().unwrap();
+        if !sempre && *u == Some(attivo) {
+            return;
+        }
+        *u = Some(attivo);
+    }
+    for q in ["foss", "chat"] {
+        al_ponte(app, q, json!({"tipo": "silenzio", "attivo": attivo}));
+    }
+    let n = *app.state::<Stato>().non_lette.lock().unwrap();
+    vassoio::aggiorna_numero(app, n);
+    vassoio::aggiorna_menu(app);
+    registra(app, "silenzio", json!(attivo));
+}
+
+/// Pausa del «Non disturbare»: minuti (0 = riprendi), oppure fino a domani mattina.
+pub fn metti_pausa(app: &AppHandle, quanto: &str) {
+    use chrono::{Duration as D, Local, TimeZone};
+    let st = app.state::<Stato>();
+    {
+        let mut c = st.cfg.lock().unwrap();
+        let ora = Local::now();
+        c.pausa_fino = match quanto {
+            "domani" => {
+                // domani all'ora di fine del silenzio di ogni giorno (di solito le 8)
+                let m = minuti(&c.silenzio_a).unwrap_or(8 * 60);
+                let d = ora.date_naive() + D::days(1);
+                d.and_hms_opt(m / 60, m % 60, 0)
+                    .and_then(|t| Local.from_local_datetime(&t).single())
+                    .map(|t| t.timestamp())
+                    .unwrap_or(ora.timestamp() + 12 * 3600)
+            }
+            q => {
+                let min = q.parse::<i64>().unwrap_or(0);
+                if min > 0 { ora.timestamp() + min * 60 } else { 0 }
+            }
+        };
+        // «riprendi»: se siamo nell'orario di ogni giorno, lo spengo per stasera
+        if quanto == "0" && c.silenzio_orario && in_silenzio(&c) {
+            c.silenzio_orario = false;
+        }
+    }
+    st.salva();
+    annuncia_silenzio(app, true);
+}
+
+/// Una risposta scritta dentro l'avviso: la manda la chat, senza aprire la finestra.
+pub fn rispondi(app: &AppHandle, d: &Dove, testo: &str) {
+    let testo = testo.trim();
+    registra(app, "risposta", json!({"hash": d.hash, "testo": testo}));
+    if testo.is_empty() || d.vista != "chat" {
+        vai_a(app, d);
+        return;
+    }
+    al_ponte(app, "chat", json!({"tipo": "rispondi", "hash": d.hash, "testo": testo}));
+}
+
 /// Manda un messaggio al ponte di una pagina.
 pub fn al_ponte(app: &AppHandle, quale: &str, dati: Value) {
     if let Some(v) = vista(app, quale) {
@@ -448,6 +565,8 @@ fn costruisci_vista(app: &AppHandle, quale: &'static str) -> WebviewBuilder<taur
             if wv.label() == "chat" {
                 manda_disposizione(&a, true);
             }
+            let sil = in_silenzio(&a.state::<Stato>().cfg.lock().unwrap());
+            al_ponte(&a, wv.label(), json!({"tipo": "silenzio", "attivo": sil}));
         }
     });
     b
@@ -780,6 +899,11 @@ fn impostazioni(app: AppHandle) -> Value {
         "chat_accanto": c.chat_accanto,
         "lato": c.lato,
         "modo": c.modo,
+        "silenzio": in_silenzio(&c),
+        "silenzio_fino": silenzio_fino(&c),
+        "silenzio_orario": c.silenzio_orario,
+        "silenzio_da": c.silenzio_da,
+        "silenzio_a": c.silenzio_a,
         "os": if cfg!(target_os = "macos") { "mac" } else { "windows" },
     })
 }
@@ -800,6 +924,26 @@ fn imposta(app: AppHandle, chiave: String, valore: Value) -> Value {
         "chat_accanto" => chat_mostra_interna(&app, Some(si), false),
         "lato" => cambia_lato(&app, valore.as_str().unwrap_or("destra")),
         "modo" => cambia_modo(&app, valore.as_str()),
+        "silenzio_orario" => {
+            st.cfg.lock().unwrap().silenzio_orario = si;
+            st.salva();
+            annuncia_silenzio(&app, true);
+        }
+        "silenzio_da" | "silenzio_a" => {
+            if let Some(v) = valore.as_str().filter(|v| minuti(v).is_some()) {
+                let v = format!("{:02}:{:02}", minuti(v).unwrap() / 60, minuti(v).unwrap() % 60);
+                {
+                    let mut c = st.cfg.lock().unwrap();
+                    if chiave == "silenzio_da" { c.silenzio_da = v } else { c.silenzio_a = v }
+                }
+                st.salva();
+                annuncia_silenzio(&app, true);
+            }
+        }
+        "pausa" => {
+            let q = valore.as_str().map(|s| s.to_string()).or_else(|| valore.as_i64().map(|n| n.to_string())).unwrap_or_else(|| "0".into());
+            metti_pausa(&app, &q);
+        }
         _ => {}
     }
     registra(&app, "imposta", json!({"chiave": chiave, "valore": valore}));
@@ -869,6 +1013,11 @@ fn prova(app: AppHandle, dati: Value) {
             }
         }
         Some("mostra") => mostra_finestra(&app),
+        Some("risposta") => {
+            if let Ok(d) = serde_json::from_value::<Dove>(dati.get("dove").cloned().unwrap_or_default()) {
+                rispondi(&app, &d, dati.get("testo").and_then(|v| v.as_str()).unwrap_or(""));
+            }
+        }
         Some("aggiornamento") => {
             let v = dati.get("versione").and_then(|v| v.as_str()).unwrap_or("9.9.9").to_string();
             *app.state::<Stato>().nuova_versione.lock().unwrap() = Some(v.clone());
@@ -887,7 +1036,7 @@ fn prova(app: AppHandle, dati: Value) {
                 json!([p.x, p.y, s.width, s.height])
             });
             registra(&app, "stato", json!({"chat_accanto": c.chat_accanto, "larghezza_chat": c.larghezza_chat,
-                "lato": c.lato, "modo": c.modo, "davanti": c.davanti,
+                "lato": c.lato, "modo": c.modo, "davanti": c.davanti, "silenzio": in_silenzio(&c),
                 "visibile": vis, "foss": b("foss"), "chat": b("chat"),
                 "non_lette": *st.non_lette.lock().unwrap()}));
         }
@@ -1069,6 +1218,15 @@ pub fn run() {
                 });
             }
             vassoio::aggiorna_menu(&h);
+
+            // il «Non disturbare» a orario comincia e finisce da solo: controllo ogni 30 secondi
+            let h7 = h.clone();
+            tauri::async_runtime::spawn(async move {
+                loop {
+                    annuncia_silenzio(&h7, false);
+                    tokio_sleep(Duration::from_secs(30)).await;
+                }
+            });
 
             // a ogni avvio (e poi ogni 6 ore, per chi la tiene sempre accesa) controllo gli aggiornamenti
             if h.state::<Stato>().prova.is_none() || std::env::var("FOSS_PROVA_AGGIORNAMENTI").is_ok() {

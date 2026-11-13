@@ -19,7 +19,23 @@ function avvisoDesktop(m, c, o){
     if(o.promemoria){ titolo = '⏰ Promemoria' + (gruppo ? ' · ' + nomeConv(c) : ''); testo = riservata ? 'Un messaggio da rivedere' : chi + ': ' + testoAnteprima(m); }
     const p = S.persone.get(m.autore) || {};
     window.fossDesktop.avviso({vista: 'chat', titolo, testo, foto: riservata ? '' : fotoSicura(p.foto),
-                               hash: '#c=' + c.id + '&m=' + m.id, suono: false});
+                               hash: '#c=' + c.id + '&m=' + m.id, suono: false, risposta: !o.promemoria});
     if(o.colpetto) window.fossDesktop.attenzione();
   }catch(e){}
 }
+/* risposta scritta direttamente nell'avviso (Mac e Windows): la mando come un messaggio normale,
+   senza aprire la chat; nei gruppi cita il messaggio a cui rispondi */
+async function rispondiDaAvviso(conv, msg, testo){
+  const c = conv && S.convs.get(conv);
+  testo = String(testo || '').replace(/\s+$/, '').slice(0, 6000);
+  if(!c || !testo.trim()) return false;
+  const m = nuovoLocale('testo', {testo, risponde_a: c.tipo === 'gruppo' && msg && trovaMsg(conv, msg) ? msg : null}, conv);
+  mettiInLista(m);
+  try{ await salvaMessaggio(m); segnaLetto(conv); return true; }
+  catch(e){
+    m._stato = 'errore'; ridisegnaMessaggio(m.id);
+    if(suComputer()) window.fossDesktop.avviso({vista: 'chat', titolo: 'Risposta non inviata', testo: '«' + testo.slice(0, 80) + '» non è partito: apri la chat e riprova.', hash: '#c=' + conv});
+    return false;
+  }
+}
+if(suComputer()) window.__fossChatRispondi = rispondiDaAvviso;

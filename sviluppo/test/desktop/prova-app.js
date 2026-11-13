@@ -39,6 +39,24 @@ if(VISTA === 'chat' && !LOCALE) (async function(){
   localStorage.setItem('prova_id_priv', idPriv);
   M.arriva(M.C1, M.MO, null, {tipo: 'colpetto', media: {a: M.D}}); await P.aspetta(1500);
 
+  /* 1b. risposta scritta nell'avviso: parte come messaggio, senza aprire la chat */
+  await P.fai('risposta', {dove: {vista: 'chat', hash: '#c=' + M.C1 + '&m=' + idPriv}, testo: 'Risposta dal test'});
+  var risp = await P.quando(function(){ return M.db.chat_messaggi.some(function(x){ return x.conv_id === M.C1 && x.autore === M.D && x.testo === 'Risposta dal test'; }); }, 6000);
+  P.log('risposta dall’avviso: il messaggio parte nella chat giusta', !!risp, '');
+
+  /* 1c. «Non disturbare» per 1 ora: niente avvisi e niente suoni; poi si riprende */
+  await invoca('imposta', {chiave: 'pausa', valore: '60'}); await P.aspetta(500);
+  P.log('non disturbare: la chat sa che deve stare zitta', window.fossDesktop.silenzio() === true, '');
+  M.arriva(M.C1, M.MO, 'Messaggio durante il silenzio'); await P.aspetta(1500);
+  await invoca('imposta', {chiave: 'pausa', valore: '0'}); await P.aspetta(500);
+  P.log('non disturbare tolto', window.fossDesktop.silenzio() === false, '');
+  var oraD = new Date(), hh = function(d){ return String(d.getHours()).padStart(2, '0') + ':' + String(d.getMinutes()).padStart(2, '0'); };
+  await invoca('imposta', {chiave: 'silenzio_da', valore: hh(new Date(oraD.getTime() - 3600000))});
+  await invoca('imposta', {chiave: 'silenzio_a', valore: hh(new Date(oraD.getTime() + 3600000))});
+  var imp1 = await invoca('imposta', {chiave: 'silenzio_orario', valore: true}); await P.aspetta(400);
+  P.log('non disturbare a orario (adesso dentro l’orario)', imp1.silenzio === true && /fino alle/.test(imp1.silenzio_fino), JSON.stringify(imp1.silenzio_fino));
+  await invoca('imposta', {chiave: 'silenzio_orario', valore: false}); await P.aspetta(400);
+
   /* 2. gruppo silenziato: niente avviso */
   await window.__clientFinto.from('chat_membri').update({silenziata: true}).eq('conv_id', M.G1).eq('utente_id', M.D);
   await P.aspetta(800);
@@ -97,6 +115,15 @@ if(VISTA === 'chat' && !LOCALE) (async function(){
 if(VISTA === 'foss' && !LOCALE) (async function(){
   await P.quando(function(){ return window.fossApp && fossApp.pronto(); }, 15000);
   P.log('FOSS pronto', window.fossApp && fossApp.pronto(), '');
+  /* le copertine degli spazi hanno altezza (prima, nell'app, erano alte zero e l'icona restava tagliata) */
+  var cop = await P.quando(function(){ return document.querySelector('.hm-spc .cop'); }, 5000);
+  if(cop){
+    var rc = cop.getBoundingClientRect(), q = cop.parentNode.querySelector('.q');
+    var qr = q && q.getBoundingClientRect(), cr = cop.parentNode.getBoundingClientRect();
+    P.log('icone degli spazi intere (copertina ' + Math.round(rc.width) + 'x' + Math.round(rc.height) + ' px, scheda ' + Math.round(cr.width) + ' px)',
+      rc.height > 40 && rc.width > cr.width - 6 && qr && qr.top >= cr.top, '');
+  } else P.log('icone degli spazi intere', false, 'nessuna scheda di spazio');
+
   await P.quando(function(){ return localStorage.getItem('prova_chat_fatta') === '1'; }, 60000);
   localStorage.removeItem('prova_chat_fatta');
   await P.fai('nascondi'); await P.aspetta(500);

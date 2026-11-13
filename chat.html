@@ -1494,7 +1494,7 @@ const SUPA_KEY = 'sb_publishable_f5Kjp6NHT9yTxr1bhWJjhg_4y72V-Kj';
 const VAPID_PUBBLICA = 'BNlGbW4nZrXmx8DioKxnl7ubULVOr5_6CAKvpuQYoiXeObmxYAzGU6UrkExx2zu1hACmtRNDcpoMh_ARQ0GSmlw';
 /* il server dei file sul NAS (es. 'https://media.foss.team'). Vuoto = si usa Supabase. */
 const MEDIA_NAS = 'https://media.foss.team';
-const VERSIONE = 'chat-2.9';
+const VERSIONE = 'chat-2.9.1';
 /* i temi colore: gli stessi di FOSS. Il predefinito per tutti è Brand (blu e giallo). */
 const TEMI_COLORE = [
   {id:'brand',   nome:'Brand',    ds:'Navy e ambra, il predefinito', c:['#0D1926','#1A3149','#FFAD01']},
@@ -1860,6 +1860,8 @@ function suonoTrillo(ac){
 }
 function suono(tipo){
   if(!S.cfg.suoni) return;
+  /* app per computer con «Non disturbare» attivo: niente suoni */
+  try{ if(window.fossDesktop && window.fossDesktop.silenzio && window.fossDesktop.silenzio()) return; }catch(e){}
   try{
     audioCtx = audioCtx || new (window.AudioContext || window.webkitAudioContext)();
     audioDiContorno();
@@ -8008,10 +8010,26 @@ function avvisoDesktop(m, c, o){
     if(o.promemoria){ titolo = '⏰ Promemoria' + (gruppo ? ' · ' + nomeConv(c) : ''); testo = riservata ? 'Un messaggio da rivedere' : chi + ': ' + testoAnteprima(m); }
     const p = S.persone.get(m.autore) || {};
     window.fossDesktop.avviso({vista: 'chat', titolo, testo, foto: riservata ? '' : fotoSicura(p.foto),
-                               hash: '#c=' + c.id + '&m=' + m.id, suono: false});
+                               hash: '#c=' + c.id + '&m=' + m.id, suono: false, risposta: !o.promemoria});
     if(o.colpetto) window.fossDesktop.attenzione();
   }catch(e){}
 }
+/* risposta scritta direttamente nell'avviso (Mac e Windows): la mando come un messaggio normale,
+   senza aprire la chat; nei gruppi cita il messaggio a cui rispondi */
+async function rispondiDaAvviso(conv, msg, testo){
+  const c = conv && S.convs.get(conv);
+  testo = String(testo || '').replace(/\s+$/, '').slice(0, 6000);
+  if(!c || !testo.trim()) return false;
+  const m = nuovoLocale('testo', {testo, risponde_a: c.tipo === 'gruppo' && msg && trovaMsg(conv, msg) ? msg : null}, conv);
+  mettiInLista(m);
+  try{ await salvaMessaggio(m); segnaLetto(conv); return true; }
+  catch(e){
+    m._stato = 'errore'; ridisegnaMessaggio(m.id);
+    if(suComputer()) window.fossDesktop.avviso({vista: 'chat', titolo: 'Risposta non inviata', testo: '«' + testo.slice(0, 80) + '» non è partito: apri la chat e riprova.', hash: '#c=' + conv});
+    return false;
+  }
+}
+if(suComputer()) window.__fossChatRispondi = rispondiDaAvviso;
 
 /* ---------- 2.9: lo stato di ognuno, come su MSN ----------
    Chi è online ha un cerchio verde intorno alla foto; chi si è messo «occupato» un cerchio rosso;
