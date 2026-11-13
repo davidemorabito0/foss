@@ -270,6 +270,20 @@
     }, true);
   }
 
+  /* ---------- la chat: appena fai l'accesso in FOSS (colonna accanto) si ricollega da sola ---------- */
+  if(VISTA === 'chat'){
+    var conAccesso = function(){
+      try{ for(var i = 0; i < localStorage.length; i++) if(/^sb-.+-auth-token$/.test(localStorage.key(i) || '')) return true; }catch(e){}
+      return false;
+    };
+    var accessoPrima = conAccesso();
+    setInterval(function(){
+      var ora = conAccesso();
+      if(ora && !accessoPrima) location.reload();
+      accessoPrima = ora;
+    }, 2000);
+  }
+
   /* ---------- la chat: la si allarga o stringe tirando il bordo sinistro ---------- */
   if(VISTA === 'chat'){
     pronto(function(){

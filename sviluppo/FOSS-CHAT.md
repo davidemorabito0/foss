@@ -300,6 +300,8 @@ accesso. Il sito per il resto del team non cambia.
   `build.rs`; solo le pagine del sito li possono chiamare). `avvisi.rs`: avvisi di sistema col clic che
   porta al punto giusto. `vassoio.rs`: icona nella barra dei menu (Mac) / vicino all'orologio (Windows)
   col numero, menu del Mac (FOSS, Modifica, Vista, Finestra).
+- Prima dell'accesso la chat mostra «entra prima in FOSS»: il ponte della chat controlla ogni 2 s se compare la sessione
+  di Supabase (`sb-…-auth-token` nel localStorage, comune alle due colonne) e allora ricarica la chat.
 - `desktop/locale/impostazioni.html`: impostazioni dell'app (avvio automatico, avvisi, chat accanto,
   prova avviso, collega il browser, versione e aggiornamenti, scorciatoie).
 - Icone: sorgenti in `desktop/grafica/` (`icona.svg` dal logo di FOSS), file finali in `src-tauri/icons/`
