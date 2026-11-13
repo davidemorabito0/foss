@@ -399,6 +399,10 @@ browser prova ad aprire l'app e mostra «Ti ho aperto FOSS nell'app» con «Cont
   non accettano più aggiornamenti: serve una chiave nuova e reinstallare a mano.
 - Le modifiche al sito NON richiedono una versione nuova dell'app. Serve solo quando cambia `desktop/`.
 
+- Il sito lo pubblica Cloudflare Pages a ogni push su `main` (di solito in meno di un minuto). Se resta fermo
+  (stato «Cloudflare Pages» del commit su GitHub in corso da molto o fallito), un nuovo commit lo fa ripartire.
+  Le funzioni nuove della chat usate dall'app (es. `__fossChatRispondi`) arrivano solo quando il sito è pubblicato.
+
 ### Pubblicare una versione nuova dell'app
 
 `.github/workflows/app-desktop.yml`: con un tag `vX.Y.Z` (oppure GitHub → Actions → «App per computer» →
