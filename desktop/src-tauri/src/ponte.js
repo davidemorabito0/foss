@@ -85,6 +85,7 @@
       case 'aggiornamento': mostraAggiornamento(String(d.versione || '')); break;
       case 'aggiornamento-progresso': progresso(+d.pct); break;
       case 'aggiornamento-errore': erroreAggiornamento(String(d.testo || '')); break;
+      case 'disposizione': disposizione(d); break;
     }
     if(typeof window.__fossDesktopEvento === 'function') try{ window.__fossDesktopEvento(d); }catch(e){}
   };
@@ -142,6 +143,9 @@
       '#fdManiglia button{position:absolute;left:4px;top:50%;width:16px;height:44px;margin-top:-22px;border:0;border-radius:0 8px 8px 0;background:rgba(13,25,38,.85);' +
         'color:#E8EEF7;font:700 13px sans-serif;cursor:pointer;opacity:0;transition:opacity .15s;padding:0}' +
       '#fdManiglia:hover button{opacity:1}' +
+      '#fdManiglia.a-destra{left:auto;right:0}' +
+      '#fdManiglia.a-destra::before{left:auto;right:0}' +
+      '#fdManiglia.a-destra button{left:auto;right:4px;border-radius:8px 0 0 8px}' +
       'html.fd-tiro,html.fd-tiro *{cursor:col-resize!important;user-select:none!important}';
     (document.head || document.documentElement).appendChild(s);
   });
@@ -215,7 +219,7 @@
     document.addEventListener('keydown', function(e){
       if(!e.ctrlKey || e.altKey || e.metaKey) return;
       var k = (e.key || '').toLowerCase();
-      var cosa = {k: 'cerca', n: 'nuova-task', j: 'chat', ',': 'impostazioni', r: 'ricarica'}[k];
+      var cosa = {k: 'cerca', n: 'nuova-task', j: 'chat', ',': 'impostazioni', r: 'ricarica', '1': 'foss-davanti', '2': 'chat-davanti', '\\': 'modo'}[k];
       if(!cosa || (cosa === 'ricarica' && e.shiftKey)) return;
       e.preventDefault(); e.stopPropagation();
       invoca('scorciatoia', {k: cosa});
@@ -284,7 +288,17 @@
     }, 2000);
   }
 
-  /* ---------- la chat: la si allarga o stringe tirando il bordo sinistro ---------- */
+  /* ---------- la chat: la si allarga o stringe tirando il bordo verso FOSS ----------
+     La chat puo' stare a destra o a sinistra di FOSS; a tutta finestra la maniglia non c'e'. */
+  var DISP = {lato: 'destra', modo: 'accanto', accanto: true};
+  function disposizione(d){
+    DISP = {lato: d.lato === 'sinistra' ? 'sinistra' : 'destra', modo: d.modo === 'pieno' ? 'pieno' : 'accanto', accanto: d.accanto !== false};
+    var m = document.getElementById('fdManiglia'); if(!m) return;
+    var sx = DISP.lato === 'sinistra';
+    m.classList.toggle('a-destra', sx);
+    m.style.display = DISP.modo === 'pieno' || !DISP.accanto ? 'none' : '';
+    var b = m.querySelector('button'); if(b) b.textContent = sx ? '‹' : '›';
+  }
   if(VISTA === 'chat'){
     pronto(function(){
       var m = document.createElement('div'); m.id = 'fdManiglia'; m.title = 'Trascina per allargare la chat';
@@ -300,7 +314,9 @@
       });
       m.addEventListener('pointermove', function(e){
         if(!tiro) return;
-        ultimo = Math.round(w0 - (e.screenX - x0));
+        /* a destra si allarga tirando verso sinistra, a sinistra tirando verso destra */
+        var dx = e.screenX - x0;
+        ultimo = Math.round(DISP.lato === 'sinistra' ? w0 + dx : w0 - dx);
         if(!raf) raf = requestAnimationFrame(function(){ raf = 0; invoca('chat_larghezza', {w: ultimo, fine: false}); });
       });
       var fine = function(){ if(!tiro) return; tiro = false; document.documentElement.classList.remove('fd-tiro'); invoca('chat_larghezza', {w: ultimo, fine: true}); };
@@ -308,6 +324,7 @@
       m.addEventListener('pointercancel', fine);
       b.addEventListener('click', function(e){ e.stopPropagation(); invoca('chat_mostra', {mostra: false}); });
       document.body.appendChild(m);
+      disposizione(DISP);
     });
   }
 

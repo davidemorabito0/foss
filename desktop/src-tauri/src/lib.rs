@@ -63,12 +63,26 @@ pub struct Cfg {
     pub larghezza_chat: f64,
     /// avvisi di sistema
     pub notifiche: bool,
+    /// da che parte sta la chat: "destra" o "sinistra"
+    pub lato: String,
+    /// "accanto" = FOSS e chat affiancate; "pieno" = una alla volta, a tutta finestra
+    pub modo: String,
+    /// con "pieno": quale si vede ("foss" o "chat")
+    pub davanti: String,
     /// gia' fatto al primo avvio: avvio automatico acceso e browser collegato
     pub primo_avvio_fatto: bool,
 }
 impl Default for Cfg {
     fn default() -> Self {
-        Cfg { chat_accanto: true, larghezza_chat: 430.0, notifiche: true, primo_avvio_fatto: false }
+        Cfg {
+            chat_accanto: true,
+            larghezza_chat: 430.0,
+            notifiche: true,
+            lato: "destra".into(),
+            modo: "accanto".into(),
+            davanti: "foss".into(),
+            primo_avvio_fatto: false,
+        }
     }
 }
 
@@ -132,7 +146,8 @@ fn vista(app: &AppHandle, quale: &str) -> Option<Webview> {
     app.get_webview(quale)
 }
 
-/// Mette FOSS a sinistra e la chat a destra, secondo la larghezza della finestra.
+/// Mette FOSS e la chat nella finestra: affiancate (chat a destra o a sinistra), solo FOSS,
+/// oppure una alla volta a tutta finestra. Quella che non si vede resta viva fuori vista.
 pub fn disponi(app: &AppHandle) {
     let Some(w) = finestra(app) else { return };
     let (Some(foss), Some(chat)) = (vista(app, "foss"), vista(app, "chat")) else { return };
@@ -140,25 +155,112 @@ pub fn disponi(app: &AppHandle) {
     let Ok(dim) = w.inner_size() else { return };
     let dim = dim.to_logical::<f64>(scala);
     let st = app.state::<Stato>();
-    let (accanto, voluta) = {
-        let c = st.cfg.lock().unwrap();
-        (c.chat_accanto, c.larghezza_chat)
-    };
+    let c = st.cfg.lock().unwrap().clone();
     let largh = dim.width.max(1.0);
     let alto = dim.height.max(1.0);
-    if accanto {
+    let metti = |v: &Webview, x: f64, l: f64| {
+        let _ = v.set_bounds(Rect { position: LogicalPosition::new(x, 0.0).into(), size: LogicalSize::new(l, alto).into() });
+        let _ = v.show();
+    };
+    // fuori dalla finestra e nascosta: resta viva (messaggi, avvisi, numero) ma non si vede
+    let via = |v: &Webview| {
+        let _ = v.hide();
+        let _ = v.set_bounds(Rect { position: LogicalPosition::new(largh, 0.0).into(), size: LogicalSize::new(MIN_CHAT.max(largh / 2.0), alto).into() });
+    };
+    if c.modo == "pieno" {
+        if c.davanti == "chat" {
+            metti(&chat, 0.0, largh);
+            via(&foss);
+        } else {
+            metti(&foss, 0.0, largh);
+            via(&chat);
+        }
+    } else if c.chat_accanto {
         let max_chat = (largh - MIN_FOSS).max(MIN_CHAT);
-        let lc = voluta.clamp(MIN_CHAT, max_chat).min(largh);
+        let lc = c.larghezza_chat.clamp(MIN_CHAT, max_chat).min(largh);
         let lf = (largh - lc).max(0.0);
-        let _ = foss.set_bounds(Rect { position: LogicalPosition::new(0.0, 0.0).into(), size: LogicalSize::new(lf, alto).into() });
-        let _ = chat.set_bounds(Rect { position: LogicalPosition::new(lf, 0.0).into(), size: LogicalSize::new(lc, alto).into() });
-        let _ = chat.show();
+        if c.lato == "sinistra" {
+            metti(&chat, 0.0, lc);
+            metti(&foss, lc, lf);
+        } else {
+            metti(&foss, 0.0, lf);
+            metti(&chat, lf, lc);
+        }
     } else {
-        let _ = foss.set_bounds(Rect { position: LogicalPosition::new(0.0, 0.0).into(), size: LogicalSize::new(largh, alto).into() });
-        let _ = chat.hide();
-        // fuori dallo schermo e minuscola: resta viva (messaggi, avvisi, numero) ma non si vede
-        let _ = chat.set_bounds(Rect { position: LogicalPosition::new(largh, 0.0).into(), size: LogicalSize::new(MIN_CHAT, alto).into() });
+        metti(&foss, 0.0, largh);
+        via(&chat);
     }
+    manda_disposizione(app, false);
+}
+
+/// La chat deve sapere dove sta (maniglia sul bordo giusto, o niente maniglia).
+pub fn manda_disposizione(app: &AppHandle, sempre: bool) {
+    static ULTIMA: Mutex<String> = Mutex::new(String::new());
+    let c = app.state::<Stato>().cfg.lock().unwrap().clone();
+    let d = json!({"tipo": "disposizione", "lato": c.lato, "modo": c.modo, "accanto": c.chat_accanto, "davanti": c.davanti});
+    let chiave = d.to_string();
+    {
+        let mut u = ULTIMA.lock().unwrap();
+        if !sempre && *u == chiave {
+            return;
+        }
+        *u = chiave;
+    }
+    al_ponte(app, "chat", d);
+}
+
+/// Porta davanti FOSS o la chat. Affiancate: la chat si apre accanto. Una alla volta: cambia pagina.
+pub fn porta_davanti(app: &AppHandle, quale: &str) {
+    let st = app.state::<Stato>();
+    {
+        let mut c = st.cfg.lock().unwrap();
+        if c.modo == "pieno" {
+            c.davanti = if quale == "chat" { "chat".into() } else { "foss".into() };
+        } else if quale == "chat" {
+            c.chat_accanto = true;
+        }
+    }
+    st.salva();
+    disponi(app);
+    vassoio::aggiorna_menu(app);
+    if let Some(v) = vista(app, if quale == "chat" { "chat" } else { "foss" }) {
+        let _ = v.set_focus();
+    }
+    registra(app, "davanti", json!(quale));
+}
+
+/// Affiancate <-> una alla volta (a tutta finestra).
+pub fn cambia_modo(app: &AppHandle, modo: Option<&str>) {
+    let st = app.state::<Stato>();
+    let nuovo = {
+        let mut c = st.cfg.lock().unwrap();
+        let nuovo = match modo {
+            Some("pieno") => "pieno",
+            Some("accanto") => "accanto",
+            _ => {
+                if c.modo == "pieno" { "accanto" } else { "pieno" }
+            }
+        };
+        if nuovo == "accanto" {
+            c.chat_accanto = true;
+        }
+        c.modo = nuovo.to_string();
+        nuovo
+    };
+    st.salva();
+    disponi(app);
+    vassoio::aggiorna_menu(app);
+    registra(app, "modo", json!(nuovo));
+}
+
+/// La chat a destra o a sinistra di FOSS.
+pub fn cambia_lato(app: &AppHandle, lato: &str) {
+    let st = app.state::<Stato>();
+    st.cfg.lock().unwrap().lato = if lato == "sinistra" { "sinistra".to_string() } else { "destra".to_string() };
+    st.salva();
+    disponi(app);
+    vassoio::aggiorna_menu(app);
+    registra(app, "lato", json!(lato));
 }
 
 pub fn mostra_finestra(app: &AppHandle) {
@@ -175,6 +277,16 @@ pub fn chat_mostra_pubblica(app: &AppHandle, mostra: Option<bool>) {
 
 fn chat_mostra_interna(app: &AppHandle, mostra: Option<bool>, fuoco: bool) {
     let st = app.state::<Stato>();
+    // una alla volta: ⌘J (e simili) scambia FOSS e chat
+    let pieno = st.cfg.lock().unwrap().modo == "pieno";
+    if pieno {
+        let chat = {
+            let c = st.cfg.lock().unwrap();
+            mostra.unwrap_or(c.davanti != "chat")
+        };
+        porta_davanti(app, if chat { "chat" } else { "foss" });
+        return;
+    }
     let ora = {
         let mut c = st.cfg.lock().unwrap();
         c.chat_accanto = mostra.unwrap_or(!c.chat_accanto);
@@ -209,7 +321,7 @@ pub fn apri_indirizzo(app: &AppHandle, u: &Url) {
     }
     mostra_finestra(app);
     if e_chat(u) {
-        chat_mostra_interna(app, Some(true), true);
+        porta_davanti(app, "chat");
         if let Some(chat) = vista(app, "chat") {
             let h = u.fragment().map(|f| format!("#{f}")).unwrap_or_default();
             let gia = chat.url().map(|x| e_chat(&x) && stesso_sito(&st, &x)).unwrap_or(false);
@@ -220,7 +332,7 @@ pub fn apri_indirizzo(app: &AppHandle, u: &Url) {
             }
         }
     } else if let Some(foss) = vista(app, "foss") {
-        let _ = foss.set_focus();
+        porta_davanti(app, "foss");
         let gia = foss.url().map(|x| !e_chat(&x) && stesso_sito(&st, &x)).unwrap_or(false);
         let h = u.fragment().map(|f| format!("#{f}")).unwrap_or_default();
         if gia && !h.is_empty() && u.query().is_none() {
@@ -256,12 +368,10 @@ pub fn vai_a(app: &AppHandle, d: &Dove) {
     }
     mostra_finestra(app);
     if d.vista == "chat" {
-        chat_mostra_interna(app, Some(true), true);
+        porta_davanti(app, "chat");
         al_ponte(app, "chat", json!({"tipo": "hash", "hash": d.hash}));
     } else {
-        if let Some(f) = vista(app, "foss") {
-            let _ = f.set_focus();
-        }
+        porta_davanti(app, "foss");
         al_ponte(app, "foss", json!({"tipo": "apri", "notifica": d.notifica, "azione": d.azione}));
     }
 }
@@ -331,6 +441,9 @@ fn costruisci_vista(app: &AppHandle, quale: &'static str) -> WebviewBuilder<taur
             let v = a.state::<Stato>().nuova_versione.lock().unwrap().clone();
             if let Some(v) = v {
                 al_ponte(&a, wv.label(), json!({"tipo": "aggiornamento", "versione": v}));
+            }
+            if wv.label() == "chat" {
+                manda_disposizione(&a, true);
             }
         }
     });
@@ -622,11 +735,24 @@ pub fn esegui_scorciatoia(app: &AppHandle, k: &str) {
             al_ponte(app, "foss", json!({"tipo": "scorciatoia", "k": k}));
         }
         "chat" => {
-            let st = app.state::<Stato>();
-            let visibile = st.cfg.lock().unwrap().chat_accanto;
             mostra_finestra(app);
-            chat_mostra_interna(app, Some(!visibile), true);
+            chat_mostra_interna(app, None, true);
         }
+        // ⌘1 FOSS, ⌘2 chat, ⌘\ affiancate / una alla volta
+        "foss-davanti" => {
+            mostra_finestra(app);
+            porta_davanti(app, "foss");
+        }
+        "chat-davanti" => {
+            mostra_finestra(app);
+            porta_davanti(app, "chat");
+        }
+        "modo" => {
+            mostra_finestra(app);
+            cambia_modo(app, None);
+        }
+        "lato-destra" => cambia_lato(app, "destra"),
+        "lato-sinistra" => cambia_lato(app, "sinistra"),
         "impostazioni" => apri_impostazioni(app),
         "ricarica" => {
             for q in ["foss", "chat"] {
@@ -649,6 +775,8 @@ fn impostazioni(app: AppHandle) -> Value {
         "avvio": app.autolaunch().is_enabled().unwrap_or(false),
         "notifiche": c.notifiche,
         "chat_accanto": c.chat_accanto,
+        "lato": c.lato,
+        "modo": c.modo,
         "os": if cfg!(target_os = "macos") { "mac" } else { "windows" },
     })
 }
@@ -667,6 +795,8 @@ fn imposta(app: AppHandle, chiave: String, valore: Value) -> Value {
             st.salva();
         }
         "chat_accanto" => chat_mostra_interna(&app, Some(si), false),
+        "lato" => cambia_lato(&app, valore.as_str().unwrap_or("destra")),
+        "modo" => cambia_modo(&app, valore.as_str()),
         _ => {}
     }
     registra(&app, "imposta", json!({"chiave": chiave, "valore": valore}));
@@ -753,6 +883,7 @@ fn prova(app: AppHandle, dati: Value) {
                 json!([p.x, p.y, s.width, s.height])
             });
             registra(&app, "stato", json!({"chat_accanto": c.chat_accanto, "larghezza_chat": c.larghezza_chat,
+                "lato": c.lato, "modo": c.modo, "davanti": c.davanti,
                 "visibile": vis, "foss": b("foss"), "chat": b("chat"),
                 "non_lette": *st.non_lette.lock().unwrap()}));
         }
@@ -777,9 +908,8 @@ pub fn apri_impostazioni(app: &AppHandle) {
     let script = ponte_per(&st, "impostazioni");
     let _ = tauri::WebviewWindowBuilder::new(app, "impostazioni", WebviewUrl::App(PathBuf::from("impostazioni.html")))
         .title("Impostazioni di FOSS")
-        .inner_size(460.0, 760.0)
-        .resizable(false)
-        .minimizable(false)
+        .inner_size(460.0, 820.0)
+                .minimizable(false)
         .maximizable(false)
         .center()
         .initialization_script(script)
@@ -817,7 +947,9 @@ pub fn run() {
 
     #[cfg(target_os = "macos")]
     {
-        b = b.menu(vassoio::menu_mac).on_menu_event(|app, ev| vassoio::menu_scelto(app, ev.id().as_ref()));
+        // i clic sul menu li riceve gia' il gestore dell'icona (vale per tutti i menu):
+        // un secondo gestore li farebbe due volte (⌘J aprirebbe e richiuderebbe la chat)
+        b = b.menu(vassoio::menu_mac);
     }
 
     b.invoke_handler(tauri::generate_handler![

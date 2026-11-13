@@ -1408,5 +1408,30 @@ input,textarea,[contenteditable="true"]{-webkit-user-select:text;user-select:tex
 .msg .a-capo{flex-basis:100%;height:0}
 .passi{margin:0;padding-left:22px;line-height:1.55}
 .passi li{margin:3px 0}
+/* 2.8.1: le date non restano incollate in cima (si accavallavano): una sola data che compare
+   mentre scorri e sparisce da sola (mostraDataFluttua in 04-conv.js) */
+.giorno{position:relative;top:auto}
+.data-fluttua{position:absolute;left:0;right:0;top:10px;display:flex;justify-content:center;z-index:5;pointer-events:none;opacity:0;transform:translateY(-6px);transition:opacity .25s ease,transform .25s ease}
+.data-fluttua.su{opacity:1;transform:none}
+.data-fluttua span{font-size:12.5px;color:var(--sistema-testo);background:var(--sistema);padding:5px 12px 6px;border-radius:7.5px;box-shadow:0 1px .5px rgba(11,20,26,.13);text-transform:uppercase;letter-spacing:.01em}
+@media (max-width:899px){
+  .data-fluttua{top:calc(82px + env(safe-area-inset-top))}
+  .data-fluttua span{text-transform:none;font-size:13.5px;font-weight:600;border-radius:9px;padding:4px 14px;box-shadow:none;-webkit-backdrop-filter:blur(10px);backdrop-filter:blur(10px)}
+}
+/* 2.9: lo stato intorno alla foto (27-stato.js): verde online, rosso occupato (sempre verde e rosso, qualsiasi tema) */
+.av.st-online{--c-st:#22c55e}
+.av.st-occupato{--c-st:#ef4444}
+.av.st-online:not([class*=" cr-"]),.av.st-occupato:not([class*=" cr-"]){box-shadow:0 0 0 2px var(--pannello),0 0 0 4.5px var(--c-st)}
+/* con la cornice il cerchio va dentro la foto, cosi' la cornice resta com'e' */
+.av[class*=" cr-"].st-online::after,.av[class*=" cr-"].st-occupato::after{content:"";position:absolute;inset:0;border-radius:50%;box-shadow:inset 0 0 0 3px var(--c-st);pointer-events:none}
+.stati-scelta{display:flex;flex-direction:column;gap:2px;padding:0 12px 12px}
+.stati-scelta button{display:grid;grid-template-columns:14px 1fr;column-gap:12px;row-gap:1px;align-items:center;text-align:left;padding:9px 10px;border-radius:10px;background:none;border:0;color:var(--testo);cursor:pointer;font:inherit}
+.stati-scelta button b{font-weight:600;font-size:15px}
+.stati-scelta button > span:last-child{grid-column:2;color:var(--testo-2);font-size:13px}
+.stati-scelta button.on{background:rgba(127,127,127,.16)}
+.st-pallino{width:12px;height:12px;border-radius:50%;grid-row:span 2;box-sizing:border-box}
+.st-pallino.st-online{background:#22c55e}
+.st-pallino.st-occupato{background:#ef4444}
+.st-pallino.st-invisibile{border:2px solid var(--testo-2)}
 </style>
 </head>

@@ -324,9 +324,10 @@ function avviaTempoReale(){
     const st = canaleOnline.presenceState();
     const prima = S.online;
     S.online = new Set(Object.keys(st));
+    leggiStati(st);
     notaEntrati(prima, S.online);
     aggiornaTestaConv(); disegnaListaPresto();
-  }).subscribe(async st => { if(st === 'SUBSCRIBED') onlinePronto = Date.now(); if(st === 'SUBSCRIBED') try{ await canaleOnline.track({id: S.io, dal: Date.now()}); }catch(e){} });
+  }).subscribe(async st => { if(st === 'SUBSCRIBED') onlinePronto = Date.now(); if(st === 'SUBSCRIBED') annunciaStato(); });
 
   canaleScrive = sb.channel('fosschat-scrive');
   canaleScrive.on('broadcast', {event: 'scrive'}, ({payload}) => {
@@ -521,7 +522,7 @@ function aggiornaTitolo(){
 }
 
 /* ---------- presenza: sono qui, i messaggi mi arrivano ---------- */
-async function ping(){ if(document.visibilityState === 'visible') try{ await sb.rpc('chat_ping'); }catch(e){} }
+async function ping(){ if(document.visibilityState === 'visible' && mioStato() !== 'invisibile') try{ await sb.rpc('chat_ping'); }catch(e){} }
 
 /* ---------- impostazioni dell'account (salvate nel profilo FOSS) ---------- */
 const salvaCfgPresto = debounce(async () => {

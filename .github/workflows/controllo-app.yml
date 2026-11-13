@@ -7,7 +7,7 @@ name: Controllo app per computer
 on:
   workflow_dispatch:
   push:
-    branches: [main]
+    branches: [main, 'prova-*']
     paths: ['desktop/**', 'sviluppo/test/desktop/**', '.github/workflows/controllo-app.yml']
 
 jobs:

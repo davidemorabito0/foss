@@ -10,7 +10,7 @@ const SUPA_KEY = 'sb_publishable_f5Kjp6NHT9yTxr1bhWJjhg_4y72V-Kj';
 const VAPID_PUBBLICA = 'BNlGbW4nZrXmx8DioKxnl7ubULVOr5_6CAKvpuQYoiXeObmxYAzGU6UrkExx2zu1hACmtRNDcpoMh_ARQ0GSmlw';
 /* il server dei file sul NAS (es. 'https://media.foss.team'). Vuoto = si usa Supabase. */
 const MEDIA_NAS = 'https://media.foss.team';
-const VERSIONE = 'chat-2.8';
+const VERSIONE = 'chat-2.9';
 /* i temi colore: gli stessi di FOSS. Il predefinito per tutti è Brand (blu e giallo). */
 const TEMI_COLORE = [
   {id:'brand',   nome:'Brand',    ds:'Navy e ambra, il predefinito', c:['#0D1926','#1A3149','#FFAD01']},
@@ -241,6 +241,7 @@ const S = {
   reazioni: new Map(),      // msg -> Map(utente -> emoji)
   nascosti: new Set(),
   online: new Set(),
+  stati: new Map(),         // chi è «occupato» (2.9, dalla presenza)
   scrive: new Map(),        // conv -> Map(utente -> scadenza)
   sbloccate: new Set(),
   haPin: false,
@@ -290,9 +291,10 @@ const CORNICI = [{id:'oro', nome:'Oro'}, {id:'argento', nome:'Argento'}, {id:'ne
 function avatar(id, cls, conOnline, stile){
   const p = S.persone.get(id) || {}, f = fotoSicura(p.foto);
   const cr = /(^|\s)cr-/.test(cls || '') ? '' : (p.cornice && CORNICI.some(x => x.id === p.cornice) ? ' cr-' + p.cornice : '');
-  return '<span class="av '+(cls||'')+cr+'" style="background:'+(f ? 'transparent' : colore(id))+';'+(stile||'')+'">'+
-    (f ? '<img src="'+esc(f)+'" alt="" loading="lazy" onerror="this.remove()">' : svg('persona', 1.6))+
-    (conOnline && S.online.has(id) ? '<i class="online"></i>' : '')+'</span>';
+  /* 2.9: online (verde) o occupato (rosso): un cerchio intorno alla foto */
+  const st = conOnline && typeof statoDi === 'function' ? statoDi(id) : '';
+  return '<span class="av '+(cls||'')+cr+(st ? ' st-' + st : '')+'" style="background:'+(f ? 'transparent' : colore(id))+';'+(stile||'')+'">'+
+    (f ? '<img src="'+esc(f)+'" alt="" loading="lazy" onerror="this.remove()">' : svg('persona', 1.6))+'</span>';
 }
 /* i messaggi importati da WhatsApp di chi non e' su FOSS: hanno solo il nome */
 function importatoDa(m){ return !m.autore && m.media && m.media.importato ? m.media.importato : null; }

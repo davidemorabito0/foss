@@ -20,7 +20,7 @@ function nuovaChat(){
         '<button class="voce" data-a="scrivi-a" data-id="'+S.io+'">'+avatar(S.io, '', true)+'<span class="vc"><b>'+esc(nomeLungo(S.io))+' (tu)</b><span>Scrivi a te stesso: appunti, link, prove</span></span></button>'+
         '<div class="sez-t grigio" style="padding:20px 30px 10px">Il tuo team su FOSS</div>')+
       (pp.length ? pp.map(id => '<button class="voce" data-a="scrivi-a" data-id="'+id+'">'+avatar(id, '', true)+'<span class="vc"><b>'+esc(nomeLungo(id))+'</b><span>'+
-        esc(fraseDi(id) || (S.online.has(id) ? 'online' : (S.persone.get(id) || {}).ruolo || 'Nel tuo team'))+'</span></span></button>').join('')
+        esc(fraseDi(id) || (S.online.has(id) ? testoStato(id) : (S.persone.get(id) || {}).ruolo || 'Nel tuo team'))+'</span></span></button>').join('')
         : '<div class="vuoto-lista">'+(q ? 'Nessuno con questo nome.' : 'Nel tuo team non c’è ancora nessuno.<br>Invita i collaboratori da FOSS: appena entrano li trovi qui.')+'</div>');
     const i = el('ncCerca'); i.oninput = () => { const pos = i.selectionStart; disegna(i.value); const n = el('ncCerca'); n.focus(); n.setSelectionRange(pos, pos); };
   };
@@ -127,7 +127,7 @@ async function disegnaInfo(){
     '<h3>'+esc(nomeConv(c))+(gr ? '<button class="ib" data-a="rinomina-gruppo" title="Cambia nome">'+svg('matita', 1.8)+'</button>' : '')+'</h3>'+
     '<p>'+(gr ? 'Gruppo · ' + (c.membri || []).length + ' partecipanti' : esc(p.ruolo || ''))+'</p>'+
     (!gr && fraseDi(a) ? '<p class="frase-big">«'+esc(fraseDi(a))+'»</p>' : '')+
-    (!gr ? '<p style="font-size:14px;margin-top:4px">'+esc(S.online.has(a) ? 'online' : ultimoAccesso(p.visto))+'</p>' : '')+'</div>';
+    (!gr ? '<p style="font-size:14px;margin-top:4px">'+esc(S.online.has(a) ? testoStato(a) : ultimoAccesso(p.visto))+'</p>' : '')+'</div>';
   if(gr){
     h += '<div class="blocco"><div class="sez-t grigio" style="padding:16px 20px 6px;display:flex;align-items:center">Descrizione<span style="flex:1"></span>'+
       '<button class="ib piccolo" data-a="descr-gruppo" title="Modifica">'+svg('matita', 1.8)+'</button></div>'+
@@ -340,6 +340,7 @@ function disegnaImpostazioni(){
     '<div class="blocco"><div class="sez-t">Come ti vedono gli altri</div>'+
       '<div class="sez-t grigio" style="padding:4px 20px 8px">Messaggio personale</div>'+
       '<div class="frase-campo"><input id="fraseIn" maxlength="140" placeholder="Una frase sotto il tuo nome (es. sul set fino alle 18)" value="'+esc(S.cfg.frase || '')+'"><span id="fraseN">'+(S.cfg.frase || '').length+'/140</span></div>'+
+      '<div class="sez-t grigio" style="padding:10px 20px 8px">Il tuo stato</div>'+sceltaStatoHTML()+
       '<div class="sez-t grigio" style="padding:10px 20px 8px">Cornice della foto</div>'+corniciHTML()+'</div>'+
     '<div class="blocco"><div class="sez-t">Privacy e sicurezza</div>'+
       voce('proteggi-tutto', 'lucchetto', 'Proteggi FOSS.chat con un codice', 'Ogni volta che la apri ti chiede 4 cifre', interr(S.tutto))+

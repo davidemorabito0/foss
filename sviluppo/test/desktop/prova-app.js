@@ -55,6 +55,24 @@ if(VISTA === 'chat' && !LOCALE) (async function(){
   await invoca('chat_mostra', {mostra: true}); await P.aspetta(400);
   await P.fai('stato'); await P.aspetta(200);
 
+  /* 4b. chat a sinistra; poi una alla volta a tutta finestra (FOSS <-> chat) */
+  await invoca('imposta', {chiave: 'lato', valore: 'sinistra'}); await P.aspetta(400);
+  await P.fai('stato'); await P.aspetta(200);
+  var man = document.getElementById('fdManiglia');
+  P.log('chat a sinistra: maniglia sul bordo destro', man && man.classList.contains('a-destra') && man.style.display !== 'none', man && man.className);
+  await invoca('imposta', {chiave: 'modo', valore: 'pieno'}); await P.aspetta(400);
+  await P.fai('stato'); await P.aspetta(200);
+  await P.fai('scorciatoia', {k: 'chat-davanti'}); await P.aspetta(400);
+  await P.fai('stato'); await P.aspetta(200);
+  P.log('a tutta finestra: niente maniglia', man && man.style.display === 'none', man && man.style.display);
+  window.open(SITO + '#/p/p2001'); await P.aspetta(600);
+  await P.fai('stato'); await P.aspetta(200);
+  await P.fai('scorciatoia', {k: 'chat'}); await P.aspetta(400);
+  await P.fai('stato'); await P.aspetta(200);
+  await invoca('imposta', {chiave: 'modo', valore: 'accanto'}); await P.aspetta(300);
+  await invoca('imposta', {chiave: 'lato', valore: 'destra'}); await P.aspetta(300);
+  await P.fai('stato'); await P.aspetta(200);
+
   /* 5. link foss:// dal browser: apre il gruppo */
   await P.fai('link', {url: 'foss://apri?u=' + encodeURIComponent(SITO + 'chat.html#c=' + M.G1)});
   var gruppo = await P.quando(function(){ return location.hash.indexOf(M.G1) >= 0 && /Videoclip Il Merlo/.test((document.querySelector('.conv-testa') || {}).innerText || ''); }, 6000);

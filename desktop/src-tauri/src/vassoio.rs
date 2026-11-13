@@ -17,10 +17,16 @@ fn menu_vassoio(app: &AppHandle) -> tauri::Result<Menu<tauri::Wry>> {
     let st = app.state::<Stato>();
     let nuova = st.nuova_versione.lock().unwrap().clone();
     let avvio = app.autolaunch().is_enabled().unwrap_or(false);
-    let chat = st.cfg.lock().unwrap().chat_accanto;
+    let c = st.cfg.lock().unwrap().clone();
+    let pieno = c.modo == "pieno";
     let mut m = MenuBuilder::new(app)
         .item(&MenuItemBuilder::with_id("apri", "Apri FOSS").build(app)?)
-        .item(&MenuItemBuilder::with_id("chat", if chat { "Apri FOSS.chat" } else { "Mostra FOSS.chat accanto" }).build(app)?)
+        .item(&MenuItemBuilder::with_id("chat", if pieno || c.chat_accanto { "Apri FOSS.chat" } else { "Mostra FOSS.chat accanto" }).build(app)?)
+        .separator()
+        .item(&CheckMenuItemBuilder::with_id("modo-accanto", "FOSS e chat affiancate").checked(!pieno).build(app)?)
+        .item(&CheckMenuItemBuilder::with_id("modo-pieno", "Una alla volta, a tutta finestra").checked(pieno).build(app)?)
+        .item(&CheckMenuItemBuilder::with_id("lato-destra", "Chat a destra").checked(c.lato != "sinistra").enabled(!pieno).build(app)?)
+        .item(&CheckMenuItemBuilder::with_id("lato-sinistra", "Chat a sinistra").checked(c.lato == "sinistra").enabled(!pieno).build(app)?)
         .separator();
     if let Some(v) = nuova {
         m = m.item(&MenuItemBuilder::with_id("aggiorna", format!("⬆ Aggiorna FOSS alla versione {v}")).build(app)?).separator();
@@ -66,7 +72,11 @@ pub fn menu_scelto(app: &AppHandle, id: &str) {
         "apri" => mostra_finestra(app),
         "chat" => {
             mostra_finestra(app);
-            crate::chat_mostra_pubblica(app, Some(true));
+            crate::porta_davanti(app, "chat");
+        }
+        "modo-accanto" | "modo-pieno" => {
+            mostra_finestra(app);
+            crate::cambia_modo(app, Some(if id == "modo-pieno" { "pieno" } else { "accanto" }));
         }
         "aggiorna" => {
             mostra_finestra(app);
@@ -89,7 +99,7 @@ pub fn menu_scelto(app: &AppHandle, id: &str) {
             *app.state::<Stato>().uscita.lock().unwrap() = true;
             app.exit(0);
         }
-        "cerca" | "nuova-task" | "chat-mostra" | "ricarica" => {
+        "cerca" | "nuova-task" | "chat-mostra" | "ricarica" | "foss-davanti" | "chat-davanti" | "modo" | "lato-destra" | "lato-sinistra" => {
             esegui_scorciatoia(app, if id == "chat-mostra" { "chat" } else { id })
         }
         _ => {}
@@ -126,7 +136,13 @@ pub fn menu_mac(app: &AppHandle) -> tauri::Result<Menu<tauri::Wry>> {
     let vista = SubmenuBuilder::new(app, "Vista")
         .item(&MenuItemBuilder::with_id("cerca", "Cerca").accelerator("CmdOrCtrl+K").build(app)?)
         .item(&MenuItemBuilder::with_id("nuova-task", "Nuova task").accelerator("CmdOrCtrl+N").build(app)?)
+        .separator()
+        .item(&MenuItemBuilder::with_id("foss-davanti", "FOSS").accelerator("CmdOrCtrl+1").build(app)?)
+        .item(&MenuItemBuilder::with_id("chat-davanti", "FOSS.chat").accelerator("CmdOrCtrl+2").build(app)?)
         .item(&MenuItemBuilder::with_id("chat-mostra", "Mostra o nascondi la chat").accelerator("CmdOrCtrl+J").build(app)?)
+        .item(&MenuItemBuilder::with_id("modo", "Affiancate / una alla volta").accelerator("CmdOrCtrl+Backslash").build(app)?)
+        .item(&MenuItemBuilder::with_id("lato-destra", "Chat a destra").build(app)?)
+        .item(&MenuItemBuilder::with_id("lato-sinistra", "Chat a sinistra").build(app)?)
         .separator()
         .item(&MenuItemBuilder::with_id("ricarica", "Ricarica").accelerator("CmdOrCtrl+R").build(app)?)
         .separator()

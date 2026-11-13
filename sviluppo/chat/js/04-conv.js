@@ -73,6 +73,7 @@ function disegnaConv(){
     '<header class="conv-testa" id="convTesta"></header>'+
     '<div class="fissati-barra nascosto" id="fissatiB"></div>'+
     '<div class="msgs-wrap"><div class="messaggi'+(S.cfg.doodle === false ? ' niente-doodle' : '')+'" id="msgs"></div>'+
+    '<div class="data-fluttua" id="dataFluttua" aria-hidden="true"><span></span></div>'+
     '<button class="menz-b nascosto" id="menzB" data-a="vai-menzione" aria-label="Vai alla menzione">'+svg('chiocciola', 2.2)+'</button>'+
     '<button class="giu-b nascosto" id="giuB" data-a="in-fondo" aria-label="Vai in fondo">'+svg('giu')+'</button></div>'+
     '<footer class="scrivi" id="scrivi"></footer>';
@@ -95,7 +96,7 @@ function aggiornaTestaConv(){
     stato = c.tipo === 'gruppo' ? nomeDi(sc[0].id) + ' ' + cosa : cosa;
   } else if(c.tipo === 'privata'){
     const a = altro(c);
-    stato = a === S.io ? (fraseDi(S.io) || 'Messaggi a te stesso') : fraseDi(a) && !S.online.has(a) ? fraseDi(a) : S.online.has(a) ? 'online' + (fraseDi(a) ? ' · ' + fraseDi(a) : '') : ultimoAccesso((S.persone.get(a) || {}).visto) || (S.persone.get(a) || {}).ruolo || '';
+    stato = a === S.io ? (fraseDi(S.io) || 'Messaggi a te stesso') : fraseDi(a) && !S.online.has(a) ? fraseDi(a) : S.online.has(a) ? testoStato(a) + (fraseDi(a) ? ' · ' + fraseDi(a) : '') : ultimoAccesso((S.persone.get(a) || {}).visto) || (S.persone.get(a) || {}).ruolo || '';
   } else {
     const m = (c.membri || []).map(x => x.id).sort((a, b) => (a === S.io) - (b === S.io));
     stato = m.map(id => id === S.io ? 'Tu' : nomeDi(id)).join(', ');
@@ -116,6 +117,7 @@ function msgVisibili(id){
   return s.lista.filter(m => !S.nascosti.has(m.id));
 }
 function disegnaMessaggi(mantieni){
+  ultimoDisegno = Date.now();
   const M = el('msgs'); const c = S.convs.get(S.aperta); if(!M || !c) return;
   const lista = msgVisibili(c.id), s = statoMsgs(c.id);
   const daFondo = M.scrollHeight - M.scrollTop;
@@ -449,6 +451,7 @@ let caricandoSu = false;
 async function alloScorrere(){
   const M = el('msgs'); if(!M) return;
   mostraGiu();
+  mostraDataFluttua();
   if(menzDaVedere.length) mostraMenz();
   if(vicinoAlFondo()){ nuoviSotto = 0; const c = S.convs.get(S.aperta); if(c && c.non_lette) segnaLetto(c.id); }
   if(M.scrollTop < 300 && !caricandoSu){
@@ -571,4 +574,20 @@ function attivaScorriPerRispondere(M){
     if(attivo && v >= 60){ const c = S.convs.get(S.aperta); const m = trovaMsg(c.id, nodo.dataset.id); if(m && m.tipo !== 'sistema' && !m.eliminato){ impostaRisposta(m); try{ navigator.vibrate && navigator.vibrate(15); }catch(e){} } }
     nodo = null; attivo = false;
   });
+}
+/* 2.8.1: la data in alto mentre scorri (come WhatsApp). Prima le date restavano incollate
+   in cima una sull'altra; ora i separatori scorrono con i messaggi e in alto compare una sola
+   data, quella del primo messaggio che vedi, che sparisce da sola appena smetti di scorrere. */
+let ultimoDisegno = 0, tDataFluttua = null;
+function mostraDataFluttua(){
+  const M = el('msgs'), D = el('dataFluttua'); if(!M || !D) return;
+  if(Date.now() - ultimoDisegno < 700) return;          // e' il ridisegno, non sei tu che scorri
+  const alto = M.scrollTop + (parseFloat(getComputedStyle(M).paddingTop) || 0) + 4;
+  let testo = '';
+  for(const g of M.querySelectorAll('.giorno')){ if(g.offsetTop <= alto) testo = g.textContent; else break; }
+  clearTimeout(tDataFluttua);
+  if(!testo){ D.classList.remove('su'); return; }
+  D.firstChild.textContent = testo;
+  D.classList.add('su');
+  tDataFluttua = setTimeout(() => D.classList.remove('su'), 1300);
 }

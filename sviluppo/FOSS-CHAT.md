@@ -275,6 +275,21 @@ L'elenco completo è nel `README.md` del sito, sezioni «FOSS.chat» e «FOSS.ch
 - Prima la chat usava il manifest di FOSS (start_url `./`) e l'icona aperta portava a FOSS.
 - Sorgente dell'icona: `sviluppo/chat/chat-icona.svg` (il LOGO della chat).
 
+### 2.8.1 — le date in alto non si accavallano più
+- I separatori dei giorni (`.giorno`) non sono più `position:sticky` (si incollavano tutti in cima, uno
+  sull'altro). Mentre scorri compare una sola data in alto (`#dataFluttua`, `mostraDataFluttua` in
+  `04-conv.js`), quella del primo messaggio che vedi, e sparisce da sola dopo 1,3 s (come WhatsApp).
+
+### 2.9 — stato: online, occupato, invisibile (`js/27-stato.js`)
+- Intorno alla foto di chi è online un cerchio **verde**; chi si è messo «occupato» un cerchio **rosso**
+  (colori fissi, non del tema). Al posto del vecchio pallino. Con una cornice scelta, il cerchio va dentro la foto.
+- Il proprio stato si sceglie in Impostazioni → «Come ti vedono gli altri» → «Il tuo stato»; sta in
+  `profili.chat_cfg.stato` e passa agli altri nella presenza del tempo reale (`canaleOnline.track({... stato})`),
+  quindi **nessuna modifica al database**. «Invisibile» fa `untrack()` e non chiama `chat_ping`
+  (niente «online» e niente «ultimo accesso» aggiornato).
+- Su GitHub `.github/workflows/controllo-chat.yml` fa girare le prove della chat nel browser (sezione 6)
+  a ogni modifica della chat (anche nei rami `prova-*`) e controlla che `chat.html` sia uguale ai sorgenti.
+
 ---
 
 ## 12. App per computer (Mac e Windows) — cartella `desktop/`
@@ -286,9 +301,13 @@ accesso. Il sito per il resto del team non cambia.
 
 ### Com'è fatta
 
-- Una finestra con **due pagine affiancate**: a sinistra FOSS (pagina «foss»), a destra la chat
-  (pagina «chat»). La chat si allarga/stringe tirando il suo bordo sinistro, si nasconde con
-  ⌘J/Ctrl+J o con la linguetta «›» sul bordo, si riapre col tasto FOSS.chat di FOSS.
+- Una finestra con **due pagine**: FOSS (pagina «foss») e la chat (pagina «chat»). Si possono avere
+  **affiancate** (chat a destra o a sinistra: `lato`) oppure **una alla volta a tutta finestra** (`modo = pieno`,
+  `davanti` = quale si vede): il tasto FOSS.chat di FOSS porta alla chat, il logo/tasto FOSS della chat riporta
+  a FOSS, ⌘1/⌘2 (Ctrl+1/2) scelgono, ⌘J scambia, ⌘\ passa da affiancate a una alla volta. Si sceglie anche
+  nelle impostazioni dell'app e dal menu dell'icona (`disponi`, `porta_davanti`, `cambia_modo`, `cambia_lato` in `lib.rs`).
+  Affiancate: la chat si allarga/stringe tirando il suo bordo verso FOSS, si nasconde con
+  ⌘J/Ctrl+J o con la linguetta «›» (o «‹») sul bordo, si riapre col tasto FOSS.chat di FOSS.
 - Partono da `desktop/locale/avvio.html`, che aspetta la rete e poi apre il sito.
 - In cima a entrambe l'app mette il **ponte** `desktop/src-tauri/src/ponte.js` (prima di ogni altro
   script). Il ponte: definisce `window.fossDesktop`; manda nel browser i link esterni e porta
@@ -336,6 +355,8 @@ browser prova ad aprire l'app e mostra «Ti ho aperto FOSS nell'app» con «Cont
 
 ### Avvisi, icona, avvio
 
+- I clic sui menu li gestisce un solo gestore (quello dell'icona, che in Tauri riceve tutti i menu): con due
+  gestori ogni voce partiva due volte (⌘J apriva e richiudeva la chat).
 - Mac: avvisi del Centro notifiche con un delegato nostro (`avvisi.rs`, modulo `mac`): ogni avviso ha un
   identificativo, il clic lo restituisce e da li' l'app sa dove portarti. Windows: avvisi «toast» con
   `tauri-winrt-notification`, nome app `team.foss.app` (lo registra l'installer). Su Windows il clic da

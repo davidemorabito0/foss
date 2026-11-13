@@ -74,6 +74,17 @@ vero(larghi and abs(larghi[0]['foss'][2] + 520 - (larghi[0]['foss'][2] + larghi[
      'colonna della chat larga 520 accanto a FOSS: %s' % (larghi[:1]))
 vero(any(s['chat_accanto'] is False for s in stati), 'chat nascosta (⌘J)')
 vero(stati and stati[-1]['chat_accanto'] is True, 'chat di nuovo accanto')
+sx = [s for s in stati if s.get('lato') == 'sinistra' and s.get('modo') == 'accanto']
+vero(sx and sx[0]['chat'][0] == 0 and abs(sx[0]['foss'][0] - sx[0]['chat'][2]) < 2, 'chat a sinistra di FOSS: %s' % sx[:1])
+pieni = [s for s in stati if s.get('modo') == 'pieno']
+largo = lambda s: s['foss'][2] if s['davanti'] == 'foss' else s['chat'][2]
+ok_pieno = lambda s, q: s['davanti'] == q and s[q][0] == 0 and largo(s) > 700 and s['chat' if q == 'foss' else 'foss'][0] >= largo(s) - 1
+seq = [s['davanti'] for s in pieni]
+vero(len(pieni) >= 4 and ok_pieno(pieni[0], 'foss'), 'una alla volta: FOSS a tutta finestra')
+vero(len(pieni) >= 4 and ok_pieno(pieni[1], 'chat'), 'una alla volta: ⌘2 porta la chat a tutta finestra')
+vero(len(pieni) >= 4 and ok_pieno(pieni[2], 'foss'), 'una alla volta: un link di FOSS dalla chat riporta FOSS')
+vero(len(pieni) >= 4 and ok_pieno(pieni[3], 'chat'), 'una alla volta: ⌘J passa alla chat (%s)' % seq)
+vero(stati and stati[-1].get('modo') == 'accanto' and stati[-1].get('lato') == 'destra' and stati[-1]['chat'][0] > 0, 'di nuovo affiancate, chat a destra')
 fuori = di('apri_fuori')
 vero('https://example.com/esterno' in fuori, 'window.open di un sito esterno va nel browser')
 vero('https://example.org/link' in fuori, 'link esterno con target=_blank va nel browser')

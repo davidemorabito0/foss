@@ -35,6 +35,11 @@
   .agg{display:flex;align-items:center;gap:10px}
   .freccia{width:30px;height:30px;border-radius:50%;background:#0D1926;color:#FFAD01;display:grid;place-items:center;flex:none;border:1.5px solid rgba(255,173,1,.55)}
   .freccia svg{width:17px;height:17px}
+  .riga.colonna{flex-direction:column;align-items:stretch;gap:8px}
+  .scelta{display:flex;background:var(--riga);border-radius:10px;padding:3px;gap:3px}
+  .scelta button{flex:1;border:0;border-radius:8px;padding:7px 8px;background:none;color:var(--testo);font:600 13px inherit;font-family:inherit;cursor:pointer}
+  .scelta button.on{background:var(--carta);box-shadow:0 1px 3px rgba(0,0,0,.18)}
+  .spenta{opacity:.45;pointer-events:none}
   .tasti{display:grid;grid-template-columns:auto 1fr;gap:6px 12px;padding:12px 0;font-size:13px}
   kbd{font:600 12px ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;background:var(--riga);border-radius:6px;padding:2px 7px;justify-self:start}
   .piede{color:var(--piano);font-size:12px;text-align:center;margin-top:4px}
@@ -54,9 +59,17 @@
       <div class="tx"><b>Avvisi sul computer</b><span>Messaggi della chat, task assegnate, menzioni e scadenze, anche a finestra chiusa</span></div>
       <button class="interr" role="switch" aria-checked="false" data-k="notifiche" aria-label="Avvisi sul computer"></button>
     </div>
-    <div class="riga">
-      <div class="tx"><b>Chat accanto a FOSS</b><span>FOSS.chat nella colonna a destra</span></div>
-      <button class="interr" role="switch" aria-checked="false" data-k="chat_accanto" aria-label="Chat accanto a FOSS"></button>
+    <div class="riga colonna">
+      <div class="tx"><b>FOSS e la chat</b><span>Affiancate, oppure una alla volta a tutta finestra (si passa dall’una all’altra col tasto FOSS.chat e col logo di FOSS)</span></div>
+      <div class="scelta" data-k="modo"><button data-v="accanto">Affiancate</button><button data-v="pieno">Una alla volta</button></div>
+    </div>
+    <div class="riga colonna" id="rigaLato">
+      <div class="tx"><b>Dove sta la chat</b><span>Quando sono affiancate</span></div>
+      <div class="scelta" data-k="lato"><button data-v="sinistra">A sinistra</button><button data-v="destra">A destra</button></div>
+    </div>
+    <div class="riga" id="rigaAccanto">
+      <div class="tx"><b>Chat aperta accanto a FOSS</b><span>Spenta: solo FOSS (la chat si riapre col tasto FOSS.chat)</span></div>
+      <button class="interr" role="switch" aria-checked="false" data-k="chat_accanto" aria-label="Chat aperta accanto a FOSS"></button>
     </div>
     <div class="riga">
       <div class="tx"><b>Prova gli avvisi</b><span>Ne arriva uno di prova</span></div>
@@ -90,9 +103,12 @@
   function mostra(s){
     if(!s) return;
     document.querySelectorAll('.interr').forEach(function(b){ b.setAttribute('aria-checked', s[b.dataset.k] ? 'true' : 'false'); });
+    document.querySelectorAll('.scelta').forEach(function(g){ g.querySelectorAll('button').forEach(function(b){ b.classList.toggle('on', s[g.dataset.k] === b.dataset.v); }); });
+    var pieno = s.modo === 'pieno';
+    $('#rigaLato').classList.toggle('spenta', pieno); $('#rigaAccanto').classList.toggle('spenta', pieno);
     $('#ver').textContent = s.versione;
     var mac = s.os === 'mac', m = mac ? '⌘' : 'Ctrl+';
-    $('#tasti').innerHTML = [[m + 'K', 'Cerca in FOSS'], [m + 'N', 'Nuova task nel progetto aperto'], [m + 'J', 'Mostra o nascondi la chat'], [m + ',', 'Queste impostazioni'], [m + 'R', 'Ricarica']]
+    $('#tasti').innerHTML = [[m + 'K', 'Cerca in FOSS'], [m + 'N', 'Nuova task nel progetto aperto'], [m + '1', 'FOSS'], [m + '2', 'FOSS.chat'], [m + 'J', 'Mostra o nascondi la chat (una alla volta: passa all’altra)'], [m + '\\', 'Affiancate / una alla volta'], [m + ',', 'Queste impostazioni'], [m + 'R', 'Ricarica']]
       .map(function(r){ return '<kbd>' + r[0] + '</kbd><span>' + r[1] + '</span>'; }).join('');
     if(s.nuova) pronta(s.nuova);
   }
@@ -107,6 +123,9 @@
       b.setAttribute('aria-checked', si ? 'true' : 'false');
       D.imposta(b.dataset.k, si).then(mostra);
     });
+  });
+  document.querySelectorAll('.scelta button').forEach(function(b){
+    b.addEventListener('click', function(){ D.imposta(b.parentNode.dataset.k, b.dataset.v).then(mostra); });
   });
   $('#provaAvviso').addEventListener('click', function(){ D.provaAvviso(); });
   $('#collega').addEventListener('click', function(){

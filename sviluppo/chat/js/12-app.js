@@ -182,6 +182,7 @@ document.addEventListener('click', async e => {
     case 'cfg-invio': cambiaCfg('invio', !S.cfg.invio); disegnaImpostazioni(); break;
     case 'cfg-entrati': cambiaCfg('entrati', S.cfg.entrati === false); disegnaImpostazioni(); break;
     case 'cornice': scegliCornice(t.dataset.v); break;
+    case 'scegli-stato': scegliStato(t.dataset.v); break;
     case 'colori-gruppo': scegliColoriGruppo(infoAperta || S.aperta); break;
     case 'vivo': cambiaCfg('vivo', t.dataset.v || ''); disegnaImpostazioni(); avviaVivo(); if(t.dataset.v) setTimeout(vivoScossa, 300); break;
     case 'gestisci-sticker': gestisciRaccolta('sticker'); break;
