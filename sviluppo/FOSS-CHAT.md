@@ -285,6 +285,11 @@ L'elenco completo è nel `README.md` del sito, sezioni «FOSS.chat» e «FOSS.ch
   e alta zero perche' la scheda (un `<button>`) allinea i figli a sinistra (`align-items:flex-start`). Ora ha
   `width:100%` e l'altezza dal padding (`padding-bottom: calc(100% / 3.6)`), che funziona ovunque.
 
+### 2.9.3 — foto profilo non quadrate con la cornice (15 novembre 2026)
+- Con una cornice (`.av.cr-*`, anche «Nessuna» nella scelta delle cornici) la foto ha `overflow:visible`, e una foto
+  piu' alta che larga usciva dal cerchio come un ovale: `.av` e' una griglia e l'altezza `100%` dell'immagine
+  seguiva la foto, non il cerchio. Ora `.av img` e' `position:absolute; inset:0` (chat.css), sempre tonda.
+
 ### 2.9.2 — reazioni, sticker e tasto per tornare a FOSS (14 novembre 2026)
 - Reazioni: nel database l'UPDATE su `chat_reazioni` e' permesso solo su `emoji` e `creata_il`; l'upsert di
   supabase-js riscriveva anche le altre colonne e veniva rifiutato («permission denied», 403). Ora `reagisci`
