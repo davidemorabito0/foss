@@ -1433,5 +1433,15 @@ input,textarea,[contenteditable="true"]{-webkit-user-select:text;user-select:tex
 .st-pallino.st-online{background:#22c55e}
 .st-pallino.st-occupato{background:#ef4444}
 .st-pallino.st-invisibile{border:2px solid var(--testo-2)}
+/* 2.9.2: il tasto per tornare a FOSS, accanto al titolo (solo con la chat larga: stretta c'e' la barra in basso) */
+.lato-testa .vai-foss{display:none}
+@media (min-width:900px){
+  .lato-testa .vai-foss{display:inline-flex;align-items:center;gap:6px;flex:none;height:34px;padding:0 12px 0 6px;margin-right:12px;border-radius:17px;
+    border:1px solid var(--linea);background:var(--hover);color:var(--testo);font:600 14px var(--font);cursor:pointer;transition:background .15s,border-color .15s}
+  .lato-testa .vai-foss:hover{background:var(--scelta);border-color:var(--ambra)}
+  .lato-testa .vai-foss > svg{width:18px;height:18px;color:var(--testo-2)}
+  .lato-testa .vai-foss .vf-logo{display:grid;width:20px;height:20px}
+  .lato-testa .vai-foss .vf-logo svg{width:20px;height:20px}
+}
 </style>
 </head>

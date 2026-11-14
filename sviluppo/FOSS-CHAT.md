@@ -285,6 +285,16 @@ L'elenco completo è nel `README.md` del sito, sezioni «FOSS.chat» e «FOSS.ch
   e alta zero perche' la scheda (un `<button>`) allinea i figli a sinistra (`align-items:flex-start`). Ora ha
   `width:100%` e l'altezza dal padding (`padding-bottom: calc(100% / 3.6)`), che funziona ovunque.
 
+### 2.9.2 — reazioni, sticker e tasto per tornare a FOSS (14 novembre 2026)
+- Reazioni: nel database l'UPDATE su `chat_reazioni` e' permesso solo su `emoji` e `creata_il`; l'upsert di
+  supabase-js riscriveva anche le altre colonne e veniva rifiutato («permission denied», 403). Ora `reagisci`
+  (04-conv.js) prima aggiorna la mia reazione e, se non c'era, la inserisce.
+- Sticker, sfondi e foto dei gruppi: si ritrovano dal loro percorso su Supabase, ma `caricaFile` li mandava al NAS
+  (che accetta solo `<chat>/<file>` e restituisce un indirizzo suo): gli sticker davano errore, la foto del gruppo
+  finiva dove la chat non la cerca. Ora usano `caricaPerPercorso` (02-dati.js), sempre su Supabase. Le foto di
+  gruppo caricate tra l'11 e il 14 novembre sono sul NAS: vanno ricaricate.
+- Tasto «‹ FOSS» accanto al titolo FOSS.chat con la chat larga (`.vai-foss`); stretta c'e' gia' la barra in basso.
+
 ### 2.9 — stato: online, occupato, invisibile (`js/27-stato.js`)
 - Intorno alla foto di chi è online un cerchio **verde**; chi si è messo «occupato» un cerchio **rosso**
   (colori fissi, non del tema). Al posto del vecchio pallino. Con una cornice scelta, il cerchio va dentro la foto.

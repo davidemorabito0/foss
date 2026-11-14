@@ -487,8 +487,15 @@ async function reagisci(id, emoji){
       const {error} = await sb.from('chat_reazioni').delete().eq('msg_id', id).eq('utente_id', S.io); if(error) throw error;
     } else {
       r.set(S.io, emoji); ridisegnaMessaggio(id);
-      const {error} = await sb.from('chat_reazioni').upsert({msg_id: id, utente_id: S.io, conv_id: c.id, emoji, creata_il: new Date().toISOString()}, {onConflict: 'msg_id,utente_id'});
-      if(error) throw error;
+      /* 2.9.2: prima cambio la mia reazione (se c'era), altrimenti la aggiungo. L'upsert riscriveva anche
+         msg_id/utente_id/conv_id, che il database non lascia piu' cambiare (permesso di UPDATE solo su emoji e ora) */
+      const ora = new Date().toISOString();
+      const {data: cambiate, error: e1} = await sb.from('chat_reazioni').update({emoji, creata_il: ora}).eq('msg_id', id).eq('utente_id', S.io).select('msg_id');
+      if(e1) throw e1;
+      if(!cambiate || !cambiate.length){
+        const {error} = await sb.from('chat_reazioni').insert({msg_id: id, utente_id: S.io, conv_id: c.id, emoji, creata_il: ora});
+        if(error) throw error;
+      }
     }
   }catch(e){ errore(e, 'Reazione non salvata'); }
 }

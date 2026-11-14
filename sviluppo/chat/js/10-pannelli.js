@@ -91,7 +91,7 @@ function gruppoNome(scelti){
       if(error) throw error;
       if(foto){
         const nomeF = 'gruppo-' + uuid() + '.jpg';
-        try{ await caricaFile(id + '/' + nomeF, foto); await sb.rpc('chat_modifica_gruppo', {p_conv: id, p_foto: nomeF}); }catch(e){ toast('Gruppo creato, ma l’immagine non è partita.'); }
+        try{ await caricaPerPercorso(id + '/' + nomeF, foto); await sb.rpc('chat_modifica_gruppo', {p_conv: id, p_foto: nomeF}); }catch(e){ toast('Gruppo creato, ma l’immagine non è partita.'); }
       }
       await caricaElenco();
       chiudiPannelloSinistra(); disegnaLista(); apriConv(id);
@@ -227,7 +227,7 @@ function fotoGruppo(){
     try{
       const b = await fotoQuadrata(f[0]); const nomeF = 'gruppo-' + uuid() + '.jpg';
       toast('Carico l’immagine…');
-      await caricaFile(c.id + '/' + nomeF, b);
+      await caricaPerPercorso(c.id + '/' + nomeF, b);
       firme.set(c.id + '/' + nomeF, {url: URL.createObjectURL(b), scade: Date.now() + 864e5});
       const {error} = await sb.rpc('chat_modifica_gruppo', {p_conv: c.id, p_foto: nomeF}); if(error) throw error;
       c.foto = c.id + '/' + nomeF; disegnaInfo(); aggiornaTestaConv(); disegnaLista();

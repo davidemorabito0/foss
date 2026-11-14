@@ -35,6 +35,8 @@ function disegnaGuscio(){
         '<h1 class="ios-titolo">Chat</h1></div>'+
       '<div class="lato-testa">'+
         '<button class="ib torna-foss" data-a="foss" title="Torna a FOSS" style="display:none">'+svg('indietro')+'</button>'+
+        /* 2.9.2: un tasto chiaro per tornare a FOSS (sul computer, con la chat larga) */
+        '<button class="vai-foss" data-a="foss" title="Torna a FOSS: lavori, task, calendario">'+svg('indietro')+'<span class="vf-logo">'+LOGO+'</span><span>FOSS</span></button>'+
         '<h1>FOSS.chat</h1>'+
         '<button class="ib" data-a="nuova" title="Nuova chat">'+svg('nuova',1.9)+'</button>'+
         '<button class="ib" data-a="menu-lista" title="Menu">'+svg('menu')+'</button>'+

@@ -53,6 +53,9 @@ function caricaFile(path, blob, avanza, ctrl){
     return inviaFile(path, blob, avanza, false, ctrl);
   });
 }
+/* 2.9.2: i file che la chat ritrova dal loro percorso (sticker, sfondi, foto dei gruppi) vanno sempre su
+   Supabase. Il NAS accetta solo i file dentro una chat e restituisce un indirizzo suo, che questi non salvano. */
+function caricaPerPercorso(path, blob, avanza){ return inviaFile(path, blob, avanza, false); }
 function inviaFile(path, blob, avanza, nas, ctrl){
   return new Promise(async (ok, ko) => {
     let tk = '';

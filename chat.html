@@ -1475,6 +1475,16 @@ input,textarea,[contenteditable="true"]{-webkit-user-select:text;user-select:tex
 .st-pallino.st-online{background:#22c55e}
 .st-pallino.st-occupato{background:#ef4444}
 .st-pallino.st-invisibile{border:2px solid var(--testo-2)}
+/* 2.9.2: il tasto per tornare a FOSS, accanto al titolo (solo con la chat larga: stretta c'e' la barra in basso) */
+.lato-testa .vai-foss{display:none}
+@media (min-width:900px){
+  .lato-testa .vai-foss{display:inline-flex;align-items:center;gap:6px;flex:none;height:34px;padding:0 12px 0 6px;margin-right:12px;border-radius:17px;
+    border:1px solid var(--linea);background:var(--hover);color:var(--testo);font:600 14px var(--font);cursor:pointer;transition:background .15s,border-color .15s}
+  .lato-testa .vai-foss:hover{background:var(--scelta);border-color:var(--ambra)}
+  .lato-testa .vai-foss > svg{width:18px;height:18px;color:var(--testo-2)}
+  .lato-testa .vai-foss .vf-logo{display:grid;width:20px;height:20px}
+  .lato-testa .vai-foss .vf-logo svg{width:20px;height:20px}
+}
 </style>
 </head>
 <body>
@@ -1494,7 +1504,7 @@ const SUPA_KEY = 'sb_publishable_f5Kjp6NHT9yTxr1bhWJjhg_4y72V-Kj';
 const VAPID_PUBBLICA = 'BNlGbW4nZrXmx8DioKxnl7ubULVOr5_6CAKvpuQYoiXeObmxYAzGU6UrkExx2zu1hACmtRNDcpoMh_ARQ0GSmlw';
 /* il server dei file sul NAS (es. 'https://media.foss.team'). Vuoto = si usa Supabase. */
 const MEDIA_NAS = 'https://media.foss.team';
-const VERSIONE = 'chat-2.9.1';
+const VERSIONE = 'chat-2.9.2';
 /* i temi colore: gli stessi di FOSS. Il predefinito per tutti è Brand (blu e giallo). */
 const TEMI_COLORE = [
   {id:'brand',   nome:'Brand',    ds:'Navy e ambra, il predefinito', c:['#0D1926','#1A3149','#FFAD01']},
@@ -1935,6 +1945,9 @@ function caricaFile(path, blob, avanza, ctrl){
     return inviaFile(path, blob, avanza, false, ctrl);
   });
 }
+/* 2.9.2: i file che la chat ritrova dal loro percorso (sticker, sfondi, foto dei gruppi) vanno sempre su
+   Supabase. Il NAS accetta solo i file dentro una chat e restituisce un indirizzo suo, che questi non salvano. */
+function caricaPerPercorso(path, blob, avanza){ return inviaFile(path, blob, avanza, false); }
 function inviaFile(path, blob, avanza, nas, ctrl){
   return new Promise(async (ok, ko) => {
     let tk = '';
@@ -2451,6 +2464,8 @@ function disegnaGuscio(){
         '<h1 class="ios-titolo">Chat</h1></div>'+
       '<div class="lato-testa">'+
         '<button class="ib torna-foss" data-a="foss" title="Torna a FOSS" style="display:none">'+svg('indietro')+'</button>'+
+        /* 2.9.2: un tasto chiaro per tornare a FOSS (sul computer, con la chat larga) */
+        '<button class="vai-foss" data-a="foss" title="Torna a FOSS: lavori, task, calendario">'+svg('indietro')+'<span class="vf-logo">'+LOGO+'</span><span>FOSS</span></button>'+
         '<h1>FOSS.chat</h1>'+
         '<button class="ib" data-a="nuova" title="Nuova chat">'+svg('nuova',1.9)+'</button>'+
         '<button class="ib" data-a="menu-lista" title="Menu">'+svg('menu')+'</button>'+
@@ -3109,8 +3124,15 @@ async function reagisci(id, emoji){
       const {error} = await sb.from('chat_reazioni').delete().eq('msg_id', id).eq('utente_id', S.io); if(error) throw error;
     } else {
       r.set(S.io, emoji); ridisegnaMessaggio(id);
-      const {error} = await sb.from('chat_reazioni').upsert({msg_id: id, utente_id: S.io, conv_id: c.id, emoji, creata_il: new Date().toISOString()}, {onConflict: 'msg_id,utente_id'});
-      if(error) throw error;
+      /* 2.9.2: prima cambio la mia reazione (se c'era), altrimenti la aggiungo. L'upsert riscriveva anche
+         msg_id/utente_id/conv_id, che il database non lascia piu' cambiare (permesso di UPDATE solo su emoji e ora) */
+      const ora = new Date().toISOString();
+      const {data: cambiate, error: e1} = await sb.from('chat_reazioni').update({emoji, creata_il: ora}).eq('msg_id', id).eq('utente_id', S.io).select('msg_id');
+      if(e1) throw e1;
+      if(!cambiate || !cambiate.length){
+        const {error} = await sb.from('chat_reazioni').insert({msg_id: id, utente_id: S.io, conv_id: c.id, emoji, creata_il: ora});
+        if(error) throw error;
+      }
     }
   }catch(e){ errore(e, 'Reazione non salvata'); }
 }
@@ -4456,7 +4478,7 @@ async function salvaStickerFile(blob, tipo, manda){
   const path = 'sticker/' + S.io + '/' + uuid() + '.' + ext;
   toast(tipo === 'gif' ? 'Salvo la GIF…' : 'Salvo lo sticker…');
   try{
-    await caricaFile(path, blob);
+    await caricaPerPercorso(path, blob);
     firme.set(path, {url: URL.createObjectURL(blob), scade: Date.now() + 864e5});
     const {data, error} = await sb.from('chat_sticker').insert({path, tipo: tipo === 'gif' ? 'gif' : 'sticker'}).select().single();
     if(error) throw error;
@@ -4792,7 +4814,7 @@ function gruppoNome(scelti){
       if(error) throw error;
       if(foto){
         const nomeF = 'gruppo-' + uuid() + '.jpg';
-        try{ await caricaFile(id + '/' + nomeF, foto); await sb.rpc('chat_modifica_gruppo', {p_conv: id, p_foto: nomeF}); }catch(e){ toast('Gruppo creato, ma l’immagine non è partita.'); }
+        try{ await caricaPerPercorso(id + '/' + nomeF, foto); await sb.rpc('chat_modifica_gruppo', {p_conv: id, p_foto: nomeF}); }catch(e){ toast('Gruppo creato, ma l’immagine non è partita.'); }
       }
       await caricaElenco();
       chiudiPannelloSinistra(); disegnaLista(); apriConv(id);
@@ -4928,7 +4950,7 @@ function fotoGruppo(){
     try{
       const b = await fotoQuadrata(f[0]); const nomeF = 'gruppo-' + uuid() + '.jpg';
       toast('Carico l’immagine…');
-      await caricaFile(c.id + '/' + nomeF, b);
+      await caricaPerPercorso(c.id + '/' + nomeF, b);
       firme.set(c.id + '/' + nomeF, {url: URL.createObjectURL(b), scade: Date.now() + 864e5});
       const {error} = await sb.rpc('chat_modifica_gruppo', {p_conv: c.id, p_foto: nomeF}); if(error) throw error;
       c.foto = c.id + '/' + nomeF; disegnaInfo(); aggiornaTestaConv(); disegnaLista();
@@ -5385,7 +5407,7 @@ function scegliSfondoFoto(conv){
       const b = await versoBlob(c, 'image/jpeg', .86);
       const path = 'sticker/' + S.io + '/sfondo-' + uuid() + '.jpg';
       toast('Imposto lo sfondo…');
-      await caricaFile(path, b);
+      await caricaPerPercorso(path, b);
       firme.set(path, {url: URL.createObjectURL(b), scade: Date.now() + 864e5});
       const vecchia = conv ? ((S.cfg.sfondiChat || {})[conv] || {}).f : S.cfg.sfondoFoto;
       if(conv){ const sc = Object.assign({}, S.cfg.sfondiChat || {}); sc[conv] = {f: path}; cambiaCfg('sfondiChat', sc); }

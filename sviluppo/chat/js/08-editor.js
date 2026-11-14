@@ -330,7 +330,7 @@ async function salvaStickerFile(blob, tipo, manda){
   const path = 'sticker/' + S.io + '/' + uuid() + '.' + ext;
   toast(tipo === 'gif' ? 'Salvo la GIF…' : 'Salvo lo sticker…');
   try{
-    await caricaFile(path, blob);
+    await caricaPerPercorso(path, blob);
     firme.set(path, {url: URL.createObjectURL(blob), scade: Date.now() + 864e5});
     const {data, error} = await sb.from('chat_sticker').insert({path, tipo: tipo === 'gif' ? 'gif' : 'sticker'}).select().single();
     if(error) throw error;

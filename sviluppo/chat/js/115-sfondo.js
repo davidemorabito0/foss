@@ -33,7 +33,7 @@ function scegliSfondoFoto(conv){
       const b = await versoBlob(c, 'image/jpeg', .86);
       const path = 'sticker/' + S.io + '/sfondo-' + uuid() + '.jpg';
       toast('Imposto lo sfondo…');
-      await caricaFile(path, b);
+      await caricaPerPercorso(path, b);
       firme.set(path, {url: URL.createObjectURL(b), scade: Date.now() + 864e5});
       const vecchia = conv ? ((S.cfg.sfondiChat || {})[conv] || {}).f : S.cfg.sfondoFoto;
       if(conv){ const sc = Object.assign({}, S.cfg.sfondiChat || {}); sc[conv] = {f: path}; cambiaCfg('sfondiChat', sc); }
