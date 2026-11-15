@@ -5,7 +5,7 @@
 //   TRASCRIZIONE_LINGUA («it» di serie, «auto» per lasciarla scegliere al servizio).
 import { createClient } from "jsr:@supabase/supabase-js@2";
 
-const MAX_SECONDI = 120, MAX_BYTE = 24 * 1024 * 1024;
+const MAX_SECONDI = 120, MAX_BYTE = 4 * 1024 * 1024;   // 2 minuti di vocale pesano meno di 1 MB: oltre 4 MB non è un vocale breve (la durata la dichiara chi manda)
 const CORS = {
   "Access-Control-Allow-Origin": "*",
   "Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type",
@@ -79,10 +79,13 @@ Deno.serve(async (req) => {
     const url = String(media.url || "");
     if (url) {
       const h = new URL(url);
-      if (h.protocol !== "https:" || !(h.hostname === "foss.team" || h.hostname.endsWith(".foss.team"))) return await sbaglio("file", 400);
+      // solo il server dei media di FOSS, e solo un file di QUESTA conversazione (il messaggio lo scrive chi lo manda:
+      // senza questo controllo si potrebbe far trascrivere un file di un'altra chat conoscendone l'indirizzo)
+      if (h.protocol !== "https:" || h.hostname !== "media.foss.team" || !h.pathname.includes("/" + m.conv_id + "/")) return await sbaglio("file", 400);
       const r = await fetch(url);
       if (r.ok) audio = await r.blob();
     } else if (media.path) {
+      if (!String(media.path).startsWith(m.conv_id + "/") || String(media.path).includes("..")) return await sbaglio("file", 400);
       const { data } = await adm.storage.from("chat").download(String(media.path));
       audio = data;
     }

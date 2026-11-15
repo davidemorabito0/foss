@@ -16069,14 +16069,19 @@ async function inviaRispostaCliente(){
 /* ============ PROFILO, INVITI, PERMESSI ============ */
 async function salvaProfiloCloud(){
   if(!sb || !utenteCloud) return;
-  const {error} = await sb.from('profili').upsert({
+  /* v2.9.8: il database accetta come foto solo un indirizzo https o un'immagine incorporata. Se qui c'è altro
+     (un'anteprima non ancora caricata, un valore vecchio) non la mando: prima faceva fallire tutto il
+     salvataggio del profilo («violates check constraint profili_foto_sicura»); la foto sul server resta com'è. */
+  const fotoOk = state.me.foto == null || /^(https:\/\/[A-Za-z0-9._~:\/?#@!$+,;=%-]+|data:image\/(png|jpeg|jpg|webp|gif);base64,[A-Za-z0-9+\/=]+)$/.test(state.me.foto);
+  if(!fotoOk) console.warn('profilo: foto non valida, non la salvo');
+  const {error} = await sb.from('profili').upsert(Object.assign(fotoOk ? {foto_url:state.me.foto} : {}, {
     id: utenteCloud.id, nome:state.me.nome, cognome:state.me.cognome, nickname:state.me.nick,
-    email:state.me.email, ruolo:state.me.ruolo, foto_url:state.me.foto,
+    email:state.me.email, ruolo:state.me.ruolo,
     tema:state.cfg.tema, cfg:{boxFull:state.cfg.boxFull, toast:state.cfg.toast,
                               soloMiei:state.cfg.soloMiei, snoozeMin:state.cfg.snoozeMin,
                               link:state.me.link||'', professioni:state.cfg.professioni,
                               temaMio:state.cfg.temaMio, temaLucePrima:state.cfg.temaLucePrima}
-  });
+  }));
   if(error) toast(error.message,'warn','Profilo non salvato');
 }
 async function invitiAperti(){

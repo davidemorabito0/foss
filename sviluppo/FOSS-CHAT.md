@@ -285,6 +285,38 @@ L'elenco completo è nel `README.md` del sito, sezioni «FOSS.chat» e «FOSS.ch
   e alta zero perche' la scheda (un `<button>`) allinea i figli a sinistra (`align-items:flex-start`). Ora ha
   `width:100%` e l'altezza dal padding (`padding-bottom: calc(100% / 3.6)`), che funziona ovunque.
 
+### Revisione di sicurezza — 16 novembre 2026
+Controllati: regole e permessi del database (consulente di Supabase, tutte le regole RLS, le funzioni
+«security definer»), l'archivio dei file, le funzioni sul server, il server dei media del NAS, il codice del
+sito (testi inseriti nella pagina, segreti nel repository), l'app per computer (link aperti), gli errori
+registrati dall'app e i registri del database.
+- **Falla chiusa — entrare da soli in un team.** La regola «membri: si entra solo da se'» su `membri_org`
+  permetteva a chiunque avesse un account di inserirsi in un team qualsiasi conoscendone l'identificativo,
+  anche come titolare. Il sito non la usava (in un team si entra con invito, richiesta accettata o alla
+  registrazione, tutte funzioni del database): **tolta**. Nessun team aveva più di un titolare.
+- **Lavoro senza team.** `sincronizza_membri` lasciava che un collaboratore si mettesse da solo in un lavoro che
+  in quel momento non aveva nessuno nel team: tolto (chi crea un lavoro ci entra già col trigger
+  `creatore_nel_lavoro`).
+- **Funzioni richiamabili senza accesso**: `chat_fissa`, `chat_modifica`, `chat_vota`, `chat_chiudi_sondaggio`,
+  `chat_dove_creare`, `chat_crea_lavoro` ora si possono chiamare solo da utenti entrati (rifiutavano già gli
+  estranei). Restano aperte, per scelta, quelle a codice segreto: `pagina_cliente`, `risposta_cliente`,
+  `feed_calendario`, `togli_iscrizioni_push`.
+- `nome_di` non è più richiamabile da fuori (serviva solo ad altre funzioni; dava il nome di chiunque dall'id).
+- Tolti a `anon` e `authenticated` i permessi inutili sulle tabelle (TRUNCATE, TRIGGER, REFERENCES);
+  `membri_org_fisso` ha il percorso di ricerca fissato.
+- **Trascrizione** (`trascrivi`): il file deve essere di quella conversazione (prima un messaggio costruito
+  apposta poteva indicare il file di un'altra chat, conoscendone l'indirizzo) e pesare al massimo 4 MB.
+- **Difetto trovato nei registri**: il salvataggio del profilo falliva se la foto non era nel formato che il
+  database accetta (`profili_foto_sicura`). Ora `salvaProfiloCloud` in quel caso salva tutto il resto e lascia
+  la foto com'è.
+- **Da fare a mano nel pannello di Supabase** (non si può da qui): Authentication → «Leaked password
+  protection» (rifiuta le password note per essere state rubate). Segnalato anche: l'estensione `pg_net` sta
+  nello schema `public` (innocuo, spostarla è delicato: lasciata).
+- A posto senza modifiche: tutte le tabelle hanno le regole attive; i file della chat e gli allegati si
+  leggono solo se si è nella chat o nel lavoro; il NAS chiede a Supabase chi sei e firma gli indirizzi;
+  nessuna chiave segreta nel repository; l'app per computer apre fuori solo link http/https/mailto/tel.
+- Migrazioni: `sicurezza_16_novembre`, `sicurezza_team_solo_su_invito`.
+
 ### 2.9.7 e FOSS — 16 novembre 2026
 - **Tema «Personalizzato»** (FOSS: Profilo → Tema dell'interfaccia; chat: Impostazioni → Colori): tre colori
   scelti da ognuno, **sfondo, pannelli, accento**; da quelli si ricavano tutte le altre tinte (`coloriMio`) e si
