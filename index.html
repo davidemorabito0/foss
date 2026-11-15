@@ -3530,6 +3530,9 @@ button.pf-p:hover{background:var(--surface-2);border-radius:10px}
 .pf-ri svg{width:17px;height:17px}
 .pf-sel{background:var(--surface-2);border:1px solid var(--line);border-radius:10px;padding:8px 10px;font-size:13px;color:var(--text);outline:none}
 /* tema */
+.ces-vuoto{font-size:12.5px;color:var(--mute);padding:4px 2px}
+.ces-r{gap:10px}
+.ces-r .btn{flex:none}
 .pf-temi{display:grid;grid-template-columns:repeat(auto-fill,minmax(112px,1fr));gap:8px;margin-bottom:6px}
 .pf-tema{display:flex;flex-direction:column;align-items:flex-start;gap:2px;padding:10px 11px;border-radius:12px;border:1px solid var(--line);background:var(--surface-2);text-align:left;min-width:0}
 .pf-tema:hover{border-color:var(--surface-3)}
@@ -3538,6 +3541,20 @@ button.pf-p:hover{background:var(--surface-2);border-radius:10px}
 .pf-tema b{font-size:12.5px;font-weight:700}
 .pf-tema span{font-size:10.5px;color:var(--mute);line-height:1.3}
 .pf-tema.on{border-color:var(--amber);box-shadow:inset 0 0 0 1px var(--amber)}
+.pf-tema-mio{border-style:dashed}
+.pf-mio{margin:8px 0 4px;padding:12px;border-radius:12px;border:1px solid var(--line);background:var(--surface-2)}
+.pf-mio-r{display:grid;grid-template-columns:repeat(auto-fit,minmax(170px,1fr));gap:10px}
+.pf-mio label{display:flex;align-items:center;gap:11px;padding:8px;border-radius:11px;border:1px solid var(--line);background:var(--surface);cursor:pointer;min-width:0}
+.pf-mio label:hover{border-color:var(--amber)}
+.pf-mio input[type=color]{-webkit-appearance:none;appearance:none;width:44px;height:44px;flex:none;padding:0;border:0;border-radius:11px;background:none;cursor:pointer;overflow:hidden;box-shadow:0 0 0 1px rgba(128,128,128,.35)}
+.pf-mio input[type=color]::-webkit-color-swatch-wrapper{padding:0}
+.pf-mio input[type=color]::-webkit-color-swatch{border:0;border-radius:11px}
+.pf-mio input[type=color]::-moz-color-swatch{border:0;border-radius:11px}
+.pf-mio label > span{display:flex;flex-direction:column;min-width:0;line-height:1.25}
+.pf-mio label b{font-size:13px;font-weight:700}
+.pf-mio label span span{font-size:11px;color:var(--mute)}
+.pf-mio label em{font-style:normal;font-size:10.5px;color:var(--dim);font-family:ui-monospace,Menlo,monospace;margin-top:2px}
+.pf-mio p{margin:10px 2px 8px;font-size:11.5px;color:var(--mute)}
 .pf .esci-rosso{width:100%;justify-content:center}
 .pf .card.pf-adm{padding:18px 20px!important;overflow:visible}
 /* inviti nel profilo */
@@ -5212,6 +5229,69 @@ function renderTop(){
       svg(VISTE[k].ic)+'<span>'+VISTE[k].n+'</span></button>').join('');
   }
 }
+/* ---------- TEMA PERSONALIZZATO (v2.9.7) ----------
+   Tre colori scelti da ognuno: sfondo, pannelli, accento. Da quelli ricavo tutte le altre tinte
+   (testi, linee, sfumature) e le metto direttamente sulla pagina, quindi si vede subito mentre si sceglie.
+   Chiaro o scuro lo decide lo sfondo. state.cfg.tema = 'mio', i colori in state.cfg.temaMio. */
+const VAR_MIO = ['--bg','--surface','--surface-2','--surface-3','--line','--line-soft','--text','--dim','--mute','--navy','--navy-deep',
+  '--amber','--amber-ink','--amber-soft','--on-amber','--ok','--ok-soft','--alert','--alert-soft','--ring','--shadow'];
+const MIO_BASE = ['#0D1926','#1A3149','#FFAD01'];
+const hexOk = c => typeof c === 'string' && /^#[0-9a-f]{6}$/i.test(c);
+const rgbDi = x => [1,3,5].map(i=>parseInt(x.slice(i, i+2), 16));
+const hexDi = v => '#' + v.map(n=>Math.max(0, Math.min(255, Math.round(n))).toString(16).padStart(2, '0')).join('');
+const mescolaCol = (a, b, q) => { const x = rgbDi(a), y = rgbDi(b); return hexDi(x.map((n, i)=>n + (y[i] - n) * q)); };   // q=0 a, q=1 b
+const luceDi = x => { const c = rgbDi(x).map(n=>{ n /= 255; return n <= .03928 ? n / 12.92 : Math.pow((n + .055) / 1.055, 2.4); }); return .2126*c[0] + .7152*c[1] + .0722*c[2]; };
+function triadeMia(){ const t = state.cfg.temaMio; return Array.isArray(t) && t.length === 3 && t.every(hexOk) ? t : MIO_BASE.slice(); }
+function coloriMio(t){
+  const bg = t[0], pan = t[1], acc = t[2], scuro = luceDi(bg) < .4;
+  const testo = scuro ? mescolaCol('#FFFFFF', bg, .08) : mescolaCol('#0B1320', bg, .1);
+  const la = luceDi(acc);
+  return {scuro, v:{
+    '--bg':bg, '--surface':mescolaCol(bg, pan, .55), '--surface-2':pan, '--surface-3':mescolaCol(pan, testo, .09),
+    '--line':mescolaCol(pan, testo, .16), '--line-soft':mescolaCol(pan, testo, .07),
+    '--text':testo, '--dim':mescolaCol(testo, bg, .36), '--mute':mescolaCol(testo, bg, .58),
+    '--navy':mescolaCol(pan, testo, .28), '--navy-deep':mescolaCol(bg, pan, .5),
+    '--amber':acc, '--amber-ink': scuro ? (la < .25 ? mescolaCol(acc, '#FFFFFF', .4) : acc) : (la > .3 ? mescolaCol(acc, '#000000', .42) : acc),
+    '--amber-soft':mescolaCol(bg, acc, .2), '--on-amber': la > .45 ? '#1A1305' : '#FFFFFF',
+    '--ok': scuro ? '#3FBF8F' : '#1E9A6E', '--ok-soft': scuro ? '#0F2E26' : '#DDF3EA',
+    '--alert': scuro ? '#F2635A' : '#D2413A', '--alert-soft': scuro ? '#341A1C' : '#FBE4E3',
+    '--ring':'rgba(' + rgbDi(acc).join(',') + ',.42)', '--shadow': scuro ? '0 10px 34px rgba(0,0,0,.42)' : '0 8px 28px rgba(19,40,64,.14)'}};
+}
+function applicaTemaScelto(){
+  const R = document.documentElement;
+  if(state.cfg.tema === 'mio'){
+    const c = coloriMio(triadeMia());
+    Object.keys(c.v).forEach(k=>R.style.setProperty(k, c.v[k]));
+    R.style.colorScheme = c.scuro ? 'dark' : 'light';
+    R.setAttribute('data-tema', 'mio');
+    R.setAttribute('data-theme', c.scuro ? 'dark' : 'light');      // chiaro o scuro segue lo sfondo scelto
+  } else {
+    VAR_MIO.forEach(k=>R.style.removeProperty(k)); R.style.colorScheme = '';
+    if(state.cfg.tema && state.cfg.tema !== 'brand') R.setAttribute('data-tema', state.cfg.tema);
+    else R.removeAttribute('data-tema');
+  }
+}
+let tSalvaMio = null;
+function cambiaColoreMio(i, v){
+  if(!hexOk(v) || state.cfg.tema !== 'mio') return;
+  const t = triadeMia(); t[i] = v; state.cfg.temaMio = t;
+  applicaTemaScelto();
+  const sw = document.querySelector('.pf-tema[data-t="mio"] .sw3'); if(sw) sw.innerHTML = t.map(x=>'<i style="background:'+x+'"></i>').join('');
+  const et = document.querySelector('.pf-mio label[data-i="'+i+'"] em'); if(et) et.textContent = v.toUpperCase();
+  clearTimeout(tSalvaMio);
+  tSalvaMio = setTimeout(()=>{ save(); if(typeof salvaProfiloCloud === 'function') salvaProfiloCloud(); }, 700);
+}
+document.addEventListener('input', e=>{
+  const i = e.target && e.target.closest ? e.target.closest('input[data-mio]') : null;
+  if(i) cambiaColoreMio(Number(i.dataset.mio), i.value);
+});
+function pannelloMio(){
+  const t = triadeMia(), nomi = [['Sfondo','Il colore dietro a tutto'],['Pannelli','Schede, barre e riquadri'],['Accento','Tasti, evidenze e scadenze']];
+  return '<div class="pf-mio"><div class="pf-mio-r">'+nomi.map((n, i)=>
+    '<label data-i="'+i+'"><input type="color" data-mio="'+i+'" value="'+t[i]+'" aria-label="'+n[0]+'"><span><b>'+n[0]+'</b><span>'+n[1]+'</span><em>'+t[i].toUpperCase()+'</em></span></label>').join('')+'</div>'+
+    '<p>Tocca un colore e scegli: l’app cambia mentre lo muovi. Chiaro o scuro lo decide lo sfondo.</p>'+
+    '<button class="btn sm ghost" data-action="tema-mio-base">Riparti dai colori di FOSS</button></div>';
+}
 function tema(){
   const a = document.documentElement.getAttribute('data-theme');
   if(a) return a;
@@ -5391,6 +5471,92 @@ const GRUPPI = [
 ];
 
 /* i lavori completati si possono togliere: solo i miei, mai quelli dell'archivio di un altro */
+/* ---------- CESTINO DEI PROGETTI (v2.9.7) ----------
+   Un lavoro rimosso (completato o eliminato) non si perde: prima di toglierlo ne metto una copia intera nel
+   cestino di chi lo rimuove (tabella cestino_progetti, la vede solo lui). Dal Profilo si ripristina:
+   torna tra i progetti con lo stesso identificativo, quindi anche la sua chat lo ritrova. */
+let cestinoVista = null;      // null = non ancora chiesto al server
+function copiaPerCestino(p){
+  return {progetto_id:p.id, org_id:(orgProg[p.id] || orgSpazio[p.spazio] || null), nome:String(p.nome||'Lavoro').slice(0,200),
+          cliente:p.cliente||null, dati:JSON.parse(JSON.stringify(p)), conti:(state.conti && state.conti[p.id]) || null};
+}
+async function mettiNelCestino(lista){
+  const righe = lista.map(copiaPerCestino);
+  if(cloudAttivo()){
+    const {error} = await sb.from('cestino_progetti').insert(righe);
+    if(error){ console.warn('cestino:', error.message); return false; }
+  } else {
+    state.cestinoLocale = (state.cestinoLocale||[]).concat(righe.map(x=>Object.assign({id:nuovoId('c'), eliminato_il:new Date().toISOString()}, x))).slice(-50);
+  }
+  cestinoVista = null;
+  return true;
+}
+async function rimuoviNelCestino(lista, descr, azioneHtml, messaggio){
+  chiudiModale();
+  if(!(await mettiNelCestino(lista))){ toast('Non sono riuscito a metterlo nel cestino, quindi non ho rimosso niente. Riprova.','warn','Non rimosso'); return; }
+  snap(descr); azione(azioneHtml);
+  const via = lista.map(x=>x.id);
+  state.progetti = state.progetti.filter(x=>via.indexOf(x.id)<0);
+  if(via.indexOf(state.progettoId)>=0){ state.progettoId = null; state.schermo = 'home'; }
+  render();
+  toast(messaggio,'ok','Nel cestino');
+}
+async function caricaCestino(){
+  if(cloudAttivo()){
+    const {data, error} = await sb.from('cestino_progetti').select('id,progetto_id,nome,cliente,eliminato_il').order('eliminato_il', {ascending:false}).limit(200);
+    if(error){ toast('Non riesco a leggere il cestino: riprova.','warn','Cestino'); return; }
+    cestinoVista = data || [];
+  } else cestinoVista = (state.cestinoLocale||[]).slice().reverse();
+  if(state.schermo==='profilo') render();
+}
+async function ripristinaDalCestino(id){
+  let r = null;
+  if(cloudAttivo()){
+    const {data, error} = await sb.from('cestino_progetti').select('id,org_id,progetto_id,dati,conti').eq('id', id).maybeSingle();
+    if(error || !data){ toast('Non riesco a leggere il lavoro dal cestino: riprova.','warn','Cestino'); return; }
+    r = data;
+  } else r = (state.cestinoLocale||[]).find(x=>x.id===id);
+  if(!r || !r.dati) return;
+  if(state.progetti.some(x=>x.id===r.progetto_id)){ toast('Questo lavoro c’è già tra i tuoi progetti.','info','Cestino'); return; }
+  const p = JSON.parse(JSON.stringify(r.dati));
+  if(!state.spazi.some(x=>x.id===p.spazio)){
+    const sp = spaziVisibili()[0] || state.spazi[0];
+    if(!sp){ toast('Crea prima uno spazio di lavoro.','warn','Cestino'); return; }
+    p.spazio = sp.id;
+  }
+  snap('Ripristino di «'+p.nome+'»');
+  if(r.org_id && orgSpazio[p.spazio] === r.org_id) orgProg[p.id] = r.org_id;
+  state.progetti.push(p);
+  if(r.conti){ state.conti = state.conti || {}; state.conti[p.id] = r.conti; }
+  try{ normalizzaLavoro(p); }catch(e){}
+  azione('Ripristinato dal cestino <b>'+esc(p.nome)+'</b>');
+  if(cloudAttivo()){ const {error} = await sb.from('cestino_progetti').delete().eq('id', id); if(error) console.warn('cestino:', error.message); }
+  else state.cestinoLocale = (state.cestinoLocale||[]).filter(x=>x.id!==id);
+  if(cestinoVista) cestinoVista = cestinoVista.filter(x=>x.id!==id);
+  render();
+  toast(p.nome+' è tornato tra i progetti'+(p.completato?' completati':'')+'.','ok','Ripristinato');
+}
+async function eliminaDalCestino(id){
+  if(cloudAttivo()){
+    const {error} = await sb.from('cestino_progetti').delete().eq('id', id);
+    if(error){ toast('Non sono riuscito a eliminarlo: riprova.','warn','Cestino'); return; }
+  } else state.cestinoLocale = (state.cestinoLocale||[]).filter(x=>x.id!==id);
+  if(cestinoVista) cestinoVista = cestinoVista.filter(x=>x.id!==id);
+  if(state.schermo==='profilo') render();
+}
+function cartaCestino(){
+  if(state.ospite || !puo('elimina')) return '';
+  let dentro;
+  if(cestinoVista === null) dentro = '<button class="btn sm ghost" data-action="cestino-apri">'+svg('cestino',2)+'Mostra il cestino</button>';
+  else if(!cestinoVista.length) dentro = '<div class="ces-vuoto">Il cestino è vuoto.</div>';
+  else dentro = cestinoVista.map(x=>{
+    let q = ''; try{ q = new Date(x.eliminato_il).toLocaleDateString('it-IT', {day:'numeric', month:'short', year:'numeric'}); }catch(e){}
+    return '<div class="riga pf-r ces-r"><span class="pf-ri">'+svg('cestino',2)+'</span>'+
+      '<div class="tx"><b>'+esc(x.nome)+'</b><span>'+esc([x.cliente, q ? 'rimosso il '+q : ''].filter(Boolean).join(' · '))+'</span></div>'+
+      '<button class="btn sm" data-action="cestino-ripristina" data-id="'+esc(x.id)+'">Ripristina</button>'+
+      '<button class="iconbtn" data-action="cestino-elimina" data-id="'+esc(x.id)+'" title="Elimina per sempre" aria-label="Elimina per sempre">'+svg('x',2.4)+'</button></div>'; }).join('');
+  return '<div class="card" id="cartaCestino">'+pfTesta('cestino','Cestino dei progetti','I lavori che rimuovi restano qui: li puoi ripristinare quando vuoi.')+dentro+'</div>';
+}
 function puoTogliereFatto(p){ return !!(p && p.completato) && !state.ospite && !(p.lock && p.lock.on) && !titolareDiProgetto(p) && puo('elimina'); }
 function tastoTogliFatto(p){
   return puoTogliereFatto(p) ? '<span class="tk-via" role="button" tabindex="0" data-action="togli-fatto" data-pid="'+p.id+'" title="Rimuovi questo lavoro" aria-label="Rimuovi '+esc(p.nome)+'">'+svg('cestino',2)+'</span>' : '';
@@ -6141,7 +6307,7 @@ const PERM_AZIONE = {
   'cm-invia':'modifica', 'cm-letto':'spunta', 'all-togli':'modifica', 'all-togli-ok':'modifica',
   'pe-nuovo':'crea_lavori','pe-importa':'crea_lavori','pe-salva':'crea_lavori','pe-elimina':'crea_lavori','pe-usa':'crea_lavori',
   'conti':'soldi','conti-prev':'soldi-scrive','conti-add':'soldi-scrive','conti-togli':'soldi-scrive',
-  'data-nuova':'modifica','data-salva':'modifica', 'consegna-cal':'modifica',
+  'data-nuova':'modifica','data-salva':'modifica', 'cestino-ripristina':'elimina','cestino-elimina':'elimina','cestino-elimina-ok':'elimina', 'consegna-cal':'modifica',
   'edit':'modifica','personale-toggle':'modifica','cop-progetto':'modifica','rit-progetto':'modifica','togli-cop-progetto':'modifica','salva-campo':'modifica','nuova-task':'modifica','add-compito':'modifica',
   'tagga':'modifica','tagga-chi':'modifica','stagga':'modifica','assegna-sub':'modifica','assegna-sub-chi':'modifica','ass-tocca':'modifica','ass-salva':'modifica','ass-mail':'modifica',
   'fase':'modifica','indietro':'modifica','torna-a-fase':'modifica','riprendi':'modifica','completa':'modifica',
@@ -8155,9 +8321,13 @@ function renderProfilo(){
   h += '<div class="card">'+pfTesta('palette','Tema dell’interfaccia','Scegli i colori che preferisci. Puoi cambiarli quando vuoi.')+
     '<div class="pf-temi">'+TEMI.filter(t=>['brand','ardesia','nebbia','sabbia','idea','limoni','autunno','bloom'].indexOf(t.id)>=0 || t.id===c.tema).map(t=>'<button class="pf-tema'+(c.tema===t.id?' on':'')+'" data-action="tema-set" data-t="'+t.id+'" title="'+esc(t.ds)+'">'+
       '<span class="sw3">'+t.c.map(x=>'<i style="background:'+x+'"></i>').join('')+'</span>'+
-      '<b>'+t.nome+'</b><span>'+esc(t.breve||t.ds)+'</span></button>').join('')+'</div>'+
+      '<b>'+t.nome+'</b><span>'+esc(t.breve||t.ds)+'</span></button>').join('')+
+      '<button class="pf-tema pf-tema-mio'+(c.tema==='mio'?' on':'')+'" data-action="tema-set" data-t="mio" title="Scegli tu i tre colori">'+
+        '<span class="sw3">'+triadeMia().map(x=>'<i style="background:'+x+'"></i>').join('')+'</span><b>Personalizzato</b><span>I tuoi tre colori</span></button>'+
+    '</div>'+
+    (c.tema==='mio' ? pannelloMio() :
     '<div class="riga pf-r"><span class="pf-ri">'+svg('sun',2)+'</span><div class="tx"><b>Modalità chiara</b><span>Una versione più luminosa, vale su tutti i temi</span></div>'+
-      '<button class="sw'+(tema()==='light'?' on':'')+'" data-action="theme" aria-label="Modalità chiara"></button></div>'+
+      '<button class="sw'+(tema()==='light'?' on':'')+'" data-action="theme" aria-label="Modalità chiara"></button></div>')+
   '</div>';
 
   h += cartaGuida();
@@ -8178,6 +8348,7 @@ function renderProfilo(){
   '</details>';
 
   h += '<button class="btn esci-rosso" data-action="esci">'+svg('out')+'Esci da FOSS</button>';
+  h += cartaCestino();
   h += '<div class="pf-legal"><a href="privacy.html" target="_blank" rel="noopener">Privacy</a> \u00b7 <a href="termini.html" target="_blank" rel="noopener">Termini</a> \u00b7 <a href="mailto:info@davidemorabito.com">info@davidemorabito.com</a></div>';
   h += '</div></div></div></div></div>';
   el('stage').innerHTML = h;
@@ -11911,7 +12082,7 @@ document.addEventListener('click', function(e){
 
     case 'elimina-progetto':
       modale('<h3>Eliminare il progetto?</h3><div class="sub-t">'+esc(p.nome)+'</div>'+
-        '<div class="modal-b"><div class="nota-box">Spariscono task, subtask, commenti, chat ed eventi in calendario. Con <b>Ctrl+Z</b> puoi recuperarlo subito dopo.</div></div>'+
+        '<div class="modal-b"><div class="nota-box">Sparisce dai progetti, anche per chi ci lavora con te. Resta nel <b>cestino</b> (Profilo → Cestino dei progetti): da lì lo puoi ripristinare quando vuoi.</div></div>'+
         '<div class="modal-f"><button class="btn ghost" data-action="chiudi-modale">Annulla</button>'+
         '<button class="btn" style="background:var(--alert);border-color:var(--alert);color:#fff" data-action="conferma-elimina" data-pid="'+p.id+'">Elimina</button></div>');
       break;
@@ -11920,43 +12091,45 @@ document.addEventListener('click', function(e){
     case 'togli-fatto':{
       if(!puoTogliereFatto(p)) break;
       modale('<h3>Rimuovere questo lavoro?</h3><div class="sub-t">'+esc(p.nome)+(p.cliente?' \u00b7 '+esc(p.cliente):'')+'</div>'+
-        '<div class="modal-b"><div class="nota-box">\u00c8 completato: sparisce con task, commenti, chat, file ed eventi in calendario, anche per chi ci lavorava con te. Con <b>Ctrl+Z</b> puoi recuperarlo subito dopo.</div></div>'+
+        '<div class="modal-b"><div class="nota-box">È completato: sparisce dai progetti, anche per chi ci lavorava con te. Resta nel <b>cestino</b> (Profilo → Cestino dei progetti): da lì lo puoi ripristinare quando vuoi.</div></div>'+
         '<div class="modal-f"><button class="btn ghost" data-action="chiudi-modale">Annulla</button>'+
         '<button class="btn" style="background:var(--alert);border-color:var(--alert);color:#fff" data-action="togli-fatto-ok" data-pid="'+p.id+'">Rimuovi</button></div>');
       break; }
     case 'togli-fatto-ok':{
       if(!puoTogliereFatto(p)){ chiudiModale(); break; }
-      snap('Rimozione di «'+p.nome+'»');
-      azione('Rimosso il lavoro completato <b>'+esc(p.nome)+'</b>');
-      state.progetti = state.progetti.filter(x=>x.id!==p.id);
-      chiudiModale(); render();
-      toast(p.nome+' rimosso. Ctrl+Z per recuperarlo.','warn','Rimosso'); break; }
+      rimuoviNelCestino([p], 'Rimozione di «'+p.nome+'»', 'Rimosso il lavoro completato <b>'+esc(p.nome)+'</b>', p.nome+' è nel cestino (Profilo → Cestino dei progetti).');
+      break; }
     case 'rimuovi-fatti':{
       const fatti = progettiDi(state.spazioId).filter(puoTogliereFatto);
       if(!fatti.length) break;
       modale('<h3>Rimuovere '+fatti.length+' lavori completati?</h3><div class="sub-t">'+esc((SPZ()||{}).nome||'')+'</div>'+
-        '<div class="modal-b"><div class="nota-box">Spariscono per sempre, con task, commenti, chat, file ed eventi in calendario, anche per chi ci lavorava con te. Con <b>Ctrl+Z</b> puoi recuperarli subito dopo.</div>'+
+        '<div class="modal-b"><div class="nota-box">Spariscono dai progetti, anche per chi ci lavorava con te. Restano nel <b>cestino</b> (Profilo → Cestino dei progetti): da lì li puoi ripristinare quando vuoi.</div>'+
         '<ul class="via-lista">'+fatti.slice(0,12).map(x=>'<li>'+esc(x.nome)+(x.cliente?' <span>'+esc(x.cliente)+'</span>':'')+'</li>').join('')+
         (fatti.length>12? '<li class="altri">e altri '+(fatti.length-12)+'</li>' : '')+'</ul></div>'+
         '<div class="modal-f"><button class="btn ghost" data-action="chiudi-modale">Annulla</button>'+
         '<button class="btn" style="background:var(--alert);border-color:var(--alert);color:#fff" data-action="rimuovi-fatti-ok">Rimuovi tutti</button></div>');
       break; }
     case 'rimuovi-fatti-ok':{
-      const via = progettiDi(state.spazioId).filter(puoTogliereFatto).map(x=>x.id);
+      const via = progettiDi(state.spazioId).filter(puoTogliereFatto);
       if(!via.length){ chiudiModale(); break; }
-      snap('Rimozione di '+via.length+' lavori completati');
-      azione('Rimossi <b>'+via.length+'</b> lavori completati');
-      state.progetti = state.progetti.filter(x=>via.indexOf(x.id)<0);
-      chiudiModale(); render();
-      toast(via.length+' lavori completati rimossi. Ctrl+Z per recuperarli.','warn','Rimossi'); break; }
+      rimuoviNelCestino(via, 'Rimozione di '+via.length+' lavori completati', 'Rimossi <b>'+via.length+'</b> lavori completati', via.length+' lavori completati sono nel cestino (Profilo → Cestino dei progetti).');
+      break; }
 
     case 'conferma-elimina':
-      snap('Eliminazione di «'+p.nome+'»');
-      azione('Eliminato il progetto <b>'+esc(p.nome)+'</b>');
-      state.progetti = state.progetti.filter(x=>x.id!==p.id);
-      if(state.progettoId===p.id){ state.progettoId=null; state.schermo='home'; }
-      chiudiModale(); render();
-      toast(p.nome+' eliminato. Ctrl+Z per recuperarlo.','warn','Eliminato'); break;
+      rimuoviNelCestino([p], 'Eliminazione di «'+p.nome+'»', 'Eliminato il progetto <b>'+esc(p.nome)+'</b>', p.nome+' è nel cestino (Profilo → Cestino dei progetti).');
+      break;
+
+    /* v2.9.7: il cestino dei progetti (nel Profilo) */
+    case 'cestino-apri': caricaCestino(); break;
+    case 'cestino-ripristina': ripristinaDalCestino(t.dataset.id); break;
+    case 'cestino-elimina':{
+      const r = (cestinoVista||[]).find(x=>x.id===t.dataset.id); if(!r) break;
+      modale('<h3>Eliminare per sempre?</h3><div class="sub-t">'+esc(r.nome)+'</div>'+
+        '<div class="modal-b"><div class="nota-box">Dal cestino non si torna indietro: il lavoro non si potrà più ripristinare.</div></div>'+
+        '<div class="modal-f"><button class="btn ghost" data-action="chiudi-modale">Annulla</button>'+
+        '<button class="btn" style="background:var(--alert);border-color:var(--alert);color:#fff" data-action="cestino-elimina-ok" data-id="'+esc(r.id)+'">Elimina per sempre</button></div>');
+      break; }
+    case 'cestino-elimina-ok': chiudiModale(); eliminaDalCestino(t.dataset.id); break;
 
     case 'sposta-ev':{
       const i = Number(t.dataset.i), g = Number(t.dataset.g), ev = p.eventi[i];
@@ -13377,11 +13550,23 @@ document.addEventListener('click', function(e){
       break; }
 
     case 'tema-set':{
-      const id = t.dataset.t; state.cfg.tema = id;
-      document.documentElement.setAttribute('data-tema', id);
+      const id = t.dataset.t, R = document.documentElement;
+      if(id === 'mio' && state.cfg.tema !== 'mio'){
+        /* la prima volta si parte dai colori del tema che hai adesso */
+        if(!(Array.isArray(state.cfg.temaMio) && state.cfg.temaMio.every(hexOk))){ const T0 = TEMI.find(x=>x.id===state.cfg.tema) || TEMI[0]; state.cfg.temaMio = T0.c.slice(); }
+        state.cfg.temaLucePrima = R.getAttribute('data-theme') || '';
+      }
+      if(id !== 'mio' && state.cfg.tema === 'mio'){ if(state.cfg.temaLucePrima) R.setAttribute('data-theme', state.cfg.temaLucePrima); else R.removeAttribute('data-theme'); }
+      state.cfg.tema = id;
+      applicaTemaScelto();
       render();
+      if(typeof salvaProfiloCloud === 'function') salvaProfiloCloud();
       const T = TEMI.find(x=>x.id===id);
-      toast('«'+T.nome+'» applicato a tutta l\'app.','ok','Tema cambiato'); break; }
+      toast('«'+(T ? T.nome : 'Personalizzato')+'» applicato a tutta l\'app.','ok','Tema cambiato'); break; }
+    case 'tema-mio-base':
+      state.cfg.temaMio = MIO_BASE.slice(); applicaTemaScelto(); render();
+      if(typeof salvaProfiloCloud === 'function') salvaProfiloCloud();
+      break;
 
     case 'togli-foto':
       state.me.foto = null; U(state.utente).foto = null; render(); applicaProfilo();
@@ -13398,6 +13583,7 @@ document.addEventListener('click', function(e){
       toast('Profilo aggiornato — ora sei «'+nomeVisibile()+'».','ok','Salvato'); break; }
 
     case 'theme':{
+      if(state.cfg.tema === 'mio') break;        // col tema personalizzato chiaro/scuro lo decide lo sfondo
       const nuovo = tema()==='light'?'dark':'light';
       document.documentElement.setAttribute('data-theme', nuovo);
       if(state.schermo==='profilo') render(); else renderTop();
@@ -14468,8 +14654,7 @@ function load(){
       if(r.tema) document.documentElement.setAttribute('data-theme', r.tema);
     }
   }catch(e){}
-  if(state.cfg.tema && state.cfg.tema!=='brand') document.documentElement.setAttribute('data-tema', state.cfg.tema);
-  else document.documentElement.removeAttribute('data-tema');
+  applicaTemaScelto();
 }
 
 
@@ -14774,8 +14959,7 @@ async function caricaCloud(){
       state.cfg = Object.assign(state.cfg, prof.cfg||{}, {tema:prof.tema||'brand'});
       /* le professioni sono di questo profilo: non ereditate da chi ha usato prima il dispositivo */
       state.cfg.professioni = (prof.cfg && Array.isArray(prof.cfg.professioni)) ? prof.cfg.professioni : undefined;
-      if(state.cfg.tema && state.cfg.tema!=='brand') document.documentElement.setAttribute('data-tema', state.cfg.tema);
-      else document.documentElement.removeAttribute('data-tema');
+      applicaTemaScelto();
     }
 
     /* le organizzazioni di cui faccio parte: la mia e' quella dove sono titolare */
@@ -15890,7 +16074,8 @@ async function salvaProfiloCloud(){
     email:state.me.email, ruolo:state.me.ruolo, foto_url:state.me.foto,
     tema:state.cfg.tema, cfg:{boxFull:state.cfg.boxFull, toast:state.cfg.toast,
                               soloMiei:state.cfg.soloMiei, snoozeMin:state.cfg.snoozeMin,
-                              link:state.me.link||'', professioni:state.cfg.professioni}
+                              link:state.me.link||'', professioni:state.cfg.professioni,
+                              temaMio:state.cfg.temaMio, temaLucePrima:state.cfg.temaLucePrima}
   });
   if(error) toast(error.message,'warn','Profilo non salvato');
 }
@@ -16160,7 +16345,11 @@ document.addEventListener('dblclick', e=>{
   if(e.target.closest('input,textarea,[contenteditable]')) return;
   e.preventDefault();
 }, {passive:false});
-window.addEventListener('hashchange', ()=>{ applicaIndirizzo(); });
+window.addEventListener('hashchange', ()=>{
+  /* «#/» è solo «torna davanti» dall'app per computer: non resta nell'indirizzo */
+  if(location.hash === '#/'){ try{ history.replaceState(null, '', location.pathname + location.search); }catch(e){} return; }
+  applicaIndirizzo();
+});
 /* installabile: si aggiunge alla schermata Home e si apre a tutto schermo */
 if('serviceWorker' in navigator){
   window.addEventListener('load', ()=>{

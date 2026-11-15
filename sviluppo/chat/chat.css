@@ -1477,5 +1477,18 @@ input,textarea,[contenteditable="true"]{-webkit-user-select:text;user-select:tex
 .trascr-f:empty{display:none}
 .trascr-f .btn{display:inline-flex;align-items:center;gap:7px}
 .trascr-f .btn svg{width:16px;height:16px}
+/* 2.9.7: il tema personalizzato (tre colori) */
+.colore-tema.colore-mio{border-style:dashed}
+.mio-colori{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:8px;padding:0 20px 14px}
+.mio-colori label{display:flex;align-items:center;gap:11px;padding:8px;border-radius:12px;border:1.5px solid var(--linea);background:var(--pannello);cursor:pointer;min-width:0}
+.mio-colori label:hover{border-color:var(--testo-3)}
+.mio-colori input[type=color]{-webkit-appearance:none;appearance:none;width:44px;height:44px;flex:none;padding:0;border:0;border-radius:11px;background:none;cursor:pointer;overflow:hidden;box-shadow:0 0 0 1px rgba(127,127,127,.4)}
+.mio-colori input[type=color]::-webkit-color-swatch-wrapper{padding:0}
+.mio-colori input[type=color]::-webkit-color-swatch{border:0;border-radius:11px}
+.mio-colori input[type=color]::-moz-color-swatch{border:0;border-radius:11px}
+.mio-colori label > span{display:flex;flex-direction:column;min-width:0;line-height:1.25}
+.mio-colori label b{font-size:14px;font-weight:600;color:var(--testo)}
+.mio-colori label span span{font-size:12px;color:var(--testo-2)}
+.mio-colori p{grid-column:1/-1;margin:2px 2px 0;font-size:12.5px;color:var(--testo-2)}
 </style>
 </head>

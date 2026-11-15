@@ -1519,6 +1519,19 @@ input,textarea,[contenteditable="true"]{-webkit-user-select:text;user-select:tex
 .trascr-f:empty{display:none}
 .trascr-f .btn{display:inline-flex;align-items:center;gap:7px}
 .trascr-f .btn svg{width:16px;height:16px}
+/* 2.9.7: il tema personalizzato (tre colori) */
+.colore-tema.colore-mio{border-style:dashed}
+.mio-colori{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:8px;padding:0 20px 14px}
+.mio-colori label{display:flex;align-items:center;gap:11px;padding:8px;border-radius:12px;border:1.5px solid var(--linea);background:var(--pannello);cursor:pointer;min-width:0}
+.mio-colori label:hover{border-color:var(--testo-3)}
+.mio-colori input[type=color]{-webkit-appearance:none;appearance:none;width:44px;height:44px;flex:none;padding:0;border:0;border-radius:11px;background:none;cursor:pointer;overflow:hidden;box-shadow:0 0 0 1px rgba(127,127,127,.4)}
+.mio-colori input[type=color]::-webkit-color-swatch-wrapper{padding:0}
+.mio-colori input[type=color]::-webkit-color-swatch{border:0;border-radius:11px}
+.mio-colori input[type=color]::-moz-color-swatch{border:0;border-radius:11px}
+.mio-colori label > span{display:flex;flex-direction:column;min-width:0;line-height:1.25}
+.mio-colori label b{font-size:14px;font-weight:600;color:var(--testo)}
+.mio-colori label span span{font-size:12px;color:var(--testo-2)}
+.mio-colori p{grid-column:1/-1;margin:2px 2px 0;font-size:12.5px;color:var(--testo-2)}
 </style>
 </head>
 <body>
@@ -1538,7 +1551,7 @@ const SUPA_KEY = 'sb_publishable_f5Kjp6NHT9yTxr1bhWJjhg_4y72V-Kj';
 const VAPID_PUBBLICA = 'BNlGbW4nZrXmx8DioKxnl7ubULVOr5_6CAKvpuQYoiXeObmxYAzGU6UrkExx2zu1hACmtRNDcpoMh_ARQ0GSmlw';
 /* il server dei file sul NAS (es. 'https://media.foss.team'). Vuoto = si usa Supabase. */
 const MEDIA_NAS = 'https://media.foss.team';
-const VERSIONE = 'chat-2.9.6';
+const VERSIONE = 'chat-2.9.7';
 /* i temi colore: gli stessi di FOSS. Il predefinito per tutti è Brand (blu e giallo). */
 const TEMI_COLORE = [
   {id:'brand',   nome:'Brand',    ds:'Navy e ambra, il predefinito', c:['#0D1926','#1A3149','#FFAD01']},
@@ -1550,6 +1563,32 @@ const TEMI_COLORE = [
   {id:'autunno', nome:'Autunno',  ds:'Marrone scuro e arancio',      c:['#1E1411','#35241E','#E39A4F']},
   {id:'bloom',   nome:'Bloom',    ds:'Morbido e grafico',            c:['#EBD3AF','#3B1F45','#D1733D']}
 ];
+/* 2.9.7: il tema «Personalizzato»: tre colori scelti da ognuno (sfondo, pannelli, accento); da quelli ricavo
+   tutte le altre tinte e le metto sulla pagina (applicaTema). Chiaro o scuro lo decide lo sfondo.
+   S.cfg.colori = 'mio', i tre colori in S.cfg.mio. Stesso criterio del tema personalizzato di FOSS. */
+const MIO_BASE = ['#0D1926', '#1A3149', '#FFAD01'];
+const hexOk = c => typeof c === 'string' && /^#[0-9a-f]{6}$/i.test(c);
+const rgbDi = x => [1, 3, 5].map(i => parseInt(x.slice(i, i + 2), 16));
+const hexDi = v => '#' + v.map(n => Math.max(0, Math.min(255, Math.round(n))).toString(16).padStart(2, '0')).join('');
+const mescolaCol = (a, b, q) => { const x = rgbDi(a), y = rgbDi(b); return hexDi(x.map((n, i) => n + (y[i] - n) * q)); };   // q=0 a, q=1 b
+const luceDi = x => { const c = rgbDi(x).map(n => { n /= 255; return n <= .03928 ? n / 12.92 : Math.pow((n + .055) / 1.055, 2.4); }); return .2126 * c[0] + .7152 * c[1] + .0722 * c[2]; };
+function triadeMia(){ const t = S.cfg.mio; return Array.isArray(t) && t.length === 3 && t.every(hexOk) ? t : MIO_BASE.slice(); }
+function coloriMio(t){
+  const bg = t[0], pan = t[1], acc = t[2], scuro = luceDi(bg) < .4, la = luceDi(acc);
+  const testo = scuro ? mescolaCol('#FFFFFF', bg, .08) : mescolaCol('#0B1320', bg, .1);
+  const t2 = mescolaCol(testo, bg, .36), t3 = mescolaCol(testo, bg, .58);
+  const pann = mescolaCol(bg, pan, .55), suAcc = la > .45 ? '#1A1305' : '#FFFFFF';
+  const ink = scuro ? (la < .25 ? mescolaCol(acc, '#FFFFFF', .4) : acc) : (la > .3 ? mescolaCol(acc, '#000000', .42) : acc);
+  const mio = scuro ? mescolaCol(pan, testo, .15) : mescolaCol(pann, acc, .2);
+  return {scuro, v: {
+    '--app': bg, '--pannello': pann, '--testa': pan, '--sfondo-chat': bg, '--mio': mio, '--suo': scuro ? pan : pann,
+    '--testo': testo, '--testo-2': t2, '--testo-3': t3, '--linea': mescolaCol(pan, testo, .08), '--hover': scuro ? pan : mescolaCol(pann, testo, .04),
+    '--scelta': mescolaCol(pan, testo, .11), '--campo': scuro ? pan : pann, '--icona': t2, '--menu': scuro ? pan : pann,
+    '--badge': acc, '--badge-testo': suAcc, '--pieno': acc, '--su-pieno': suAcc, '--sistema': pann, '--sistema-testo': t2,
+    '--citazione': mescolaCol(scuro ? pan : pann, testo, .08), '--citazione-mio': mescolaCol(mio, testo, .07),
+    '--link': ink, '--verde': ink, '--verde-forte': mescolaCol(ink, '#000000', .15), '--verde-chiaro': ink, '--verde-ios': ink,
+    '--su-verde': luceDi(ink) > .45 ? '#1A1305' : '#FFFFFF', '--cit-mio': ink}};
+}
 const MAX_SUPA = 50 * 1024 * 1024;
 const MAX_FILE = MEDIA_NAS ? 2048 * 1024 * 1024 : MAX_SUPA;   // sul NAS anche i video lunghi
 
@@ -2464,14 +2503,19 @@ function cambiaCfg(k, v){
 function applicaTema(){
   let t = S.cfg.tema || 'sistema';
   if(t === 'sistema') t = matchMedia('(prefers-color-scheme: light)').matches ? 'chiaro' : 'scuro';
+  /* 2.9.7: col tema personalizzato i colori li metto direttamente sulla pagina; chiaro o scuro lo decide lo sfondo */
+  const R = document.documentElement, pers = S.cfg.colori === 'mio' ? coloriMio(triadeMia()) : null;
+  if(pers){ t = pers.scuro ? 'scuro' : 'chiaro'; Object.keys(pers.v).forEach(k => R.style.setProperty(k, pers.v[k])); }
+  else Object.keys(coloriMio(MIO_BASE).v).forEach(k => R.style.removeProperty(k));
   document.documentElement.setAttribute('data-tema', t);
-  const col = TEMI_COLORE.some(x => x.id === S.cfg.colori) ? S.cfg.colori : 'brand';
+  const col = pers ? 'mio' : (TEMI_COLORE.some(x => x.id === S.cfg.colori) ? S.cfg.colori : 'brand');
   document.documentElement.setAttribute('data-colori', col);
   try{ if(VV.cv) leggiColoriVivo(); }catch(e){}
   document.documentElement.setAttribute('data-testo', S.cfg.testo || 'medio');
   const scuro = t === 'scuro';
   document.documentElement.style.setProperty('--doodle-img', S.cfg.doodle === false ? 'none' : doodle(scuro));
   if(S.cfg.sfondo) document.documentElement.style.setProperty('--sfondo-chat', S.cfg.sfondo);
+  else if(pers) document.documentElement.style.setProperty('--sfondo-chat', pers.v['--sfondo-chat']);
   else document.documentElement.style.removeProperty('--sfondo-chat');
   const m = document.querySelector('meta[name="theme-color"]'); if(m){ const v = getComputedStyle(document.documentElement).getPropertyValue('--testa').trim(); m.content = v || (scuro ? '#111b21' : '#f0f2f5'); }
 }
@@ -5187,8 +5231,13 @@ function disegnaImpostazioni(){
     '<div class="blocco"><div class="sez-t">Chat</div>'+
       '<div class="sez-t grigio" style="padding:4px 20px 8px">Colori</div>'+
       '<div class="colori-griglia">'+TEMI_COLORE.map(x => '<button class="colore-tema'+((S.cfg.colori || 'brand') === x.id ? ' on' : '')+'" data-a="cfg" data-k="colori" data-v="'+x.id+'">'+
-        '<span class="pall3">'+x.c.map(c => '<i style="background:'+c+'"></i>').join('')+'</span><b>'+esc(x.nome)+'</b><span>'+esc(x.ds)+'</span></button>').join('')+'</div>'+
-      '<div class="sez-t grigio" style="padding:4px 20px 8px">Chiaro o scuro</div>'+opz('tema', [['sistema','Come il dispositivo'],['chiaro','Chiaro'],['scuro','Scuro']])+
+        '<span class="pall3">'+x.c.map(c => '<i style="background:'+c+'"></i>').join('')+'</span><b>'+esc(x.nome)+'</b><span>'+esc(x.ds)+'</span></button>').join('')+
+        '<button class="colore-tema colore-mio'+(S.cfg.colori === 'mio' ? ' on' : '')+'" data-a="cfg" data-k="colori" data-v="mio">'+
+        '<span class="pall3">'+triadeMia().map(c => '<i style="background:'+c+'"></i>').join('')+'</span><b>Personalizzato</b><span>I tuoi tre colori</span></button></div>'+
+      (S.cfg.colori === 'mio' ? '<div class="mio-colori">'+[['Sfondo','Dietro ai messaggi'],['Pannelli','Elenco, barre e bolle'],['Accento','Tasti, numeri e link']].map((n, i) =>
+        '<label data-i="'+i+'"><input type="color" data-miocol="'+i+'" value="'+triadeMia()[i]+'" aria-label="'+n[0]+'"><span><b>'+n[0]+'</b><span>'+n[1]+'</span></span></label>').join('')+
+        '<p>Tocca un colore e scegli: la chat cambia mentre lo muovi. Chiaro o scuro lo decide lo sfondo.</p></div>' : '')+
+      (S.cfg.colori === 'mio' ? '' : '<div class="sez-t grigio" style="padding:4px 20px 8px">Chiaro o scuro</div>'+opz('tema', [['sistema','Come il dispositivo'],['chiaro','Chiaro'],['scuro','Scuro']]))+
       '<div class="sez-t grigio" style="padding:4px 20px 8px">Dimensione del testo</div>'+opz('testo', [['piccolo','Piccolo'],['medio','Medio'],['grande','Grande']])+
       '<div class="sez-t grigio" style="padding:4px 20px 8px">Sfondo delle chat</div>'+anteprimaSfondoHTML()+
       '<div class="opz"><button data-a="sfondo-foto">'+svg('foto', 1.8).replace('<svg', '<svg style="width:16px;height:16px;display:inline;vertical-align:-3px;margin-right:6px"')+'Scegli una foto</button>'+
@@ -5622,12 +5671,25 @@ function chiediTesto(titolo, testo, max, tipo, valore){
 
 /* ---------- azioni (un solo ascoltatore per tutta la pagina) ---------- */
 function vaiAFoss(cosa){
+  /* 2.9.7, app per computer: FOSS è già aperto nell'altra vista. Con l'indirizzo «nudo» l'app lo ricaricava
+     da capo (si vedeva la schermata di prima e poi il caricamento); con «#/» lo porta solo davanti. */
+  if(window.fossDesktop && !cosa){ location.href = './#/'; return; }
   const u = './' + (cosa || '');
   if(window.opener && !window.opener.closed){ try{ window.opener.focus(); if(cosa) window.opener.location.hash = cosa.replace(/^#?/, '#'); return; }catch(e){} }
   /* sul computer FOSS si apre accanto (sempre la stessa scheda), la chat resta qui */
   if(cosa && !suTelefono() && !aTuttoSchermo()){ const w = window.open(u, 'foss-team'); if(w){ try{ w.focus(); }catch(e){} return; } }
   location.href = u;
 }
+/* 2.9.7: i tre colori del tema personalizzato: la chat cambia mentre si sceglie */
+let tSalvaMio = null;
+document.addEventListener('input', e => {
+  const i = e.target && e.target.closest ? e.target.closest('input[data-miocol]') : null;
+  if(!i || !hexOk(i.value) || S.cfg.colori !== 'mio') return;
+  const t = triadeMia(); t[+i.dataset.miocol] = i.value; S.cfg.mio = t;
+  applicaTema();
+  const p = $('.colore-mio .pall3'); if(p) p.innerHTML = t.map(c => '<i style="background:'+c+'"></i>').join('');
+  clearTimeout(tSalvaMio); tSalvaMio = setTimeout(() => cambiaCfg('mio', S.cfg.mio), 700);
+});
 document.addEventListener('click', async e => {
   /* modalita' selezione: un tocco sceglie o toglie il messaggio */
   if(S.selezione && !e.target.closest('.sel-barra, .sel-testa, .velo, .foglio, #focusMenu')){
@@ -5747,7 +5809,10 @@ document.addEventListener('click', async e => {
     case 'cambia-pin': await impostaNuovoPin(); disegnaImpostazioni(); break;
     case 'pin-dimenticato': if(await codiceDimenticato()) toast('Codice nuovo impostato.'); disegnaImpostazioni(); break;
     case 'attiva-push': attivaPush(); break;
-    case 'cfg': { const k = t.dataset.k; cambiaCfg(k, t.dataset.v); applicaTema(); disegnaImpostazioni(); break; }
+    case 'cfg': { const k = t.dataset.k;
+      /* il tema personalizzato, la prima volta, parte dai colori del tema che hai adesso */
+      if(k === 'colori' && t.dataset.v === 'mio' && !(Array.isArray(S.cfg.mio) && S.cfg.mio.every(hexOk))) S.cfg.mio = (TEMI_COLORE.find(x => x.id === S.cfg.colori) || TEMI_COLORE[0]).c.slice();
+      cambiaCfg(k, t.dataset.v); applicaTema(); disegnaImpostazioni(); break; }
     case 'cfg-suoni': cambiaCfg('suoni', !S.cfg.suoni); disegnaImpostazioni(); break;
     case 'cfg-doodle': cambiaCfg('doodle', S.cfg.doodle === false); applicaTema(); disegnaImpostazioni(); { const M = el('msgs'); if(M) M.classList.toggle('niente-doodle', S.cfg.doodle === false); } break;
     case 'cfg-invio': cambiaCfg('invio', !S.cfg.invio); disegnaImpostazioni(); break;

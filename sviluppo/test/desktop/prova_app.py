@@ -61,7 +61,7 @@ vero(len(di('attenzione')) >= 1, 'trillo: l\'icona dell\'app salta / lampeggia')
 vero(not any('non deve suonare' in a[1] for a in titoli), 'gruppo silenziato: nessun avviso')
 vero(c_e('Videoclip Il Merlo', 'riunione alle 10'), 'gruppo silenziato ma con @tutti: l\'avviso arriva')
 vero(c_e('Ti hanno assegnato', 'Luci e set'), 'avviso di FOSS: task assegnata («' + next((a[0] + ' / ' + a[1] for a in titoli if 'Luci' in a[1]), '-') + '»)')
-fa = [a for a in avvisi if 'Luci e set' in a['testo']]
+fa = [a for a in avvisi if 'Luci e set' in a['testo'] and 'assegnat' in a['titolo']]   # non l'avviso «Scadenze di oggi», che cita la stessa voce
 vero(fa and fa[0]['dove']['vista'] == 'foss' and len(fa[0]['dove']['notifica']) == 36 and fa[0]['suono'], 'l\'avviso di FOSS porta alla notifica, col suono')
 vero(any('menzionato' in d.get('titolo', '') for d in di('avviso_spento')), 'avvisi spenti dalle impostazioni: non arrivano')
 vero(not any('non deve arrivare' in a[1] for a in titoli), 'avvisi spenti: nessun avviso di sistema')

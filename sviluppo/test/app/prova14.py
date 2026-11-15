@@ -53,12 +53,20 @@ async def main():
             if n == 0:
                 print('   (impostazioni non aperte dal tasto, salto la griglia)')
             else:
-                ok(n == 8, 'otto temi come in FOSS: %d' % n)
+                ok(n == 9 and await p.evaluate("!!document.querySelector('.colore-tema.colore-mio')"), 'otto temi come in FOSS piu\' il Personalizzato: %d' % n)
                 await p.screenshot(path=OUT + '/c14-%s-impostazioni.png' % nome)
                 await p.click('.colore-tema[data-v="limoni"]'); await p.wait_for_timeout(400)
                 ok(await p.evaluate("document.documentElement.getAttribute('data-colori')") == 'limoni', 'scelto Limoni')
                 await p.wait_for_timeout(1000); ok(await p.evaluate("(__mock.db.profili.find(x=>x.id===__mock.D).chat_cfg||{}).colori") == "limoni", "salvato nel profilo")
                 await p.screenshot(path=OUT + '/c14-%s-limoni.png' % nome)
+                # 2.9.7: il tema personalizzato: il colore scelto si applica subito e decide chiaro o scuro; tornando a un tema pronto sparisce
+                await p.click('.colore-tema.colore-mio'); await p.wait_for_timeout(400)
+                await p.evaluate("""(()=>{const i=document.querySelector('input[data-miocol="0"]'); i.value='#f6f1e7'; i.dispatchEvent(new Event('input',{bubbles:true}));})()"""); await p.wait_for_timeout(1100)
+                v = await p.evaluate("[getComputedStyle(document.documentElement).getPropertyValue('--app').trim().toLowerCase(), document.documentElement.getAttribute('data-tema'), ((__mock.db.profili.find(x=>x.id===__mock.D).chat_cfg||{}).mio||[])[0]]")
+                ok(v[0] == '#f6f1e7' and v[1] == 'chiaro' and v[2] == '#f6f1e7', 'tema personalizzato: lo sfondo scelto si applica subito, decide chiaro/scuro e si salva (%s)' % v)
+                await p.screenshot(path=OUT + '/c14-%s-personalizzato.png' % nome)
+                await p.click('.colore-tema[data-v="brand"]'); await p.wait_for_timeout(400)
+                ok(await p.evaluate("document.documentElement.style.getPropertyValue('--app')") == '', 'tornando a un tema pronto i colori personalizzati si tolgono')
             await ctx.close()
         await b.close()
     print('\n'.join(e for e in errori if 'ERR_FAILED' not in e) or 'NESSUN ERRORE')

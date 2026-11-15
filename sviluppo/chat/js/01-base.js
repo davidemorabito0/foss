@@ -10,7 +10,7 @@ const SUPA_KEY = 'sb_publishable_f5Kjp6NHT9yTxr1bhWJjhg_4y72V-Kj';
 const VAPID_PUBBLICA = 'BNlGbW4nZrXmx8DioKxnl7ubULVOr5_6CAKvpuQYoiXeObmxYAzGU6UrkExx2zu1hACmtRNDcpoMh_ARQ0GSmlw';
 /* il server dei file sul NAS (es. 'https://media.foss.team'). Vuoto = si usa Supabase. */
 const MEDIA_NAS = 'https://media.foss.team';
-const VERSIONE = 'chat-2.9.6';
+const VERSIONE = 'chat-2.9.7';
 /* i temi colore: gli stessi di FOSS. Il predefinito per tutti è Brand (blu e giallo). */
 const TEMI_COLORE = [
   {id:'brand',   nome:'Brand',    ds:'Navy e ambra, il predefinito', c:['#0D1926','#1A3149','#FFAD01']},
@@ -22,6 +22,32 @@ const TEMI_COLORE = [
   {id:'autunno', nome:'Autunno',  ds:'Marrone scuro e arancio',      c:['#1E1411','#35241E','#E39A4F']},
   {id:'bloom',   nome:'Bloom',    ds:'Morbido e grafico',            c:['#EBD3AF','#3B1F45','#D1733D']}
 ];
+/* 2.9.7: il tema «Personalizzato»: tre colori scelti da ognuno (sfondo, pannelli, accento); da quelli ricavo
+   tutte le altre tinte e le metto sulla pagina (applicaTema). Chiaro o scuro lo decide lo sfondo.
+   S.cfg.colori = 'mio', i tre colori in S.cfg.mio. Stesso criterio del tema personalizzato di FOSS. */
+const MIO_BASE = ['#0D1926', '#1A3149', '#FFAD01'];
+const hexOk = c => typeof c === 'string' && /^#[0-9a-f]{6}$/i.test(c);
+const rgbDi = x => [1, 3, 5].map(i => parseInt(x.slice(i, i + 2), 16));
+const hexDi = v => '#' + v.map(n => Math.max(0, Math.min(255, Math.round(n))).toString(16).padStart(2, '0')).join('');
+const mescolaCol = (a, b, q) => { const x = rgbDi(a), y = rgbDi(b); return hexDi(x.map((n, i) => n + (y[i] - n) * q)); };   // q=0 a, q=1 b
+const luceDi = x => { const c = rgbDi(x).map(n => { n /= 255; return n <= .03928 ? n / 12.92 : Math.pow((n + .055) / 1.055, 2.4); }); return .2126 * c[0] + .7152 * c[1] + .0722 * c[2]; };
+function triadeMia(){ const t = S.cfg.mio; return Array.isArray(t) && t.length === 3 && t.every(hexOk) ? t : MIO_BASE.slice(); }
+function coloriMio(t){
+  const bg = t[0], pan = t[1], acc = t[2], scuro = luceDi(bg) < .4, la = luceDi(acc);
+  const testo = scuro ? mescolaCol('#FFFFFF', bg, .08) : mescolaCol('#0B1320', bg, .1);
+  const t2 = mescolaCol(testo, bg, .36), t3 = mescolaCol(testo, bg, .58);
+  const pann = mescolaCol(bg, pan, .55), suAcc = la > .45 ? '#1A1305' : '#FFFFFF';
+  const ink = scuro ? (la < .25 ? mescolaCol(acc, '#FFFFFF', .4) : acc) : (la > .3 ? mescolaCol(acc, '#000000', .42) : acc);
+  const mio = scuro ? mescolaCol(pan, testo, .15) : mescolaCol(pann, acc, .2);
+  return {scuro, v: {
+    '--app': bg, '--pannello': pann, '--testa': pan, '--sfondo-chat': bg, '--mio': mio, '--suo': scuro ? pan : pann,
+    '--testo': testo, '--testo-2': t2, '--testo-3': t3, '--linea': mescolaCol(pan, testo, .08), '--hover': scuro ? pan : mescolaCol(pann, testo, .04),
+    '--scelta': mescolaCol(pan, testo, .11), '--campo': scuro ? pan : pann, '--icona': t2, '--menu': scuro ? pan : pann,
+    '--badge': acc, '--badge-testo': suAcc, '--pieno': acc, '--su-pieno': suAcc, '--sistema': pann, '--sistema-testo': t2,
+    '--citazione': mescolaCol(scuro ? pan : pann, testo, .08), '--citazione-mio': mescolaCol(mio, testo, .07),
+    '--link': ink, '--verde': ink, '--verde-forte': mescolaCol(ink, '#000000', .15), '--verde-chiaro': ink, '--verde-ios': ink,
+    '--su-verde': luceDi(ink) > .45 ? '#1A1305' : '#FFFFFF', '--cit-mio': ink}};
+}
 const MAX_SUPA = 50 * 1024 * 1024;
 const MAX_FILE = MEDIA_NAS ? 2048 * 1024 * 1024 : MAX_SUPA;   // sul NAS anche i video lunghi
 

@@ -352,8 +352,13 @@ function disegnaImpostazioni(){
     '<div class="blocco"><div class="sez-t">Chat</div>'+
       '<div class="sez-t grigio" style="padding:4px 20px 8px">Colori</div>'+
       '<div class="colori-griglia">'+TEMI_COLORE.map(x => '<button class="colore-tema'+((S.cfg.colori || 'brand') === x.id ? ' on' : '')+'" data-a="cfg" data-k="colori" data-v="'+x.id+'">'+
-        '<span class="pall3">'+x.c.map(c => '<i style="background:'+c+'"></i>').join('')+'</span><b>'+esc(x.nome)+'</b><span>'+esc(x.ds)+'</span></button>').join('')+'</div>'+
-      '<div class="sez-t grigio" style="padding:4px 20px 8px">Chiaro o scuro</div>'+opz('tema', [['sistema','Come il dispositivo'],['chiaro','Chiaro'],['scuro','Scuro']])+
+        '<span class="pall3">'+x.c.map(c => '<i style="background:'+c+'"></i>').join('')+'</span><b>'+esc(x.nome)+'</b><span>'+esc(x.ds)+'</span></button>').join('')+
+        '<button class="colore-tema colore-mio'+(S.cfg.colori === 'mio' ? ' on' : '')+'" data-a="cfg" data-k="colori" data-v="mio">'+
+        '<span class="pall3">'+triadeMia().map(c => '<i style="background:'+c+'"></i>').join('')+'</span><b>Personalizzato</b><span>I tuoi tre colori</span></button></div>'+
+      (S.cfg.colori === 'mio' ? '<div class="mio-colori">'+[['Sfondo','Dietro ai messaggi'],['Pannelli','Elenco, barre e bolle'],['Accento','Tasti, numeri e link']].map((n, i) =>
+        '<label data-i="'+i+'"><input type="color" data-miocol="'+i+'" value="'+triadeMia()[i]+'" aria-label="'+n[0]+'"><span><b>'+n[0]+'</b><span>'+n[1]+'</span></span></label>').join('')+
+        '<p>Tocca un colore e scegli: la chat cambia mentre lo muovi. Chiaro o scuro lo decide lo sfondo.</p></div>' : '')+
+      (S.cfg.colori === 'mio' ? '' : '<div class="sez-t grigio" style="padding:4px 20px 8px">Chiaro o scuro</div>'+opz('tema', [['sistema','Come il dispositivo'],['chiaro','Chiaro'],['scuro','Scuro']]))+
       '<div class="sez-t grigio" style="padding:4px 20px 8px">Dimensione del testo</div>'+opz('testo', [['piccolo','Piccolo'],['medio','Medio'],['grande','Grande']])+
       '<div class="sez-t grigio" style="padding:4px 20px 8px">Sfondo delle chat</div>'+anteprimaSfondoHTML()+
       '<div class="opz"><button data-a="sfondo-foto">'+svg('foto', 1.8).replace('<svg', '<svg style="width:16px;height:16px;display:inline;vertical-align:-3px;margin-right:6px"')+'Scegli una foto</button>'+

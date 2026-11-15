@@ -53,12 +53,25 @@ function chiediTesto(titolo, testo, max, tipo, valore){
 
 /* ---------- azioni (un solo ascoltatore per tutta la pagina) ---------- */
 function vaiAFoss(cosa){
+  /* 2.9.7, app per computer: FOSS è già aperto nell'altra vista. Con l'indirizzo «nudo» l'app lo ricaricava
+     da capo (si vedeva la schermata di prima e poi il caricamento); con «#/» lo porta solo davanti. */
+  if(window.fossDesktop && !cosa){ location.href = './#/'; return; }
   const u = './' + (cosa || '');
   if(window.opener && !window.opener.closed){ try{ window.opener.focus(); if(cosa) window.opener.location.hash = cosa.replace(/^#?/, '#'); return; }catch(e){} }
   /* sul computer FOSS si apre accanto (sempre la stessa scheda), la chat resta qui */
   if(cosa && !suTelefono() && !aTuttoSchermo()){ const w = window.open(u, 'foss-team'); if(w){ try{ w.focus(); }catch(e){} return; } }
   location.href = u;
 }
+/* 2.9.7: i tre colori del tema personalizzato: la chat cambia mentre si sceglie */
+let tSalvaMio = null;
+document.addEventListener('input', e => {
+  const i = e.target && e.target.closest ? e.target.closest('input[data-miocol]') : null;
+  if(!i || !hexOk(i.value) || S.cfg.colori !== 'mio') return;
+  const t = triadeMia(); t[+i.dataset.miocol] = i.value; S.cfg.mio = t;
+  applicaTema();
+  const p = $('.colore-mio .pall3'); if(p) p.innerHTML = t.map(c => '<i style="background:'+c+'"></i>').join('');
+  clearTimeout(tSalvaMio); tSalvaMio = setTimeout(() => cambiaCfg('mio', S.cfg.mio), 700);
+});
 document.addEventListener('click', async e => {
   /* modalita' selezione: un tocco sceglie o toglie il messaggio */
   if(S.selezione && !e.target.closest('.sel-barra, .sel-testa, .velo, .foglio, #focusMenu')){
@@ -178,7 +191,10 @@ document.addEventListener('click', async e => {
     case 'cambia-pin': await impostaNuovoPin(); disegnaImpostazioni(); break;
     case 'pin-dimenticato': if(await codiceDimenticato()) toast('Codice nuovo impostato.'); disegnaImpostazioni(); break;
     case 'attiva-push': attivaPush(); break;
-    case 'cfg': { const k = t.dataset.k; cambiaCfg(k, t.dataset.v); applicaTema(); disegnaImpostazioni(); break; }
+    case 'cfg': { const k = t.dataset.k;
+      /* il tema personalizzato, la prima volta, parte dai colori del tema che hai adesso */
+      if(k === 'colori' && t.dataset.v === 'mio' && !(Array.isArray(S.cfg.mio) && S.cfg.mio.every(hexOk))) S.cfg.mio = (TEMI_COLORE.find(x => x.id === S.cfg.colori) || TEMI_COLORE[0]).c.slice();
+      cambiaCfg(k, t.dataset.v); applicaTema(); disegnaImpostazioni(); break; }
     case 'cfg-suoni': cambiaCfg('suoni', !S.cfg.suoni); disegnaImpostazioni(); break;
     case 'cfg-doodle': cambiaCfg('doodle', S.cfg.doodle === false); applicaTema(); disegnaImpostazioni(); { const M = el('msgs'); if(M) M.classList.toggle('niente-doodle', S.cfg.doodle === false); } break;
     case 'cfg-invio': cambiaCfg('invio', !S.cfg.invio); disegnaImpostazioni(); break;

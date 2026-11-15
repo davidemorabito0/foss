@@ -1,0 +1,15 @@
+-- FOSS, 16 novembre 2026 (già applicato al database: migrazioni «cestino_progetti_e_chat_lavoro_admin»
+-- e «admin_chat_lavori_due_passaggi»). Qui resta come promemoria di cosa c'è.
+--
+-- 1) cestino_progetti: quando un lavoro viene rimosso da FOSS (index.html, rimuoviNelCestino) una copia intera
+--    finisce qui, visibile solo a chi l'ha rimosso; da Profilo → Cestino dei progetti la si ripristina.
+--    Colonne: id, utente_id (auth.uid()), org_id, progetto_id, nome, cliente, dati (il lavoro intero), conti,
+--    eliminato_il. RLS: ognuno vede, mette e toglie solo le sue righe.
+--
+-- 2) Pannello admin → «Chat dei progetti»: collegare un lavoro a un gruppo di FOSS.chat che esiste già.
+--    admin_solo_2fa()                      controllo: amministratore di FOSS e accesso a due passaggi (aal2)
+--    admin_chat_lavori()                   elenco dei lavori (con la chat collegata) e dei gruppi
+--    admin_collega_chat(conv, org, prog)   collega; con prog = null scollega. Se il lavoro aveva un'altra chat,
+--                                          quella torna un gruppo normale; chi lavora al progetto entra nel gruppo;
+--                                          nel gruppo compare «Questo gruppo è ora la chat del lavoro …».
+--    Il legame è chat_conversazioni(org_id, progetto_id), lo stesso che usa chat_gruppo_lavoro («Crea chat»).

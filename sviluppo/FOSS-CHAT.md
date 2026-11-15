@@ -285,6 +285,27 @@ L'elenco completo è nel `README.md` del sito, sezioni «FOSS.chat» e «FOSS.ch
   e alta zero perche' la scheda (un `<button>`) allinea i figli a sinistra (`align-items:flex-start`). Ora ha
   `width:100%` e l'altezza dal padding (`padding-bottom: calc(100% / 3.6)`), che funziona ovunque.
 
+### 2.9.7 e FOSS — 16 novembre 2026
+- **Tema «Personalizzato»** (FOSS: Profilo → Tema dell'interfaccia; chat: Impostazioni → Colori): tre colori
+  scelti da ognuno, **sfondo, pannelli, accento**; da quelli si ricavano tutte le altre tinte (`coloriMio`) e si
+  mettono direttamente sulla pagina, quindi l'app cambia **mentre si muove il colore**. Chiaro o scuro lo decide
+  lo sfondo (l'interruttore chiaro/scuro sparisce col tema personalizzato). FOSS: `state.cfg.tema = 'mio'`,
+  colori in `state.cfg.temaMio` (salvati in `profili.cfg`); chat: `S.cfg.colori = 'mio'`, colori in `S.cfg.mio`
+  (`profili.chat_cfg`). Sono due scelte separate, come gli altri temi.
+- **«Torna a FOSS» nell'app per computer**: dalla chat, senza un punto preciso a cui andare, l'app ricaricava
+  FOSS da capo (si vedeva la schermata di prima e poi il caricamento). Ora la chat va a `./#/` e l'app porta
+  FOSS solo davanti (`vaiAFoss` in 12-app.js; FOSS toglie `#/` dall'indirizzo). Corretto anche in
+  `apri_indirizzo` (lib.rs) per le prossime versioni dell'app.
+- **Cestino dei progetti**: «Elimina progetto», «Rimuovi» sui completati e «Rimuovi tutti» non cancellano più
+  senza rimedio: prima una copia intera va in `cestino_progetti` (`rimuoviNelCestino`), poi il lavoro si toglie
+  come prima. In **Profilo → Cestino dei progetti** («Mostra il cestino») si ripristina o si elimina per sempre.
+  Il ripristino rimette il lavoro con lo stesso id (la sua chat lo ritrova); il link per il cliente va rifatto.
+  Se la copia non riesce, non si rimuove niente. Il cestino è di chi rimuove (gli altri non lo vedono).
+- **Pannello admin → «Chat dei progetti»** (`admin.html`): elenco dei lavori con la chat collegata; «Collega a
+  una chat» lega il lavoro a un gruppo che esiste già (creato a mano), «Scollega» lo stacca. Funzioni nel
+  database: `admin_chat_lavori`, `admin_collega_chat` (solo amministratore, con i due passaggi).
+  Promemoria in `sviluppo/sql/foss_cestino_chat_admin.sql`.
+
 ### 2.9.6 — niente cornici colorate, vocali che non si perdono (16 novembre 2026)
 - **Cornici della foto tolte** (erano della 2.4: oro, argento, neon…): intorno alla foto resta solo il cerchio
   dello stato, **verde online, rosso occupato, niente se offline**. Tolta la scelta dalle impostazioni, il codice

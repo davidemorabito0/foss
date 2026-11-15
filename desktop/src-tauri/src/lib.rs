@@ -455,8 +455,12 @@ pub fn apri_indirizzo(app: &AppHandle, u: &Url) {
         porta_davanti(app, "foss");
         let gia = foss.url().map(|x| !e_chat(&x) && stesso_sito(&st, &x)).unwrap_or(false);
         let h = u.fragment().map(|f| format!("#{f}")).unwrap_or_default();
-        if gia && !h.is_empty() && u.query().is_none() {
-            al_ponte(app, "foss", json!({"tipo": "hash", "hash": h}));
+        if gia && u.query().is_none() {
+            // FOSS è già aperto: lo porto davanti senza ricaricarlo (prima, senza un punto preciso
+            // a cui andare, ripartiva da capo: si vedeva la schermata vecchia e poi il caricamento)
+            if !h.is_empty() {
+                al_ponte(app, "foss", json!({"tipo": "hash", "hash": h}));
+            }
         } else {
             let _ = foss.navigate(u.clone());
         }

@@ -209,6 +209,7 @@ tbody tr:hover td{background:#0E1E35}
     <button class="nav on" data-vai="spazio"><svg class="i"><use href="#i-db"/></svg>Spazio e limiti</button>
     <button class="nav" data-vai="file"><svg class="i"><use href="#i-file"/></svg>File</button>
     <button class="nav" data-vai="utenti"><svg class="i"><use href="#i-users"/></svg>Utenti</button>
+    <button class="nav" data-vai="chatlavori"><svg class="i"><use href="#i-link"/></svg>Chat dei progetti</button>
     <button class="nav" data-vai="inviti"><svg class="i"><use href="#i-invito"/></svg>Inviti</button>
     <button class="nav" data-vai="segnalazioni"><svg class="i"><use href="#i-bandiera"/></svg>Segnalazioni<span class="n" id="nSegn" hidden></span></button>
     <button class="nav" data-vai="comunica"><svg class="i"><use href="#i-megafono"/></svg>Comunicazioni</button>
@@ -385,7 +386,7 @@ function vai(v){
   st.vista = v;
   document.querySelectorAll('.nav[data-vai]').forEach(b=>b.classList.toggle('on', b.dataset.vai === v));
   $('main').innerHTML = '<div class="carica">Carico…</div>';
-  ({spazio:vistaSpazio, file:vistaFile, utenti:vistaUtenti, inviti:vistaInviti, segnalazioni:vistaSegn, email:vistaEmail, backup:vistaBackup, errori:vistaErrori, comunica:vistaComunica}[v])()
+  ({spazio:vistaSpazio, file:vistaFile, utenti:vistaUtenti, inviti:vistaInviti, segnalazioni:vistaSegn, email:vistaEmail, backup:vistaBackup, errori:vistaErrori, comunica:vistaComunica, chatlavori:vistaChatLavori}[v])()
     .catch(e=>{ if(e.message !== '2fa' && e.message !== 'non-admin') $('main').innerHTML = '<div class="avviso ko">' + ico('allerta') + 'Non riesco a leggere i dati (' + esc(e.message) + '). Riprova tra poco.</div>'; });
 }
 function testa(titolo, sotto, destra){
@@ -587,6 +588,59 @@ async function vistaInviti(){
   $('main').innerHTML = h;
 }
 
+/* ---------- chat dei progetti ----------
+   Ogni lavoro può avere il suo gruppo su FOSS.chat (di solito nasce dal tasto «Crea chat» dentro il lavoro).
+   Se il gruppo era stato creato a mano, qui lo si collega al lavoro: da quel momento il tasto della chat
+   dentro il lavoro apre quel gruppo, e chi lavora al progetto ci entra. Funzioni admin_chat_lavori e
+   admin_collega_chat nel database (solo amministratore, con il codice a due passaggi). */
+async function vistaChatLavori(){
+  const {data, error} = await sb.rpc('admin_chat_lavori');
+  if(error) throw new Error(error.message || 'server');
+  st.dati.cl = data || {lavori:[], chat:[]};
+  disegnaChatLavori();
+}
+function disegnaChatLavori(){
+  const d = st.dati.cl, q = (st.clCerca || '').toLowerCase();
+  const chatDi = {}; d.chat.forEach(c=>{ chatDi[c.id] = c; });
+  const lavori = d.lavori.filter(l=>!q || ((l.nome || '') + ' ' + (l.cliente || '')).toLowerCase().indexOf(q) >= 0);
+  const collegati = d.lavori.filter(l=>l.chat).length;
+  let h = testa('Chat dei progetti', collegati + ' lavori su ' + d.lavori.length + ' hanno la loro chat. Qui colleghi un lavoro a un gruppo che esiste già.',
+    '<label class="cerca">' + ico('cerca') + '<input id="clCerca" type="search" placeholder="Cerca un lavoro" value="' + esc(st.clCerca || '') + '"></label>');
+  if(!d.lavori.length){ $('main').innerHTML = h + '<div class="pannello vuoto">Nessun lavoro.</div>'; return; }
+  h += '<div class="pannello"><div class="tab-wrap"><table><thead><tr><th>Lavoro</th><th>Chat collegata</th><th class="dx">Azioni</th></tr></thead><tbody>' +
+    (lavori.length ? lavori.map(l=>{
+      const c = l.chat ? chatDi[l.chat] : null;
+      return '<tr><td><b>' + esc(l.nome) + '</b><div class="piccolo">' + esc(l.cliente || '—') + (l.fatto ? ' · completato' : '') + '</div></td>' +
+        '<td>' + (c ? '<span class="chip ok">' + esc(c.nome) + '</span><div class="piccolo">' + c.membri + (c.membri === 1 ? ' persona' : ' persone') + '</div>' : '<span class="chip">nessuna</span>') + '</td>' +
+        '<td><div class="azr"><button class="btn sm" data-cl="scegli" data-org="' + esc(l.org) + '" data-id="' + esc(l.id) + '">' + (c ? 'Cambia chat' : 'Collega a una chat') + '</button>' +
+        (c ? '<button class="btn sm" data-cl="stacca" data-conv="' + esc(c.id) + '" data-id="' + esc(l.id) + '">Scollega</button>' : '') + '</div></td></tr>'; }).join('')
+      : '<tr><td colspan="3" class="piccolo">Nessun lavoro con questo nome.</td></tr>') + '</tbody></table></div></div>';
+  $('main').innerHTML = h;
+  const i = $('clCerca');
+  if(i){ i.addEventListener('input', ()=>{ st.clCerca = i.value; const p = i.selectionStart; disegnaChatLavori(); const n = $('clCerca'); if(n){ n.focus(); try{ n.setSelectionRange(p, p); }catch(x){} } }); }
+}
+function scegliChatLavoro(org, id){
+  const d = st.dati.cl, l = d.lavori.find(x=>x.org === org && x.id === id); if(!l) return;
+  const nomeLavoro = {}; d.lavori.forEach(x=>{ if(x.chat) nomeLavoro[x.chat] = x.nome; });
+  const gruppi = d.chat.filter(c=>c.id !== l.chat);
+  if(!gruppi.length){ toast('Non ci sono altri gruppi a cui collegarlo.'); return; }
+  modale('<h3>Collega «' + esc(l.nome) + '» a una chat</h3>' +
+    '<p>Scegli il gruppo di FOSS.chat che deve diventare la chat di questo lavoro. Chi lavora al progetto entra nel gruppo; chi c’è già resta.</p>' +
+    '<select id="clScelta" style="width:100%;margin:6px 0 4px;background:#091526;border:1px solid var(--line-2);border-radius:10px;padding:10px 12px;font-size:13px">' + gruppi.map(c=>'<option value="' + esc(c.id) + '">' + esc(c.nome) + ' · ' + c.membri + (c.membri === 1 ? ' persona' : ' persone') +
+      (c.lavoro ? ' · ora collegata a «' + esc(nomeLavoro[c.id] || 'un altro lavoro') + '»' : '') + '</option>').join('') + '</select>' +
+    (l.chat ? '<p class="piccolo">La chat collegata adesso resta un gruppo normale, con i suoi messaggi.</p>' : '') +
+    '<p class="piccolo">Se il gruppo che scegli è già la chat di un altro lavoro, passa a questo.</p>' +
+    '<div class="az"><button class="btn" data-az="chiudi">Annulla</button><button class="btn prim" data-cl="collega" data-org="' + esc(org) + '" data-id="' + esc(id) + '">Collega</button></div>');
+}
+async function collegaChatLavoro(conv, org, id, t){
+  if(t) t.disabled = true;
+  const {data, error} = await sb.rpc('admin_collega_chat', {p_conv:conv, p_org:org || null, p_prog:id || null});
+  if(error){ if(t) t.disabled = false; toast('Non riuscito: ' + (error.message || 'riprova') + '.'); return; }
+  chiudi();
+  toast(id ? 'Collegata: «' + ((data && data.nome) || 'il lavoro') + '» ora apre questa chat.' : 'Scollegata: resta un gruppo normale.');
+  vai('chatlavori');
+}
+
 /* ---------- segnalazioni ---------- */
 const TIPO_SEGN = {problema:'Non funziona', domanda:'Domanda', idea:'Idea'};
 async function vistaSegn(){
@@ -762,6 +816,9 @@ document.addEventListener('click', async e=>{
   if(d.togli1) return chiediTogliFile([d.togli1]);
   if(d.apri){ const i = d.apri.indexOf('|'); const w = window.open('about:blank', '_blank'); if(w) w.opener = null;
     try{ const r = await chiedi('link-file', {bucket:d.apri.slice(0, i), nome:d.apri.slice(i + 1)}); if(w) w.location.href = r.url; }catch(x){ if(w) w.close(); toast('Il file non si apre.'); } return; }
+  if(d.cl === 'scegli') return scegliChatLavoro(d.org, d.id);
+  if(d.cl === 'collega'){ const sel = $('clScelta'); if(!sel || !sel.value) return; return collegaChatLavoro(sel.value, d.org, d.id, t); }
+  if(d.cl === 'stacca'){ if(!confirm('Scollegare la chat da questo lavoro? Il gruppo resta, con i suoi messaggi.')) return; return collegaChatLavoro(d.conv, null, null, t); }
   if(d.ut) return azioneUtente(d.ut, d.id);
   if(d.ok) return faiUtente(d.ok, d.id);
   if(d.annulla){ try{ await chiedi('annulla-invito', {id:d.annulla}); toast('Invito annullato.'); }catch(x){ toast('Non riuscito.'); } return vai('inviti'); }

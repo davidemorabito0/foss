@@ -2,14 +2,19 @@
 function applicaTema(){
   let t = S.cfg.tema || 'sistema';
   if(t === 'sistema') t = matchMedia('(prefers-color-scheme: light)').matches ? 'chiaro' : 'scuro';
+  /* 2.9.7: col tema personalizzato i colori li metto direttamente sulla pagina; chiaro o scuro lo decide lo sfondo */
+  const R = document.documentElement, pers = S.cfg.colori === 'mio' ? coloriMio(triadeMia()) : null;
+  if(pers){ t = pers.scuro ? 'scuro' : 'chiaro'; Object.keys(pers.v).forEach(k => R.style.setProperty(k, pers.v[k])); }
+  else Object.keys(coloriMio(MIO_BASE).v).forEach(k => R.style.removeProperty(k));
   document.documentElement.setAttribute('data-tema', t);
-  const col = TEMI_COLORE.some(x => x.id === S.cfg.colori) ? S.cfg.colori : 'brand';
+  const col = pers ? 'mio' : (TEMI_COLORE.some(x => x.id === S.cfg.colori) ? S.cfg.colori : 'brand');
   document.documentElement.setAttribute('data-colori', col);
   try{ if(VV.cv) leggiColoriVivo(); }catch(e){}
   document.documentElement.setAttribute('data-testo', S.cfg.testo || 'medio');
   const scuro = t === 'scuro';
   document.documentElement.style.setProperty('--doodle-img', S.cfg.doodle === false ? 'none' : doodle(scuro));
   if(S.cfg.sfondo) document.documentElement.style.setProperty('--sfondo-chat', S.cfg.sfondo);
+  else if(pers) document.documentElement.style.setProperty('--sfondo-chat', pers.v['--sfondo-chat']);
   else document.documentElement.style.removeProperty('--sfondo-chat');
   const m = document.querySelector('meta[name="theme-color"]'); if(m){ const v = getComputedStyle(document.documentElement).getPropertyValue('--testa').trim(); m.content = v || (scuro ? '#111b21' : '#f0f2f5'); }
 }
