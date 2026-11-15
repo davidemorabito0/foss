@@ -490,3 +490,54 @@ certificato: SmartScreen → «Ulteriori informazioni» → «Esegui comunque».
    Su GitHub il controllo `.github/workflows/controllo-app.yml` costruisce l'app per Mac, fa le stesse 39
    prove e lascia l'app da provare negli «Artifacts»; per Windows controlla che si costruisca.
 4. Costruzione completa sul Mac: `TAURI_SIGNING_PRIVATE_KEY="$(cat <chiave>)" cargo tauri build`.
+
+---
+
+## 13. App per Android (APK, fuori dallo store) — cartella `android/`
+
+Un file `.apk` che Davide passa a mano ai collaboratori con telefono Android. Non è una copia del sito:
+è un «guscio» (Trusted Web Activity) che apre `https://foss.team` a tutto schermo con il motore di Chrome
+del telefono. Quindi **ogni pubblicazione del sito arriva anche all'app** e tutto funziona come nel browser
+(accesso, avvisi push, vocali, fotocamera, allegati). FOSS e la chat stanno nella stessa app; tenendo
+premuta l'icona c'è la scorciatoia «Chat».
+
+### Com'è fatta
+- `android/app/src/main/AndroidManifest.xml` e `res/`: solo configurazione (nome «FOSS», pacchetto
+  `team.foss.app`, colori, scorciatoia, icona degli avvisi). **Niente codice nostro**: le classi sono
+  quelle della libreria `com.google.androidbrowserhelper:androidbrowserhelper` (LauncherActivity,
+  DelegationService per mostrare gli avvisi a nome dell'app).
+- `android/icone.py`: prima di costruire prepara le immagini dell'app dalle icone del sito
+  (`foss-icona-512.png`, `chat-icona-192.png`). Le immagini generate non stanno nel repository.
+- `.well-known/assetlinks.json` (nel sito): dice a Chrome che l'app firmata con la nostra firma è
+  «di foss.team». **È quello che toglie la barra dell'indirizzo** e fa arrivare gli avvisi a nome dell'app.
+  Dentro c'è l'impronta della firma: se la firma cambia, va aggiornata lì (e l'azione di GitHub si ferma
+  se le due non coincidono).
+- I link `https://foss.team/...` toccati sul telefono si aprono nell'app.
+
+### Firma (segreti: non stanno nel repository)
+- File sul Mac di Davide, cartella `Downloads/FOSS-chiavi/`: `foss-android.p12` (la firma),
+  `foss-android-password.txt`, `foss-android-base64.txt` (la firma in testo, per GitHub),
+  `foss-android-cert.pem` (la parte pubblica). **Da tenere al sicuro con una copia**: se la firma si perde,
+  un APK nuovo non può aggiornare quello installato (andrebbe disinstallato e rimesso).
+- Segreti su GitHub (Settings → Secrets and variables → Actions): `ANDROID_KEYSTORE_BASE64` e
+  `ANDROID_KEYSTORE_PASSWORD`. Li inserisce Davide.
+
+### Costruire e pubblicare un APK
+- `.github/workflows/app-android.yml`. A mano: Actions → «App Android» → Run workflow con la versione
+  (es. `1.0.0`): costruisce, firma, prova su un telefono finto (si installa, si apre, schermate negli
+  «Artifacts») e crea la release **`android-v1.0.0`** con `FOSS-1.0.0.apk`.
+- La release Android **non è mai «latest»**: quella resta dell'app per computer, che da
+  `releases/latest/download/latest.json` prende gli aggiornamenti. Non cambiare questa cosa.
+- A ogni modifica di `android/` l'azione costruisce e prova soltanto (APK negli «Artifacts»).
+- Un APK nuovo serve solo se cambia il guscio (nome, icona, scorciatoie): il sito si aggiorna da solo.
+  Senza store l'APK non si aggiorna da solo: si ripassa il file, che si installa sopra quello vecchio.
+
+### Cosa serve sul telefono
+- Chrome (c'è quasi sempre). Senza un browser adatto l'app si apre lo stesso ma con la barra dell'indirizzo.
+- Alla prima installazione: consentire le app da «origini sconosciute» per l'app da cui si apre il file
+  (WhatsApp, Drive, File…). Play Protect può mostrare un avviso: è normale fuori dallo store.
+- Gli avvisi si accendono dentro l'app come sul sito (Profilo → Avvisi), una volta.
+
+### Strumenti per pubblicare senza git (`sviluppo/strumenti/`)
+Sul Mac di Davide git e python non ci sono più: `pubblica.pl` carica le modifiche su GitHub con `gh`
+(anche su un ramo di prova: `RAMO=prova-x`), `build.pl` ricostruisce `chat.html` come `build.py`.

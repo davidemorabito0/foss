@@ -1,0 +1,55 @@
+// FOSS per Android: un «guscio» (Trusted Web Activity) che apre https://foss.team a tutto schermo
+// con il motore di Chrome del telefono. Niente codice nostro: solo configurazione.
+// La versione e la firma arrivano dall'azione di GitHub (.github/workflows/app-android.yml):
+//   FOSS_VERSIONE (es. 1.0.0), FOSS_FIRMA_FILE (il file .p12), FOSS_FIRMA_PASSWORD.
+plugins {
+    id 'com.android.application'
+}
+
+def versione = System.getenv('FOSS_VERSIONE') ?: '0.0.1'
+def pezzi = versione.tokenize('.-').findAll { it.isInteger() }.collect { it as int }
+while (pezzi.size() < 3) pezzi << 0
+def numero = Math.max(1, pezzi[0] * 10000 + pezzi[1] * 100 + pezzi[2])
+def firma = System.getenv('FOSS_FIRMA_FILE')
+
+android {
+    namespace 'team.foss.app'
+    compileSdk 34
+
+    defaultConfig {
+        applicationId 'team.foss.app'
+        minSdk 21
+        targetSdk 34
+        versionCode numero
+        versionName versione
+    }
+    signingConfigs {
+        if (firma) {
+            rilascio {
+                storeFile file(firma)
+                storeType 'pkcs12'
+                storePassword System.getenv('FOSS_FIRMA_PASSWORD')
+                keyAlias 'foss'
+                keyPassword System.getenv('FOSS_FIRMA_PASSWORD')
+            }
+        }
+    }
+    buildTypes {
+        release {
+            minifyEnabled false
+            if (firma) signingConfig signingConfigs.rilascio
+        }
+    }
+    compileOptions {
+        sourceCompatibility JavaVersion.VERSION_17
+        targetCompatibility JavaVersion.VERSION_17
+    }
+    lint {
+        checkReleaseBuilds false
+        abortOnError false
+    }
+}
+
+dependencies {
+    implementation 'com.google.androidbrowserhelper:androidbrowserhelper:2.5.0'
+}

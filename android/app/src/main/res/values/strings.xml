@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="appName">FOSS</string>
+    <string name="hostName">foss.team</string>
+    <string name="launchUrl">https://foss.team/</string>
+    <string name="webManifestUrl">https://foss.team/manifest.json</string>
+    <string name="providerAuthority">team.foss.app.fileprovider</string>
+    <string name="scorciatoiaChat">Chat</string>
+    <string name="scorciatoiaChatLunga">Apri FOSS.chat</string>
+    <string name="assetStatements">[{ \"relation\": [\"delegate_permission/common.handle_all_urls\"], \"target\": { \"namespace\": \"web\", \"site\": \"https://foss.team\" } }]</string>
+</resources>

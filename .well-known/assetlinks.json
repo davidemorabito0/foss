@@ -1,0 +1,10 @@
+[
+  {
+    "relation": ["delegate_permission/common.handle_all_urls"],
+    "target": {
+      "namespace": "android_app",
+      "package_name": "team.foss.app",
+      "sha256_cert_fingerprints": ["6D:F3:DB:F5:63:E6:D0:B1:CA:D7:F2:02:78:CE:10:96:A5:4D:87:2B:0C:78:65:93:9B:70:B1:D2:05:53:4D:59"]
+    }
+  }
+]

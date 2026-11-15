@@ -1,0 +1,161 @@
+# FOSS per Android: costruisce l'APK (cartella android/) e lo mette tra le Releases, da passare a mano.
+# - A mano: Actions → «App Android» → Run workflow, con il numero di versione (es. 1.0.0):
+#   nasce la release «android-v1.0.0» con dentro FOSS-1.0.0.apk (NON diventa «latest»:
+#   quella resta dell'app per computer, che da lì prende gli aggiornamenti).
+# - A ogni modifica di android/: costruisce e prova soltanto (l'APK resta tra gli «artifact»).
+# Segreti (Settings → Secrets and variables → Actions): ANDROID_KEYSTORE_BASE64, ANDROID_KEYSTORE_PASSWORD.
+# Senza segreti costruisce un APK di prova non firmato da noi (si apre con la barra dell'indirizzo).
+name: App Android
+
+on:
+  workflow_dispatch:
+    inputs:
+      versione:
+        description: 'Versione (es. 1.0.0)'
+        required: true
+        default: '1.0.0'
+  push:
+    branches: [main, 'prova-*']
+    paths: ['android/**', '.github/workflows/app-android.yml']
+
+permissions:
+  contents: write
+
+jobs:
+  apk:
+    runs-on: ubuntu-latest
+    outputs:
+      firmato: ${{ steps.firma.outputs.firmato }}
+      versione: ${{ steps.v.outputs.versione }}
+    env:
+      KS_B64: ${{ secrets.ANDROID_KEYSTORE_BASE64 }}
+      FOSS_FIRMA_PASSWORD: ${{ secrets.ANDROID_KEYSTORE_PASSWORD }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '17'
+      - uses: gradle/actions/setup-gradle@v4
+        with:
+          gradle-version: '8.9'
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Versione
+        id: v
+        run: |
+          v="${{ github.event.inputs.versione }}"
+          if [ -z "$v" ]; then v="0.0.${{ github.run_number }}"; fi
+          echo "$v" | grep -Eq '^[0-9]+\.[0-9]+\.[0-9]+$' || { echo "::error::La versione deve essere del tipo 1.0.0"; exit 1; }
+          echo "versione=$v" >> "$GITHUB_OUTPUT"
+          echo "FOSS_VERSIONE=$v" >> "$GITHUB_ENV"
+      - name: Immagini dell'app (dalle icone del sito)
+        run: |
+          pip install --quiet pillow
+          python3 android/icone.py
+      - name: Firma
+        id: firma
+        run: |
+          if [ -z "$KS_B64" ] || [ -z "$FOSS_FIRMA_PASSWORD" ]; then
+            echo "::warning::Mancano i segreti della firma: costruisco un APK di prova."
+            echo "firmato=no" >> "$GITHUB_OUTPUT"; exit 0
+          fi
+          echo "$KS_B64" | base64 -d > "$RUNNER_TEMP/firma.p12"
+          impronta=$(keytool -list -v -keystore "$RUNNER_TEMP/firma.p12" -storetype PKCS12 -storepass:env FOSS_FIRMA_PASSWORD -alias foss | grep -m1 'SHA256:' | sed 's/.*SHA256: *//')
+          echo "impronta della firma: $impronta"
+          grep -q "$impronta" .well-known/assetlinks.json || { echo "::error::La firma non è quella scritta in .well-known/assetlinks.json: l'app si aprirebbe con la barra dell'indirizzo."; exit 1; }
+          echo "FOSS_FIRMA_FILE=$RUNNER_TEMP/firma.p12" >> "$GITHUB_ENV"
+          echo "firmato=si" >> "$GITHUB_OUTPUT"
+      - name: Costruzione
+        run: |
+          cd android
+          if [ "${{ steps.firma.outputs.firmato }}" = "si" ]; then
+            gradle --no-daemon assembleRelease
+            cp app/build/outputs/apk/release/app-release.apk "$GITHUB_WORKSPACE/FOSS-$FOSS_VERSIONE.apk"
+          else
+            gradle --no-daemon assembleDebug
+            cp app/build/outputs/apk/debug/app-debug.apk "$GITHUB_WORKSPACE/FOSS-$FOSS_VERSIONE.apk"
+          fi
+      - name: Controllo dell'APK
+        run: |
+          bt=$(ls -d "$ANDROID_HOME"/build-tools/* | sort -V | tail -1)
+          "$bt/apksigner" verify --print-certs "FOSS-$FOSS_VERSIONE.apk" | grep -i 'SHA-256'
+          "$bt/aapt2" dump badging "FOSS-$FOSS_VERSIONE.apk" | grep -E "^package|^application-label:|launchable-activity|sdkVersion|targetSdkVersion"
+          ls -la FOSS-*.apk
+      - uses: actions/upload-artifact@v4
+        with:
+          name: FOSS-android
+          path: FOSS-*.apk
+          retention-days: 14
+
+  # Prova su un telefono finto: si installa, si apre e mostra FOSS? (la schermata resta tra gli «artifact»)
+  prova:
+    needs: apk
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/download-artifact@v4
+        with:
+          name: FOSS-android
+      - name: KVM
+        run: |
+          echo 'KERNEL=="kvm", GROUP="kvm", MODE="0666", OPTIONS+="static_node=kvm"' | sudo tee /etc/udev/rules.d/99-kvm4all.rules
+          sudo udevadm control --reload-rules
+          sudo udevadm trigger --name-match=kvm
+      - name: Telefono finto
+        uses: reactivecircus/android-emulator-runner@v2
+        with:
+          api-level: 34
+          target: google_apis
+          arch: x86_64
+          profile: pixel_6
+          disable-animations: true
+          emulator-options: -no-snapshot-save -no-window -gpu swiftshader_indirect -noaudio -no-boot-anim
+          script: |
+            adb shell pm list packages | grep -i -E "chrome|webview" || true
+            adb shell 'echo "chrome --disable-fre --no-default-browser-check --no-first-run" > /data/local/tmp/chrome-command-line' || true
+            adb install -r FOSS-*.apk
+            adb shell pm grant team.foss.app android.permission.POST_NOTIFICATIONS || true
+            adb logcat -c
+            adb shell am start -W -n team.foss.app/com.google.androidbrowserhelper.trusted.LauncherActivity
+            sleep 45
+            adb exec-out screencap -p > schermo-1.png
+            adb shell dumpsys activity activities | grep -E "ResumedActivity|topResumedActivity" | head -3 || true
+            sleep 20
+            adb exec-out screencap -p > schermo-2.png
+            adb shell input keyevent KEYCODE_HOME
+            sleep 4
+            adb shell am start -W -a android.intent.action.MAIN -d "https://foss.team/chat.html" -n team.foss.app/com.google.androidbrowserhelper.trusted.LauncherActivity
+            sleep 45
+            adb shell dumpsys activity activities | grep -E "topResumedActivity" | head -2 || true
+            adb exec-out screencap -p > schermo-3-chat.png
+            adb logcat -d | grep -i -E "TWA|TrustedWeb|DigitalAssetLinks|OriginVerif|team\.foss\.app|AndroidRuntime" | tail -80 > registro.txt || true
+            cat registro.txt | tail -40
+            adb shell dumpsys package team.foss.app | grep -E "versionName|versionCode" | head -2
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: prova-android
+          path: |
+            schermo-*.png
+            registro.txt
+          retention-days: 14
+
+  rilascio:
+    needs: [apk, prova]
+    # aspetta la prova sul telefono finto, ma se quella si inceppa l'APK esce lo stesso
+    if: always() && needs.apk.result == 'success' && github.event_name == 'workflow_dispatch' && needs.apk.outputs.firmato == 'si'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/download-artifact@v4
+        with:
+          name: FOSS-android
+      - name: "Release (mai «latest», che resta dell'app per computer)"
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          v="${{ needs.apk.outputs.versione }}"
+          gh release delete "android-v$v" -R "${{ github.repository }}" --yes --cleanup-tag 2>/dev/null || true
+          gh release create "android-v$v" "FOSS-$v.apk" -R "${{ github.repository }}" --target "${{ github.sha }}" --latest=false \
+            --title "FOSS per Android $v" \
+            --notes "Scarica **FOSS-$v.apk** sul telefono Android e aprilo per installare FOSS. Alla prima installazione il telefono chiede di consentire le app da questa origine: è normale per le app fuori dallo store. Serve Chrome sul telefono."

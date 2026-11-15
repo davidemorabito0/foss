@@ -149,6 +149,13 @@ aggiornamento automatico. Non copia il sito: apre `foss.team`, quindi ogni pubbl
 anche all'app. Gli installer (`.dmg` e `-setup.exe`) si scaricano da **Releases** e li costruisce
 `.github/workflows/app-desktop.yml`. Dettagli in `sviluppo/FOSS-CHAT.md`, sezione 12.
 
+## FOSS per Android (APK)
+
+In `android/` c'è l'app per Android da passare a mano come file `.apk`, senza store: un guscio che apre
+`foss.team` a tutto schermo con il motore di Chrome (FOSS e chat insieme, avvisi, vocali, fotocamera),
+quindi si aggiorna col sito. La costruisce `.github/workflows/app-android.yml` e la mette tra le
+**Releases** come `android-v…`. Dettagli in `sviluppo/FOSS-CHAT.md`, sezione 13.
+
 ## Pubblicazione su GitHub Pages
 
 1. Carica i file di questa cartella nel repository
