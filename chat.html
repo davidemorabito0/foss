@@ -1485,6 +1485,30 @@ input,textarea,[contenteditable="true"]{-webkit-user-select:text;user-select:tex
   .lato-testa .vai-foss .vf-logo{display:grid;width:20px;height:20px}
   .lato-testa .vai-foss .vf-logo svg{width:20px;height:20px}
 }
+/* 2.9.4: vocali. Tenendo premuto il microfono il dito non fa scorrere la pagina (prima il telefono a volte
+   «rubava» il gesto e la registrazione restava appesa); scorri in su sul lucchetto per bloccarla */
+.barra-scrivi .manda,.registra{touch-action:none}
+.registra{position:relative}
+.registra .vivo{display:none}
+.registra.bloccata .vivo{display:flex}
+.registra.bloccata .scorri{display:none}
+.registra:not(.pronta) .punto{animation:none;background:var(--testo-3)}
+.registra .scorri{transition:transform .08s linear}
+.reg-blocco{position:absolute;right:11px;bottom:calc(100% + 10px);width:44px;padding:10px 0 6px;border-radius:22px;
+  display:flex;flex-direction:column;align-items:center;gap:2px;background:var(--menu);color:var(--testo-2);box-shadow:var(--ombra);z-index:6;
+  animation:rb-entra .22s ease-out;transition:transform .08s linear,opacity .3s}
+.reg-blocco .rb-l svg{width:22px;height:22px;display:block}
+.reg-blocco .rb-su svg{width:18px;height:18px;display:block;animation:rb-su 1.2s ease-in-out infinite}
+.reg-blocco.chiuso{color:var(--verde);opacity:0;transition:opacity .4s ease .1s}
+@keyframes rb-entra{from{opacity:0;transform:translateY(12px)}}
+@keyframes rb-su{0%,100%{transform:translateY(3px);opacity:.5}50%{transform:translateY(-3px);opacity:1}}
+@media (max-width:899px){ .reg-blocco{right:14px} }
+/* il play mostra subito che sta caricando */
+.vocale .vp{position:relative}
+.vocale.carica .vp svg{opacity:.25}
+.vocale.carica .vp::after{content:"";position:absolute;inset:4px;border-radius:50%;border:2.5px solid rgba(134,150,160,.3);border-top-color:var(--blu-spunta);animation:gira .8s linear infinite}
+/* sull'onda il dito scorre la chat in verticale e sposta il pallino in orizzontale */
+.vocale .onda{touch-action:pan-y}
 </style>
 </head>
 <body>
@@ -1504,7 +1528,7 @@ const SUPA_KEY = 'sb_publishable_f5Kjp6NHT9yTxr1bhWJjhg_4y72V-Kj';
 const VAPID_PUBBLICA = 'BNlGbW4nZrXmx8DioKxnl7ubULVOr5_6CAKvpuQYoiXeObmxYAzGU6UrkExx2zu1hACmtRNDcpoMh_ARQ0GSmlw';
 /* il server dei file sul NAS (es. 'https://media.foss.team'). Vuoto = si usa Supabase. */
 const MEDIA_NAS = 'https://media.foss.team';
-const VERSIONE = 'chat-2.9.3';
+const VERSIONE = 'chat-2.9.4';
 /* i temi colore: gli stessi di FOSS. Il predefinito per tutti è Brand (blu e giallo). */
 const TEMI_COLORE = [
   {id:'brand',   nome:'Brand',    ds:'Navy e ambra, il predefinito', c:['#0D1926','#1A3149','#FFAD01']},
@@ -2996,6 +3020,8 @@ function ondaDa(s){
 /* i file arrivano dopo: prima disegno, poi chiedo gli indirizzi */
 async function idrataMedia(root){
   const c = S.convs.get(S.aperta); if(!c) return;
+  /* 2.9.4: i vocali su Supabase: chiedo l'indirizzo già adesso, così il play parte appena lo tocchi */
+  $$('.vocale[data-voc]', root).forEach(v => { const m = trovaMsg(c.id, v.dataset.voc); if(m && m.media && m.media.path && !m.media.locale && !m.media.url) urlFirmata(m.media.path).catch(() => {}); });
   const nodi = $$('img[data-mid]:not([src]), video[data-mid]:not([src])', root);
   for(const n of nodi){
     const m = trovaMsg(c.id, n.dataset.mid); if(!m || !m.media) continue;
@@ -3201,7 +3227,7 @@ async function scaricaMedia(m){
 function attivaScorriPerRispondere(M){
   let x0 = 0, y0 = 0, nodo = null, attivo = false;
   M.addEventListener('touchstart', e => {
-    const n = e.target.closest('.msg'); if(!n || e.touches.length > 1) return;
+    const n = e.target.closest('.msg'); if(!n || e.touches.length > 1 || e.target.closest('.vocale .onda')) return;   /* sull'onda il dito sposta il pallino */
     nodo = n; x0 = e.touches[0].clientX; y0 = e.touches[0].clientY; attivo = false;
   }, {passive: true});
   M.addEventListener('touchmove', e => {
@@ -3404,6 +3430,11 @@ async function inviaPreparato(conv, tipo, p, extra){
   const m = nuovoLocale(tipo, {media: Object.assign({locale: URL.createObjectURL(p.blob)}, p.media || {}, extra || {}), _avanza: 0}, conv);
   m._file = p;
   mettiInLista(m);
+  /* vocali: l'onda vera dal file arriva dopo, la disegno appena c'e' */
+  if(p.ondaDopo) p.ondaDopo.then(o => {
+    if(!o || !m.media) return; m.media.onda = o;
+    const v = $('.vocale[data-voc="'+m.id+'"] .barre'); if(v) v.innerHTML = ondaDa(o).map(x => '<i style="height:'+Math.max(10, x * 100)+'%"></i>').join('');
+  }, () => {});
   return inviaFilePronto(m, p);
 }
 async function inviaFilePronto(m, p){
@@ -3420,6 +3451,7 @@ async function inviaFilePronto(m, p){
     if(r.path){ m.media.path = r.path; firme.set(r.path, {url: locale, scade: Date.now() + 864e5}); }
     if(r.url){ m.media.url = r.url; }
     delete m._avanza;
+    if(p.ondaDopo){ const o = await Promise.race([p.ondaDopo.catch(() => null), new Promise(ok => setTimeout(ok, 4000, null))]); if(o) m.media.onda = o; }
     await salvaMessaggio(m);
     delete m._file; delete m._ctrl;
   }catch(e){
@@ -3454,90 +3486,114 @@ function formatoAudio(){
   for(const x of f) try{ if(MediaRecorder.isTypeSupported(x)) return x; }catch(e){}
   return '';
 }
+function vibra(ms){ try{ if(navigator.vibrate && (!navigator.userActivation || navigator.userActivation.hasBeenActive)) navigator.vibrate(ms); }catch(_){} }
+/* 2.9.4: la barra della registrazione compare subito (il microfono arriva dopo, a volte serve mezzo secondo);
+   tenendo premuto: lasci = invia, scorri a sinistra = annulla, scorri in su = blocca (registra a mani libere). */
 async function avviaRegistrazione(e){
   if(reg) return;
   if(!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia || !window.MediaRecorder){ toast('Questo browser non registra l’audio.'); return; }
-  const x0 = e.clientX, inizio = Date.now();
-  let bloccata = false, annullata = false, rilasciata = false;
-  const suPrima = () => { rilasciata = true; };
-  document.addEventListener('pointerup', suPrima, {once: true});
-  let stream, ac0 = null;
+  const x0 = e.clientX, y0 = e.clientY, premuto = Date.now(), pid = e.pointerId, origine = e.target;
+  const r = reg = {pronto: false, bloccata: !tocco(), annullata: false, conv: S.aperta, inizio: Date.now(), pezzi: [], livelli: []};
+  let ac0 = null;
   try{ ac0 = new (window.AudioContext || window.webkitAudioContext)(); }catch(_){}
   /* v2.7.1: per registrare l'audio del telefono deve essere in modalità «registra» (con «di contorno» l'iPhone nega il microfono) */
   try{ if(navigator.audioSession) navigator.audioSession.type = 'play-and-record'; }catch(_){}
-  try{ stream = await navigator.mediaDevices.getUserMedia({audio: {echoCancellation: true, noiseSuppression: true}}); }
-  catch(err){ document.removeEventListener('pointerup', suPrima); try{ ac0 && ac0.close(); }catch(_){} audioDiContorno(); spiegaMicrofono(err); return; }
-  const tipo = formatoAudio();
-  const rec = new MediaRecorder(stream, tipo ? {mimeType: tipo, audioBitsPerSecond: 48000} : undefined);
-  const pezzi = [], livelli = [];
-  let ac, an, buf;
-  try{ ac = ac0 || new (window.AudioContext || window.webkitAudioContext)(); if(ac.state !== 'running') ac.resume().catch(() => {}); const src = ac.createMediaStreamSource(stream); an = ac.createAnalyser(); an.fftSize = 512; src.connect(an); buf = new Uint8Array(an.fftSize); }catch(err){}
-  rec.ondataavailable = ev => { if(ev.data && ev.data.size) pezzi.push(ev.data); };
-  reg = {rec, stream, pezzi, livelli, inizio: Date.now(), ac};
-  rec.start(250);
-  dicoCheScrivo('registra');
+  vibra(12);
   const F = el('barraScrivi');
-  F.outerHTML = '<div class="registra" id="barraScrivi">'+
+  F.outerHTML = '<div class="registra'+(r.bloccata ? ' bloccata' : '')+'" id="barraScrivi">'+
     '<button class="ib cestino" data-a="reg-annulla" title="Annulla">'+svg('cestino', 1.8)+'</button>'+
     '<span class="punto"></span><span class="t" id="regT">0:00</span>'+
     '<span class="vivo" id="regVivo"></span>'+
     '<span class="scorri" id="regScorri">‹ Scorri per annullare</span>'+
+    (r.bloccata ? '' : '<span class="reg-blocco" id="regBlocco" aria-hidden="true"><span class="rb-l">'+svg('lucchettoAperto', 2)+'</span><span class="rb-su">'+svg('su', 2.4)+'</span></span>')+
     '<button class="manda pieno" data-a="reg-manda" id="regManda" title="Invia">'+svg('manda', 1.8)+'</button></div>';
+  const barra = el('barraScrivi');
+  const blocca = () => {
+    if(r.bloccata || r.annullata) return;
+    r.bloccata = true; barra.classList.add('bloccata');
+    const b = el('regBlocco'); if(b){ b.innerHTML = '<span class="rb-l">'+svg('lucchetto', 2)+'</span>'; b.classList.add('chiuso'); setTimeout(() => b.remove(), 450); }
+    vibra(10);
+  };
+  r.blocca = blocca;
+  if(!r.bloccata){
+    /* il tasto premuto e' appena stato sostituito: catturo il dito sulla barra, cosi' i movimenti arrivano lo stesso */
+    try{ barra.setPointerCapture(pid); }catch(_){}
+    let finito = false;
+    const muovi = ev => {
+      if(ev.pointerId !== pid || r.bloccata || r.annullata) return;
+      const dx = ev.clientX - x0, dy = ev.clientY - y0;
+      const sc = el('regScorri'); if(sc) sc.style.transform = 'translateX(' + Math.min(0, dx) + 'px)';
+      const b = el('regBlocco'); if(b) b.style.transform = 'translateY(' + Math.max(-60, Math.min(0, dy)) + 'px)';
+      if(dy < -75 && dy < dx){ blocca(); return; }
+      if(dx < -110){ r.annullata = true; fineRegistrazione(false); }
+    };
+    const su = ev => {
+      if(ev.pointerId !== pid || finito) return;
+      finito = true; pulisci();
+      if(r.annullata || r.bloccata || reg !== r) return;
+      /* tocco breve, o il microfono non e' ancora pronto (la prima volta il telefono chiede il permesso): resta aperta */
+      if(Date.now() - premuto < 400 || !r.pronto || ev.type === 'pointercancel'){ blocca(); return; }
+      fineRegistrazione(true);
+    };
+    const pulisci = () => [document, origine].forEach(n => { n.removeEventListener('pointermove', muovi); n.removeEventListener('pointerup', su); n.removeEventListener('pointercancel', su); });
+    [document, origine].forEach(n => { n.addEventListener('pointermove', muovi); n.addEventListener('pointerup', su); n.addEventListener('pointercancel', su); });
+    r.pulisci = pulisci;
+  }
+  let stream;
+  try{ stream = await navigator.mediaDevices.getUserMedia({audio: {echoCancellation: true, noiseSuppression: true}}); }
+  catch(err){
+    try{ ac0 && ac0.close(); }catch(_){}
+    if(reg === r){ reg = null; r.pulisci && r.pulisci(); disegnaScrivi(); }
+    audioDiContorno(); spiegaMicrofono(err); return;
+  }
+  /* annullata mentre il microfono si accendeva */
+  if(reg !== r){ stream.getTracks().forEach(t => t.stop()); try{ ac0 && ac0.close(); }catch(_){} audioDiContorno(); return; }
+  const tipo = formatoAudio();
+  let rec;
+  try{ rec = new MediaRecorder(stream, tipo ? {mimeType: tipo, audioBitsPerSecond: 48000} : undefined); }
+  catch(err){ stream.getTracks().forEach(t => t.stop()); reg = null; r.pulisci && r.pulisci(); disegnaScrivi(); toast('Non riesco a registrare su questo dispositivo.'); return; }
+  let an, buf;
+  try{ r.ac = ac0 || new (window.AudioContext || window.webkitAudioContext)(); if(r.ac.state !== 'running') r.ac.resume().catch(() => {}); const src = r.ac.createMediaStreamSource(stream); an = r.ac.createAnalyser(); an.fftSize = 512; src.connect(an); buf = new Uint8Array(an.fftSize); }catch(err){}
+  rec.ondataavailable = ev => { if(ev.data && ev.data.size) r.pezzi.push(ev.data); };
+  Object.assign(r, {rec, stream, inizio: Date.now(), pronto: true});
+  barra.classList.add('pronta');            /* il pallino rosso lampeggia: adesso si sente */
+  rec.start(250);
+  dicoCheScrivo('registra');
   const vivo = el('regVivo');
-  if(vivo) vivo.style.display = 'none';
-  const giro = setInterval(() => {
-    if(!reg) return clearInterval(giro);
-    const s = (Date.now() - reg.inizio) / 1000;
+  r.giro = setInterval(() => {
+    if(reg !== r) return clearInterval(r.giro);
+    const s = (Date.now() - r.inizio) / 1000;
     const t = el('regT'); if(t) t.textContent = fmtDur(s);
-    if(an){ an.getByteTimeDomainData(buf); let m = 0; for(let i = 0; i < buf.length; i++) m = Math.max(m, Math.abs(buf[i] - 128)); livelli.push(Math.min(1, m / 70)); }
-    else livelli.push(.3);
-    if(vivo && (bloccata || tocco() === false)){
-      vivo.style.display = 'flex'; const sc = el('regScorri'); if(sc && bloccata) sc.style.display = 'none';
-      const ult = livelli.slice(-60), pk = Math.max(.05, ...livelli.slice(-200)); vivo.innerHTML = ult.map(v => '<i style="height:'+Math.max(3, v / pk * 26)+'px"></i>').join('');
+    if(an){ an.getByteTimeDomainData(buf); let m = 0; for(let i = 0; i < buf.length; i++) m = Math.max(m, Math.abs(buf[i] - 128)); r.livelli.push(Math.min(1, m / 70)); }
+    else r.livelli.push(.3);
+    if(vivo && r.bloccata){
+      const ult = r.livelli.slice(-60), pk = Math.max(.05, ...r.livelli.slice(-200)); vivo.innerHTML = ult.map(v => '<i style="height:'+Math.max(3, v / pk * 26)+'px"></i>').join('');
     }
     if(s > 600) fineRegistrazione(true);
     if(s % 3 < .11) dicoCheScrivo('registra');
   }, 100);
-  reg.giro = giro;
-  /* tenuto premuto: si manda lasciando. Tocco breve: resta aperto (bloccato) */
-  if(rilasciata){ bloccata = true; const sc = el('regScorri'); if(sc) sc.style.display = 'none'; }
-  else {
-    const muovi = ev => {
-      const dx = ev.clientX - x0;
-      const sc = el('regScorri'); if(sc && !bloccata) sc.style.transform = 'translateX(' + Math.min(0, dx) + 'px)';
-      if(dx < -110 && !bloccata){ annullata = true; pulisci(); fineRegistrazione(false); }
-    };
-    const su = () => {
-      pulisci();
-      if(annullata) return;
-      if(Date.now() - inizio < 400){ bloccata = true; const sc = el('regScorri'); if(sc) sc.style.display = 'none'; const v = el('regVivo'); if(v) v.style.display = 'flex'; return; }
-      if(!bloccata) fineRegistrazione(true);
-    };
-    const pulisci = () => { document.removeEventListener('pointermove', muovi); document.removeEventListener('pointerup', su); };
-    document.addEventListener('pointermove', muovi);
-    document.addEventListener('pointerup', su);
-  }
-  if(!tocco()){ bloccata = true; const sc = el('regScorri'); if(sc) sc.style.display = 'none'; }
 }
 function fineRegistrazione(manda){
   const r = reg; if(!r) return; reg = null;
-  clearInterval(r.giro);
+  clearInterval(r.giro); r.pulisci && r.pulisci();
+  /* la barra per scrivere torna subito; il file si prepara intanto */
+  disegnaScrivi();
+  if(!r.pronto){ if(manda) toast('Il microfono non è ancora pronto: riprova.'); return; }
   const durata = (Date.now() - r.inizio) / 1000;
-  r.rec.onstop = async () => {
+  r.rec.onstop = () => {
     r.stream.getTracks().forEach(t => t.stop()); audioDiContorno();
     try{ r.ac && r.ac.close(); }catch(e){}
-    disegnaScrivi();
     if(!manda) return;
     if(durata < 0.8){ toast('Tieni premuto per registrare un vocale.'); return; }
     const tipo = (r.rec.mimeType || 'audio/webm').split(';')[0];
     const blob = new Blob(r.pezzi, {type: tipo});
-    /* v2.7.2: l'onda la calcolo dal file registrato (sempre giusta); se non si può, dai livelli presi durante la registrazione */
-    const daFile = await ondaDalFile(blob);
-    const onda = daFile || ondaDaLivelli(r.livelli);
-    inviaPreparato(S.aperta, 'vocale', {blob, ext: tipo.includes('mp4') ? 'm4a' : tipo.includes('ogg') ? 'ogg' : 'webm',
-      media: {dur: Math.round(durata * 10) / 10, onda, mime: tipo, dim: blob.size}});
+    /* il vocale compare subito con l'onda presa durante la registrazione; quella vera, calcolata dal file
+       (v2.7.2), arriva mentre il file sale e viene salvata con il messaggio */
+    inviaPreparato(r.conv || S.aperta, 'vocale', {blob, ext: tipo.includes('mp4') ? 'm4a' : tipo.includes('ogg') ? 'ogg' : 'webm',
+      ondaDopo: ondaDalFile(blob),
+      media: {dur: Math.round(durata * 10) / 10, onda: ondaDaLivelli(r.livelli), mime: tipo, dim: blob.size}});
   };
-  try{ r.rec.stop(); }catch(e){ r.stream.getTracks().forEach(t => t.stop()); disegnaScrivi(); }
+  try{ r.rec.stop(); }catch(e){ r.stream.getTracks().forEach(t => t.stop()); audioDiContorno(); }
 }
 
 function ondaDaLivelli(lv){
@@ -3580,22 +3636,30 @@ async function suonaVocale(id){
     audio.addEventListener('ended', () => { const fatto = audioId; disegnaAvanzamento(true); audioId = null; prossimoVocale(fatto); if(!audioId) audioDiContorno(); });
     audio.addEventListener('pause', () => { disegnaAvanzamento(); setTimeout(() => { if(audio.paused) audioDiContorno(); }, 400); });
     audio.addEventListener('play', () => { disegnaAvanzamento(); scorriPallino(); });
+    /* 2.9.4: finché il file non parte si vede la rotellina sul tasto (prima sembrava che il tocco non avesse fatto niente) */
+    audio.addEventListener('playing', () => vocaleInCarica(null));
+    audio.addEventListener('waiting', () => { if(audioId) vocaleInCarica(audioId); });
     audio.addEventListener('loadedmetadata', () => {   /* i vocali registrati nel browser a volte dicono «durata infinita» */
       const mm = audioId && trovaMsg(S.aperta, audioId);
       if(audio.duration === Infinity && !(mm && mm.media && mm.media.dur)){ const t = audio.currentTime; audio.currentTime = 1e101; audio.addEventListener('timeupdate', function una(){ audio.removeEventListener('timeupdate', una); audio.currentTime = t; }); }
     });
-    audio.addEventListener('error', () => { const id2 = audioId; audioId = null; disegnaAvanzamento(); if(id2) mediaNonArriva(id2); });
+    audio.addEventListener('error', () => { vocaleInCarica(null); const id2 = audioId; audioId = null; disegnaAvanzamento(); if(id2) mediaNonArriva(id2); });
   }
   if(audioId === id){ if(audio.paused) audio.play().catch(() => {}); else audio.pause(); return; }
+  vocaleInCarica(id);
   const u = await urlMedia(m.media);
-  if(!u){ mediaNonArriva(id); return; }
+  if(!u){ vocaleInCarica(null); mediaNonArriva(id); return; }
   if(audioId){ const vecchio = audioId; audioId = null; disegnaAvanzamento(false, vecchio); }
   audioId = id; audio.src = u; audio.playbackRate = velocita;
   try{ if(navigator.audioSession) navigator.audioSession.type = 'playback'; }catch(e){}
-  try{ await audio.play(); }catch(e){ if(e && e.name !== 'AbortError') toast(m.media && m.media.url ? 'Il server dei media sembra offline.' : 'Non riesco a riprodurre il vocale.'); }
+  try{ await audio.play(); }catch(e){ vocaleInCarica(null); if(e && e.name !== 'AbortError') toast(m.media && m.media.url ? 'Il server dei media sembra offline.' : 'Non riesco a riprodurre il vocale.'); }
   if(ondaPiatta((m.media || {}).onda)) ridisegnaOnda(m, u);
   const a = memoria('ascoltati') || {}; a[id] = 1; const k = Object.keys(a); if(k.length > 500) k.slice(0, k.length - 500).forEach(x => delete a[x]); memoria('ascoltati', a);
   const mic = $('.vocale[data-voc="'+id+'"] .mic'); if(mic) mic.className = 'mic ascoltato';
+}
+function vocaleInCarica(id){
+  $$('.vocale.carica').forEach(v => { if(v.dataset.voc !== id) v.classList.remove('carica'); });
+  if(id){ const v = $('.vocale[data-voc="'+id+'"]'); if(v) v.classList.add('carica'); }
 }
 function prossimoVocale(id){
   const c = S.convs.get(S.aperta); if(!c) return;
@@ -3625,24 +3689,53 @@ function disegnaAvanzamento(finito, quale){
   const v = $('.vocale[data-voc="'+id+'"]'); if(!v) return;
   const va = audioId === id && audio && !audio.paused;
   v.classList.toggle('va', audioId === id && !finito);
-  const b = v.querySelector('.vp'); if(b) b.innerHTML = svg(va ? 'pausa' : 'play');
-  const vel = v.querySelector('.vel'); if(vel) vel.textContent = String(velocita).replace('.', ',') + '×';
+  /* gira a ogni fotogramma: tocco il tasto solo quando cambia */
+  const b = v.querySelector('.vp'), ic = va ? 'pausa' : 'play'; if(b && b.dataset.ic !== ic){ b.dataset.ic = ic; b.innerHTML = svg(ic); }
+  const vel = v.querySelector('.vel'), vt = String(velocita).replace('.', ',') + '×'; if(vel && vel.textContent !== vt) vel.textContent = vt;
   /* v2.7.2: i vocali registrati sull'iPhone a volte dichiarano una durata sbagliata (enorme o infinita):
      se non torna con quella salvata quando l'abbiamo registrato, vale quella salvata */
-  const salvata = +(((trovaMsg(S.aperta, id) || {}).media || {}).dur) || 0, dich = audio && isFinite(audio.duration) ? audio.duration : 0;
-  const d = salvata && (!dich || Math.abs(dich - salvata) > Math.max(1.5, salvata * .25)) ? salvata : (dich || salvata || 1);
+  const d = durataVoc(id);
   const p = finito || audioId !== id ? 0 : Math.min(1, (audio.currentTime || 0) / d);
   const barre = v.querySelectorAll('.barre i'); const k = Math.round(p * barre.length);
   barre.forEach((x, i) => x.classList.toggle('su', i < k));
   const pl = v.querySelector('.pallino'); if(pl) pl.style.left = (p * 100) + '%';
-  const t = v.querySelector('.tempo'); if(t) t.textContent = fmtDur(audioId === id && !finito && audio.currentTime ? audio.currentTime : d);
+  const t = v.querySelector('.tempo'), tt = fmtDur(audioId === id && !finito && audio.currentTime ? audio.currentTime : d); if(t && t.textContent !== tt) t.textContent = tt;
 }
+function durataVoc(id){
+  const salvata = +(((trovaMsg(S.aperta, id) || {}).media || {}).dur) || 0, dich = audio && audioId === id && isFinite(audio.duration) ? audio.duration : 0;
+  return salvata && (!dich || Math.abs(dich - salvata) > Math.max(1.5, salvata * .25)) ? salvata : (dich || salvata || 1);
+}
+/* sposta l'ascolto al punto p (0..1) dell'onda; se il vocale non sta suonando lo fa partire da li' */
+function vaiAlPunto(id, p){
+  const metti = () => { if(audio && audioId === id){ try{ audio.currentTime = Math.max(0, Math.min(.999, p)) * durataVoc(id); }catch(e){} disegnaAvanzamento(); } };
+  if(audioId !== id){ suonaVocale(id).then(metti); return; }
+  metti();
+}
+let trascinoVoc = 0;
 function cercaVocale(id, ev){
+  if(Date.now() - trascinoVoc < 350) return;      /* il click che arriva alla fine di un trascinamento */
   const o = ev.target.closest('.onda'); if(!o) return;
-  const r = o.getBoundingClientRect(), p = Math.max(0, Math.min(1, (ev.clientX - r.left) / r.width));
-  if(audioId !== id){ suonaVocale(id).then(() => { if(audio && isFinite(audio.duration)) audio.currentTime = p * audio.duration; }); return; }
-  if(audio && isFinite(audio.duration)) audio.currentTime = p * audio.duration;
+  const r = o.getBoundingClientRect();
+  vaiAlPunto(id, Math.max(0, Math.min(1, (ev.clientX - r.left) / r.width)));
 }
+/* 2.9.4: col dito si trascina il pallino lungo l'onda; in verticale la chat scorre come sempre */
+document.addEventListener('pointerdown', e => {
+  const o = e.target.closest && e.target.closest('.vocale .onda'); if(!o || e.button > 0) return;
+  const id = o.dataset.id, x0 = e.clientX, y0 = e.clientY;
+  let attivo = false;
+  const punto = ev => { const r = o.getBoundingClientRect(); return Math.max(0, Math.min(1, (ev.clientX - r.left) / r.width)); };
+  const muovi = ev => {
+    if(ev.pointerId !== e.pointerId) return;
+    if(!attivo){
+      if(Math.abs(ev.clientX - x0) < 8 || Math.abs(ev.clientX - x0) < Math.abs(ev.clientY - y0)) return;
+      attivo = true; if(audioId !== id) suonaVocale(id);
+    }
+    trascinoVoc = Date.now();
+    if(audioId === id && audio){ try{ audio.currentTime = punto(ev) * durataVoc(id); }catch(_){} disegnaAvanzamento(); }
+  };
+  const fine = ev => { if(ev.pointerId !== e.pointerId) return; if(attivo) trascinoVoc = Date.now(); document.removeEventListener('pointermove', muovi); document.removeEventListener('pointerup', fine); document.removeEventListener('pointercancel', fine); };
+  document.addEventListener('pointermove', muovi); document.addEventListener('pointerup', fine); document.addEventListener('pointercancel', fine);
+});
 
 /* ---------- incollare e trascinare (anche GIF da altre app) ---------- */
 function incolla(e){

@@ -1443,5 +1443,29 @@ input,textarea,[contenteditable="true"]{-webkit-user-select:text;user-select:tex
   .lato-testa .vai-foss .vf-logo{display:grid;width:20px;height:20px}
   .lato-testa .vai-foss .vf-logo svg{width:20px;height:20px}
 }
+/* 2.9.4: vocali. Tenendo premuto il microfono il dito non fa scorrere la pagina (prima il telefono a volte
+   «rubava» il gesto e la registrazione restava appesa); scorri in su sul lucchetto per bloccarla */
+.barra-scrivi .manda,.registra{touch-action:none}
+.registra{position:relative}
+.registra .vivo{display:none}
+.registra.bloccata .vivo{display:flex}
+.registra.bloccata .scorri{display:none}
+.registra:not(.pronta) .punto{animation:none;background:var(--testo-3)}
+.registra .scorri{transition:transform .08s linear}
+.reg-blocco{position:absolute;right:11px;bottom:calc(100% + 10px);width:44px;padding:10px 0 6px;border-radius:22px;
+  display:flex;flex-direction:column;align-items:center;gap:2px;background:var(--menu);color:var(--testo-2);box-shadow:var(--ombra);z-index:6;
+  animation:rb-entra .22s ease-out;transition:transform .08s linear,opacity .3s}
+.reg-blocco .rb-l svg{width:22px;height:22px;display:block}
+.reg-blocco .rb-su svg{width:18px;height:18px;display:block;animation:rb-su 1.2s ease-in-out infinite}
+.reg-blocco.chiuso{color:var(--verde);opacity:0;transition:opacity .4s ease .1s}
+@keyframes rb-entra{from{opacity:0;transform:translateY(12px)}}
+@keyframes rb-su{0%,100%{transform:translateY(3px);opacity:.5}50%{transform:translateY(-3px);opacity:1}}
+@media (max-width:899px){ .reg-blocco{right:14px} }
+/* il play mostra subito che sta caricando */
+.vocale .vp{position:relative}
+.vocale.carica .vp svg{opacity:.25}
+.vocale.carica .vp::after{content:"";position:absolute;inset:4px;border-radius:50%;border:2.5px solid rgba(134,150,160,.3);border-top-color:var(--blu-spunta);animation:gira .8s linear infinite}
+/* sull'onda il dito scorre la chat in verticale e sposta il pallino in orizzontale */
+.vocale .onda{touch-action:pan-y}
 </style>
 </head>

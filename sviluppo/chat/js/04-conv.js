@@ -359,6 +359,8 @@ function ondaDa(s){
 /* i file arrivano dopo: prima disegno, poi chiedo gli indirizzi */
 async function idrataMedia(root){
   const c = S.convs.get(S.aperta); if(!c) return;
+  /* 2.9.4: i vocali su Supabase: chiedo l'indirizzo già adesso, così il play parte appena lo tocchi */
+  $$('.vocale[data-voc]', root).forEach(v => { const m = trovaMsg(c.id, v.dataset.voc); if(m && m.media && m.media.path && !m.media.locale && !m.media.url) urlFirmata(m.media.path).catch(() => {}); });
   const nodi = $$('img[data-mid]:not([src]), video[data-mid]:not([src])', root);
   for(const n of nodi){
     const m = trovaMsg(c.id, n.dataset.mid); if(!m || !m.media) continue;
@@ -564,7 +566,7 @@ async function scaricaMedia(m){
 function attivaScorriPerRispondere(M){
   let x0 = 0, y0 = 0, nodo = null, attivo = false;
   M.addEventListener('touchstart', e => {
-    const n = e.target.closest('.msg'); if(!n || e.touches.length > 1) return;
+    const n = e.target.closest('.msg'); if(!n || e.touches.length > 1 || e.target.closest('.vocale .onda')) return;   /* sull'onda il dito sposta il pallino */
     nodo = n; x0 = e.touches[0].clientX; y0 = e.touches[0].clientY; attivo = false;
   }, {passive: true});
   M.addEventListener('touchmove', e => {

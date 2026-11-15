@@ -285,6 +285,22 @@ L'elenco completo è nel `README.md` del sito, sezioni «FOSS.chat» e «FOSS.ch
   e alta zero perche' la scheda (un `<button>`) allinea i figli a sinistra (`align-items:flex-start`). Ora ha
   `width:100%` e l'altezza dal padding (`padding-bottom: calc(100% / 3.6)`), che funziona ovunque.
 
+### 2.9.4 — vocali: scorri in su per bloccare, più reattivi (15 novembre 2026)
+- Registrazione (`avviaRegistrazione` in 05-scrivi.js): la barra compare **subito** al tocco, il microfono si
+  accende dopo (il pallino rosso lampeggia quando si sente davvero: classe `.pronta`). Tenendo premuto:
+  lasci = invia, scorri a sinistra = annulla, **scorri in su sul lucchetto = bloccata** (mani libere, poi
+  cestino o invia). Tocco breve, o dito lasciato prima che il microfono sia acceso: resta aperta bloccata.
+- Il dito non si perde più: `touch-action:none` sul tasto e sulla barra (prima il telefono poteva prendersi il
+  gesto, `pointercancel`, e la registrazione restava appesa), cattura del dito sulla barra
+  (`setPointerCapture`, il tasto premuto viene sostituito) e `pointercancel` = bloccata, così non si perde niente.
+- Invio: il vocale compare subito con l'onda presa dal vivo; quella vera dal file (`ondaDalFile`) si calcola
+  intanto e viene salvata col messaggio (`p.ondaDopo` in `inviaFilePronto`, al massimo 4 s di attesa).
+- Ascolto: rotellina sul play finché il file non parte (`.vocale.carica`); gli indirizzi dei vocali su Supabase
+  si chiedono già quando la chat si apre (`idrataMedia`); il pallino si trascina col dito lungo l'onda
+  (`touch-action:pan-y`: in verticale la chat scorre ancora, prima sull'onda non scorreva), e trascinare
+  sull'onda non attiva più «scorri per rispondere»; durante l'ascolto si aggiornano solo le parti che cambiano.
+- Prova nel browser: `sviluppo/test/app/prova25.py` (anche su GitHub, «Controllo chat»).
+
 ### 2.9.3 — foto profilo non quadrate con la cornice (15 novembre 2026)
 - Con una cornice (`.av.cr-*`, anche «Nessuna» nella scelta delle cornici) la foto ha `overflow:visible`, e una foto
   piu' alta che larga usciva dal cerchio come un ovale: `.av` e' una griglia e l'altezza `100%` dell'immagine
