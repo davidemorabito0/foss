@@ -12832,6 +12832,7 @@ document.addEventListener('click', function(e){
     case 'seg-stato': cambiaStatoSegnalazione(t); break;
 
     case 'push-attiva': if(typeof attivaPush === 'function') attivaPush(); break;
+    case 'push-attiva-invito': chiudiModale(); if(typeof attivaPush === 'function') attivaPush(); break;
     case 'push-spegni': if(typeof disattivaPush === 'function') disattivaPush(); break;
     case 'push-prova': if(typeof provaPush === 'function') provaPush(t); break;
 
@@ -15462,6 +15463,7 @@ async function caricaNotifiche(){
   /* l'avviso di prova serve solo al telefono: nella campanella non entra */
   state.notifiche = unisciNotifiche((data||[]).filter(r=>r.tipo!=='prova').map(notificaDaRiga), state.notifiche || []);
   setTimeout(controllaRichieste, 800);
+  setTimeout(invitaAvvisi, 2500);
   /* v68: i box a schermo intero arrivati mentre FOSS era chiuso (ultime 12 ore, al massimo 3) */
   if(typeof accodaForte === 'function'){
     const da = Date.now() - 12*3600*1000;
@@ -15555,6 +15557,25 @@ function attivaPush(){
     state.push = {stato:'no'}; aggiornaRigaPush();
     toast('Non sono riuscito ad attivarli'+(e && e.message ? ': '+e.message : '')+'.','warn','Avvisi non attivi');
   });
+}
+/* v2.9.6: nell'app sul telefono (APK Android, icona sulla Home) chi non ha ancora acceso gli avvisi
+   viene invitato a farlo appena entra: senza, il telefono non suona. Il permesso parte dal tocco sul tasto.
+   «Non ora»: lo richiedo dopo 3 giorni. */
+let invitoAvvisiFatto = false;
+async function invitaAvvisi(){
+  if(invitoAvvisiFatto || window.fossDesktop || state.ospite || !aTuttoSchermo()) return;
+  invitoAvvisiFatto = true;
+  try{
+    const ultimo = +(localStorage.getItem('foss_avvisi_invito') || 0);
+    if(Date.now() - ultimo < 3*86400000) return;
+    if(await statoPush() !== 'no') return;
+    if(el('modalSlot').children.length || state.schermo==='gate') { invitoAvvisiFatto = false; return; }
+    localStorage.setItem('foss_avvisi_invito', String(Date.now()));
+    modale('<h3>Accendi gli avvisi</h3><div class="sub-t">Come in un’app di messaggi</div>'+
+      '<div class="modal-b"><div class="nota-box">Il telefono suona quando ti scrivono in chat, ti assegnano una task o si avvicina una consegna, anche con l’app chiusa. Si spengono quando vuoi dal Profilo.</div></div>'+
+      '<div class="modal-f"><button class="btn ghost" data-action="chiudi-modale">Non ora</button>'+
+      '<button class="btn primary" data-action="push-attiva-invito">'+svg('bell')+'Attiva gli avvisi</button></div>');
+  }catch(e){}
 }
 async function disattivaPush(){
   if(!sb || !utenteCloud) return;

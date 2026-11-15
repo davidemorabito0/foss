@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!-- FOSS per Android: apre https://foss.team a tutto schermo (Trusted Web Activity).
-     Le classi sono quelle della libreria androidbrowserhelper: qui c'e' solo la configurazione. -->
+     Le classi sono quelle della libreria androidbrowserhelper; di nostro c'e' solo Avvisi.java (avvisi forti). -->
 <manifest xmlns:android="http://schemas.android.com/apk/res/android">
 
     <!-- Android 13+: gli avvisi vanno chiesti; li mostra l'app (non Chrome) grazie al DelegationService -->
@@ -47,7 +47,6 @@
             <meta-data android:name="android.support.customtabs.trusted.SPLASH_SCREEN_BACKGROUND_COLOR" android:resource="@color/iconBackground" />
             <meta-data android:name="android.support.customtabs.trusted.SPLASH_SCREEN_FADE_OUT_DURATION" android:value="@integer/splashScreenFadeOutDuration" />
             <meta-data android:name="android.support.customtabs.trusted.FILE_PROVIDER_AUTHORITY" android:value="@string/providerAuthority" />
-            <meta-data android:name="android.app.shortcuts" android:resource="@xml/shortcuts" />
             <!-- senza Chrome (o un altro browser che lo sappia fare) si apre comunque, con la barra dell'indirizzo -->
             <meta-data android:name="android.support.customtabs.trusted.FALLBACK_STRATEGY" android:value="customtabs" />
             <meta-data android:name="android.support.customtabs.trusted.SCREEN_ORIENTATION" android:value="any" />
@@ -76,9 +75,9 @@
             <meta-data android:name="android.support.FILE_PROVIDER_PATHS" android:resource="@xml/filepaths" />
         </provider>
 
-        <!-- gli avvisi del sito (web push) compaiono a nome di FOSS, con la sua icona -->
+        <!-- gli avvisi del sito (web push) compaiono a nome di FOSS, con la sua icona, in alto e col suono (Avvisi.java) -->
         <service
-            android:name="com.google.androidbrowserhelper.trusted.DelegationService"
+            android:name=".Avvisi"
             android:enabled="true"
             android:exported="true">
             <meta-data android:name="android.support.customtabs.trusted.SMALL_ICON" android:resource="@drawable/ic_notification_icon" />

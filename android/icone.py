@@ -1,5 +1,5 @@
 # Prepara le immagini dell'app Android a partire dalle icone del sito (le stesse di FOSS e della chat):
-# icona nelle varie misure, icona «adattiva», schermata di avvio, icona della scorciatoia «Chat».
+# icona nelle varie misure, icona «adattiva», schermata di avvio.
 # Lo lancia l'azione di GitHub prima di costruire:  pip install pillow && python3 android/icone.py
 import os
 from PIL import Image
@@ -11,7 +11,6 @@ def salva(img, cartella, nome):
     img.save(os.path.join(d, nome)); print(' ', cartella + '/' + nome, img.size)
 
 icona = Image.open(os.path.join(RADICE, 'foss-icona-512.png')).convert('RGB')
-chat = Image.open(os.path.join(RADICE, 'chat-icona-192.png')).convert('RGBA')
 fondo = icona.getpixel((6, 6))                      # il colore di fondo dell'icona (uguale in tutto il bordo)
 esad = '#%02X%02X%02X' % fondo
 print('fondo', esad)
@@ -24,9 +23,8 @@ tela = Image.new('RGB', (432, 432), fondo)
 dentro = icona.resize((388, 388), Image.LANCZOS)
 tela.paste(dentro, ((432 - 388) // 2, (432 - 388) // 2))
 salva(tela, 'mipmap-xxxhdpi', 'ic_launcher_foreground.png')
-# schermata di avvio e scorciatoia
+# schermata di avvio
 salva(icona, 'drawable-nodpi', 'splash.png')
-salva(chat.resize((192, 192), Image.LANCZOS), 'drawable-xxxhdpi', 'shortcut_chat.png')
 with open(os.path.join(RES, 'values', 'colori_icona.xml'), 'w') as f:
     f.write('<?xml version="1.0" encoding="utf-8"?>\n<resources>\n    <color name="iconBackground">%s</color>\n</resources>\n' % esad)
 print('fatto')

@@ -123,13 +123,8 @@ jobs:
             adb shell dumpsys activity activities | grep -E "ResumedActivity|topResumedActivity" | head -3 || true
             sleep 20
             adb exec-out screencap -p > schermo-2.png
-            adb shell input keyevent KEYCODE_HOME
-            sleep 4
-            # come la scorciatoia «Chat» dell'icona: Android la apre sempre ripartendo da capo (clear task)
-            adb shell am start -W --activity-clear-task -a android.intent.action.MAIN -d "https://foss.team/chat.html" -n team.foss.app/com.google.androidbrowserhelper.trusted.LauncherActivity
-            sleep 45
-            adb shell dumpsys activity activities | grep -E "topResumedActivity" | head -2 || true
-            adb exec-out screencap -p > schermo-3-chat.png
+            echo "controllo il servizio degli avvisi forti (Avvisi.java)"
+            adb shell dumpsys package team.foss.app | grep -m1 "team.foss.app/.Avvisi" || { echo "::error::manca il servizio degli avvisi"; exit 1; }
             adb logcat -d | grep -E "ActivityTaskManager: (START|Displayed)|Force finishing|has died" | tail -25 || true
             adb logcat -d | grep -i -E "TWA|TrustedWeb|DigitalAssetLinks|OriginVerif|team\.foss\.app|AndroidRuntime" | tail -80 > registro.txt || true
             cat registro.txt | tail -40

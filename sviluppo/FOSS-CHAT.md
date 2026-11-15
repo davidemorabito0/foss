@@ -498,14 +498,22 @@ certificato: SmartScreen → «Ulteriori informazioni» → «Esegui comunque».
 Un file `.apk` che Davide passa a mano ai collaboratori con telefono Android. Non è una copia del sito:
 è un «guscio» (Trusted Web Activity) che apre `https://foss.team` a tutto schermo con il motore di Chrome
 del telefono. Quindi **ogni pubblicazione del sito arriva anche all'app** e tutto funziona come nel browser
-(accesso, avvisi push, vocali, fotocamera, allegati). FOSS e la chat stanno nella stessa app; tenendo
-premuta l'icona c'è la scorciatoia «Chat».
+(accesso, avvisi push, vocali, fotocamera, allegati). **Un'app sola** per FOSS e la chat: dalla barra in basso
+di FOSS il tasto «Chat» porta alla chat, e dalla chat il tasto «FOSS» riporta indietro (niente seconda icona,
+niente scorciatoie: Davide le ha escluse).
 
 ### Com'è fatta
 - `android/app/src/main/AndroidManifest.xml` e `res/`: solo configurazione (nome «FOSS», pacchetto
-  `team.foss.app`, colori, scorciatoia, icona degli avvisi). **Niente codice nostro**: le classi sono
-  quelle della libreria `com.google.androidbrowserhelper:androidbrowserhelper` (LauncherActivity,
-  DelegationService per mostrare gli avvisi a nome dell'app).
+  `team.foss.app`, colori, icona degli avvisi). Le classi sono quelle della libreria
+  `com.google.androidbrowserhelper:androidbrowserhelper` (LauncherActivity); di nostro c'è un solo file:
+- `android/app/src/main/java/team/foss/app/Avvisi.java` (dalla 1.1.0): **avvisi come un'app di messaggi**.
+  Gli avvisi del sito (web push, sia FOSS sia FOSS.chat: li manda la funzione `push`, urgenza alta)
+  passano dall'app; di serie finirebbero su un canale «normale» (suono ma niente comparsa in alto), qui vanno
+  sul canale «Messaggi e avvisi» ad **alta importanza**: compaiono in alto, suonano, vibrano. Il suono è quello
+  degli avvisi del telefono; si cambia da Impostazioni → App → FOSS → Notifiche. I messaggi mandati «senza
+  suono» restano muti. Se qualcosa va storto l'avviso arriva nel modo di serie (non si perde).
+- Nel sito (`invitaAvvisi` in index.html): chi apre FOSS come app (APK o icona sulla Home) e non ha gli avvisi
+  accesi riceve l'invito «Accendi gli avvisi» appena entra; «Non ora» = richiesto dopo 3 giorni.
 - `android/icone.py`: prima di costruire prepara le immagini dell'app dalle icone del sito
   (`foss-icona-512.png`, `chat-icona-192.png`). Le immagini generate non stanno nel repository.
 - `.well-known/assetlinks.json` (nel sito): dice a Chrome che l'app firmata con la nostra firma è
@@ -536,7 +544,9 @@ premuta l'icona c'è la scorciatoia «Chat».
 - Chrome (c'è quasi sempre). Senza un browser adatto l'app si apre lo stesso ma con la barra dell'indirizzo.
 - Alla prima installazione: consentire le app da «origini sconosciute» per l'app da cui si apre il file
   (WhatsApp, Drive, File…). Play Protect può mostrare un avviso: è normale fuori dallo store.
-- Gli avvisi si accendono dentro l'app come sul sito (Profilo → Avvisi), una volta.
+- Gli avvisi: al primo ingresso l'app invita ad accenderli (poi Profilo → Avvisi). Su alcuni telefoni
+  (Xiaomi, Huawei, Oppo, Samsung con risparmio energetico) conviene togliere a FOSS **e a Chrome** le
+  restrizioni della batteria, altrimenti gli avvisi possono arrivare in ritardo ad app chiusa.
 
 ### Strumenti per pubblicare senza git (`sviluppo/strumenti/`)
 Sul Mac di Davide git e python non ci sono più: `pubblica.pl` carica le modifiche su GitHub con `gh`
