@@ -25,6 +25,7 @@ function vociMessaggio(m, c){
   if(!colp) p.push(['Rispondi', 'rispondi', () => impostaRisposta(m)]);
   if(m.tipo === 'lavoro' && md.lavoro) p.push(['Apri in FOSS', 'apri', () => apriLavoroInFoss(md.lavoro)]);
   if(testoDi(m) && m.tipo !== 'lavoro') p.push(['Copia', 'copia', () => copia(testoDi(m))]);
+  if(m.tipo === 'vocale') p.push(['Trascrivi', 'testo', () => apriTrascrizione(m.id)]);
   if(['foto','video','file','vocale'].includes(m.tipo)) p.push([m.tipo === 'foto' ? 'Salva immagine' : m.tipo === 'video' ? (md.gif ? 'Salva GIF' : 'Salva video') : 'Salva', 'scarica', () => scaricaMedia(m)]);
   if(puoModificare(m)) p.push([m.tipo === 'testo' ? 'Modifica' : 'Modifica didascalia', 'matita', () => avviaModifica(m)]);
   if(!colp) p.push(m.fissato_il ? ['Togli dai fissati', 'spilloVia', () => fissa(m, false)] : ['Fissa', 'spillo', () => fissa(m, true)]);

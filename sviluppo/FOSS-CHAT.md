@@ -285,6 +285,38 @@ L'elenco completo è nel `README.md` del sito, sezioni «FOSS.chat» e «FOSS.ch
   e alta zero perche' la scheda (un `<button>`) allinea i figli a sinistra (`align-items:flex-start`). Ora ha
   `width:100%` e l'altezza dal padding (`padding-bottom: calc(100% / 3.6)`), che funziona ovunque.
 
+### 2.9.5 — trascrizione dei vocali, velocità, «Torna a FOSS» (15 novembre 2026)
+- **Trascrizione** (`js/28-trascrivi.js`): due tocchi su un vocale (non sul play) aprono in basso il testo;
+  anche dal menu del messaggio, «Trascrivi». Un tocco solo fa quello di sempre dopo 300 ms (per capire se
+  arriva il secondo); mentre il vocale suona risponde subito. Oltre **2 minuti** non si trascrive (messaggio).
+- Server: funzione `trascrivi` (`sviluppo/edge/trascrivi/index.ts`) e tabella `chat_trascrizioni`
+  (una riga per vocale, la scrive solo la funzione, la legge chi è nella chat): si trascrive **una volta sola**
+  e chi apre dopo trova il testo pronto. Servizio compatibile «audio/transcriptions», di serie **Groq**
+  (`whisper-large-v3-turbo`, italiano). Segreto da inserire nelle Edge Functions di Supabase:
+  **`TRASCRIZIONE_CHIAVE`** (la chiave di Groq). Facoltativi: `TRASCRIZIONE_URL` (per usare OpenAI:
+  `https://api.openai.com/v1/audio/transcriptions` + `TRASCRIZIONE_MODELLO` = `whisper-1`),
+  `TRASCRIZIONE_LINGUA` (`it` di serie, `auto`). Senza chiave la finestra dice che non è ancora attiva.
+- **In anticipo**: ogni dispositivo ricorda quanto ci mette (millisecondi per secondo di audio, ultime 10 volte,
+  `memoria('trascrRitmo')`); se per un vocale appena arrivato la stima supera **5 secondi**, la trascrizione
+  parte subito (`anticipaTrascrizione`): la fa chi l'ha mandato, gli altri solo se dopo qualche secondo
+  nessuno ha cominciato (la funzione comunque non la fa due volte).
+- **Velocità** 1× / 1,5× / 2×: il tasto si vede sempre, non solo durante l'ascolto.
+- **Torna a FOSS**: tasto giallo come quello della chat dentro FOSS, «‹ Torna a FOSS» accanto al titolo
+  (chat larga) e «‹ FOSS» in alto accanto al menu (telefono).
+- Prova: `sviluppo/test/app/prova26.py`.
+
+### FOSS (index.html), 15 novembre 2026
+- I **tre puntini** dentro un progetto (e il menu dei progetti) non si aprivano con il database collegato:
+  `vociMenuProgetto` usava `p.id` invece di `pr.id` (errore, menu mai mostrato).
+- **Le mie task**: niente più completate (quelle appena spuntate restano barrate finché non esci), niente
+  filtri; i progetti sono **chiusi** e dicono quante task aspettano te («3 per te», in rosso quelle in ritardo
+  o di oggi); si aprono toccandoli o scegliendoli dal menu a tendina (`state.mieAperti`).
+- **Campanella**: tasto **Svuota** (con conferma) che toglie tutte le mie notifiche, anche dal database
+  (la regola «notifiche: tolgo le mie» lo permette già).
+- **Consegna** nella scheda del progetto: toccando la data (o «Scaduto…/Tra…») si apre il calendario
+  (`scegliDataConsegna`, `showPicker`); scelto il giorno chiede conferma e poi sposta anche l'evento in
+  calendario. Dove il calendario a comparsa non c'è, si apre la solita finestra con il campo data.
+
 ### 2.9.4 — vocali: scorri in su per bloccare, più reattivi (15 novembre 2026)
 - Registrazione (`avviaRegistrazione` in 05-scrivi.js): la barra compare **subito** al tocco, il microfono si
   accende dopo (il pallino rosso lampeggia quando si sente davvero: classe `.pronta`). Tenendo premuto:

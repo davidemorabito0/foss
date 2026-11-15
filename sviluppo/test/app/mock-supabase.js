@@ -14,6 +14,7 @@
       {id: SE, nome: 'Sergio', cognome: 'Pellino', nickname: '', foto_url: null, ruolo: 'Colorist'},
     ],
     chat_conversazioni: [], chat_membri: [], chat_messaggi: [], chat_reazioni: [], chat_nascosti: [], chat_sticker: [], chat_presenza: [{utente_id: MO, visto_il: fa(12)}],
+    chat_trascrizioni: [],
     chat_voti: [], chat_programmati: [], chat_promemoria: [], chat_importanti: [], chat_letture: [],
     progetti: [], elementi: [],
     pin: window.__PIN || null, tutto: !!window.__TUTTO,
@@ -346,6 +347,13 @@
         const m = db.chat_messaggi.find(x => x.id === o.body.messaggio);
         if(window.__super.filter(x => x === o.body.messaggio).length > 1) return {data: null, error: {message: 'gia', context: {json: async () => ({errore: 'gia'})}}};
         return {data: {inviate: db.chat_membri.filter(x => x.conv_id === m.conv_id && x.utente_id !== io).map(x => x.utente_id), saltate: []}, error: null}; }
+      if(n === 'trascrivi'){ window.__trascr = (window.__trascr || []).concat([o.body.messaggio]);
+        const m = db.chat_messaggi.find(x => x.id === o.body.messaggio); if(!m) return {data: {errore: 'messaggio'}, error: null};
+        if(((m.media || {}).dur || 0) > 120) return {data: {errore: 'lungo'}, error: null};
+        await new Promise(r => setTimeout(r, window.__TRASCR_MS || 700));
+        const testo = 'Ciao, questa è la trascrizione di prova del vocale.';
+        db.chat_trascrizioni.push({msg_id: m.id, conv_id: m.conv_id, stato: 'fatta', testo});
+        return {data: {testo, ms: 500}, error: null}; }
       if(n !== 'gif') return {data: null, error: {message: 'no'}};
       const q = (o.body && o.body.q) || ''; const off = (o.body && o.body.offset) || 0;
       const lista = Array.from({length: 24}, (_, i) => ({id: 'g' + q + (off + i), anteprima: 'https://media.giphy.test/media/x/a.gif', mp4: 'https://media.giphy.test/media/x/a.mp4', w: 200, h: 150 + (i % 3) * 30, titolo: q + ' ' + (off + i)}));

@@ -146,7 +146,9 @@ document.addEventListener('click', async e => {
     case 'apri-doc': apriDocumento(id); break;
     case 'play-voc': suonaVocale(id); break;
     case 'cerca-voc': cercaVocale(id, e); break;
-    case 'vel-voc': velocita = velocita === 1 ? 1.5 : velocita === 1.5 ? 2 : 1; if(audio) audio.playbackRate = velocita; disegnaAvanzamento(); break;
+    case 'tocca-voc': toccoVocale(id, null); break;
+    case 'vel-voc': velocita = velocita === 1 ? 1.5 : velocita === 1.5 ? 2 : 1; if(audio) audio.playbackRate = velocita;
+      $$('.vocale .vel').forEach(b => { b.textContent = String(velocita).replace('.', ',') + '×'; }); disegnaAvanzamento(); break;
     case 'ricarica-media': { const c = S.convs.get(S.aperta); const m = c && trovaMsg(c.id, id); if(m && m.media && m.media.path) firme.delete(m.media.path); ridisegnaMessaggio(id); break; }
     case 'riprova': riprova(id); break;
     case 'annulla-carica': annullaCaricamento(id); break;

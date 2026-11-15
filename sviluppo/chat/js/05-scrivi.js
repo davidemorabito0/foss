@@ -190,6 +190,7 @@ async function inviaFilePronto(m, p){
     if(p.ondaDopo){ const o = await Promise.race([p.ondaDopo.catch(() => null), new Promise(ok => setTimeout(ok, 4000, null))]); if(o) m.media.onda = o; }
     await salvaMessaggio(m);
     delete m._file; delete m._ctrl;
+    if(m.tipo === 'vocale' && typeof anticipaTrascrizione === 'function') anticipaTrascrizione(m);
   }catch(e){
     m._stato = 'errore'; delete m._avanza; delete m._ctrl; ridisegnaMessaggio(m.id);
     if(e && e.annullato){ toast('Invio annullato: tocca «Riprova» quando vuoi.'); return; }
@@ -451,8 +452,8 @@ let trascinoVoc = 0;
 function cercaVocale(id, ev){
   if(Date.now() - trascinoVoc < 350) return;      /* il click che arriva alla fine di un trascinamento */
   const o = ev.target.closest('.onda'); if(!o) return;
-  const r = o.getBoundingClientRect();
-  vaiAlPunto(id, Math.max(0, Math.min(1, (ev.clientX - r.left) / r.width)));
+  const r = o.getBoundingClientRect(), p = Math.max(0, Math.min(1, (ev.clientX - r.left) / r.width));
+  toccoVocale(id, () => vaiAlPunto(id, p));          /* due tocchi = trascrizione (28-trascrivi.js) */
 }
 /* 2.9.4: col dito si trascina il pallino lungo l'onda; in verticale la chat scorre come sempre */
 document.addEventListener('pointerdown', e => {

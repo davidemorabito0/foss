@@ -345,8 +345,7 @@ svg{display:block}
 .vocale .barre i.su{background:var(--blu-spunta);opacity:1}
 .msg.mio .vocale .barre i.su{background:#53bdeb}
 .vocale .tempo{position:absolute;left:0;bottom:-8px;font-size:11px;color:var(--testo-2)}
-.vocale .vel{flex:none;height:24px;min-width:38px;border-radius:12px;background:rgba(134,150,160,.25);font:600 12px/24px var(--font);color:var(--testo);padding:0 6px;display:none}
-.vocale.va .vel{display:block}
+.vocale .vel{flex:none;height:24px;min-width:38px;border-radius:12px;background:rgba(134,150,160,.25);font:600 12px/24px var(--font);color:var(--testo);padding:0 6px;display:block}
 .vocale.va .vav{display:none}
 
 /* ---------- barra per scrivere ---------- */
@@ -1478,13 +1477,20 @@ input,textarea,[contenteditable="true"]{-webkit-user-select:text;user-select:tex
 /* 2.9.2: il tasto per tornare a FOSS, accanto al titolo (solo con la chat larga: stretta c'e' la barra in basso) */
 .lato-testa .vai-foss{display:none}
 @media (min-width:900px){
-  .lato-testa .vai-foss{display:inline-flex;align-items:center;gap:6px;flex:none;height:34px;padding:0 12px 0 6px;margin-right:12px;border-radius:17px;
-    border:1px solid var(--linea);background:var(--hover);color:var(--testo);font:600 14px var(--font);cursor:pointer;transition:background .15s,border-color .15s}
-  .lato-testa .vai-foss:hover{background:var(--scelta);border-color:var(--ambra)}
-  .lato-testa .vai-foss > svg{width:18px;height:18px;color:var(--testo-2)}
-  .lato-testa .vai-foss .vf-logo{display:grid;width:20px;height:20px}
-  .lato-testa .vai-foss .vf-logo svg{width:20px;height:20px}
+  .lato-testa .vai-foss{display:inline-flex;margin-right:12px}
+  .lato-testa .torna-foss{display:none!important}
 }
+/* 2.9.4: piu' chiaro, come il tasto della chat dentro FOSS: bordo giallo, «Torna a FOSS» */
+.vai-foss{align-items:center;gap:7px;flex:none;height:38px;padding:0 15px 0 8px;border-radius:19px;cursor:pointer;
+  border:1.5px solid var(--ambra);background:color-mix(in srgb,var(--ambra) 14%,transparent);color:var(--testo);font:700 14px var(--font);
+  box-shadow:0 0 0 3px color-mix(in srgb,var(--ambra) 10%,transparent);transition:background .15s,transform .1s}
+.vai-foss:hover{background:color-mix(in srgb,var(--ambra) 26%,transparent)}
+.vai-foss:active{transform:scale(.97)}
+.vai-foss > svg{width:17px;height:17px;color:var(--ambra)}
+.vai-foss .vf-logo{display:grid;width:20px;height:20px}
+.vai-foss .vf-logo svg{width:20px;height:20px}
+.ios-riga .vai-foss{display:none}
+@media (max-width:899px){ .ios-riga .vai-foss{display:inline-flex;height:40px} }
 /* 2.9.4: vocali. Tenendo premuto il microfono il dito non fa scorrere la pagina (prima il telefono a volte
    «rubava» il gesto e la registrazione restava appesa); scorri in su sul lucchetto per bloccarla */
 .barra-scrivi .manda,.registra{touch-action:none}
@@ -1509,6 +1515,27 @@ input,textarea,[contenteditable="true"]{-webkit-user-select:text;user-select:tex
 .vocale.carica .vp::after{content:"";position:absolute;inset:4px;border-radius:50%;border:2.5px solid rgba(134,150,160,.3);border-top-color:var(--blu-spunta);animation:gira .8s linear infinite}
 /* sull'onda il dito scorre la chat in verticale e sposta il pallino in orizzontale */
 .vocale .onda{touch-action:pan-y}
+/* 2.9.4: la trascrizione di un vocale, in basso */
+.vocale .vel{min-width:40px}
+.trascr-velo{position:fixed;inset:0;z-index:120;background:rgba(0,0,0,0);transition:background .2s}
+.trascr-velo.su{background:rgba(0,0,0,.35)}
+.trascr{position:absolute;left:50%;bottom:0;width:min(620px,100%);max-height:70dvh;display:flex;flex-direction:column;transform:translate(-50%,100%);transition:transform .22s cubic-bezier(.2,.9,.3,1);
+  background:var(--menu);color:var(--testo);border-radius:18px 18px 0 0;box-shadow:0 -10px 40px rgba(0,0,0,.35);padding-bottom:env(safe-area-inset-bottom)}
+.trascr-velo.su .trascr{transform:translate(-50%,0)}
+.trascr-t{display:flex;align-items:center;gap:10px;padding:14px 10px 10px 18px;border-bottom:1px solid var(--linea)}
+.trascr-t .ic{display:grid;place-items:center;width:30px;height:30px;border-radius:50%;background:color-mix(in srgb,var(--verde) 18%,transparent);color:var(--verde)}
+.trascr-t .ic svg{width:17px;height:17px}
+.trascr-t b{font-size:16px;font-weight:700}
+.trascr-d{flex:1;min-width:0;color:var(--testo-2);font-size:13px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.trascr-c{overflow:auto;padding:16px 20px 8px;-webkit-user-select:text;user-select:text}
+.trascr-testo{margin:0;font-size:16px;line-height:1.5;white-space:pre-wrap}
+.trascr-no{margin:0;color:var(--testo-2);font-size:15px;line-height:1.45;display:flex;gap:10px;align-items:flex-start}
+.trascr-no svg{width:18px;height:18px;flex:none;margin-top:2px}
+.trascr-att{display:flex;align-items:center;gap:10px;color:var(--testo-2);font-size:15px}
+.trascr-f{display:flex;justify-content:flex-end;padding:6px 16px 14px}
+.trascr-f:empty{display:none}
+.trascr-f .btn{display:inline-flex;align-items:center;gap:7px}
+.trascr-f .btn svg{width:16px;height:16px}
 </style>
 </head>
 <body>
@@ -1528,7 +1555,7 @@ const SUPA_KEY = 'sb_publishable_f5Kjp6NHT9yTxr1bhWJjhg_4y72V-Kj';
 const VAPID_PUBBLICA = 'BNlGbW4nZrXmx8DioKxnl7ubULVOr5_6CAKvpuQYoiXeObmxYAzGU6UrkExx2zu1hACmtRNDcpoMh_ARQ0GSmlw';
 /* il server dei file sul NAS (es. 'https://media.foss.team'). Vuoto = si usa Supabase. */
 const MEDIA_NAS = 'https://media.foss.team';
-const VERSIONE = 'chat-2.9.4';
+const VERSIONE = 'chat-2.9.5';
 /* i temi colore: gli stessi di FOSS. Il predefinito per tutti è Brand (blu e giallo). */
 const TEMI_COLORE = [
   {id:'brand',   nome:'Brand',    ds:'Navy e ambra, il predefinito', c:['#0D1926','#1A3149','#FFAD01']},
@@ -2303,6 +2330,7 @@ function arrivaMessaggio(m){
     c.ultimo_il = m.creato_il;
   }
   const mio = m.autore === S.io;
+  if(!gia && m.tipo === 'vocale' && typeof anticipaTrascrizione === 'function') anticipaTrascrizione(m);
   if(!gia && !mio && m.tipo !== 'sistema'){
     S.scrive.get(m.conv_id) && S.scrive.get(m.conv_id).delete(m.autore);
     /* letto solo se lo stai davvero guardando: chat aperta, finestra davanti a te, in fondo ai messaggi */
@@ -2482,14 +2510,15 @@ function disegnaGuscio(){
     '</nav>'+
     '<aside class="lato" id="lato">'+
       '<div class="ios-testa">'+
-        '<div class="ios-riga"><button class="ios-tondo" data-a="menu-lista" aria-label="Menu">'+svg('puntini')+'</button><span class="sp"></span>'+
+        '<div class="ios-riga"><button class="ios-tondo" data-a="menu-lista" aria-label="Menu">'+svg('puntini')+'</button>'+
+          '<button class="vai-foss vf-tel" data-a="foss" title="Torna a FOSS: lavori, task, calendario">'+svg('indietro', 2.4)+'<span class="vf-logo">'+LOGO+'</span><span>FOSS</span></button><span class="sp"></span>'+
           '<button class="ios-tondo" data-a="fotocamera-lista" aria-label="Fotocamera">'+svg('camera', 1.9)+'</button>'+
           '<button class="ios-tondo verde" data-a="nuova" aria-label="Nuova chat">'+svg('piu', 2.4)+'</button></div>'+
         '<h1 class="ios-titolo">Chat</h1></div>'+
       '<div class="lato-testa">'+
         '<button class="ib torna-foss" data-a="foss" title="Torna a FOSS" style="display:none">'+svg('indietro')+'</button>'+
         /* 2.9.2: un tasto chiaro per tornare a FOSS (sul computer, con la chat larga) */
-        '<button class="vai-foss" data-a="foss" title="Torna a FOSS: lavori, task, calendario">'+svg('indietro')+'<span class="vf-logo">'+LOGO+'</span><span>FOSS</span></button>'+
+        '<button class="vai-foss" data-a="foss" title="Torna a FOSS: lavori, task, calendario">'+svg('indietro', 2.4)+'<span class="vf-logo">'+LOGO+'</span><span>Torna a FOSS</span></button>'+
         '<h1>FOSS.chat</h1>'+
         '<button class="ib" data-a="nuova" title="Nuova chat">'+svg('nuova',1.9)+'</button>'+
         '<button class="ib" data-a="menu-lista" title="Menu">'+svg('menu')+'</button>'+
@@ -2999,11 +3028,11 @@ function vocaleHTML(m, mio){
   const onda = ondaDa(md.onda);
   const ascoltati = memoria('ascoltati') || {};
   const nuovo = !mio && !ascoltati[m.id];
-  return '<div class="vocale" data-voc="'+m.id+'">'+
+  return '<div class="vocale" data-voc="'+m.id+'" data-a="tocca-voc" data-id="'+m.id+'" title="Due tocchi: leggi il testo">'+
     '<button class="vp" data-a="play-voc" data-id="'+m.id+'" aria-label="Ascolta">'+svg('play')+'</button>'+
     '<div class="onda" data-a="cerca-voc" data-id="'+m.id+'"><span class="barre">'+onda.map(v => '<i style="height:'+Math.max(10, v * 100)+'%"></i>').join('')+'</span><span class="pallino"></span>'+
       '<span class="tempo">'+fmtDur(md.dur)+'</span></div>'+
-    '<button class="vel" data-a="vel-voc">1×</button>'+
+    '<button class="vel" data-a="vel-voc" title="Velocità di ascolto">'+String(velocita).replace('.', ',')+'×</button>'+
     '<span class="vav">'+avatarMsg(m)+'<span class="mic '+(nuovo ? 'nuovo' : 'ascoltato')+'">'+svg('mic', 2.4)+'</span></span>'+
     '</div>'+meta(m, S.convs.get(m.conv_id) || {membri: []}, mio);
 }
@@ -3454,6 +3483,7 @@ async function inviaFilePronto(m, p){
     if(p.ondaDopo){ const o = await Promise.race([p.ondaDopo.catch(() => null), new Promise(ok => setTimeout(ok, 4000, null))]); if(o) m.media.onda = o; }
     await salvaMessaggio(m);
     delete m._file; delete m._ctrl;
+    if(m.tipo === 'vocale' && typeof anticipaTrascrizione === 'function') anticipaTrascrizione(m);
   }catch(e){
     m._stato = 'errore'; delete m._avanza; delete m._ctrl; ridisegnaMessaggio(m.id);
     if(e && e.annullato){ toast('Invio annullato: tocca «Riprova» quando vuoi.'); return; }
@@ -3715,8 +3745,8 @@ let trascinoVoc = 0;
 function cercaVocale(id, ev){
   if(Date.now() - trascinoVoc < 350) return;      /* il click che arriva alla fine di un trascinamento */
   const o = ev.target.closest('.onda'); if(!o) return;
-  const r = o.getBoundingClientRect();
-  vaiAlPunto(id, Math.max(0, Math.min(1, (ev.clientX - r.left) / r.width)));
+  const r = o.getBoundingClientRect(), p = Math.max(0, Math.min(1, (ev.clientX - r.left) / r.width));
+  toccoVocale(id, () => vaiAlPunto(id, p));          /* due tocchi = trascrizione (28-trascrivi.js) */
 }
 /* 2.9.4: col dito si trascina il pallino lungo l'onda; in verticale la chat scorre come sempre */
 document.addEventListener('pointerdown', e => {
@@ -5697,7 +5727,9 @@ document.addEventListener('click', async e => {
     case 'apri-doc': apriDocumento(id); break;
     case 'play-voc': suonaVocale(id); break;
     case 'cerca-voc': cercaVocale(id, e); break;
-    case 'vel-voc': velocita = velocita === 1 ? 1.5 : velocita === 1.5 ? 2 : 1; if(audio) audio.playbackRate = velocita; disegnaAvanzamento(); break;
+    case 'tocca-voc': toccoVocale(id, null); break;
+    case 'vel-voc': velocita = velocita === 1 ? 1.5 : velocita === 1.5 ? 2 : 1; if(audio) audio.playbackRate = velocita;
+      $$('.vocale .vel').forEach(b => { b.textContent = String(velocita).replace('.', ',') + '×'; }); disegnaAvanzamento(); break;
     case 'ricarica-media': { const c = S.convs.get(S.aperta); const m = c && trovaMsg(c.id, id); if(m && m.media && m.media.path) firme.delete(m.media.path); ridisegnaMessaggio(id); break; }
     case 'riprova': riprova(id); break;
     case 'annulla-carica': annullaCaricamento(id); break;
@@ -5977,6 +6009,7 @@ function vociMessaggio(m, c){
   if(!colp) p.push(['Rispondi', 'rispondi', () => impostaRisposta(m)]);
   if(m.tipo === 'lavoro' && md.lavoro) p.push(['Apri in FOSS', 'apri', () => apriLavoroInFoss(md.lavoro)]);
   if(testoDi(m) && m.tipo !== 'lavoro') p.push(['Copia', 'copia', () => copia(testoDi(m))]);
+  if(m.tipo === 'vocale') p.push(['Trascrivi', 'testo', () => apriTrascrizione(m.id)]);
   if(['foto','video','file','vocale'].includes(m.tipo)) p.push([m.tipo === 'foto' ? 'Salva immagine' : m.tipo === 'video' ? (md.gif ? 'Salva GIF' : 'Salva video') : 'Salva', 'scarica', () => scaricaMedia(m)]);
   if(puoModificare(m)) p.push([m.tipo === 'testo' ? 'Modifica' : 'Modifica didascalia', 'matita', () => avviaModifica(m)]);
   if(!colp) p.push(m.fissato_il ? ['Togli dai fissati', 'spilloVia', () => fissa(m, false)] : ['Fissa', 'spillo', () => fissa(m, true)]);
@@ -8189,6 +8222,119 @@ function scegliStato(v){
   disegnaImpostazioni(); disegnaListaPresto(); aggiornaTestaConv();
   toast(v === 'invisibile' ? 'Sei invisibile: nessuno ti vede online.' : v === 'occupato' ? 'Sei occupato: gli altri vedono il cerchio rosso.' : 'Sei online: gli altri vedono il cerchio verde.');
 }
+
+/* ---------- 2.9.4: trascrizione dei vocali ----------
+   Due tocchi su un vocale (senza farlo partire) aprono in basso il testo del messaggio.
+   La trascrizione la fa la funzione «trascrivi» sul server e resta salvata (chat_trascrizioni):
+   si fa una volta sola per vocale. Se di solito ci mette più di 5 secondi, la si comincia
+   già quando il vocale arriva. Oltre i 2 minuti non si trascrive. */
+const TRASCR_MAX = 120;
+const trascritti = new Map();        // id -> testo
+const trascrInCorso = new Map();     // id -> promessa
+function vocaleTroppoLungo(m){ return (+((m && m.media) || {}).dur || 0) > TRASCR_MAX; }
+
+/* quanto ci mette, in base alle volte precedenti (millisecondi per secondo di audio) */
+function stimaTrascrizione(dur){
+  const r = (memoria('trascrRitmo') || []).filter(x => x && x.dur > 0 && x.ms > 0);
+  if(!r.length) return 1500 + 60 * dur;
+  const q = r.map(x => x.ms / x.dur).sort((a, b) => a - b), med = q[Math.floor(q.length / 2)];
+  return med * dur;
+}
+function notaRitmo(ms, dur){
+  if(!(dur > 0) || !(ms > 0)) return;
+  const r = (memoria('trascrRitmo') || []).concat([{ms: Math.round(ms), dur}]).slice(-10);
+  memoria('trascrRitmo', r);
+}
+
+async function trascrivi(m, inAnticipo){
+  if(trascritti.has(m.id)) return {testo: trascritti.get(m.id)};
+  if(trascrInCorso.has(m.id)) return trascrInCorso.get(m.id);
+  const lavoro = (async () => {
+    /* già fatta da qualcuno? */
+    try{
+      const {data} = await sb.from('chat_trascrizioni').select('stato,testo').eq('msg_id', m.id).maybeSingle();
+      if(data && data.stato === 'fatta'){ trascritti.set(m.id, data.testo || ''); return {testo: data.testo || ''}; }
+    }catch(e){}
+    const t0 = Date.now();
+    const {data, error} = await sb.functions.invoke('trascrivi', {body: {messaggio: m.id}});
+    if(error) return {errore: 'rete'};
+    if(data && typeof data.testo === 'string'){
+      trascritti.set(m.id, data.testo);
+      if(!data.pronta) notaRitmo(Date.now() - t0, +((m.media || {}).dur) || 0);
+      return {testo: data.testo};
+    }
+    return {errore: (data && (data.errore || data.stato)) || 'servizio'};
+  })();
+  trascrInCorso.set(m.id, lavoro);
+  try{ return await lavoro; } finally { trascrInCorso.delete(m.id); }
+}
+
+/* appena arriva un vocale: se la trascrizione di solito è lenta, la comincio subito */
+function anticipaTrascrizione(m){
+  if(!m || m.tipo !== 'vocale' || m.eliminato || vocaleTroppoLungo(m)) return;
+  const dur = +((m.media || {}).dur) || 0; if(!dur) return;
+  if(stimaTrascrizione(dur) <= 5000) return;
+  /* la fa chi l'ha mandato; gli altri aspettano un attimo e la fanno solo se nessuno ha cominciato */
+  setTimeout(() => trascrivi(m, true).catch(() => {}), m.autore === S.io ? 300 : 4000 + Math.random() * 3000);
+}
+
+/* due tocchi su un vocale = trascrizione; un tocco solo fa quello di sempre (con un attimo di attesa,
+   per capire se arriva il secondo), ma mentre suona risponde subito */
+let tapVoc = {id: null, t: 0}, tapVocAttesa = null;
+function toccoVocale(id, singolo){
+  const ora = Date.now();
+  if(tapVoc.id === id && ora - tapVoc.t < 350){
+    clearTimeout(tapVocAttesa); tapVocAttesa = null; tapVoc = {id: null, t: 0};
+    apriTrascrizione(id); return;
+  }
+  tapVoc = {id, t: ora};
+  if(!singolo) return;
+  if(audioId === id && audio && !audio.paused){ singolo(); return; }
+  clearTimeout(tapVocAttesa);
+  tapVocAttesa = setTimeout(() => { tapVocAttesa = null; singolo(); }, 300);
+}
+
+function chiudiTrascrizione(){
+  const v = el('trascrVelo'); if(!v) return;
+  v.classList.remove('su'); setTimeout(() => v.remove(), 220);
+}
+async function apriTrascrizione(id){
+  const c = S.convs.get(S.aperta); const m = c && trovaMsg(c.id, id); if(!m) return;
+  chiudiTrascrizione();
+  const v = document.createElement('div'); v.className = 'trascr-velo'; v.id = 'trascrVelo';
+  v.innerHTML = '<div class="trascr" role="dialog" aria-label="Trascrizione del vocale">'+
+    '<div class="trascr-t"><span class="ic">'+svg('testo', 1.8)+'</span><b>Trascrizione</b><span class="trascr-d">'+esc(nomeMsg(m))+' · '+fmtDur((m.media || {}).dur)+'</span>'+
+    '<button class="ib" data-x="1" aria-label="Chiudi">'+svg('chiudi')+'</button></div>'+
+    '<div class="trascr-c" id="trascrC"><span class="trascr-att"><span class="giro"></span>Trascrivo il vocale…</span></div>'+
+    '<div class="trascr-f" id="trascrF"></div></div>';
+  document.body.appendChild(v);
+  requestAnimationFrame(() => v.classList.add('su'));
+  v.addEventListener('click', e => {
+    if(e.target === v || e.target.closest('[data-x]')) chiudiTrascrizione();
+    if(e.target.closest('[data-copia]')){ copia(trascritti.get(id) || ''); }
+  });
+  const C = () => el('trascrC');
+  if(vocaleTroppoLungo(m)){
+    C().innerHTML = '<p class="trascr-no">'+svg('mic', 2)+'L’audio supera i 2 minuti: la trascrizione è disponibile solo per i vocali fino a 2 minuti.</p>';
+    return;
+  }
+  const r = await trascrivi(m);
+  if(!el('trascrVelo') || !C()) return;
+  if(r.testo != null){
+    C().innerHTML = r.testo ? '<p class="trascr-testo">'+esc(r.testo)+'</p>' : '<p class="trascr-no">Non ho sentito parole in questo vocale.</p>';
+    if(r.testo) el('trascrF').innerHTML = '<button class="btn" data-copia="1">'+svg('copia', 1.8)+'Copia il testo</button>';
+    return;
+  }
+  const msg = {
+    lungo: 'L’audio supera i 2 minuti: la trascrizione è disponibile solo per i vocali fino a 2 minuti.',
+    chiave: 'La trascrizione non è ancora attiva: l’amministratore deve collegare il servizio.',
+    in_corso: 'La sta già preparando qualcun altro: riprova tra qualche secondo.',
+    file: 'Non riesco a prendere il file del vocale (il server dei media è acceso?).',
+    rete: 'Non riesco a collegarmi: controlla la connessione e riprova.',
+  }[r.errore] || 'La trascrizione non è riuscita: riprova tra poco.';
+  C().innerHTML = '<p class="trascr-no">'+esc(msg)+'</p>';
+}
+document.addEventListener('keydown', e => { if(e.key === 'Escape' && el('trascrVelo')) chiudiTrascrizione(); });
 
 /* ======================= VIA ======================= */
 avvia();

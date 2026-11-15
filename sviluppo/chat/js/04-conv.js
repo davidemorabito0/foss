@@ -338,11 +338,11 @@ function vocaleHTML(m, mio){
   const onda = ondaDa(md.onda);
   const ascoltati = memoria('ascoltati') || {};
   const nuovo = !mio && !ascoltati[m.id];
-  return '<div class="vocale" data-voc="'+m.id+'">'+
+  return '<div class="vocale" data-voc="'+m.id+'" data-a="tocca-voc" data-id="'+m.id+'" title="Due tocchi: leggi il testo">'+
     '<button class="vp" data-a="play-voc" data-id="'+m.id+'" aria-label="Ascolta">'+svg('play')+'</button>'+
     '<div class="onda" data-a="cerca-voc" data-id="'+m.id+'"><span class="barre">'+onda.map(v => '<i style="height:'+Math.max(10, v * 100)+'%"></i>').join('')+'</span><span class="pallino"></span>'+
       '<span class="tempo">'+fmtDur(md.dur)+'</span></div>'+
-    '<button class="vel" data-a="vel-voc">1×</button>'+
+    '<button class="vel" data-a="vel-voc" title="Velocità di ascolto">'+String(velocita).replace('.', ',')+'×</button>'+
     '<span class="vav">'+avatarMsg(m)+'<span class="mic '+(nuovo ? 'nuovo' : 'ascoltato')+'">'+svg('mic', 2.4)+'</span></span>'+
     '</div>'+meta(m, S.convs.get(m.conv_id) || {membri: []}, mio);
 }

@@ -723,6 +723,12 @@ input,textarea,select{font:inherit;color:inherit}
 .kv{display:flex;justify-content:space-between;gap:10px;padding:3px 0;font-size:12px}
 .kv span{color:var(--dim)}
 .kv b{font-weight:600;text-align:right}
+.kv-cal{cursor:pointer;border-radius:8px;margin:0 -6px;padding:3px 6px;transition:background .15s}
+.kv-cal:hover,.kv-cal:focus-visible{background:var(--surface-2)}
+.kv-cal b{display:inline-flex;align-items:center;gap:6px;color:var(--amber-ink)}
+.kv-cal b svg{width:13px;height:13px;flex:none}
+.chip-cal{cursor:pointer;border:0;font:inherit}
+.chip-cal:hover{filter:brightness(1.12)}
 .ring-wrap{display:flex;align-items:center;gap:12px}
 .ring{width:54px;height:54px;flex:none}
 .ring circle{fill:none;stroke-width:5}
@@ -3377,6 +3383,11 @@ em.capo{font-style:normal;font-weight:700;color:var(--amber-ink)}
 .mt-av{width:230px;flex:none;display:flex;flex-direction:column;gap:7px;font-size:13px;font-weight:600}
 .mt-av i{display:block;height:6px;border-radius:4px;background:var(--surface-3);overflow:hidden}
 .mt-av i b{display:block;height:100%;border-radius:4px;background:var(--acc)}
+.mt-att{display:inline-flex;align-items:center;gap:9px;flex:none;height:38px;padding:0 14px 0 6px;border-radius:11px;background:var(--surface-2);border:1px solid var(--line);font-size:13px;color:var(--dim);font-weight:600;white-space:nowrap}
+.mt-att b{min-width:26px;height:26px;padding:0 7px;border-radius:13px;background:var(--amber);color:#15120a;display:grid;place-items:center;font-size:13.5px;font-weight:800}
+.mt-att em{font-style:normal;color:var(--alert);font-weight:700}
+.mt-att.tardi b{background:var(--alert);color:#fff}
+.mt-filtri:empty{display:none}
 .mt-data{display:inline-flex;align-items:center;gap:7px;height:38px;padding:0 14px;border-radius:11px;background:var(--surface-2);border:1px solid var(--line);font-size:13.5px;font-weight:700;flex:none;margin-left:12px}
 .mt-data svg{width:15px;height:15px}
 .mt-data.alert{background:var(--alert-soft);color:var(--alert);border-color:transparent}
@@ -3422,6 +3433,7 @@ em.capo{font-style:normal;font-weight:700;color:var(--amber-ink)}
   .mt-pn .q{width:38px;height:38px;border-radius:11px}
   .mt-pn{flex:1 1 calc(100% - 52px)}
   .mt-av{order:3;width:auto;flex:1 1 0;min-width:0;padding-left:40px}
+  .mt-att{order:3;margin-left:40px;height:32px;font-size:12px}
   .mt-data{order:4;margin-left:0;height:32px;padding:0 10px;font-size:12px}
   .mt-d.vuota{visibility:hidden}
   .mt-righe{padding:2px 6px 6px}
@@ -3704,6 +3716,7 @@ button.pf-p:hover{background:var(--surface-2);border-radius:10px}
 <aside class="drawer" id="drawer" aria-label="Notifiche">
   <div class="drawer-h">
     <h3>Notifiche</h3>
+    <button class="btn sm ghost" data-action="svuota-notifiche" title="Togli tutte le notifiche dalla lista">Svuota</button>
     <button class="btn sm ghost" data-action="read-all">Segna tutte</button>
     <button class="iconbtn" data-action="close-all" title="Chiudi">
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 6 6 18M6 6l12 12"/></svg>
@@ -5663,8 +5676,13 @@ function renderProgetto(){
         .concat([[esc(etichettaData(p)),'consegna']]).concat(p.personale? [] : [['Fattura','fattura']]);
       const pieno = v => v!=null && v!=='' && v!=='\u2014';
       const mancano = campi.filter(c=>!pieno(p[c[1]])).concat(pieno(p.indirizzo)? [] : [[esc(T.luogo||'Indirizzo'),'indirizzo']]);
-      return campi.filter(c=>pieno(p[c[1]])).map(c=>kv(c[0], p[c[1]], c[1])).join('')+
-        '<div class="chip '+sc.c+'" style="margin-top:8px">'+svg('clock')+sc.t+'</div>'+
+      const cal = !isLock(p) && !state.ospite && puo('modifica');
+      return campi.filter(c=>pieno(p[c[1]])).map(c=> c[1]==='consegna' && cal
+          ? '<div class="kv kv-cal" role="button" tabindex="0" data-action="consegna-cal" data-pid="'+p.id+'" title="Cambia la data dal calendario"><span>'+c[0]+'</span><b>'+svg('calendar',2)+esc(p.consegna)+'</b></div>'
+          : kv(c[0], p[c[1]], c[1])).join('')+
+        (cal && pieno(p.consegna)
+          ? '<button class="chip '+sc.c+' chip-cal" style="margin-top:8px" data-action="consegna-cal" data-pid="'+p.id+'" title="Cambia la data dal calendario">'+svg('clock')+sc.t+'</button>'
+          : '<div class="chip '+sc.c+'" style="margin-top:8px">'+svg('clock')+sc.t+'</div>')+
         (pieno(p.indirizzo) ? '<div style="margin-top:10px" class="editabile"><div class="lbl" style="display:flex;align-items:center;gap:4px">'+esc(T.luogo||'Indirizzo')+pen('proj','indirizzo')+'</div>'+
           '<div class="nota-box">'+svg('pin').replace('<svg','<svg style="width:12px;height:12px;vertical-align:-1px;margin-right:4px;color:var(--amber-ink)"')+esc(p.indirizzo)+'</div></div>' : '')+
         (mancano.length && !isLock(p) && !state.ospite && puo('modifica') ? '<button class="agg-dato" data-action="agg-dato" data-pid="'+p.id+'" data-campi="'+esc(JSON.stringify(mancano))+'">'+svg('plus',2.2)+'Aggiungi un dato</button>' : '');
@@ -6123,7 +6141,7 @@ const PERM_AZIONE = {
   'cm-invia':'modifica', 'cm-letto':'spunta', 'all-togli':'modifica', 'all-togli-ok':'modifica',
   'pe-nuovo':'crea_lavori','pe-importa':'crea_lavori','pe-salva':'crea_lavori','pe-elimina':'crea_lavori','pe-usa':'crea_lavori',
   'conti':'soldi','conti-prev':'soldi-scrive','conti-add':'soldi-scrive','conti-togli':'soldi-scrive',
-  'data-nuova':'modifica','data-salva':'modifica',
+  'data-nuova':'modifica','data-salva':'modifica', 'consegna-cal':'modifica',
   'edit':'modifica','personale-toggle':'modifica','cop-progetto':'modifica','rit-progetto':'modifica','togli-cop-progetto':'modifica','salva-campo':'modifica','nuova-task':'modifica','add-compito':'modifica',
   'tagga':'modifica','tagga-chi':'modifica','stagga':'modifica','assegna-sub':'modifica','assegna-sub-chi':'modifica','ass-tocca':'modifica','ass-salva':'modifica','ass-mail':'modifica',
   'fase':'modifica','indietro':'modifica','torna-a-fase':'modifica','riprendi':'modifica','completa':'modifica',
@@ -6292,40 +6310,42 @@ function mieTutte(){
 const COL_FASI = ['#5B8DEF','#8B6CF0','#E0A030','#E2723B','#22A565','#D94F70','#2FB3A4'];
 function renderMie(){
   const tutte = mieTutte();
-  const f = (state.mieFiltro==='corso' ? 'tutte' : state.mieFiltro) || 'tutte', pf = state.mieProg || '', ord = state.mieOrd || 'scadenza';
-  const statoDi = v => v.i.done ? 'fatte' : 'dafare';
-  const conta = {tutte:0, dafare:0, fatte:0};
-  tutte.forEach(g=>{ if(pf && g.p.id!==pf) return; g.voci.forEach(v=>{ conta.tutte++; conta[statoDi(v)]++; }); });
-  const passa = v => f==='tutte' || statoDi(v)===f || (f==='fatte' && false);
+  /* v2.9.4: le completate non si vedono piu' (restano barrate solo quelle appena spuntate, finche' non esco);
+     i progetti sono chiusi e dicono quante cose aspettano me: si aprono col menu a tendina o toccandoli */
+  const pf = state.mieProg || '', ord = state.mieOrd || 'scadenza';
+  const passa = v => !v.i.done || mieAppena.has(v.p.id+'|'+v.s.id+'|'+v.ix);
+  tutte.forEach(g=>g.voci.forEach(v=>{ v.p = g.p; }));
+  const conta = {tutte: 0};
+  tutte.forEach(g=>{ if(pf && g.p.id!==pf) return; g.voci.forEach(v=>{ if(!v.i.done) conta.tutte++; }); });
   const gq = p => { const q = giorniA(p.consegna); return q==null ? 9999 : q; };
   let gruppi = tutte.filter(g=>!pf || g.p.id===pf).map(g=>({p:g.p, voci:g.voci, vis:g.voci.filter(passa)})).filter(g=>g.vis.length);
   gruppi.sort((a,b)=> ord==='priorita' ? (PESO[a.p.prio]-PESO[b.p.prio]) || gq(a.p)-gq(b.p) : gq(a.p)-gq(b.p) || (PESO[a.p.prio]-PESO[b.p.prio]));
   const aperte = tutte.reduce((n,g)=>n+g.voci.filter(v=>!v.i.done).length, 0);
-  const chiusi = state.mieChiusi || (state.mieChiusi = new Set());
+  const aperti = state.mieAperti || (state.mieAperti = new Set());
 
   let h = '<div class="pane"><div class="hm mt-lay">'+barraSinistra('mie')+'<div class="hm-main scroller mt">';
   h += '<div class="mt-head"><div class="tx"><h1>Le mie task</h1><p><b>'+aperte+'</b> '+(aperte===1?'cosa aperta':'cose aperte')+' assegnate a te in '+
-    tutte.length+(tutte.length===1?' progetto':' progetti')+'</p></div></div>';
-  h += '<div class="mt-barra"><div class="mt-filtri">'+[['tutte','Tutte','list'],['dafare','Da fare','check'],['fatte','Completate','salva']].map(x=>
-      '<button class="mt-f'+(f===x[0]?' on':'')+'" data-action="mie-filtro" data-k="'+x[0]+'">'+svg(x[2],2)+x[1]+'<i>'+conta[x[0]]+'</i></button>').join('')+'</div>'+
+    tutte.filter(g=>g.voci.some(v=>!v.i.done)).length+(tutte.filter(g=>g.voci.some(v=>!v.i.done)).length===1?' progetto':' progetti')+'</p></div></div>';
+  h += '<div class="mt-barra"><div class="mt-filtri"></div>'+
     '<div class="mt-sel"><label>'+svg('grid',2)+'<select id="mie_prog" aria-label="Progetto"><option value="">Tutti i progetti</option>'+
-      tutte.map(g=>'<option value="'+esc(g.p.id)+'"'+(pf===g.p.id?' selected':'')+'>'+esc(g.p.nome)+'</option>').join('')+'</select></label>'+
+      tutte.filter(g=>g.voci.some(passa)).map(g=>'<option value="'+esc(g.p.id)+'"'+(pf===g.p.id?' selected':'')+'>'+esc(g.p.nome)+'</option>').join('')+'</select></label>'+
     '<label>'+svg('filter',2)+'<select id="mie_ord" aria-label="Ordina"><option value="scadenza"'+(ord==='scadenza'?' selected':'')+'>Per scadenza</option>'+
       '<option value="priorita"'+(ord==='priorita'?' selected':'')+'>Per priorità</option></select></label></div></div>';
 
-  if(!gruppi.length) h += '<div class="hm-vuoto mt-vuoto">'+svg('check',2)+'<span>'+(conta.tutte ? 'Niente qui con questo filtro.' : 'Niente in sospeso: quando qualcuno ti assegna una voce o ti tagga, la trovi qui.')+'</span></div>';
+  if(!gruppi.length) h += '<div class="hm-vuoto mt-vuoto">'+svg('check',2)+'<span>'+(pf ? 'Niente da fare in questo progetto.' : 'Niente in sospeso: quando qualcuno ti assegna una voce o ti tagga, la trovi qui.')+'</span></div>';
 
   gruppi.forEach(g=>{
     const p = g.p, col = coloreOk(p.col,'#FFAD01'), cop = sfondoSicuro(p.copertina);
-    const fatte = g.voci.filter(v=>v.i.done).length, tot = g.voci.length;
-    const sc = scadenza(p), chiuso = chiusi.has(p.id), fasi = FZ(p);
+    const daFare = g.voci.filter(v=>!v.i.done), tardi = daFare.filter(v=>dataVoce(v.i).c==='rosso').length;
+    const sc = scadenza(p), chiuso = !aperti.has(p.id), fasi = FZ(p);
     const sotto = [p.personale ? 'Personale' : clienteDi(p), nomeLavoro(p)].filter(Boolean).join(' · ');
     h += '<section class="mt-g'+(chiuso?' chiuso':'')+'" style="--acc:'+col+'">'+
       '<div class="mt-gh">'+(cop ? '<span class="mt-cop">'+imgRit(cop, ritDi(p,'bacheca'))+'</span>' : '')+
         '<button class="mt-tg" data-action="mie-chiudi" data-id="'+esc(p.id)+'" aria-label="'+(chiuso?'Apri':'Chiudi')+'">'+svg('chev',2.4)+'</button>'+
         '<button class="mt-pn" data-action="apri" data-id="'+esc(p.id)+'"><span class="q">'+svg(p.icona||TIPO(p.tipo).ic,2)+'</span>'+
           '<span class="tx"><b>'+esc(p.nome)+'</b><span>'+esc(sotto)+'</span></span></button>'+
-        '<div class="mt-av"><span>'+fatte+' / '+tot+' completate</span><i><b style="width:'+Math.round(fatte/tot*100)+'%"></b></i></div>'+
+        '<button class="mt-att'+(tardi?' tardi':'')+'" data-action="mie-chiudi" data-id="'+esc(p.id)+'" title="'+(chiuso?'Mostra':'Nascondi')+' le task">'+
+          '<b>'+daFare.length+'</b><span>'+'per te'+(tardi? ' · <em>'+tardi+' in ritardo o per oggi'+'</em>' : '')+'</span></button>'+
         '<span class="mt-data '+sc.c+'">'+svg('calendar',2)+esc(sc.t)+'</span>'+
       '</div>';
     if(!chiuso){
@@ -10231,7 +10251,7 @@ const GUIDA = [
   ['Le risposte del cliente e i vecchi commenti', 'Le risposte che il cliente dà dalla sua pagina arrivano nella chat del progetto, con l’etichetta <b>Cliente</b> e l’esito. Lì trovi anche i commenti scritti prima di questa versione, con la fase a cui si riferivano.']
 ]},
 {id:'notifiche', liv:'medio', ic:'bell', t:'Notifiche e avvisi sul telefono', s:'Sapere cosa succede senza controllare di continuo', v:[
-  ['La campanella', 'In alto a destra. Il numero dice quante notifiche non hai letto; toccane una e ti porta dove è successo: la task, la discussione di una task o la chat del progetto. <b>Segna tutte</b> le segna come lette.'],
+  ['La campanella', 'In alto a destra. Il numero dice quante notifiche non hai letto; toccane una e ti porta dove è successo: la task, la discussione di una task o la chat del progetto. <b>Segna tutte</b> le segna come lette, <b>Svuota</b> (dopo una conferma) le toglie tutte dalla lista.'],
   ['Cosa ti arriva', 'Quando ti assegnano una cosa, ti aggiungono a una task o ti menzionano; quando qualcuno commenta una task o scrive nella chat dei tuoi lavori; quando un lavoro cambia fase o viene consegnato; quando ti aprono un lavoro nuovo; quando il cliente risponde.'],
   ['Il box a schermo intero', 'Menzioni e assegnazioni possono oscurare lo schermo finché non premi <b>VISUALIZZATO</b>. Lo accendi o lo spegni in Profilo → Notifiche; la <b>×</b> lo silenzia per 10, 30 o 60 minuti.'],
   ['Solo i miei progetti', 'In Profilo → Notifiche: niente notifiche dai progetti in cui non sei assegnato.'],
@@ -11459,6 +11479,33 @@ function apriEdit(ctx){
   setTimeout(()=>{ const n = el('ed_val')||el('ed_rte'); if(n){ n.focus(); if(n.select) n.select(); } },40);
 }
 
+/* v2.9.4: toccando la consegna nella scheda si apre subito il calendario; scelto il giorno, chiede conferma */
+function scegliDataConsegna(p, ancora){
+  const m = /^(\d{2})\/(\d{2})\/(\d{4})$/.exec(p.consegna||''), prima = m ? m[3]+'-'+m[2]+'-'+m[1] : '';
+  const vecchio = el('consegnaCal'); if(vecchio) vecchio.remove();
+  const r = ancora.getBoundingClientRect(), i = document.createElement('input');
+  i.type = 'date'; i.id = 'consegnaCal'; i.value = prima; i.tabIndex = -1; i.setAttribute('aria-hidden', 'true');
+  i.style.cssText = 'position:fixed;left:'+Math.round(r.left)+'px;top:'+Math.round(r.bottom)+'px;width:'+Math.max(40, Math.round(r.width))+'px;height:2px;opacity:0;border:0;padding:0;margin:0;pointer-events:none;z-index:-1';
+  document.body.appendChild(i);
+  let fatto = false;
+  i.addEventListener('change', ()=>{
+    if(fatto || !i.value) return; fatto = true;
+    setTimeout(()=>i.remove(), 0);
+    if(i.value !== prima) confermaConsegna(p, prima, i.value);
+  });
+  try{ if(typeof i.showPicker !== 'function') throw 0; i.showPicker(); }
+  catch(e){ i.remove(); apriEdit({t:'proj', k:'consegna', pid:p.id}); }      // niente calendario a comparsa: la finestra col campo data
+}
+function confermaConsegna(p, prima, nuova){
+  editCtx = {t:'proj', k:'consegna', pid:p.id}; menzionatiOra = null;
+  const f = iso => iso ? new Date(iso+'T12:00:00').toLocaleDateString('it-IT', {weekday:'long', day:'numeric', month:'long', year:'numeric'}) : 'nessuna data';
+  modale('<h3>Cambiare la consegna?</h3><div class="sub-t">'+esc(p.nome)+'</div><div class="modal-b">'+
+    '<div class="nota-box">Da <b>'+esc(f(prima))+'</b> a <b>'+esc(f(nuova))+'</b>. Si sposta anche nel calendario.</div>'+
+    '<input id="ed_val" type="hidden" value="'+esc(nuova)+'"></div>'+
+    '<div class="modal-f"><button class="btn ghost" data-action="chiudi-modale">Annulla</button>'+
+    '<button class="btn primary" data-action="salva-campo">'+svg('check')+'Conferma</button></div>');
+}
+
 function applicaEdit(){
   const ctx = editCtx; if(!ctx) return;
   const p = Pdi(ctx); if(!p) return;
@@ -11592,7 +11639,7 @@ function modaleFiltro(){
 }
 
 /* ============ AZIONI ============ */
-const PROTETTE = ['check-lista','add-lista','togli-voce','nuova-lista','edit','salva-campo','check','fase','indietro','riprendi','add-user','assegna',
+const PROTETTE = ['consegna-cal','check-lista','add-lista','togli-voce','nuova-lista','edit','salva-campo','check','fase','indietro','riprendi','add-user','assegna',
                   'elimina-progetto','conferma-elimina','sposta-ev','rinomina-ev','elimina-ev',
                   'add-compito','elimina-compito','elimina-task','tagga','tagga-chi','stagga',
                   'assegna-sub','assegna-sub-chi','ass-salva',
@@ -12086,6 +12133,10 @@ document.addEventListener('click', function(e){
       break;
 
     case 'salva-campo': applicaEdit(); break;
+    case 'consegna-cal':{
+      const pr = state.progetti.find(x=>x.id===t.dataset.pid);
+      if(!pr || isLock(pr) || state.ospite || !puo('modifica')) break;
+      scegliDataConsegna(pr, t); break; }
 
     case 'esporta': esportaDati(); break;
 
@@ -12675,7 +12726,7 @@ document.addEventListener('click', function(e){
       });
       break; }
     case 'mie-filtro': state.mieFiltro = t.dataset.k || 'tutte'; render(); break;
-    case 'mie-chiudi':{ const c = state.mieChiusi || (state.mieChiusi = new Set()); const k = t.dataset.id; if(c.has(k)) c.delete(k); else c.add(k); render(); break; }
+    case 'mie-chiudi':{ const c = state.mieAperti || (state.mieAperti = new Set()); const k = t.dataset.id; if(c.has(k)) c.delete(k); else c.add(k); render(); break; }
     case 'mie-stato':{
       const pr = state.progetti.find(x=>x.id===t.dataset.pid); if(!pr || bloccato(pr) || !puo('spunta')) break;
       const sb = (pr.subs||[]).find(x=>x.id===t.dataset.sid); if(!sb) break;
@@ -12788,6 +12839,19 @@ document.addEventListener('click', function(e){
       state.notifiche.forEach(n=>n.nuova=false); render();
       if(typeof segnaLetteCloud === 'function') segnaLetteCloud(null);
       toast('Tutte le notifiche segnate come lette.','ok'); break;
+
+    /* v2.9.4: svuotare la campanella (con conferma): le notifiche si tolgono anche dal database */
+    case 'svuota-notifiche':
+      if(!(state.notifiche||[]).length){ toast('Non ci sono notifiche da togliere.','ok'); break; }
+      modale('<h3>Svuotare le notifiche?</h3><div class="sub-t">'+state.notifiche.length+(state.notifiche.length===1?' notifica':' notifiche')+'</div>'+
+        '<div class="modal-b"><div class="nota-box">Spariscono dalla campanella, anche quelle non lette. Task, commenti e chat restano dove sono.</div></div>'+
+        '<div class="modal-f"><button class="btn ghost" data-action="chiudi-modale">Annulla</button>'+
+        '<button class="btn" style="background:var(--alert);border-color:var(--alert);color:#fff" data-action="svuota-notifiche-ok">Svuota</button></div>');
+      break;
+    case 'svuota-notifiche-ok':
+      state.notifiche = []; chiudiModale(); render();
+      if(sb && utenteCloud) sb.from('notifiche').delete().eq('utente_id', utenteCloud.id).then(({error})=>{ if(error){ console.warn('notifiche:', error.message); toast('Non sono riuscito a toglierle dal server: riprova.','warn','Errore'); } });
+      toast('Notifiche svuotate.','ok'); break;
 
     case 'vai-notifica':{
       const n = state.notifiche.find(x=>x.id===t.dataset.id); if(!n) break;
@@ -13484,7 +13548,7 @@ function vociMenuProgetto(pr){
   const dd = D({pid:pr.id});
   return [
     {a:'apri', l:'Apri il progetto', ic:'right', d:D({id:pr.id})},
-    (cloudAttivo() && !state.ospite ? {a:'chat-lavoro', l:etichettaChatLavoro(p.id), ic:'chat', d:dd} : null),
+    (cloudAttivo() && !state.ospite ? {a:'chat-lavoro', l:etichettaChatLavoro(pr.id), ic:'chat', d:dd} : null),
     {a:'edit', l:'Rinomina progetto', ic:'pen', d:dd+' data-t="proj" data-k="nome"', off:isLock(pr)},
     (pr.personale? null : {a:'edit', l:'Cambia cliente', ic:'user', d:dd+' data-t="proj" data-k="cliente"', off:isLock(pr)}),
     {a:'edit', l:'Cambia priorità', ic:'spark', d:dd+' data-t="proj" data-k="prio"', off:isLock(pr)},
@@ -14115,7 +14179,7 @@ document.addEventListener('change', function(e){
     }).catch(()=>toast('Immagine non leggibile.','warn','Errore'));
     e.target.value=''; return;
   }
-  if(e.target.id==='mie_prog'){ state.mieProg = e.target.value; render(); return; }
+  if(e.target.id==='mie_prog'){ state.mieProg = e.target.value; if(e.target.value) (state.mieAperti || (state.mieAperti = new Set())).add(e.target.value); render(); return; }
   if(e.target.id==='mie_ord'){ state.mieOrd = e.target.value; render(); return; }
   if(e.target.id==='pf_snooze'){ state.cfg.snoozeMin = Number(e.target.value); applicaProfilo(); return; }
   if(e.target.id==='ordinaSel'){

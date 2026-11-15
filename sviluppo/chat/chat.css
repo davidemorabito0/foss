@@ -303,8 +303,7 @@ svg{display:block}
 .vocale .barre i.su{background:var(--blu-spunta);opacity:1}
 .msg.mio .vocale .barre i.su{background:#53bdeb}
 .vocale .tempo{position:absolute;left:0;bottom:-8px;font-size:11px;color:var(--testo-2)}
-.vocale .vel{flex:none;height:24px;min-width:38px;border-radius:12px;background:rgba(134,150,160,.25);font:600 12px/24px var(--font);color:var(--testo);padding:0 6px;display:none}
-.vocale.va .vel{display:block}
+.vocale .vel{flex:none;height:24px;min-width:38px;border-radius:12px;background:rgba(134,150,160,.25);font:600 12px/24px var(--font);color:var(--testo);padding:0 6px;display:block}
 .vocale.va .vav{display:none}
 
 /* ---------- barra per scrivere ---------- */
@@ -1436,13 +1435,20 @@ input,textarea,[contenteditable="true"]{-webkit-user-select:text;user-select:tex
 /* 2.9.2: il tasto per tornare a FOSS, accanto al titolo (solo con la chat larga: stretta c'e' la barra in basso) */
 .lato-testa .vai-foss{display:none}
 @media (min-width:900px){
-  .lato-testa .vai-foss{display:inline-flex;align-items:center;gap:6px;flex:none;height:34px;padding:0 12px 0 6px;margin-right:12px;border-radius:17px;
-    border:1px solid var(--linea);background:var(--hover);color:var(--testo);font:600 14px var(--font);cursor:pointer;transition:background .15s,border-color .15s}
-  .lato-testa .vai-foss:hover{background:var(--scelta);border-color:var(--ambra)}
-  .lato-testa .vai-foss > svg{width:18px;height:18px;color:var(--testo-2)}
-  .lato-testa .vai-foss .vf-logo{display:grid;width:20px;height:20px}
-  .lato-testa .vai-foss .vf-logo svg{width:20px;height:20px}
+  .lato-testa .vai-foss{display:inline-flex;margin-right:12px}
+  .lato-testa .torna-foss{display:none!important}
 }
+/* 2.9.4: piu' chiaro, come il tasto della chat dentro FOSS: bordo giallo, «Torna a FOSS» */
+.vai-foss{align-items:center;gap:7px;flex:none;height:38px;padding:0 15px 0 8px;border-radius:19px;cursor:pointer;
+  border:1.5px solid var(--ambra);background:color-mix(in srgb,var(--ambra) 14%,transparent);color:var(--testo);font:700 14px var(--font);
+  box-shadow:0 0 0 3px color-mix(in srgb,var(--ambra) 10%,transparent);transition:background .15s,transform .1s}
+.vai-foss:hover{background:color-mix(in srgb,var(--ambra) 26%,transparent)}
+.vai-foss:active{transform:scale(.97)}
+.vai-foss > svg{width:17px;height:17px;color:var(--ambra)}
+.vai-foss .vf-logo{display:grid;width:20px;height:20px}
+.vai-foss .vf-logo svg{width:20px;height:20px}
+.ios-riga .vai-foss{display:none}
+@media (max-width:899px){ .ios-riga .vai-foss{display:inline-flex;height:40px} }
 /* 2.9.4: vocali. Tenendo premuto il microfono il dito non fa scorrere la pagina (prima il telefono a volte
    «rubava» il gesto e la registrazione restava appesa); scorri in su sul lucchetto per bloccarla */
 .barra-scrivi .manda,.registra{touch-action:none}
@@ -1467,5 +1473,26 @@ input,textarea,[contenteditable="true"]{-webkit-user-select:text;user-select:tex
 .vocale.carica .vp::after{content:"";position:absolute;inset:4px;border-radius:50%;border:2.5px solid rgba(134,150,160,.3);border-top-color:var(--blu-spunta);animation:gira .8s linear infinite}
 /* sull'onda il dito scorre la chat in verticale e sposta il pallino in orizzontale */
 .vocale .onda{touch-action:pan-y}
+/* 2.9.4: la trascrizione di un vocale, in basso */
+.vocale .vel{min-width:40px}
+.trascr-velo{position:fixed;inset:0;z-index:120;background:rgba(0,0,0,0);transition:background .2s}
+.trascr-velo.su{background:rgba(0,0,0,.35)}
+.trascr{position:absolute;left:50%;bottom:0;width:min(620px,100%);max-height:70dvh;display:flex;flex-direction:column;transform:translate(-50%,100%);transition:transform .22s cubic-bezier(.2,.9,.3,1);
+  background:var(--menu);color:var(--testo);border-radius:18px 18px 0 0;box-shadow:0 -10px 40px rgba(0,0,0,.35);padding-bottom:env(safe-area-inset-bottom)}
+.trascr-velo.su .trascr{transform:translate(-50%,0)}
+.trascr-t{display:flex;align-items:center;gap:10px;padding:14px 10px 10px 18px;border-bottom:1px solid var(--linea)}
+.trascr-t .ic{display:grid;place-items:center;width:30px;height:30px;border-radius:50%;background:color-mix(in srgb,var(--verde) 18%,transparent);color:var(--verde)}
+.trascr-t .ic svg{width:17px;height:17px}
+.trascr-t b{font-size:16px;font-weight:700}
+.trascr-d{flex:1;min-width:0;color:var(--testo-2);font-size:13px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.trascr-c{overflow:auto;padding:16px 20px 8px;-webkit-user-select:text;user-select:text}
+.trascr-testo{margin:0;font-size:16px;line-height:1.5;white-space:pre-wrap}
+.trascr-no{margin:0;color:var(--testo-2);font-size:15px;line-height:1.45;display:flex;gap:10px;align-items:flex-start}
+.trascr-no svg{width:18px;height:18px;flex:none;margin-top:2px}
+.trascr-att{display:flex;align-items:center;gap:10px;color:var(--testo-2);font-size:15px}
+.trascr-f{display:flex;justify-content:flex-end;padding:6px 16px 14px}
+.trascr-f:empty{display:none}
+.trascr-f .btn{display:inline-flex;align-items:center;gap:7px}
+.trascr-f .btn svg{width:16px;height:16px}
 </style>
 </head>

@@ -387,6 +387,7 @@ function arrivaMessaggio(m){
     c.ultimo_il = m.creato_il;
   }
   const mio = m.autore === S.io;
+  if(!gia && m.tipo === 'vocale' && typeof anticipaTrascrizione === 'function') anticipaTrascrizione(m);
   if(!gia && !mio && m.tipo !== 'sistema'){
     S.scrive.get(m.conv_id) && S.scrive.get(m.conv_id).delete(m.autore);
     /* letto solo se lo stai davvero guardando: chat aperta, finestra davanti a te, in fondo ai messaggi */
