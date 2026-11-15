@@ -183,7 +183,6 @@ document.addEventListener('click', async e => {
     case 'cfg-doodle': cambiaCfg('doodle', S.cfg.doodle === false); applicaTema(); disegnaImpostazioni(); { const M = el('msgs'); if(M) M.classList.toggle('niente-doodle', S.cfg.doodle === false); } break;
     case 'cfg-invio': cambiaCfg('invio', !S.cfg.invio); disegnaImpostazioni(); break;
     case 'cfg-entrati': cambiaCfg('entrati', S.cfg.entrati === false); disegnaImpostazioni(); break;
-    case 'cornice': scegliCornice(t.dataset.v); break;
     case 'scegli-stato': scegliStato(t.dataset.v); break;
     case 'colori-gruppo': scegliColoriGruppo(infoAperta || S.aperta); break;
     case 'vivo': cambiaCfg('vivo', t.dataset.v || ''); disegnaImpostazioni(); avviaVivo(); if(t.dataset.v) setTimeout(vivoScossa, 300); break;
@@ -350,7 +349,8 @@ async function avvia(){
     const c = S.aperta && S.convs.get(S.aperta);
     if(c && c.non_lette && document.visibilityState === 'visible' && vicinoAlFondo() && sbloccata(c)) segnaLetto(c.id);
   });
-  window.addEventListener('online', () => { riavviaTempoReale(true); setTimeout(riprovaTutti, 1500); });
+  window.addEventListener('online', () => { riavviaTempoReale(true); setTimeout(riprovaTutti, 1500); setTimeout(() => { sospesiRipresi = false; riprendiSospesi(); }, 4000); });
+  setTimeout(riprendiSospesi, 2500);
   window.addEventListener('pageshow', e => { if(e.persisted) controllaTempoReale(); });
   /* rete di sicurezza: con la chat davanti controllo ogni 20 secondi che il collegamento sia vivo */
   setInterval(() => { if(document.visibilityState === 'visible') controllaTempoReale(true); }, 20000);

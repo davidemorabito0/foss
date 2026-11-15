@@ -285,6 +285,20 @@ L'elenco completo è nel `README.md` del sito, sezioni «FOSS.chat» e «FOSS.ch
   e alta zero perche' la scheda (un `<button>`) allinea i figli a sinistra (`align-items:flex-start`). Ora ha
   `width:100%` e l'altezza dal padding (`padding-bottom: calc(100% / 3.6)`), che funziona ovunque.
 
+### 2.9.6 — niente cornici colorate, vocali che non si perdono (16 novembre 2026)
+- **Cornici della foto tolte** (erano della 2.4: oro, argento, neon…): intorno alla foto resta solo il cerchio
+  dello stato, **verde online, rosso occupato, niente se offline**. Tolta la scelta dalle impostazioni, il codice
+  (`CORNICI`, `corniciHTML`, `scegliCornice`) e gli stili `.av.cr-*`. Chi ne aveva una non la vede più
+  (il vecchio valore resta in `chat_cfg.cornice`, ignorato). Vale per sito, app per computer e Android.
+- **Vocali in sospeso** (`js/29-sospesi.js`): un vocale compare subito ma, finché il file non è salito e il
+  messaggio non è salvato, viveva solo nella memoria della pagina: chiudendo l'app in quel momento spariva.
+  Ora viene anche messo da parte sul dispositivo (IndexedDB `fosschat`, archivio `sospesi`) e tolto a invio
+  riuscito; alla riapertura (e quando torna la rete) quelli rimasti ricompaiono nella loro chat e ripartono
+  da soli (`riprendiSospesi`), senza doppioni (stesso id; se era già arrivato lo riconosce). Sul computer,
+  chiudendo mentre un vocale sale, il browser chiede conferma. Prova: `prova27.py`.
+- Segnalazione «il vocale non si vede più» (15 novembre): nel database il vocale c'era ed era integro
+  (messaggio salvato, file sul NAS raggiungibile). Nessun vocale risultava cancellato o nascosto.
+
 ### 2.9.5 — trascrizione dei vocali, velocità, «Torna a FOSS» (15 novembre 2026)
 - **Trascrizione** (`js/28-trascrivi.js`): due tocchi su un vocale (non sul play) aprono in basso il testo;
   anche dal menu del messaggio, «Trascrivi». Un tocco solo fa quello di sempre dopo 300 ms (per capire se

@@ -340,8 +340,7 @@ function disegnaImpostazioni(){
     '<div class="blocco"><div class="sez-t">Come ti vedono gli altri</div>'+
       '<div class="sez-t grigio" style="padding:4px 20px 8px">Messaggio personale</div>'+
       '<div class="frase-campo"><input id="fraseIn" maxlength="140" placeholder="Una frase sotto il tuo nome (es. sul set fino alle 18)" value="'+esc(S.cfg.frase || '')+'"><span id="fraseN">'+(S.cfg.frase || '').length+'/140</span></div>'+
-      '<div class="sez-t grigio" style="padding:10px 20px 8px">Il tuo stato</div>'+sceltaStatoHTML()+
-      '<div class="sez-t grigio" style="padding:10px 20px 8px">Cornice della foto</div>'+corniciHTML()+'</div>'+
+      '<div class="sez-t grigio" style="padding:10px 20px 8px">Il tuo stato</div>'+sceltaStatoHTML()+'</div>'+
     '<div class="blocco"><div class="sez-t">Privacy e sicurezza</div>'+
       voce('proteggi-tutto', 'lucchetto', 'Proteggi FOSS.chat con un codice', 'Ogni volta che la apri ti chiede 4 cifre', interr(S.tutto))+
       voce('cambia-pin', 'matita', S.haPin ? 'Cambia il codice' : 'Scegli il codice', S.haPin ? 'Lo stesso codice apre le chat private' : 'Serve per rendere private le chat')+

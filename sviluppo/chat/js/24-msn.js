@@ -1,13 +1,12 @@
 /* ======================= FOSS.chat 2.4: le idee di MSN =======================
    1) messaggio personale sotto il nome   2) «è appena entrato»
-   3) la cornice della foto (ognuno la sua)   4) sfondi animati che reagiscono al colpetto */
+   3) (la cornice della foto: tolta nella 2.9.6)   4) sfondi animati che reagiscono al colpetto */
 
 /* ---------- 1. messaggio personale ---------- */
 function fraseDi(id){ const p = S.persone.get(id); return (p && (p.frase || '').trim()) || ''; }
 function aggiornaMe(){
   const me = S.persone.get(S.io); if(!me) return;
   me.frase = (S.cfg.frase || '').trim().slice(0, 140);
-  me.cornice = CORNICI.some(x => x.id === S.cfg.cornice) ? S.cfg.cornice : '';
 }
 function salvaFrase(v){
   v = String(v || '').replace(/\s+/g, ' ').trim().slice(0, 140);
@@ -17,19 +16,7 @@ function salvaFrase(v){
   disegnaListaPresto(); aggiornaTestaConv();
 }
 
-/* ---------- 3. la cornice della foto ---------- */
-function scegliCornice(id){
-  cambiaCfg('cornice', id === 'nessuna' ? '' : id); aggiornaMe();
-  disegnaImpostazioni(); disegnaListaPresto(); aggiornaTestaConv();
-  document.querySelectorAll('#railMe').forEach(b => { b.innerHTML = avatar(S.io); });
-}
-function corniciHTML(){
-  const mia = S.cfg.cornice || '';
-  return '<div class="cornici">'+[{id:'nessuna', nome:'Nessuna'}].concat(CORNICI).map(x =>
-    '<button class="cornice-b'+((x.id === 'nessuna' ? !mia : mia === x.id) ? ' on' : '')+'" data-a="cornice" data-v="'+x.id+'">'+
-      '<span class="cornice-av">'+avatar(S.io, 'cr-' + x.id, false, 'width:46px;height:46px')+'</span>'+
-      '<span>'+esc(x.nome)+'</span></button>').join('')+'</div>';
-}
+/* 3. la cornice della foto: tolta nella 2.9.6 */
 
 /* ---------- 2. «è appena entrato» ---------- */
 let onlinePronto = 0;              // da quando ascolto: i primi secondi non conto chi c'era già

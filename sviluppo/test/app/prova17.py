@@ -1,4 +1,4 @@
-# FOSS.chat 2.4 (idee di MSN): messaggio personale, «è appena entrato», cornice della foto, sfondi animati col colpetto
+# FOSS.chat 2.4 (idee di MSN): messaggio personale, «è appena entrato», sfondi animati col colpetto
 import asyncio, sys, os
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 from prova1 import pagina, BASE, OUT, errori
@@ -18,8 +18,8 @@ async def main():
             await p.add_init_script("window.__MSN = true")
             await p.goto(BASE + 'chat.html'); await p.wait_for_timeout(1300)
             c1 = await p.evaluate('__mock.C1'); an = await p.evaluate('__mock.AN')
-            # la cornice di Momo si vede a tutti
-            ok(await p.evaluate("!!document.querySelector('.riga[data-id=\"%s\"] .av.cr-oro')" % c1), 'cornice d\'oro di Momo nell\'elenco')
+            # 2.9.6: le cornici colorate non ci sono piu', nemmeno per chi ne aveva scelta una (Momo aveva l'oro)
+            ok(await p.evaluate("!document.querySelector('.av[class*=\"cr-\"]')"), 'nessuna cornice colorata nell\'elenco (resta solo il cerchio dello stato)')
             # il suo messaggio personale
             await p.click('.riga[data-id="%s"]' % c1); await p.wait_for_timeout(900)
             testa = await p.evaluate("(document.querySelector('.conv-testa') || document.body).innerText")
@@ -33,12 +33,7 @@ async def main():
             await p.fill('#fraseIn', 'In montaggio, rispondo dopo'); await p.press('#fraseIn', 'Enter'); await p.wait_for_timeout(1500)
             ok(await p.evaluate("(__mock.db.profili.find(x=>x.id===__mock.D).chat_cfg||{}).frase") == 'In montaggio, rispondo dopo', 'messaggio personale salvato nel profilo')
             n = await p.evaluate("document.querySelectorAll('.cornice-b').length")
-            ok(n == 9, 'nove scelte di cornice (%d)' % n)
-            await p.click('.cornice-b[data-v="neon"]'); await p.wait_for_timeout(1300)
-            ok(await p.evaluate("(__mock.db.profili.find(x=>x.id===__mock.D).chat_cfg||{}).cornice") == 'neon', 'cornice salvata')
-            ok(await p.evaluate("!!document.querySelector('.profilo-big .av.cr-neon, #pannelloSxC .voce .av.cr-neon')"), 'la mia foto ha la cornice neon')
-            await p.evaluate("document.querySelector('.cornice-b[data-v=\"neon\"]').scrollIntoView({block:'center'})"); await p.wait_for_timeout(200)
-            await p.screenshot(path=OUT + '/c17-%s-cornici.png' % nome)
+            ok(n == 0 and 'Cornice della foto' not in await p.evaluate("document.body.innerText"), 'nelle impostazioni non si sceglie piu\' la cornice')
             await p.evaluate("document.querySelector('.opz.vivi button[data-v=\"lucciole\"]').scrollIntoView({block:'center'})")
             await p.click('.opz.vivi button[data-v="lucciole"]'); await p.wait_for_timeout(400)
             await p.wait_for_timeout(1200); ok(await p.evaluate("(__mock.db.profili.find(x=>x.id===__mock.D).chat_cfg||{}).vivo") == 'lucciole', 'sfondo animato scelto e salvato')

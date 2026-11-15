@@ -166,6 +166,7 @@ async function inviaPreparato(conv, tipo, p, extra){
   const m = nuovoLocale(tipo, {media: Object.assign({locale: URL.createObjectURL(p.blob)}, p.media || {}, extra || {}), _avanza: 0}, conv);
   m._file = p;
   mettiInLista(m);
+  sospesoMetti(m, p);                 /* 2.9.6: messo da parte finché non è salvato (29-sospesi.js) */
   /* vocali: l'onda vera dal file arriva dopo, la disegno appena c'e' */
   if(p.ondaDopo) p.ondaDopo.then(o => {
     if(!o || !m.media) return; m.media.onda = o;
@@ -188,7 +189,13 @@ async function inviaFilePronto(m, p){
     if(r.url){ m.media.url = r.url; }
     delete m._avanza;
     if(p.ondaDopo){ const o = await Promise.race([p.ondaDopo.catch(() => null), new Promise(ok => setTimeout(ok, 4000, null))]); if(o) m.media.onda = o; }
-    await salvaMessaggio(m);
+    try{ await salvaMessaggio(m); }
+    catch(e){
+      /* era già arrivato (la risposta si era persa): è inviato, non lo rimando */
+      if(!(e && (e.code === '23505' || /duplicate/i.test(e.message || '')))) throw e;
+      delete m._stato; delete m._avanza; ridisegnaMessaggio(m.id);
+    }
+    sospesoTogli(m.id);
     delete m._file; delete m._ctrl;
     if(m.tipo === 'vocale' && typeof anticipaTrascrizione === 'function') anticipaTrascrizione(m);
   }catch(e){

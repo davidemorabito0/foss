@@ -521,6 +521,7 @@ function eliminaMessaggio(m){
   const mio = m.autore === S.io && !m.eliminato;
   const voci = [['Elimina per me', async () => {
     S.nascosti.add(m.id); const n = $('.msg[data-id="'+m.id+'"]'); if(n) n.remove();
+    sospesoTogli(m.id);
     const {error} = await sb.from('chat_nascosti').insert({msg_id: m.id, utente_id: S.io});
     if(error && !/duplicate/i.test(error.message)) errore(error, 'Non eliminato');
   }, 'rosso']];

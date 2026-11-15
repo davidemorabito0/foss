@@ -10,7 +10,7 @@ const SUPA_KEY = 'sb_publishable_f5Kjp6NHT9yTxr1bhWJjhg_4y72V-Kj';
 const VAPID_PUBBLICA = 'BNlGbW4nZrXmx8DioKxnl7ubULVOr5_6CAKvpuQYoiXeObmxYAzGU6UrkExx2zu1hACmtRNDcpoMh_ARQ0GSmlw';
 /* il server dei file sul NAS (es. 'https://media.foss.team'). Vuoto = si usa Supabase. */
 const MEDIA_NAS = 'https://media.foss.team';
-const VERSIONE = 'chat-2.9.5';
+const VERSIONE = 'chat-2.9.6';
 /* i temi colore: gli stessi di FOSS. Il predefinito per tutti è Brand (blu e giallo). */
 const TEMI_COLORE = [
   {id:'brand',   nome:'Brand',    ds:'Navy e ambra, il predefinito', c:['#0D1926','#1A3149','#FFAD01']},
@@ -285,15 +285,13 @@ function iniziali(t){
   return ((p[0] || '?')[0] + (p.length > 1 ? p[p.length - 1][0] : '')).toUpperCase();
 }
 function fotoSicura(u){ return typeof u === 'string' && /^(https:\/\/|data:image\/(png|jpe?g|webp|gif);base64,)/i.test(u) ? u : ''; }
-/* v2.4: la cornice della foto, scelta da ognuno (si vede a tutti) */
-const CORNICI = [{id:'oro', nome:'Oro'}, {id:'argento', nome:'Argento'}, {id:'neon', nome:'Neon'}, {id:'fuoco', nome:'Fuoco'},
-  {id:'arcobaleno', nome:'Arcobaleno'}, {id:'rosa', nome:'Rosa'}, {id:'smeraldo', nome:'Smeraldo'}, {id:'viola', nome:'Viola'}];
+/* 2.9.6: le cornici colorate della foto (v2.4) non ci sono più: intorno alla foto resta solo il cerchio
+   dello stato, verde online e rosso occupato; offline niente. Chi ne aveva scelta una la perde. */
 function avatar(id, cls, conOnline, stile){
   const p = S.persone.get(id) || {}, f = fotoSicura(p.foto);
-  const cr = /(^|\s)cr-/.test(cls || '') ? '' : (p.cornice && CORNICI.some(x => x.id === p.cornice) ? ' cr-' + p.cornice : '');
   /* 2.9: online (verde) o occupato (rosso): un cerchio intorno alla foto */
   const st = conOnline && typeof statoDi === 'function' ? statoDi(id) : '';
-  return '<span class="av '+(cls||'')+cr+(st ? ' st-' + st : '')+'" style="background:'+(f ? 'transparent' : colore(id))+';'+(stile||'')+'">'+
+  return '<span class="av '+(cls||'')+(st ? ' st-' + st : '')+'" style="background:'+(f ? 'transparent' : colore(id))+';'+(stile||'')+'">'+
     (f ? '<img src="'+esc(f)+'" alt="" loading="lazy" onerror="this.remove()">' : svg('persona', 1.6))+'</span>';
 }
 /* i messaggi importati da WhatsApp di chi non e' su FOSS: hanno solo il nome */
