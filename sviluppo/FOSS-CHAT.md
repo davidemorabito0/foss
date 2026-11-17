@@ -285,6 +285,23 @@ L'elenco completo è nel `README.md` del sito, sezioni «FOSS.chat» e «FOSS.ch
   e alta zero perche' la scheda (un `<button>`) allinea i figli a sinistra (`align-items:flex-start`). Ora ha
   `width:100%` e l'altezza dal padding (`padding-bottom: calc(100% / 3.6)`), che funziona ovunque.
 
+### 2.9.9 e FOSS — cambiare la propria password (17 novembre 2026)
+Segnalazione: «non trovo il pannello per cambiare la password». Non esisteva: in FOSS non c'era nessun modo di
+cambiarla, né un «password dimenticata» nella schermata di accesso.
+- **Profilo → «Accesso e password»** (`cartaAccesso` in index.html, subito dopo «Dati personali»):
+  tasto «Cambia password» → `modaleCambiaPw`/`cambiaPassword`. Chiede la password attuale, la verifica con
+  `signInWithPassword` (così nessuno la cambia a chi lascia FOSS aperto), poi `auth.updateUser`. Stessi
+  controlli della registrazione (`passwordDebole`, `passwordRubata`). A fine cambio una finestra di conferma,
+  perché in FOSS le conferme a comparsa sono spente.
+- **Schermata di accesso → «Password dimenticata?»**: `modaleRecuperoPw`/`mandaRecuperoPw` →
+  `auth.resetPasswordForEmail` con `redirectTo` alla pagina stessa. La risposta non dice mai se quell'email ha
+  un account. Aperto il link, `onAuthStateChange` riceve `PASSWORD_RECOVERY` e apre `modaleNuovaPw`.
+- **Chat** (Impostazioni → Privacy e sicurezza): voce «Cambia la password» che porta a `#/profilo` di FOSS
+  (`pw-foss` in 12-app.js). È lo stesso account.
+- Nuovo capitolo della guida: «Cambiare la password».
+- **Nota**: le mail di recupero le manda Supabase. Sul piano gratuito sono poche all'ora: se un collaboratore
+  non la riceve subito, deve aspettare un po' o farsi cambiare la password a mano dal pannello Supabase.
+
 ### 2.9.8 — seconda revisione di sicurezza e download dei file (17 novembre 2026)
 Revisione del codice di chat, FOSS e pannello admin. Il rischio è un collaboratore che scrive dati costruiti
 apposta (direttamente nel database) che poi vengono mostrati agli altri.

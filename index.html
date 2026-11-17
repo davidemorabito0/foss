@@ -8312,6 +8312,8 @@ function renderProfilo(){
       '<div class="lungo">'+campo('Link (sito, LinkedIn, Instagram…)','pf_link',m.link||'','https://')+'</div>'+
     '</div></div>';
 
+  h += cartaAccesso();
+
   /* notifiche */
   h += '<div class="card">'+pfTesta('bell','Notifiche','Decidi come e quando il software può interromperti.')+
     rigaIc('filter','Solo i miei progetti','Niente notifiche dai progetti in cui non sei assegnato','soloMiei',c.soloMiei)+
@@ -8806,6 +8808,101 @@ function modaleRegistro(){
     '</div><div class="modal-f"><button class="btn" data-action="chiudi-modale">Chiudi</button></div>', 'largo');
 }
 
+/* ---------- ACCESSO: CAMBIARE LA PROPRIA PASSWORD (v2.9.9) ----------
+   Prima non c'era nessun posto dove farlo: si poteva solo scordarla e restare fuori. */
+function cartaAccesso(){
+  if(!cloudAttivo()) return '';
+  return '<div class="card">'+pfTesta('lock','Accesso e password','Con questa password entri in FOSS e in FOSS.chat.')+
+    '<div class="riga pf-r"><span class="pf-ri">'+svg('lock',2)+'</span>'+
+      '<div class="tx"><b>Password</b><span>'+esc(state.me.email||'')+'</span></div>'+
+      '<button class="btn sm" data-action="cambia-pw">Cambia password</button></div>'+
+  '</div>';
+}
+function modaleCambiaPw(){
+  modale('<h3>Cambia password</h3><div class="sub-t">'+esc(state.me.email||'')+'</div><div class="modal-b">'+
+    '<input class="esca" type="text" name="username" autocomplete="username" value="'+esc(state.me.email||'')+'" tabindex="-1" aria-hidden="true">'+
+    '<div class="field"><label>Password di adesso</label><input id="pw_vecchia" type="password" autocomplete="current-password"></div>'+
+    '<div class="field"><label>Nuova password</label><input id="pw_nuova" type="password" autocomplete="new-password" placeholder="Almeno 8 caratteri"></div>'+
+    '<div class="field"><label>Ripeti la nuova password</label><input id="pw_nuova2" type="password" autocomplete="new-password"></div>'+
+    '<div class="nota-box">Serve anche per FOSS.chat. Sugli altri dispositivi resti collegato.</div></div>'+
+    '<div class="modal-f"><button class="btn ghost" data-action="chiudi-modale">Annulla</button>'+
+    '<button class="btn primary" data-action="cambia-pw-ok" id="pwBtn">Cambia password</button></div>');
+  setTimeout(()=>{ const n = el('pw_vecchia'); if(n) n.focus(); }, 40);
+}
+async function cambiaPassword(){
+  const b = el('pwBtn'); if(!b || b.disabled) return;
+  const vecchia = (el('pw_vecchia')||{}).value || '', nuova = (el('pw_nuova')||{}).value || '', due = (el('pw_nuova2')||{}).value || '';
+  if(!vecchia){ toast('Scrivi la password che usi adesso.','warn','Manca la password'); return; }
+  if(nuova !== due){ toast('Le due nuove password non coincidono.','warn','Controlla'); return; }
+  if(nuova === vecchia){ toast('La nuova password è uguale a quella di adesso.','warn','Cambiala'); return; }
+  const debole = passwordDebole(nuova, state.me.email||'');
+  if(debole){ toast(debole,'warn','Password da cambiare'); return; }
+  b.disabled = true; b.textContent = 'Cambio…';
+  try{
+    if(await passwordRubata(nuova)){
+      toast('Questa password è finita in furti di dati: scegline un’altra.','warn','Password non sicura');
+      b.disabled = false; b.textContent = 'Cambia password'; return;
+    }
+    /* la vecchia password la controllo rientrando: così nessuno cambia la password di chi lascia FOSS aperto */
+    const {error:e1} = await sb.auth.signInWithPassword({email: (utenteCloud && utenteCloud.email) || state.me.email, password: vecchia});
+    if(e1){ toast('La password di adesso non è giusta.','warn','Non cambiata'); b.disabled = false; b.textContent = 'Cambia password'; return; }
+    const {error:e2} = await sb.auth.updateUser({password: nuova});
+    if(e2){ toast(erroreAccesso(e2) || e2.message,'warn','Non cambiata'); b.disabled = false; b.textContent = 'Cambia password'; return; }
+    /* in FOSS le conferme a comparsa sono spente: per una cosa così lo dico con una finestra */
+    modale('<h3>Password cambiata</h3><div class="modal-b"><div class="nota-box">Da adesso entri con la password nuova, qui e su FOSS.chat. Sugli altri dispositivi dove sei già dentro resti collegato.</div></div>'+
+      '<div class="modal-f"><button class="btn primary" data-action="chiudi-modale">Ho capito</button></div>');
+  }catch(e){
+    toast('Non sono riuscito a cambiarla: riprova.','warn','Non cambiata');
+    b.disabled = false; b.textContent = 'Cambia password';
+  }
+}
+/* password dimenticata: mando il link per rifarla, dalla schermata di accesso */
+function modaleRecuperoPw(){
+  const m = (el('g_mail')||{}).value || state.loginMail || '';
+  modale('<h3>Password dimenticata</h3><div class="sub-t">Ti mando un link per sceglierne una nuova.</div><div class="modal-b">'+
+    '<div class="field"><label>La tua email</label><input id="rec_mail" type="email" value="'+esc(m)+'" placeholder="nome@studio.it"></div>'+
+    '<div class="nota-box">Arriva una mail da FOSS: apri il link e scrivi la password nuova. Se non la vedi, guarda nella posta indesiderata.</div></div>'+
+    '<div class="modal-f"><button class="btn ghost" data-action="chiudi-modale">Annulla</button>'+
+    '<button class="btn primary" data-action="recupero-invia" id="recBtn">Mandami il link</button></div>');
+  setTimeout(()=>{ const n = el('rec_mail'); if(n) n.focus(); }, 40);
+}
+async function mandaRecuperoPw(){
+  const b = el('recBtn'); if(!b || b.disabled) return;
+  const mail = ((el('rec_mail')||{}).value || '').trim();
+  if(!/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(mail)){ toast('Scrivi la tua email.','warn','Email non valida'); return; }
+  b.disabled = true; b.textContent = 'Mando…';
+  try{
+    await sb.auth.resetPasswordForEmail(mail, {redirectTo: location.origin + location.pathname});
+  }catch(e){}
+  chiudiModale();
+  /* non dico mai se quell'email esiste: altrimenti si scoprirebbe chi ha un account */
+  modale('<h3>Guarda la posta</h3><div class="modal-b"><div class="nota-box">Se <b>'+esc(mail)+'</b> ha un account su FOSS, tra poco ricevi una mail con il link per fare una password nuova. Guarda anche nella posta indesiderata.</div></div>'+
+    '<div class="modal-f"><button class="btn primary" data-action="chiudi-modale">Ho capito</button></div>');
+}
+function modaleNuovaPw(){
+  modale('<h3>Scegli una password nuova</h3><div class="sub-t">Poi entri subito in FOSS.</div><div class="modal-b">'+
+    '<input class="esca" type="text" name="username" autocomplete="username" tabindex="-1" aria-hidden="true">'+
+    '<div class="field"><label>Nuova password</label><input id="np_pw" type="password" autocomplete="new-password" placeholder="Almeno 8 caratteri"></div>'+
+    '<div class="field"><label>Ripeti la password</label><input id="np_pw2" type="password" autocomplete="new-password"></div></div>'+
+    '<div class="modal-f"><button class="btn primary" data-action="nuova-pw-ok" id="npBtn">Salva la password</button></div>');
+  setTimeout(()=>{ const n = el('np_pw'); if(n) n.focus(); }, 40);
+}
+async function salvaNuovaPw(){
+  const b = el('npBtn'); if(!b || b.disabled) return;
+  const pw = (el('np_pw')||{}).value || '', due = (el('np_pw2')||{}).value || '';
+  if(pw !== due){ toast('Le due password non coincidono.','warn','Controlla'); return; }
+  const debole = passwordDebole(pw, (utenteCloud && utenteCloud.email) || '');
+  if(debole){ toast(debole,'warn','Password da cambiare'); return; }
+  b.disabled = true; b.textContent = 'Salvo…';
+  if(await passwordRubata(pw)){
+    toast('Questa password è finita in furti di dati: scegline un’altra.','warn','Password non sicura');
+    b.disabled = false; b.textContent = 'Salva la password'; return;
+  }
+  const {error} = await sb.auth.updateUser({password: pw});
+  if(error){ toast(erroreAccesso(error) || error.message,'warn','Non salvata'); b.disabled = false; b.textContent = 'Salva la password'; return; }
+  modale('<h3>Password salvata</h3><div class="modal-b"><div class="nota-box">Da adesso entri con questa password, in FOSS e in FOSS.chat.</div></div>'+
+    '<div class="modal-f"><button class="btn primary" data-action="chiudi-modale">Entra in FOSS</button></div>');
+}
 function campo(l,id,v,ph){
   return '<div class="field"><label>'+l+'</label><input id="'+id+'" value="'+esc(v||'')+'" placeholder="'+(ph||'')+'"></div>';
 }
@@ -9540,7 +9637,8 @@ function renderGate(){
     '<button class="btn primary" data-action="'+(reg?'crea-account':'login')+'" id="gateBtn">'+(reg?'Crea il profilo':'Entra')+'</button>'+
     '<div class="switch">'+(reg
       ? 'Hai gi\u00e0 un account? <button data-action="modo-login">Accedi</button>'
-      : 'Non hai un account? <button data-action="modo-registra">Registrati</button>')+
+      : 'Non hai un account? <button data-action="modo-registra">Registrati</button>'+
+        '<div style="margin-top:7px">Password dimenticata? <button data-action="pw-dimenticata">Fatti mandare il link</button></div>')+
       (reg ? '' : '<div style="margin-top:7px">Ti hanno invitato? <button data-action="modo-invito">Registrati con la tua email</button></div>')+'</div>'+
     '<div class="gate-legal">'+(reg ? 'Creando il profilo accetti i <a href="termini.html" target="_blank" rel="noopener">Termini</a> e confermi di aver letto l’<a href="privacy.html" target="_blank" rel="noopener">informativa privacy</a>.'
       : '<a href="privacy.html" target="_blank" rel="noopener">Privacy</a> · <a href="termini.html" target="_blank" rel="noopener">Termini</a>')+'</div>'+
@@ -10365,6 +10463,7 @@ const GUIDA = [
   ['Che cos’è FOSS', 'È il posto dove tieni i tuoi lavori. Ogni progetto ha le sue fasi, le task da fare, le date, i soldi e le persone che ci lavorano. Funziona dal computer, dall’iPad e dal telefono: quello che cambi su uno compare anche sugli altri.'],
   ['Come è organizzato', 'Quattro livelli, uno dentro l’altro: gli <b>spazi di lavoro</b> (un ambito, per esempio «Video Milano»), i <b>progetti</b> (un lavoro per un cliente), le <b>task</b> divise per fase e, dentro ogni task, le <b>subtask</b> da spuntare. Una subtask può avere anche una sua piccola checklist.'],
   ['Entrare la prima volta', 'Apri FOSS e scegli <b>Registrati</b>: nome, il tuo <b>ruolo</b> (videomaker, montatrice, fotografo…), email e una password. Se qualcuno ti ha invitato, apri il link che ti ha mandato: trovi già scritte la tua email e, se li ha indicati, nome e ruolo. Entri direttamente nel suo archivio e vedi i lavori che ti apre. Dalla volta dopo il dispositivo si ricorda di te.'],
+  ['Cambiare la password', 'Apri il tuo <b>Profilo</b> (la tua foto in alto a destra) e cerca il riquadro <b>Accesso e password</b>: il tasto <b>Cambia password</b> ti chiede quella di adesso e poi quella nuova. È la stessa password di FOSS.chat. Se l’hai dimenticata, nella schermata di accesso c’è <b>Password dimenticata?</b>: ti arriva una mail con il link per farne una nuova.'],
   ['La Home', 'FOSS si apre sempre sulla <b>Home</b>. A sinistra il menu (Home, Le mie task, Calendario, Notifiche, <b>Team</b>) e l’elenco dei tuoi spazi. Al centro il saluto, quattro numeri (progetti attivi, task aperte, consegne entro 7 giorni, collaboratori: toccali per andarci), le schede degli spazi (sul computer le prime sei; <b>Mostra altro</b> apre le altre) e, in fondo, le task in scadenza da spuntare al volo, le attività recenti e gli impegni di oggi. Il tuo <b>profilo</b> si apre dalla tua foto in alto a destra.'],
   ['Il calendario di tutto', '<b>Calendario</b>, nel menu a sinistra della Home, mette insieme le date di tutti i lavori di tutti gli spazi, ognuno col suo colore; in alto puoi nascondere gli spazi che non ti servono. Dentro un singolo spazio il calendario mostra solo i suoi lavori.'],
   ['Il riquadro «Scopri FOSS»', 'In basso a sinistra, una volta ogni cinque aperture, compare il riquadro che porta alla guida. La <b>×</b> lo chiude; per non vederlo più spegnilo in <b>Profilo → Guida e aiuto</b>.'],
@@ -13582,6 +13681,12 @@ document.addEventListener('click', function(e){
       state.me.foto = null; U(state.utente).foto = null; render(); applicaProfilo();
       toast('Foto rimossa.','info'); break;
 
+    case 'cambia-pw': modaleCambiaPw(); break;
+    case 'cambia-pw-ok': cambiaPassword(); break;
+    case 'pw-dimenticata': modaleRecuperoPw(); break;
+    case 'recupero-invia': mandaRecuperoPw(); break;
+    case 'nuova-pw-ok': salvaNuovaPw(); break;
+
     case 'salva-profilo':{
       ['nome','cognome','nick','email','ruolo','link'].forEach(k=>{
         const n = el('pf_'+(k==='nick'?'nick':k)); if(n) state.me[k] = n.value.trim();
@@ -14677,6 +14782,8 @@ let uscita = null;          // l'uscita in corso: un nuovo accesso aspetta che f
    una lettura andata male non deve sovrascrivere il lavoro già salvato. */
 let cloudPronto = false, nuovoArrivato = false;
 try{ if(window.supabase) sb = window.supabase.createClient(SUPA_URL, SUPA_KEY); }catch(e){}
+/* v2.9.9: aperto il link «password dimenticata», chiedo subito quella nuova */
+try{ if(sb) sb.auth.onAuthStateChange((ev)=>{ if(ev === 'PASSWORD_RECOVERY') setTimeout(modaleNuovaPw, 600); }); }catch(e){}
 
 function COL(i){ return ['#FFAD01','#7FC8F8','#9AE6B4','#F6A8C0','#C3B1F0','#FFD79A','#8FD3C4'][i%7]; }
 

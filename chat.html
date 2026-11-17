@@ -1551,7 +1551,7 @@ const SUPA_KEY = 'sb_publishable_f5Kjp6NHT9yTxr1bhWJjhg_4y72V-Kj';
 const VAPID_PUBBLICA = 'BNlGbW4nZrXmx8DioKxnl7ubULVOr5_6CAKvpuQYoiXeObmxYAzGU6UrkExx2zu1hACmtRNDcpoMh_ARQ0GSmlw';
 /* il server dei file sul NAS (es. 'https://media.foss.team'). Vuoto = si usa Supabase. */
 const MEDIA_NAS = 'https://media.foss.team';
-const VERSIONE = 'chat-2.9.8';
+const VERSIONE = 'chat-2.9.9';
 /* i temi colore: gli stessi di FOSS. Il predefinito per tutti è Brand (blu e giallo). */
 const TEMI_COLORE = [
   {id:'brand',   nome:'Brand',    ds:'Navy e ambra, il predefinito', c:['#0D1926','#1A3149','#FFAD01']},
@@ -5238,7 +5238,9 @@ function disegnaImpostazioni(){
     '<div class="blocco"><div class="sez-t">Privacy e sicurezza</div>'+
       voce('proteggi-tutto', 'lucchetto', 'Proteggi FOSS.chat con un codice', 'Ogni volta che la apri ti chiede 4 cifre', interr(S.tutto))+
       voce('cambia-pin', 'matita', S.haPin ? 'Cambia il codice' : 'Scegli il codice', S.haPin ? 'Lo stesso codice apre le chat private' : 'Serve per rendere private le chat')+
-      (S.haPin ? voce('pin-dimenticato', 'info', 'Ho dimenticato il codice', 'Lo cambi con la password di FOSS') : '')+'</div>'+
+      (S.haPin ? voce('pin-dimenticato', 'info', 'Ho dimenticato il codice', 'Lo cambi con la password di FOSS') : '')+
+      /* 2.9.9: la password è quella dell'account FOSS: si cambia di là, ma la si cercava anche qui */
+      voce('pw-foss', 'lucchetto', 'Cambia la password', 'È quella di FOSS: si cambia nel tuo profilo, qui accanto')+'</div>'+
     '<div class="blocco"><div class="sez-t">Notifiche</div>'+
       voce('attiva-push', 'campana', 'Avvisi su questo dispositivo', 'Anche quando FOSS.chat è chiusa', '<span id="statoPush" style="font-size:13px;color:var(--testo-2)"></span>')+
       voce('cfg-suoni', 'nuova', 'Suoni nella chat', 'Un suono quando arriva un messaggio', interr(S.cfg.suoni))+
@@ -5823,6 +5825,7 @@ document.addEventListener('click', async e => {
     case 'proteggi-tutto': await proteggiTutto(!S.tutto); if(el('pannelloSxC')){ if($('.scorre-testa h2', el('pannelloSx')).textContent === 'Profilo') profilo(); else disegnaImpostazioni(); } break;
     case 'cambia-pin': await impostaNuovoPin(); disegnaImpostazioni(); break;
     case 'pin-dimenticato': if(await codiceDimenticato()) toast('Codice nuovo impostato.'); disegnaImpostazioni(); break;
+    case 'pw-foss': vaiAFoss('#/profilo'); break;        /* 2.9.9: la password si cambia nel profilo di FOSS */
     case 'attiva-push': attivaPush(); break;
     case 'cfg': { const k = t.dataset.k;
       /* il tema personalizzato, la prima volta, parte dai colori del tema che hai adesso */

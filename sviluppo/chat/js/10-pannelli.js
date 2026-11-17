@@ -344,7 +344,9 @@ function disegnaImpostazioni(){
     '<div class="blocco"><div class="sez-t">Privacy e sicurezza</div>'+
       voce('proteggi-tutto', 'lucchetto', 'Proteggi FOSS.chat con un codice', 'Ogni volta che la apri ti chiede 4 cifre', interr(S.tutto))+
       voce('cambia-pin', 'matita', S.haPin ? 'Cambia il codice' : 'Scegli il codice', S.haPin ? 'Lo stesso codice apre le chat private' : 'Serve per rendere private le chat')+
-      (S.haPin ? voce('pin-dimenticato', 'info', 'Ho dimenticato il codice', 'Lo cambi con la password di FOSS') : '')+'</div>'+
+      (S.haPin ? voce('pin-dimenticato', 'info', 'Ho dimenticato il codice', 'Lo cambi con la password di FOSS') : '')+
+      /* 2.9.9: la password è quella dell'account FOSS: si cambia di là, ma la si cercava anche qui */
+      voce('pw-foss', 'lucchetto', 'Cambia la password', 'È quella di FOSS: si cambia nel tuo profilo, qui accanto')+'</div>'+
     '<div class="blocco"><div class="sez-t">Notifiche</div>'+
       voce('attiva-push', 'campana', 'Avvisi su questo dispositivo', 'Anche quando FOSS.chat è chiusa', '<span id="statoPush" style="font-size:13px;color:var(--testo-2)"></span>')+
       voce('cfg-suoni', 'nuova', 'Suoni nella chat', 'Un suono quando arriva un messaggio', interr(S.cfg.suoni))+

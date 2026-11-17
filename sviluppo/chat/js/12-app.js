@@ -190,6 +190,7 @@ document.addEventListener('click', async e => {
     case 'proteggi-tutto': await proteggiTutto(!S.tutto); if(el('pannelloSxC')){ if($('.scorre-testa h2', el('pannelloSx')).textContent === 'Profilo') profilo(); else disegnaImpostazioni(); } break;
     case 'cambia-pin': await impostaNuovoPin(); disegnaImpostazioni(); break;
     case 'pin-dimenticato': if(await codiceDimenticato()) toast('Codice nuovo impostato.'); disegnaImpostazioni(); break;
+    case 'pw-foss': vaiAFoss('#/profilo'); break;        /* 2.9.9: la password si cambia nel profilo di FOSS */
     case 'attiva-push': attivaPush(); break;
     case 'cfg': { const k = t.dataset.k;
       /* il tema personalizzato, la prima volta, parte dai colori del tema che hai adesso */
