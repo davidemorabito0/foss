@@ -176,16 +176,18 @@ function bollaHTML(m, c, primo, mio, gr){
     return '<div class="'+bcls+'">'+autore+corpo+'</div>';
   }
   const nuovoEff = !S.visti.has(m.id);
-  const eff = md.bolla && (md.bolla === 'inchiostro' || nuovoEff) ? ' eff-' + md.bolla : '';
+  /* 2.9.8: solo gli effetti che esistono (il nome finisce in una classe della pagina) */
+  const bolla = EFF_BOLLA.some(x => x[0] === md.bolla) ? md.bolla : '', anim = EFF_ANIM.some(x => x[0] === md.anim) ? md.anim : '';
+  const eff = bolla && (bolla === 'inchiostro' || nuovoEff) ? ' eff-' + bolla : '';
   if(m.tipo === 'testo'){
     const em = soloEmoji(m.testo);
-    if(em && !cit && !md.anim){ bcls += ' solo-emoji'; corpo = '<div class="testo grande-emoji">'+esc(m.testo.trim())+'</div>'; }
+    if(em && !cit && !anim){ bcls += ' solo-emoji'; corpo = '<div class="testo grande-emoji">'+esc(m.testo.trim())+'</div>'; }
     else {
       /* l'ora sta sull'ultima riga del testo, come su WhatsApp: le lascio il posto con una copia invisibile */
-      const accanto = !md.anim && !(md.lavori && md.lavori.length);
+      const accanto = !anim && !(md.lavori && md.lavori.length);
       if(accanto) bcls += ' meta-in';
-      corpo = '<div class="testo'+(md.anim && nuovoEff ? ' anim-' + md.anim : '')+'"'+(md.anim ? ' data-anim="'+esc(md.anim)+'" data-a="rianima"' : '')+'>'+
-        (md.anim ? testoAnimato(m.testo, md.anim) : formatta(m.testo, md))+(accanto ? metaSpazio(m, c, mio) : '')+'</div>' + (md.lavori && md.lavori.length && !md.anim ? schedeInTesto(md) : '');
+      corpo = '<div class="testo'+(anim && nuovoEff ? ' anim-' + anim : '')+'"'+(anim ? ' data-anim="'+esc(anim)+'" data-a="rianima"' : '')+'>'+
+        (anim ? testoAnimato(m.testo, anim) : formatta(m.testo, md))+(accanto ? metaSpazio(m, c, mio) : '')+'</div>' + (md.lavori && md.lavori.length && !md.anim ? schedeInTesto(md) : '');
     }
     if(md.lavori && md.lavori.length) bcls += ' con-scheda';
   } else if(m.tipo === 'foto' || m.tipo === 'video'){
@@ -229,7 +231,7 @@ function reazioniHTML(id){
   const r = S.reazioni.get(id); if(!r || !r.size) return '';
   const cont = new Map(); r.forEach(e => cont.set(e, (cont.get(e) || 0) + 1));
   const ord = Array.from(cont.entries()).sort((a, b) => b[1] - a[1]);
-  return '<span class="reazioni" data-a="chi-reagisce" data-id="'+id+'">'+ord.slice(0, 3).map(x => x[0]).join('')+(r.size > 1 ? '<b>'+r.size+'</b>' : '')+'</span>';
+  return '<span class="reazioni" data-a="chi-reagisce" data-id="'+id+'">'+ord.slice(0, 3).map(x => esc(x[0])).join('')+(r.size > 1 ? '<b>'+r.size+'</b>' : '')+'</span>';
 }
 function citazioneHTML(rid, c){
   const q = trovaMsg(c.id, rid);
@@ -505,7 +507,7 @@ function chiReagisce(id){
   const r = S.reazioni.get(id); if(!r || !r.size) return;
   const righe = Array.from(r.entries()).map(([u, e]) =>
     '<div class="voce" '+(u === S.io ? 'data-a="togli-reazione" data-id="'+id+'" role="button"' : '')+'>'+avatar(u)+'<span class="vc"><b>'+esc(u === S.io ? 'Tu' : nomeLungo(u))+'</b>'+
-    (u === S.io ? '<span>Tocca per togliere</span>' : '')+'</span><span style="font-size:24px">'+e+'</span></div>').join('');
+    (u === S.io ? '<span>Tocca per togliere</span>' : '')+'</span><span style="font-size:24px">'+esc(e)+'</span></div>').join('');
   foglio('Reazioni · ' + r.size, '<div style="margin:0 -24px">'+righe+'</div>', [['Chiudi']]);
 }
 function impostaRisposta(m){
@@ -556,7 +558,16 @@ async function infoMessaggio(m){
 async function scaricaMedia(m){
   try{
     const u = await urlMedia(m.media); if(!u) throw new Error('nessun indirizzo');
-    const r = await fetch(u); const b = await r.blob();
+    /* 2.9.8: il file era già stato mostrato nella chat (foto, vocale, video) e il browser ne teneva una copia
+       senza il permesso di scaricarla da qui: il download falliva con «server offline». Ora lo chiedo sempre
+       nuovo; se non riesce, apro il file direttamente (il NAS lo consegna come download) */
+    let r = null;
+    try{ r = await fetch(u, {cache: 'reload'}); }catch(e){ r = null; }
+    if(!r || !r.ok){
+      if(m.media && m.media.url){ window.open(u, '_blank', 'noopener'); return; }
+      throw new Error('download');
+    }
+    const b = await r.blob();
     const a = document.createElement('a'); a.href = URL.createObjectURL(b);
     a.download = (m.media && m.media.nome) || ('FOSS-chat-' + new Date(m.creato_il).toISOString().slice(0, 19).replace(/[:T]/g, '-') + '.' + ((b.type.split('/')[1] || 'bin').replace('jpeg', 'jpg').replace(/;.*/, '')));
     document.body.appendChild(a); a.click(); setTimeout(() => { URL.revokeObjectURL(a.href); a.remove(); }, 2000);

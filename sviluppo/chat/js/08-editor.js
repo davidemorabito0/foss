@@ -137,7 +137,7 @@ async function nuovoSticker(){
 async function stickerDaMessaggio(m){
   try{
     const u = await urlMedia(m.media); if(!u) throw new Error();
-    const b = await (await fetch(u)).blob();
+    const b = await (await fetch(u, {cache: 'reload'})).blob();
     apriStickerEditor(b);
   }catch(e){ toast('Non riesco a prendere la foto.'); }
 }
@@ -342,7 +342,7 @@ async function salvaStickerFile(blob, tipo, manda){
 }
 async function salvaInRaccolta(m, tipo){
   try{
-    const u = await urlMedia(m.media); const b = await (await fetch(u)).blob();
+    const u = await urlMedia(m.media); const b = await (await fetch(u, {cache: 'reload'})).blob();
     salvaStickerFile(b, tipo, false);
   }catch(e){ toast('Non riesco a salvarlo.'); }
 }

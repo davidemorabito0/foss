@@ -285,6 +285,39 @@ L'elenco completo è nel `README.md` del sito, sezioni «FOSS.chat» e «FOSS.ch
   e alta zero perche' la scheda (un `<button>`) allinea i figli a sinistra (`align-items:flex-start`). Ora ha
   `width:100%` e l'altezza dal padding (`padding-bottom: calc(100% / 3.6)`), che funziona ovunque.
 
+### 2.9.8 — seconda revisione di sicurezza e download dei file (17 novembre 2026)
+Revisione del codice di chat, FOSS e pannello admin. Il rischio è un collaboratore che scrive dati costruiti
+apposta (direttamente nel database) che poi vengono mostrati agli altri.
+- **Chat**
+  - L'emoji delle reazioni ora passa da `esc()` (04-conv.js). Nel database `chat_reazioni_emoji_check` vieta
+    anche `< > " ' & = /` e gli spazi.
+  - Gli effetti dei messaggi (`media.bolla`, `media.anim`) vengono accettati solo se esistono in
+    `EFF_BOLLA`/`EFF_ANIM`: prima finivano nella classe della pagina senza protezione.
+  - `media.url` è accettato solo se è `https` del server dei media o di Giphy (`urlNasOk` in 02-dati.js). Prima
+    un indirizzo `javascript:` o di un altro sito veniva aperto o caricato.
+  - I colori del gruppo passano da `hexOk` (`stileDi` in 25-stile.js).
+- **FOSS**
+  - `D()` ora protegge i valori.
+  - I colori di spazi e foglietti passano da `coloreOk` anche quando arrivano in tempo reale.
+  - L'id di una riga lo decide sempre il database (`senzaId`): un `id` scritto dentro i dati non può più
+    sostituirlo, perché finiva negli attributi della pagina.
+  - **«Annulla» non cancella più il lavoro degli altri**: un lavoro cambiato o creato da un collega dopo il
+    punto da annullare resta com'è (`arrivoRemoto`). Prima veniva riportato indietro e il database perdeva le
+    modifiche altrui.
+- **Download dei file della chat.** Il NAS rispondeva senza `Vary: Origin` quando il file veniva chiesto da
+  `<img>`/`<audio>`, così il browser riusava quella copia (senza permesso CORS) per `fetch` e il download
+  falliva con «server dei media offline». Ora `scaricaMedia`, l'onda dei vocali e la modifica di una foto
+  chiedono sempre una copia nuova (`cache: 'reload'`); se non riesce si apre il file direttamente.
+  `nas/server.mjs` manda `Vary: Origin` sempre: **va aggiornato sul NAS** (riavvio del container) perché
+  valga. La chat però funziona già senza.
+- **Rimasto aperto, da valutare:**
+  - Manca la Content-Security-Policy per index.html e chat.html: è un lavoro grosso, a causa degli script
+    nella pagina.
+  - I canali «online/sta scrivendo» sono comuni a tutti gli utenti.
+  - Se arriva un aggiornamento in tempo reale prima della sincronizzazione, un lavoro appena messo nel
+    cestino potrebbe ricomparire.
+  - In `aggiornaDaCloud` i lavori si leggono senza pagine: oltre circa 1000 lavori ne mancherebbero alcuni.
+
 ### Revisione di sicurezza — 16 novembre 2026
 Controllati: regole e permessi del database (consulente di Supabase, tutte le regole RLS, le funzioni
 «security definer»), l'archivio dei file, le funzioni sul server, il server dei media del NAS, il codice del

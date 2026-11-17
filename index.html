@@ -4794,6 +4794,8 @@ function sicuro(h){
    id, data-*): passano solo se non possono uscirne. Il database fa lo stesso
    controllo quando li salva; questo e' il secondo cancello. */
 const ID_OK = /^[A-Za-z0-9_-]{1,80}$/;
+/* v2.9.8: i dati salvati non possono cambiare l'id della riga (che poi finisce negli attributi della pagina) */
+const senzaId = d => { const o = Object.assign({}, d || {}); delete o.id; return o; };
 const COL_OK = /^#[0-9A-Fa-f]{3,8}$/;
 const coloreOk = (c, d) => COL_OK.test(String(c == null ? '' : c)) ? c : d;
 function urlSicura(u){
@@ -5087,9 +5089,11 @@ function azione(tx){
   state.azioni.unshift({ts:dataOra(), tx, chi:nomeVisibile()});
   if(state.azioni.length>200) state.azioni.pop();
 }
+/* quando è arrivato l'ultimo cambiamento fatto da altri, per lavoro (serve ad «Annulla») */
+const arrivoRemoto = {};
 function snap(desc){
   try{
-    undoStack.push({desc, progetti:JSON.parse(JSON.stringify(state.progetti))});
+    undoStack.push({desc, t:Date.now(), progetti:JSON.parse(JSON.stringify(state.progetti))});
     if(undoStack.length>40) undoStack.shift();
   }catch(e){}
 }
@@ -5100,6 +5104,12 @@ function annulla(){
   /* commenti, chat e «letti» non si annullano: sono di chi li ha scritti e arrivano anche dagli altri */
   const adesso = {}; state.progetti.forEach(x=>{ adesso[x.id] = x; });
   u.progetti.forEach(x=>{ const q = adesso[x.id]; if(q){ x.commenti = q.commenti; x.chat = q.chat; x.visti = q.visti; } });
+  /* v2.9.8: un lavoro che qualcun altro ha cambiato (o creato) dopo questo punto resta com'è adesso:
+     riportarlo indietro avrebbe cancellato dal database il lavoro degli altri */
+  const t0 = u.t || 0, cera = new Set(u.progetti.map(x=>x.id)); let tenuti = 0;
+  u.progetti = u.progetti.map(x=>{ if(adesso[x.id] && (arrivoRemoto[x.id]||0) > t0){ tenuti++; return adesso[x.id]; } return x; });
+  state.progetti.forEach(x=>{ if(!cera.has(x.id) && (arrivoRemoto[x.id]||0) > t0){ u.progetti.push(x); tenuti++; } });
+  if(tenuti) setTimeout(()=>toast(tenuti===1 ? 'Un lavoro cambiato nel frattempo da un collega non è stato riportato indietro.' : tenuti+' lavori cambiati nel frattempo dai colleghi non sono stati riportati indietro.','warn','Annullato in parte'), 50);
   state.progetti = u.progetti;
   if(state.progettoId && !PROJ()) state.progettoId = state.progetti[0] && state.progetti[0].id;
   azione('Annullata l\'azione: <b>'+u.desc+'</b>');
@@ -5190,7 +5200,7 @@ function renderTop(){
     }
   } else if(state.schermo==='home' || state.schermo==='progetto'){
     const sp = SPZ();
-    c.innerHTML = sp? '<button class="sp-chip" style="--acc:'+sp.col+'" data-action="menu-spazi" title="Cambia spazio di lavoro">'+
+    c.innerHTML = sp? '<button class="sp-chip" style="--acc:'+coloreOk(sp.col,'#FFAD01')+'" data-action="menu-spazi" title="Cambia spazio di lavoro">'+
       '<span class="ic">'+svg(sp.icona)+'</span><span class="nm">'+esc(sp.nome)+'</span>'+
       '<span class="cv">'+svg('chev',2.6)+'</span></button>' : '';
   } else if(state.schermo==='profilo'){
@@ -5313,7 +5323,7 @@ function intestazioneSpazio(lista){
   const task = lista.reduce((n,p)=>n+p.subs.length,0);
   const urg = lista.filter(p=>{ const g = giorniA(p.consegna); return !p.completato && g!=null && g<=7; }).length;
   const membri = (sp.membri||[]).filter(id=>state.utenti.some(u=>u.id===id));
-  return '<div class="sp-head" style="--acc:'+sp.col+'">'+
+  return '<div class="sp-head" style="--acc:'+coloreOk(sp.col,'#FFAD01')+'">'+
     '<span class="ic">'+svg(sp.icona)+'</span>'+
     '<div style="min-width:0">'+
       '<h1>'+esc(sp.nome)+'</h1>'+
@@ -7964,7 +7974,7 @@ function renderBacheca(){
     const u = U(n.autore||state.utente);
     h += '<div class="postit" id="nota_'+n.id+'" data-nota="'+n.id+'" '+
       'style="left:'+n.x+'px;top:'+n.y+'px;width:'+(n.w||186)+'px;height:'+(n.h||150)+'px;'+
-        'background:'+n.col+';transform:rotate('+(n.rot||0)+'deg)">'+
+        'background:'+coloreOk(n.col,'#FFF3B0')+';transform:rotate('+(Number(n.rot)||0)+'deg)">'+
       '<div class="presa"></div>'+
       '<textarea maxlength="'+MAX_NOTA+'" data-nota-tx="'+n.id+'" placeholder="Scrivi un appunto…"'+
         ((state.ospite||!puo('spazi'))?' readonly':'')+'>'+esc(n.tx||'')+'</textarea>'+
@@ -13729,7 +13739,7 @@ function apriCtx(x, y, titolo, voci, bersaglio){
   ctxEl = d;
   if(bersaglio){ bersaglio.classList.add('ctx-target'); ctxMarked = bersaglio; }
 }
-const D = o => Object.keys(o).map(k=>'data-'+k+'="'+o[k]+'"').join(' ');
+const D = o => Object.keys(o).map(k=>'data-'+k+'="'+esc(o[k])+'"').join(' ');   // v2.9.8: valori protetti
 /* le azioni di un lavoro: tasto destro sulla scheda e tasto «...» dentro al lavoro */
 function vociMenuProgetto(pr){
   const dd = D({pid:pr.id});
@@ -14879,29 +14889,29 @@ function componi(p, righe, aperti){
   Object.keys(per).forEach(k=>per[k].sort(ord));
   const copia = d => JSON.parse(JSON.stringify(d||{}));
   const checkDi = {};
-  per.check.forEach(r=>{ (checkDi[r.genitore] = checkDi[r.genitore]||[]).push(Object.assign({id:r.id}, copia(r.dati))); });
+  per.check.forEach(r=>{ (checkDi[r.genitore] = checkDi[r.genitore]||[]).push(Object.assign({id:r.id}, senzaId(copia(r.dati)))); });
   const vociDi = {};
   per.voce.forEach(r=>{
-    const v = Object.assign({id:r.id}, copia(r.dati));
+    const v = Object.assign({id:r.id}, senzaId(copia(r.dati)));
     if(v.haLista || checkDi[r.id]) v.lista = checkDi[r.id] || [];
     delete v.haLista;
     (vociDi[r.genitore] = vociDi[r.genitore]||[]).push(v);
   });
   p.subs = per.task.map(r=>{
-    const s = Object.assign({id:r.id}, copia(r.dati));
+    const s = Object.assign({id:r.id}, senzaId(copia(r.dati)));
     s.items = vociDi[r.id] || [];
     s.aperto = aperti ? aperti.has(r.id) : false;
     return s;
   });
   p.commenti = {};
   per.commento.forEach(r=>{
-    const m = Object.assign({id:r.id, _o:r.ordine}, copia(r.dati));
+    const m = Object.assign({id:r.id, _o:r.ordine}, senzaId(copia(r.dati)));
     const f = m.fase || 0; delete m.fase;
     (p.commenti[f] = p.commenti[f]||[]).push(m);
   });
-  p.chat = per.chat.map(r=>Object.assign({id:r.id, _o:r.ordine}, copia(r.dati)));
-  p.log = per.log.map(r=>Object.assign({id:r.id, _o:r.ordine}, copia(r.dati)));
-  p.eventi = per.evento.map(r=>Object.assign({id:r.id}, copia(r.dati)));
+  p.chat = per.chat.map(r=>Object.assign({id:r.id, _o:r.ordine}, senzaId(copia(r.dati))));
+  p.log = per.log.map(r=>Object.assign({id:r.id, _o:r.ordine}, senzaId(copia(r.dati))));
+  p.eventi = per.evento.map(r=>Object.assign({id:r.id}, senzaId(copia(r.dati))));
 }
 function apertiDi(p){ return new Set((p.subs||[]).filter(s=>s.aperto).map(s=>s.id)); }
 
@@ -14925,7 +14935,8 @@ function ombraDaNucleo(pid, dati, spazio){
   ombraNucleo[pid] = o;
 }
 function lavoroDaRighe(r, righe, vecchio, statoMio){
-  const p = Object.assign({id:r.id, spazio:r.spazio_id}, JSON.parse(JSON.stringify(r.dati||{})));
+  arrivoRemoto[r.id] = Date.now();
+  const p = Object.assign({id:r.id, spazio:r.spazio_id}, senzaId(JSON.parse(JSON.stringify(r.dati||{}))));
   delete p._formato;
   FUORI_NUCLEO.forEach(k=>{ if(k!=='id' && k!=='spazio') delete p[k]; });
   let aperti = vecchio ? apertiDi(vecchio) : null;
@@ -15044,14 +15055,14 @@ async function caricaCloud(){
     state.spazi = (sps||[]).map(r=>{
       orgSpazio[r.id] = r.org_id;
       ombraSp[r.id] = JSON.stringify(r.dati)+'|'+r.ordine;
-      return Object.assign({id:r.id}, r.dati);
+      return Object.assign({id:r.id}, senzaId(r.dati));
     });
     vecchioFormato.clear();
     state.progetti = (prs||[]).map(r=>{
       if(r.dati && String(r.dati._formato)==='2') return lavoroDaRighe(r, perLavoro[r.id]||[], null, st);
       /* non sono riuscito a dividerlo: lo mostro com'e', senza scriverci sopra */
       vecchioFormato.add(r.id); orgProg[r.id] = r.org_id;
-      return Object.assign({id:r.id, spazio:r.spazio_id}, r.dati||{});
+      return Object.assign({id:r.id, spazio:r.spazio_id}, senzaId(r.dati));
     });
     if(vecchioFormato.size) console.warn('lavori nel formato vecchio, in sola lettura:', Array.from(vecchioFormato).join(', '));
 
@@ -15065,7 +15076,7 @@ async function caricaCloud(){
     state.modelli = [];
     if(orgMia){
       const {data:md} = await sb.from('modelli').select('id,nome,tipo,dati,creato_da,creato_il').eq('org_id', orgMia).order('creato_il');
-      state.modelli = (md||[]).map(m=>Object.assign({id:m.id, nome:m.nome, tipo:m.tipo, creato_da:m.creato_da}, m.dati||{}));
+      state.modelli = (md||[]).map(m=>Object.assign({id:m.id, nome:m.nome, tipo:m.tipo, creato_da:m.creato_da}, senzaId(m.dati)));
     }
 
     /* Nei dati ci sono anche persone senza account (quelle messe in squadra
@@ -15297,6 +15308,7 @@ function applicaNucleo(p, dati, spazio){
     if(p.spazio === ombra.__spazio || p.spazio === spazio){ p.spazio = spazio; cambiato = true; }
     ombra.__spazio = spazio;
   }
+  if(cambiato) arrivoRemoto[p.id] = Date.now();
   return cambiato;
 }
 
@@ -15324,6 +15336,7 @@ function applicaPezzi(p, cambi){
     const righe = Object.keys(L).map(id=>Object.assign({id}, L[id]));
     componi(p, righe, apertiDi(p));
   }
+  if(cambiato) arrivoRemoto[p.id] = Date.now();
   return cambiato;
 }
 
@@ -15483,8 +15496,8 @@ function svuotaCoda(){
         if(i>=0){
           const loc = JSON.stringify(datiSpazio(state.spazi[i]))+'|'+i;
           if(loc !== ombraSp[nuovo.id]) return;              // lo sto cambiando io
-          state.spazi[i] = Object.assign({id:nuovo.id}, nuovo.dati);
-        } else state.spazi.push(Object.assign({id:nuovo.id}, nuovo.dati));
+          state.spazi[i] = Object.assign({id:nuovo.id}, senzaId(nuovo.dati));
+        } else state.spazi.push(Object.assign({id:nuovo.id}, senzaId(nuovo.dati)));
         ombraSp[nuovo.id] = j; orgSpazio[nuovo.id] = nuovo.org_id; tocca = true;
       }
     }
@@ -15611,7 +15624,7 @@ async function aggiornaDaCloud(){
     if(orgMia){
       const {data:md, error:em} = await sb.from('modelli').select('id,nome,tipo,dati,creato_da,creato_il').eq('org_id', orgMia).order('creato_il');
       if(!em){
-        let nuovi = (md||[]).map(m=>Object.assign({id:m.id, nome:m.nome, tipo:m.tipo, creato_da:m.creato_da}, m.dati||{}));
+        let nuovi = (md||[]).map(m=>Object.assign({id:m.id, nome:m.nome, tipo:m.tipo, creato_da:m.creato_da}, senzaId(m.dati)));
         /* uno appena salvato da me potrebbe non essere ancora arrivato */
         nuovi = nuovi.concat((state.modelli||[]).filter(m=>!nuovi.some(x=>x.id===m.id) && m.t && Date.now()-m.t < 60000));
         if(canon(nuovi) !== canon(state.modelli||[])){ state.modelli = nuovi; tocca = true; }

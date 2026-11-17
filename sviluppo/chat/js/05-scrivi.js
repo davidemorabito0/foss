@@ -421,7 +421,7 @@ function scorriPallino(){
 /* i vocali vecchi con l'onda piatta: la ricalcolo dal file mentre lo ascolti (solo sullo schermo) */
 async function ridisegnaOnda(m, u){
   try{
-    const r = await fetch(u); const o = await ondaDalFile(await r.blob()); if(!o) return;
+    const r = await fetch(u, {cache: 'reload'}); const o = await ondaDalFile(await r.blob()); if(!o) return;
     m.media.onda = o;
     const v = $('.vocale[data-voc="'+m.id+'"] .barre'); if(!v) return;
     v.innerHTML = ondaDa(o).map(x => '<i style="height:'+Math.max(10, x * 100)+'%"></i>').join('');

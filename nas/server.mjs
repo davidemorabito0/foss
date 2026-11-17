@@ -39,7 +39,9 @@ const nomeOk = (n) => NOME.test(n) && !n.startsWith('.') && !n.endsWith('.tipo')
 
 function intestazioni(req, extra = {}) {
   const o = req.headers.origin;
-  const h = { 'X-Content-Type-Options': 'nosniff', ...extra };
+  // Vary sempre: la stessa risposta cambia a seconda di chi la chiede (con o senza Origin). Senza, il browser
+  // riusava la copia presa da <img>/<audio> (senza permessi CORS) per i download, che fallivano.
+  const h = { 'X-Content-Type-Options': 'nosniff', 'Vary': 'Origin', ...extra };
   if (o && ORIGINI.includes(o)) {
     h['Access-Control-Allow-Origin'] = o;
     h['Vary'] = 'Origin';

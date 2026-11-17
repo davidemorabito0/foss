@@ -42,7 +42,15 @@ function sfondoPalette(id){
 function luce(h){ const n = parseInt(h.slice(1), 16), c = [n >> 16, n >> 8 & 255, n & 255].map(v => { v /= 255; return v <= .03928 ? v / 12.92 : Math.pow((v + .055) / 1.055, 2.4); });
   return .2126 * c[0] + .7152 * c[1] + .0722 * c[2]; }
 function sopra(h){ return luce(h) > .36 ? '#111111' : '#FFFFFF'; }
-function stileDi(c){ return c && c.tipo === 'gruppo' && c.stile && typeof c.stile === 'object' ? c.stile : null; }
+function stileDi(c){
+  if(!(c && c.tipo === 'gruppo' && c.stile && typeof c.stile === 'object')) return null;
+  /* 2.9.8: solo colori veri (finiscono negli stili della pagina) */
+  const s = c.stile, o = {};
+  if(hexOk(s.primario)) o.primario = s.primario;
+  if(hexOk(s.secondario)) o.secondario = s.secondario;
+  if(typeof s.palette === 'string' && /^[a-z]{2,20}$/.test(s.palette)) o.palette = s.palette;
+  return o.primario || o.secondario || o.palette ? o : null;
+}
 function puoiColori(c){
   if(!c || c.tipo !== 'gruppo') return false;
   if(c.creata_da === S.io) return true;

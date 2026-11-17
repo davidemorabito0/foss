@@ -32,10 +32,14 @@ async function urlFirmata(path){
   return p;
 }
 /* l'indirizzo di un file di un messaggio: NAS (url) o Supabase (path) */
+/* 2.9.8: un file sul NAS ha sempre un indirizzo https del server dei media (o, per le GIF, di Giphy) */
+function urlNasOk(u){
+  try{ const x = new URL(String(u)); return x.protocol === 'https:' && (x.origin === MEDIA_NAS || /(^|\.)giphy\.com$/.test(x.hostname)); }catch(e){ return false; }
+}
 async function urlMedia(m){
   if(!m) return '';
   if(m.locale) return m.locale;
-  if(m.url) return m.url;
+  if(m.url) return urlNasOk(m.url) ? m.url : '';
   return urlFirmata(m.path);
 }
 
