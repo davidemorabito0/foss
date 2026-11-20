@@ -110,6 +110,8 @@ pub struct Stato {
     pub nuova_versione: Mutex<Option<String>>,
     pub aggiornando: Mutex<bool>,
     pub uscita: Mutex<bool>,
+    /// la misura della finestra con cui ho disposto le viste l'ultima volta (larghezza, altezza)
+    pub misura: Mutex<(f64, f64)>,
     /// prove automatiche: file dove scrivo cosa succede (FOSS_PROVA)
     pub prova: Option<PathBuf>,
 }
@@ -171,6 +173,9 @@ pub fn disponi(app: &AppHandle) {
     let c = st.cfg.lock().unwrap().clone();
     let largh = dim.width.max(1.0);
     let alto = dim.height.max(1.0);
+    if let Ok(mut m) = st.misura.lock() {
+        *m = (largh, alto);
+    }
     let metti = |v: &Webview, x: f64, l: f64| {
         let _ = v.set_bounds(Rect { position: LogicalPosition::new(x, 0.0).into(), size: LogicalSize::new(l, alto).into() });
         let _ = v.show();
@@ -274,6 +279,27 @@ pub fn cambia_lato(app: &AppHandle, lato: &str) {
     disponi(app);
     vassoio::aggiorna_menu(app);
     registra(app, "lato", json!(lato));
+}
+
+/// A volte la finestra cambia misura senza che arrivi l'evento: succede quando viene ingrandita o
+/// ripristinata ingrandita all'avvio. Le due viste restano della misura di prima e lasciano una fascia
+/// vuota. Qui controllo ogni tanto e, solo se non torna, rimetto a posto (senza sfarfallii).
+pub fn sorveglia_misura(app: &AppHandle) {
+    let a = app.clone();
+    std::thread::spawn(move || loop {
+        std::thread::sleep(std::time::Duration::from_millis(900));
+        let Some(w) = finestra(&a) else { continue };
+        if !w.is_visible().unwrap_or(false) || w.is_minimized().unwrap_or(false) {
+            continue;
+        }
+        let (Ok(scala), Ok(dim)) = (w.scale_factor(), w.inner_size()) else { continue };
+        let dim = dim.to_logical::<f64>(scala);
+        let vecchia = a.state::<Stato>().misura.lock().map(|m| *m).unwrap_or((0.0, 0.0));
+        if (dim.width - vecchia.0).abs() > 1.0 || (dim.height - vecchia.1).abs() > 1.0 {
+            let b = a.clone();
+            let _ = a.run_on_main_thread(move || disponi(&b));
+        }
+    });
 }
 
 pub fn mostra_finestra(app: &AppHandle) {
@@ -1128,6 +1154,7 @@ pub fn run() {
                 nuova_versione: Mutex::new(None),
                 aggiornando: Mutex::new(false),
                 uscita: Mutex::new(false),
+                misura: Mutex::new((0.0, 0.0)),
                 prova,
             });
 
@@ -1160,11 +1187,22 @@ pub fn run() {
             if !nascosta {
                 let _ = w.show();
                 let _ = w.set_focus();
+                // lo stato salvato (anche «ingrandita») arriva un attimo dopo: ridispongo
+                for ms in [120u64, 500, 1500] {
+                    let h4 = h.clone();
+                    std::thread::spawn(move || {
+                        std::thread::sleep(std::time::Duration::from_millis(ms));
+                        let b = h4.clone();
+                        let _ = h4.run_on_main_thread(move || disponi(&b));
+                    });
+                }
             }
+            sorveglia_misura(&h);
 
             let h2 = h.clone();
             w.on_window_event(move |ev| match ev {
-                WindowEvent::Resized(_) | WindowEvent::ScaleFactorChanged { .. } => disponi(&h2),
+                WindowEvent::Resized(_) | WindowEvent::ScaleFactorChanged { .. } | WindowEvent::Moved(_) => disponi(&h2),
+                WindowEvent::Focused(true) => disponi(&h2),
                 WindowEvent::CloseRequested { api, .. } => {
                     // chiudere la finestra non chiude FOSS: resta nella barra in alto / vicino all'orologio
                     if !*h2.state::<Stato>().uscita.lock().unwrap() {

@@ -304,6 +304,12 @@ Richiesta: i lavori pieni di note e riferimenti hanno bisogno di un posto solo d
 - Chi guarda da fuori (ospite), i lavori bloccati e i lavori completati: la scheda si legge ma non si cambia.
   Gli obiettivi si spuntano anche con il solo permesso «spunta».
 - Nuovo capitolo della guida: «La scheda del progetto (Riepilogo)».
+- **Si può accendere per tutto uno spazio di lavoro** (20 novembre 2026): in «Modifica lo spazio», sotto
+  «Scheda del progetto», l'interruttore **«Apri i progetti sulla scheda»** (`sp.riepAuto`, comando
+  `sp-riep`). Acceso, ogni lavoro di quello spazio si apre sul Riepilogo invece che sulle fasi:
+  `apriProgetto` fa `state.riep = !!(spz && spz.riepAuto)` leggendo lo spazio del lavoro. Il tasto
+  «Torna alle fasi» resta sempre lì, e l'impostazione vale per spazio, non per persona: si salva nel
+  nucleo dello spazio e si sincronizza con gli altri.
 
 ### 2.9.9 e FOSS — cambiare la propria password (17 novembre 2026)
 Segnalazione: «non trovo il pannello per cambiare la password». Non esisteva: in FOSS non c'era nessun modo di
