@@ -2722,7 +2722,7 @@ button.all-apri:hover .nm{color:var(--amber-ink);text-decoration:underline}
 :root[data-theme="light"]{--t-giallo:#D99A0B;--t-grigio:#6F8098}
 
 /* la scheda dello spazio a destra */
-.sp2-info{width:340px;flex:none;overflow-y:auto;border-left:1px solid var(--line);background:var(--surface);padding:16px;display:none;flex-direction:column;gap:14px}
+.sp2-info{width:420px;flex:none;overflow-y:auto;border-left:1px solid var(--line);background:var(--surface);padding:16px;display:none;flex-direction:column;gap:14px}
 .sp2-lay.con-scheda .sp2-info{display:flex}
 .sp2-card{flex:none;border:1px solid var(--line);border-radius:16px;background:var(--bg);padding:16px}
 .sp2-card h3{font-size:15px;font-weight:700;letter-spacing:-.01em}
@@ -2761,7 +2761,11 @@ button.all-apri:hover .nm{color:var(--amber-ink);text-decoration:underline}
 .sp2-info .hm-a{padding:9px 2px}
 .sp2-info .hm-a .w{white-space:normal;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical}
 
-@media (max-width:1439px){ .sp2-lay.con-scheda .sp2-info{display:none} }
+@media (max-width:1279px){ .sp2-lay.con-scheda .sp2-info{display:none} }
+/* le carte della scheda dello spazio: una colonna nella barra laterale, e sotto ai progetti sul telefono */
+.sp-rp{grid-template-columns:1fr;gap:12px;padding:0}
+.sp-rp .rp-c.largo{grid-column:auto}
+.tel-rp{margin:18px 0 10px}
 @media (max-width:999px){
   .sp-head.sp2{padding:16px 18px 4px;gap:14px}
   .sp2-viste{padding:10px 18px 12px}
@@ -5484,6 +5488,137 @@ function bachecaColonne(lista){
   return h + '</div></div>';
 }
 /* la scheda dello spazio a destra: copertina, avanzamento, numeri, persone e ultime cose successe */
+/* ============ LA SCHEDA DELLO SPAZIO DI LAVORO ============
+   Le stesse carte della scheda di un lavoro, ma su tutto lo spazio: descrizione,
+   obiettivi, informazioni, tag, colori, link, soldi, note. Sta accanto ai progetti
+   sugli schermi larghi e sotto ai progetti sul telefono. */
+function spazioModificabile(sp){ return !!sp && !state.ospite && puo('spazi'); }
+const penSp = (sp, k) => '<button class="pen fisso" data-action="sps-edit" data-k="'+esc(k)+'" '+D({sid:sp.id})+' title="Modifica">'+svg('pen',2.2)+'</button>';
+
+function carteSpazio(sp){
+  const mod = spazioModificabile(sp), ds = ' '+D({sid:sp.id});
+  const ps = progettiDi(sp.id), n = numeriSpazio(ps);
+  let h = '';
+
+  /* descrizione */
+  {
+    const c = testoVero(sp.descrizione)
+      ? '<div class="rp-testo">'+sicuro(sp.descrizione)+'</div>'
+      : '<div class="rp-vuoto">Di cosa si occupa questo spazio, con che tono, per chi. Resta qui, sempre a portata di mano.</div>'+
+        (mod ? rpPiu('sps-edit','Scrivi la descrizione',' data-k="descrizione"'+ds) : '');
+    h += rpCarta('file','Descrizione dello spazio', c, (mod && testoVero(sp.descrizione) ? penSp(sp,'descrizione') : ''), true);
+  }
+
+  /* obiettivi */
+  {
+    const ob = sp.obiettivi||[];
+    const fatti = ob.filter(x=>x.done).length;
+    let c = ob.map((x,i)=>'<div class="rp-ob'+(x.done?' fatto':'')+'">'+
+        '<span class="box" role="button" tabindex="0" data-action="sps-ob-tog" data-i="'+i+'"'+ds+' aria-label="Segna">'+svg('check',3.4)+'</span>'+
+        '<span class="tx">'+esc(x.t||'')+'</span>'+
+        (mod ? '<button class="iconbtn x" data-action="sps-ob-via" data-i="'+i+'"'+ds+' title="Togli" aria-label="Togli">'+svg('x',2.4)+'</button>' : '')+
+      '</div>').join('');
+    if(!ob.length) c = '<div class="rp-vuoto">Cosa deve portare a casa questo spazio. Li spunti man mano.</div>';
+    if(mod) c += rpPiu('sps-ob-nuovo','Aggiungi un obiettivo', ds);
+    h += rpCarta('check','Obiettivi', c, (ob.length ? '<span class="chip">'+fatti+'/'+ob.length+'</span>' : ''));
+  }
+
+  /* a che punto siamo: i progetti dello spazio */
+  {
+    const aperti = ps.filter(p=>!p.completato), fatti = ps.filter(p=>p.completato);
+    const corso = aperti.filter(p=>statoDi(p)==='corso');
+    let c = '<div class="rp-tl">'+
+      '<div class="f qui"><span class="p"></span><span class="tx">In corso</span><span class="st">'+corso.length+'</span></div>'+
+      '<div class="f"><span class="p"></span><span class="tx">Da fare</span><span class="st">'+(aperti.length-corso.length)+'</span></div>'+
+      '<div class="f fatta"><span class="p"></span><span class="tx">Completati</span><span class="st">'+fatti.length+'</span></div>'+
+      '</div>';
+    c += '<div class="rp-barra"><i style="width:'+Math.max(2,n.pct)+'%"></i></div>';
+    c += '<div class="sp2-nums" style="margin-top:10px">'+
+      '<span><b>'+ps.length+'</b>Progetti</span><span><b>'+n.task+'</b>Task totali</span>'+
+      '<span class="verde"><b>'+n.taskFatte+'</b>Completate</span><span class="'+(n.urg?'rosso':'')+'"><b>'+n.urg+'</b>In scadenza</span>'+
+      '</div>';
+    h += rpCarta('check','A che punto siamo', c, '<span class="chip">'+n.pct+'%</span>');
+  }
+
+  /* informazioni */
+  {
+    const capo = U(sp.responsabile || titolareDiSpazio(sp) || state.utente);
+    const membri = membriSpazio(sp);
+    const riga = (k, v) => v ? '<div class="rp-kv"><span>'+esc(k)+'</span><b>'+esc(v)+'</b></div>' : '';
+    let c = riga('Cliente', sp.cliente) +
+      riga('Professione', TIPO(sp.tipo).prof) +
+      '<div class="rp-kv"><span>Progetti</span><b>'+ps.length+'</b></div>'+
+      riga('Inizio', sp.inizio) + riga('Consegna', sp.consegna) +
+      '<div class="rp-kv"><span>Responsabile</span><b>'+esc(capo.nome)+'</b></div>'+
+      '<div class="rp-kv"><span>Team</span><b>'+membri.length+(membri.length===1?' persona':' persone')+'</b></div>';
+    if(mod){
+      if(!sp.cliente) c += rpPiu('sps-edit','Aggiungi il cliente',' data-k="cliente"'+ds);
+      if(!sp.inizio) c += rpPiu('sps-edit','Aggiungi la data di inizio',' data-k="inizio"'+ds);
+      if(!sp.consegna) c += rpPiu('sps-edit','Aggiungi la consegna',' data-k="consegna"'+ds);
+    }
+    h += rpCarta('file','Informazioni', c, (mod ? penSp(sp,'responsabile') : ''));
+  }
+
+  /* tag */
+  if((sp.tags||[]).length || mod){
+    const c = (sp.tags||[]).length
+      ? '<div class="rp-tags">'+sp.tags.map(t=>'<span class="chip">'+esc(t)+'</span>').join('')+'</div>'
+      : '<div class="rp-vuoto">Parole per ritrovare questo spazio e i suoi lavori.</div>';
+    h += rpCarta('spark','Tag', c, (mod ? penSp(sp,'tags') : ''));
+  }
+
+  /* colori */
+  {
+    const pal = (sp.palette||[]).filter(x=>coloreOk(x,null));
+    let c = pal.length
+      ? '<div class="rp-pal">'+pal.map((x,i)=>'<span class="rp-col"><i style="background:'+coloreOk(x,'#888888')+'"></i><span>'+esc(String(x).toUpperCase())+'</span>'+
+          (mod ? '<button class="x" data-action="sps-pal-via" data-i="'+i+'"'+ds+' title="Togli" aria-label="Togli">'+svg('x',2.6)+'</button>' : '')+'</span>').join('')+'</div>'
+      : '<div class="rp-vuoto">I colori di questo spazio, sempre uguali per tutti.</div>';
+    if(mod) c += '<label class="rp-piu" for="sp_col_'+esc(sp.id)+'">'+svg('plus',2.4)+'Aggiungi un colore'+
+      '<input type="color" id="sp_col_'+esc(sp.id)+'" data-sp-col="'+esc(sp.id)+'" value="#FFAD01" style="width:0;height:0;opacity:0;position:absolute;pointer-events:none"></label>';
+    h += rpCarta('palette','Colori', c);
+  }
+
+  /* link utili */
+  {
+    const rif = (sp.rif||[]).filter(x=>x && urlSicura(x.url));
+    let c = rif.length
+      ? rif.map((x,i)=>'<div class="rp-rif"><span class="ic" style="color:var(--dim)">'+svg('link',2)+'</span>'+
+          '<a href="'+esc(x.url)+'" target="_blank" rel="noopener noreferrer"><b>'+esc(x.t||x.url)+'</b><span>'+esc(x.url)+'</span></a>'+
+          (mod ? '<button class="iconbtn" data-action="sps-rif-via" data-i="'+i+'"'+ds+' title="Togli" aria-label="Togli">'+svg('x',2.4)+'</button>' : '')+
+        '</div>').join('')
+      : '<div class="rp-vuoto">Cartelle condivise, moodboard, riferimenti dello spazio.</div>';
+    if(mod) c += rpPiu('sps-rif-nuovo','Aggiungi un link', ds);
+    h += rpCarta('link','Link utili', c);
+  }
+
+  /* soldi: la somma dei lavori dello spazio */
+  if(vedeSoldi()){
+    let prev = 0, inc = 0, spe = 0, conConti = 0;
+    ps.forEach(p=>{ const co = contiDi(p.id); if(!co) return; const r = riassuntoConti(co);
+      if(r.prev != null){ prev += r.prev; conConti++; } inc += r.inc; spe += r.sp; });
+    let c;
+    if(conConti || inc || spe){
+      const pc = prev ? Math.min(100, Math.round(inc / prev * 100)) : 0;
+      c = '<div class="rp-kv"><span>Preventivi</span><b>'+esc(euro(prev))+'</b></div>'+
+        '<div class="rp-kv"><span>Incassato</span><b>'+esc(euro(inc))+'</b></div>'+
+        '<div class="rp-kv"><span>Spese</span><b>'+esc(euro(spe))+'</b></div>'+
+        '<div class="rp-barra"><i style="width:'+Math.max(2,pc)+'%"></i></div>'+
+        '<div class="rp-vuoto">'+pc+'% incassato su '+conConti+(conConti===1?' lavoro':' lavori')+'</div>';
+    } else c = '<div class="rp-vuoto">Qui si sommano i preventivi, gli incassi e le spese dei lavori di questo spazio.</div>';
+    h += rpCarta('euro','Soldi dello spazio', c);
+  }
+
+  /* note */
+  {
+    const c = testoVero(sp.nota)
+      ? '<div class="rp-testo">'+sicuro(sp.nota)+'</div>'
+      : '<div class="rp-vuoto">Appunti veloci: contatti, indicazioni, cose da ricordare.</div>'+
+        (mod ? rpPiu('sps-edit','Scrivi una nota',' data-k="nota"'+ds) : '');
+    h += rpCarta('pen','Note', c, (mod && testoVero(sp.nota) ? penSp(sp,'nota') : ''), true);
+  }
+  return h;
+}
 function schedaSpazio(sp){
   const ps = progettiDi(sp.id), n = numeriSpazio(ps), membri = membriSpazio(sp);
   const bg = sfondoSicuro(sp.sfondo), col = coloreOk(sp.col, '#FFAD01'), puoCop = puo('spazi') && !state.ospite;
@@ -5499,12 +5634,7 @@ function schedaSpazio(sp){
     '<div class="sp2-cop-f">'+pilaAvatar(membri, 5)+'<span class="spacer"></span>'+
       (puoCop ? '<button class="hm-b-nuovo sm" data-action="modifica-spazio" data-id="'+esc(sp.id)+'">'+svg('ingranaggio',2)+'Modifica</button>' : '')+'</div>'+
     '<input type="file" id="hmCopFile" accept="image/*" hidden></section>';
-  h += '<section class="sp2-card"><div class="sp2-pg"><h3>Progresso generale</h3><b>'+n.pct+'%</b></div>'+
-    '<div class="sp2-pb"><i style="width:'+n.pct+'%"></i></div>'+
-    '<div class="sp2-nums">'+
-      '<span><b>'+ps.length+'</b>Progetti</span><span><b>'+n.task+'</b>Task totali</span>'+
-      '<span class="verde"><b>'+n.taskFatte+'</b>Completate</span><span class="'+(n.urg?'rosso':'')+'"><b>'+n.urg+'</b>In scadenza</span>'+
-    '</div></section>';
+  h += '<div class="rp sp-rp">'+carteSpazio(sp)+'</div>';
   h += '<section class="sp2-card"><div class="sp2-ch"><h3>Membri del team</h3>'+(puoCop? '<button class="lnk" data-action="modifica-spazio" data-id="'+esc(sp.id)+'">Gestisci</button>' : '')+'</div>'+
     (membri.length ? membri.slice(0,6).map(id=>{ const u = U(id), capo = id === (titolareDiSpazio(sp) || state.utente);
       return '<div class="sp2-m">'+av(u)+'<span class="tx"><b>'+esc(id===state.utente ? u.nome+' (tu)' : u.nome)+'</b><span>'+(capo ? '<em class="capo">Proprietario</em> · ' : '')+esc(u.ruolo||'Collaboratore')+'</span></span>'+
@@ -5750,7 +5880,8 @@ function renderHome(){
      schermo e trascinare una scheda farebbe correre subito la pagina. */
   const tutto = suTelefono() && (state.vista==='tessere' || state.vista==='lista');
   const largo = !suTelefono() && !!sp;
-  const conScheda = false;   /* v48: la scheda a destra ripeteva l'intestazione */
+  /* la scheda dello spazio sta accanto ai progetti: si spegne da Modifica spazio */
+  const conScheda = largo0 && !sp.schedaOff;
   if(largo) h += '<div class="hm sp2-lay'+(conScheda?' con-scheda':'')+'">'+barraSinistra(sp.id)+'<div class="sp2-main'+(bgSp?' con-sfondo':'')+'"'+(bgSp? ' style="--bg-img:url(\''+bgSp+'\');'+varsRit(ritDi(sp,'sfondo'))+'"':'')+'>';
   if(tutto) h += '<div class="scroller tel-tutto">' + testataTelefono();
   h += intestazioneSpazio(lista);
@@ -5780,6 +5911,8 @@ function renderHome(){
   } else {
     h += renderMappa();
   }
+  if(sp && !largo && !state.ospite && (state.vista==='tessere' || state.vista==='lista') && !sp.schedaOff)
+    h += '<div class="rp sp-rp tel-rp">'+carteSpazio(sp)+'</div>';
   if(tutto) h += '</div>';
   if(largo) h += '</div>'+(conScheda? schedaSpazio(sp) : '')+'</div>';
   h += '</div>';
@@ -9429,9 +9562,7 @@ function apriProgetto(id, conDissolvenza){
   if(p.spazio && p.spazio!==state.spazioId) state.spazioId = p.spazio;   // segue il progetto nel suo spazio
   const vai = ()=>{
     state.progettoId = p.id; state.schermo='progetto'; state.showFeed=false; state.railOn=false; state.drawer=false;
-    /* lo spazio può chiedere di aprire i suoi lavori sulla scheda invece che sulle fasi */
-    const spz = state.spazi.find(x=>x.id===p.spazio);
-    state.riep = !(spz && spz.riepOff);
+    state.riep = false;
     render(); introProgetto();
   };
   if(!conDissolvenza){ vai(); return; }
@@ -10709,21 +10840,21 @@ function cartaModelli(){
    Come si fa tutto, capitolo per capitolo: dai primi passi alle cose per chi
    organizza un team. Si cerca per parola (anche senza accenti); in fondo c'e'
    il tasto per segnalare quello che manca o non funziona. */
-const VERSIONE = 'v76';
+const VERSIONE = 'v77';
 const LIVELLI_GUIDA = {base:'Per cominciare', medio:'Tutti i giorni', esperto:'Per chi organizza', aiuto:'Se qualcosa non va'};
 const GUIDA = [
 {id:'primi-passi', liv:'base', ic:'spark', t:'Primi passi', s:'Cos’è FOSS e come ci si muove', v:[
   ['Che cos’è FOSS', 'È il posto dove tieni i tuoi lavori. Ogni progetto ha le sue fasi, le task da fare, le date, i soldi e le persone che ci lavorano. Funziona dal computer, dall’iPad e dal telefono: quello che cambi su uno compare anche sugli altri.'],
   ['Come è organizzato', 'Quattro livelli, uno dentro l’altro: gli <b>spazi di lavoro</b> (un ambito, per esempio «Video Milano»), i <b>progetti</b> (un lavoro per un cliente), le <b>task</b> divise per fase e, dentro ogni task, le <b>subtask</b> da spuntare. Una subtask può avere anche una sua piccola checklist.'],
   ['Entrare la prima volta', 'Apri FOSS e scegli <b>Registrati</b>: nome, il tuo <b>ruolo</b> (videomaker, montatrice, fotografo…), email e una password. Se qualcuno ti ha invitato, apri il link che ti ha mandato: trovi già scritte la tua email e, se li ha indicati, nome e ruolo. Entri direttamente nel suo archivio e vedi i lavori che ti apre. Dalla volta dopo il dispositivo si ricorda di te.'],
-  ['Aprire sulle fasi invece che sulla scheda', 'Di partenza ogni lavoro si apre sulla <b>Scheda progetto</b>. Se in uno spazio preferisci partire dalle fasi, apri <b>Modifica spazio</b> e spegni <b>Apri i progetti sulla scheda</b>: vale per tutti i lavori di quello spazio e lo riaccendi quando vuoi. La scheda resta sempre a un tocco.'],
-  ['La scheda del progetto', 'Entrando in un lavoro vedi prima la scheda. Dentro un lavoro, in alto a destra, il tasto <b>Scheda</b> (sul telefono l’icona del foglio nella barra in basso) apre la scheda: <b>descrizione</b>, <b>obiettivi</b> da spuntare, a che punto siamo, <b>informazioni</b> (cliente, priorità, inizio, consegna, responsabile, team), <b>tag</b>, i <b>colori</b> del progetto, le <b>immagini e i file</b> allegati, i <b>link utili</b>, i soldi e le note. Si riempie un pezzo alla volta: quello che manca ha il suo tasto «+». La descrizione la puoi scrivere già quando crei il progetto. Serve per i lavori pieni di riferimenti, per averli sempre sott’occhio.'],
+  ['La scheda dello spazio di lavoro', 'Entrando in uno spazio vedi i progetti (da fare, in corso, completati) e accanto la <b>scheda dello spazio</b>: descrizione, <b>obiettivi</b> da spuntare, a che punto siamo, <b>informazioni</b> (cliente, inizio, consegna, responsabile, team), <b>tag</b>, i <b>colori</b>, i <b>link utili</b>, i <b>soldi</b> sommati dai lavori dello spazio e le <b>note</b>. Si riempie un pezzo alla volta: quello che manca ha il suo tasto «+». Sul telefono le stesse carte stanno sotto ai progetti. Se non la vuoi, apri <b>Modifica spazio</b> e spegni <b>Mostra la scheda accanto ai progetti</b>.'],
+  ['La scheda del progetto', 'Dentro un lavoro, in alto a destra, il tasto <b>Scheda</b> (sul telefono l’icona del foglio nella barra in basso) apre la scheda: <b>descrizione</b>, <b>obiettivi</b> da spuntare, a che punto siamo, <b>informazioni</b> (cliente, priorità, inizio, consegna, responsabile, team), <b>tag</b>, i <b>colori</b> del progetto, le <b>immagini e i file</b> allegati, i <b>link utili</b>, i soldi e le note. Si riempie un pezzo alla volta: quello che manca ha il suo tasto «+». La descrizione la puoi scrivere già quando crei il progetto. Serve per i lavori pieni di riferimenti, per averli sempre sott’occhio.'],
   ['Cambiare la password', 'Apri il tuo <b>Profilo</b> (la tua foto in alto a destra) e cerca il riquadro <b>Accesso e password</b>: il tasto <b>Cambia password</b> ti chiede quella di adesso e poi quella nuova. È la stessa password di FOSS.chat. Se l’hai dimenticata, nella schermata di accesso c’è <b>Password dimenticata?</b>: ti arriva una mail con il link per farne una nuova.'],
   ['La Home', 'FOSS si apre sempre sulla <b>Home</b>. A sinistra il menu (Home, Le mie task, Calendario, Notifiche, <b>Team</b>) e l’elenco dei tuoi spazi. Al centro il saluto, quattro numeri (progetti attivi, task aperte, consegne entro 7 giorni, collaboratori: toccali per andarci), le schede degli spazi (sul computer le prime sei; <b>Mostra altro</b> apre le altre) e, in fondo, le task in scadenza da spuntare al volo, le attività recenti e gli impegni di oggi. Il tuo <b>profilo</b> si apre dalla tua foto in alto a destra.'],
   ['Il calendario di tutto', '<b>Calendario</b>, nel menu a sinistra della Home, mette insieme le date di tutti i lavori di tutti gli spazi, ognuno col suo colore; in alto puoi nascondere gli spazi che non ti servono. Dentro un singolo spazio il calendario mostra solo i suoi lavori.'],
   ['Il riquadro «Scopri FOSS»', 'In basso a sinistra, una volta ogni cinque aperture, compare il riquadro che porta alla guida. La <b>×</b> lo chiude; per non vederlo più spegnilo in <b>Profilo → Guida e aiuto</b>.'],
   ['Il saluto', 'Dietro al saluto c’è una scena disegnata che segue la giornata: mattino, pomeriggio, sera e notte, con tre scene ciascuno (mongolfiere, spiaggia, tramonto, cielo stellato…). Ogni volta che apri FOSS ne esce una a caso; il tasto '+svg('spark',2.2).replace('<svg','<svg style="width:13px;height:13px;vertical-align:-2px"')+' passa alla successiva. Se sul dispositivo hai chiesto di ridurre il movimento, la scena sta ferma.'],
-  ['Sul computer e sull’iPad', 'Dalla Home entri in uno spazio: a sinistra resta il menu con i tuoi spazi, in alto il nome dello spazio con <b>Modifica spazio</b> e <b>Nuovo progetto</b>, sotto le viste (Bacheca, Lista, Calendario, Mappa, Note). La <b>Bacheca</b> mette i progetti in colonne: per stato, per priorità o per scadenza, a scelta con <b>Dividi per</b>. Sugli schermi larghi a destra trovi la scheda dello spazio: copertina, avanzamento, persone e ultime attività. In alto a destra restano Annulla, il tema, la <b>Guida</b>, la campanella e la tua foto, che apre il profilo.'],
+  ['Sul computer e sull’iPad', 'Dalla Home entri in uno spazio: a sinistra resta il menu con i tuoi spazi, in alto il nome dello spazio con <b>Modifica spazio</b> e <b>Nuovo progetto</b>, sotto le viste (Bacheca, Lista, Calendario, Mappa, Note). La <b>Bacheca</b> mette i progetti in colonne: per stato, per priorità o per scadenza, a scelta con <b>Dividi per</b>. Sugli schermi larghi a destra trovi la scheda dello spazio: copertina, descrizione, obiettivi, informazioni, tag, colori, link, soldi, note, persone e ultime attività. In alto a destra restano Annulla, il tema, la <b>Guida</b>, la campanella e la tua foto, che apre il profilo.'],
   ['Sul telefono', 'In basso ci sono cinque sezioni: <b>Home</b>, <b>Progetti</b>, <b>Task</b> (quello che tocca a te), <b>Note</b> (la bacheca dello spazio in cui sei) e <b>Profilo</b>. In alto a sinistra il <b>+</b> per creare, al centro il nome di dove sei, a destra la campanella. Dentro a un lavoro la freccia in alto a sinistra ti riporta ai lavori.'],
   ['I lavori che fai', 'Al primo accesso FOSS ti chiede che lavori fai (videomaker, fotografo, social media manager…): quando crei spazi, progetti e preset ti propone solo quelli. Li aggiungi o togli quando vuoi da <b>Profilo → I lavori che fai</b>.'],
   ['Metterlo sulla schermata Home', 'Sull’iPhone apri FOSS con Safari, tocca <b>Condividi</b> e poi <b>Aggiungi alla schermata Home</b>. Su Android, dal menu di Chrome, <b>Installa app</b> o <b>Aggiungi a schermata Home</b>. Si apre a tutto schermo come un’app; sull’iPhone è anche l’unico modo per ricevere gli avvisi.']
@@ -12269,10 +12400,10 @@ document.addEventListener('click', function(e){
           '<option value="">Nessuno: parto dalla professione</option>'+
           state.modelli.map(m=>'<option value="'+esc(m.id)+'"'+(sp.preset===m.id?' selected':'')+'>'+esc(m.nome)+'</option>').join('')+
           '</select></div>' : '')+
-        '<div class="field"><label>Scheda progetto</label>'+
-          '<div class="riga" style="border-bottom:0;padding:0"><div class="tx"><b>Apri i progetti sulla scheda</b>'+
-          '<span>Entrando in un lavoro di questo spazio vedi prima la scheda: descrizione, obiettivi, colori, immagini, link. Le fasi restano a un tocco. Se lo spegni, i lavori si aprono sulle fasi.</span></div>'+
-          '<button class="sw'+(sp.riepOff?'':' on')+'" data-action="sp-riep" aria-pressed="'+(!sp.riepOff)+'" aria-label="Apri i progetti sulla scheda"></button></div>'+
+        '<div class="field"><label>Scheda dello spazio</label>'+
+          '<div class="riga" style="border-bottom:0;padding:0"><div class="tx"><b>Mostra la scheda accanto ai progetti</b>'+
+          '<span>Entrando nello spazio, accanto ai progetti vedi la scheda: descrizione, obiettivi, informazioni, tag, colori, link, soldi e note. Sul telefono compare sotto ai progetti.</span></div>'+
+          '<button class="sw'+(sp.schedaOff?'':' on')+'" data-action="sp-scheda" aria-pressed="'+(!sp.schedaOff)+'" aria-label="Mostra la scheda accanto ai progetti"></button></div>'+
         '</div>'+
         '<div class="field"><label>Icona (facoltativa)</label><div class="icone">'+
           ICONE_PROG.map(i=>'<button class="ico-b'+(sp.icona===i?' on':'')+'" data-action="sp-icona" data-k="'+i+'">'+svg(i)+'</button>').join('')+
@@ -12300,10 +12431,10 @@ document.addEventListener('click', function(e){
         '<button class="btn primary" data-action="salva-spazio" data-id="'+sp.id+'">'+svg('check')+'Salva</button></div>');
       break; }
 
-    case 'sp-riep':{
+    case 'sp-scheda':{
       const sp = state.spazi.find(x=>x.id===spazioMod); if(!sp) break;
       leggiCampiSpazio(sp);
-      if(sp.riepOff) delete sp.riepOff; else sp.riepOff = true;
+      if(sp.schedaOff) delete sp.schedaOff; else sp.schedaOff = true;
       riapriModificaSpazio(); break; }
 
     case 'sp-icona':{
@@ -13985,6 +14116,101 @@ document.addEventListener('click', function(e){
       const pr = state.progetti.find(x=>x.id===t.dataset.pid); if(!pr || !riepModificabile(pr)) break;
       const i = Number(t.dataset.i); if(!(pr.palette||[])[i]) break;
       snap('Colore tolto'); pr.palette.splice(i,1); render(); break; }
+    /* ---- la scheda dello spazio di lavoro ---- */
+    case 'sps-edit':{
+      const sp = state.spazi.find(x=>x.id===t.dataset.sid); if(!sp || !spazioModificabile(sp)) break;
+      const k = t.dataset.k || '';
+      const ET = {descrizione:'Descrizione dello spazio', nota:'Note dello spazio', cliente:'Cliente',
+                  inizio:'Data di inizio', consegna:'Consegna', tags:'Tag', responsabile:'Responsabile dello spazio'};
+      let campo = '';
+      if(k==='descrizione' || k==='nota'){
+        campo = '<textarea id="sps_val" rows="6" maxlength="1200" placeholder="Scrivi qui...">'+esc(String(sp[k]||'').replace(/<br\s*\/?>/gi,'\n').replace(/<[^>]*>/g,''))+'</textarea>';
+      } else if(k==='inizio' || k==='consegna'){
+        const m = /^(\d{2})\/(\d{2})\/(\d{4})$/.exec(sp[k]||'');
+        campo = '<input id="sps_val" type="date" value="'+(m? m[3]+'-'+m[2]+'-'+m[1] : '')+'">';
+      } else if(k==='responsabile'){
+        const scelti = membriSpazio(sp).map(U), ora = sp.responsabile || titolareDiSpazio(sp) || state.utente;
+        campo = '<select id="sps_val">'+scelti.map(u=>'<option value="'+esc(u.id)+'"'+(u.id===ora?' selected':'')+'>'+esc(u.nome)+' — '+esc(u.ruolo||'')+'</option>').join('')+'</select>';
+      } else if(k==='tags'){
+        campo = '<input id="sps_val" maxlength="160" placeholder="Es. serie, video, youtube" value="'+esc((sp.tags||[]).join(', '))+'">'+
+          '<div class="nota-box" style="margin-top:8px">Separa le parole con una virgola.</div>';
+      } else { campo = '<input id="sps_val" maxlength="80" value="'+esc(sp[k]||'')+'">'; }
+      modale('<h3>'+esc(ET[k]||'Modifica')+'</h3><div class="sub-t">'+esc(sp.nome)+'</div><div class="modal-b">'+
+        '<div class="field"><label>'+esc(ET[k]||'Valore')+'</label>'+campo+'</div></div>'+
+        '<div class="modal-f"><button class="btn ghost" data-action="chiudi-modale">Annulla</button>'+
+        '<button class="btn primary" data-action="sps-campo-ok" data-k="'+esc(k)+'" '+D({sid:sp.id})+'>Salva</button></div>');
+      setTimeout(()=>{ const n = el('sps_val'); if(n) n.focus(); }, 40);
+      break; }
+    case 'sps-campo-ok':{
+      const sp = state.spazi.find(x=>x.id===t.dataset.sid); if(!sp || !spazioModificabile(sp)) break;
+      const k = t.dataset.k || '', n = el('sps_val'); if(!n) break;
+      let v = String(n.value||'').trim();
+      snap('Scheda dello spazio');
+      if(k==='tags'){
+        sp.tags = v ? v.split(',').map(x=>x.trim()).filter(Boolean).slice(0,12) : [];
+        if(!sp.tags.length) delete sp.tags;
+      } else if(k==='inizio' || k==='consegna'){
+        if(v){ const q = v.split('-'); sp[k] = q[2]+'/'+q[1]+'/'+q[0]; } else delete sp[k];
+      } else if(k==='descrizione' || k==='nota'){
+        const t2 = v.replace(/[<>]/g,'').replace(/\n/g,'<br>');
+        if(t2) sp[k] = t2; else delete sp[k];
+      } else if(v) sp[k] = v.slice(0,120); else delete sp[k];
+      azione('Scheda dello spazio <b>'+esc(sp.nome)+'</b> aggiornata');
+      chiudiModale(); render(); toast('Scheda aggiornata.','ok','Salvato'); break; }
+    case 'sps-ob-nuovo':{
+      const sp = state.spazi.find(x=>x.id===t.dataset.sid); if(!sp || !spazioModificabile(sp)) break;
+      modale('<h3>Nuovo obiettivo</h3><div class="sub-t">'+esc(sp.nome)+'</div><div class="modal-b">'+
+        '<div class="field"><label>Cosa deve portare a casa questo spazio</label><input id="sps_ob" maxlength="140" placeholder="Es. Produrre 6 episodi da 15-20 min"></div></div>'+
+        '<div class="modal-f"><button class="btn ghost" data-action="chiudi-modale">Annulla</button>'+
+        '<button class="btn primary" data-action="sps-ob-ok" '+D({sid:sp.id})+'>Aggiungi</button></div>');
+      setTimeout(()=>{ const n = el('sps_ob'); if(n) n.focus(); }, 40);
+      break; }
+    case 'sps-ob-ok':{
+      const sp = state.spazi.find(x=>x.id===t.dataset.sid); if(!sp || !spazioModificabile(sp)) break;
+      const v = ((el('sps_ob')||{}).value || '').trim().slice(0,140);
+      if(!v){ toast('Scrivi l’obiettivo.','warn','Manca il testo'); break; }
+      snap('Obiettivo dello spazio');
+      sp.obiettivi = (sp.obiettivi||[]).concat([{t:v, done:false}]).slice(0,40);
+      chiudiModale(); render(); break; }
+    case 'sps-ob-tog':{
+      const sp = state.spazi.find(x=>x.id===t.dataset.sid); if(!sp || state.ospite || !(puo('spazi')||puo('spunta'))) break;
+      const o = (sp.obiettivi||[])[Number(t.dataset.i)]; if(!o) break;
+      o.done = !o.done; render(); break; }
+    case 'sps-ob-via':{
+      const sp = state.spazi.find(x=>x.id===t.dataset.sid); if(!sp || !spazioModificabile(sp)) break;
+      const i = Number(t.dataset.i); if(!(sp.obiettivi||[])[i]) break;
+      snap('Obiettivo tolto'); sp.obiettivi.splice(i,1); if(!sp.obiettivi.length) delete sp.obiettivi;
+      render(); break; }
+    case 'sps-pal-via':{
+      const sp = state.spazi.find(x=>x.id===t.dataset.sid); if(!sp || !spazioModificabile(sp)) break;
+      const i = Number(t.dataset.i); if(!(sp.palette||[])[i]) break;
+      snap('Colore tolto'); sp.palette.splice(i,1); if(!sp.palette.length) delete sp.palette;
+      render(); break; }
+    case 'sps-rif-nuovo':{
+      const sp = state.spazi.find(x=>x.id===t.dataset.sid); if(!sp || !spazioModificabile(sp)) break;
+      modale('<h3>Nuovo link</h3><div class="sub-t">'+esc(sp.nome)+'</div><div class="modal-b">'+
+        '<div class="field"><label>Come si chiama</label><input id="sps_rt" maxlength="80" placeholder="Es. Cartella su Drive"></div>'+
+        '<div class="field"><label>Indirizzo</label><input id="sps_ru" placeholder="https://" maxlength="500"></div>'+
+        '<div class="nota-box">Vanno bene solo gli indirizzi che cominciano con <b>https://</b>.</div></div>'+
+        '<div class="modal-f"><button class="btn ghost" data-action="chiudi-modale">Annulla</button>'+
+        '<button class="btn primary" data-action="sps-rif-ok" '+D({sid:sp.id})+'>Aggiungi</button></div>');
+      setTimeout(()=>{ const n = el('sps_rt'); if(n) n.focus(); }, 40);
+      break; }
+    case 'sps-rif-ok':{
+      const sp = state.spazi.find(x=>x.id===t.dataset.sid); if(!sp || !spazioModificabile(sp)) break;
+      const nome = ((el('sps_rt')||{}).value || '').trim().slice(0,80);
+      let url = ((el('sps_ru')||{}).value || '').trim();
+      if(url && !/^https?:\/\//i.test(url)) url = 'https://' + url;
+      if(!urlSicura(url) || !/^https:\/\//i.test(url)){ toast('L’indirizzo deve cominciare con https://','warn','Link non valido'); break; }
+      snap('Link dello spazio');
+      sp.rif = (sp.rif||[]).concat([{t:nome || url, url}]).slice(0,30);
+      chiudiModale(); render(); break; }
+    case 'sps-rif-via':{
+      const sp = state.spazi.find(x=>x.id===t.dataset.sid); if(!sp || !spazioModificabile(sp)) break;
+      const i = Number(t.dataset.i); if(!(sp.rif||[])[i]) break;
+      snap('Link tolto'); sp.rif.splice(i,1); if(!sp.rif.length) delete sp.rif;
+      render(); break; }
+
     case 'rp-rif-nuovo':{
       const pr = state.progetti.find(x=>x.id===t.dataset.pid); if(!pr || !riepModificabile(pr)) break;
       modale('<h3>Nuovo link</h3><div class="sub-t">'+esc(pr.nome)+'</div><div class="modal-b">'+
@@ -14809,6 +15035,16 @@ document.addEventListener('change', function(e){
       });
     }).catch(()=>toast('Immagine non leggibile.','warn','Errore'));
     e.target.value=''; return;
+  }
+  if(e.target.dataset && e.target.dataset.spCol){
+    const sp = state.spazi.find(x=>x.id===e.target.dataset.spCol);
+    const c = coloreOk(e.target.value, null);
+    if(sp && c && spazioModificabile(sp)){
+      snap('Colore aggiunto');
+      sp.palette = (sp.palette||[]).concat([c.toLowerCase()]).slice(0,12);
+      render();
+    }
+    return;
   }
   if(e.target.dataset && e.target.dataset.rpCol){
     const pr = state.progetti.find(x=>x.id===e.target.dataset.rpCol);

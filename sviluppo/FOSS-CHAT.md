@@ -325,7 +325,9 @@ Richiesta: i lavori pieni di note e riferimenti hanno bisogno di un posto solo d
 - Chi guarda da fuori (ospite), i lavori bloccati e i lavori completati: la scheda si legge ma non si cambia.
   Gli obiettivi si spuntano anche con il solo permesso «spunta».
 - Nuovo capitolo della guida: «La scheda del progetto (Riepilogo)».
-- **È il modo normale di aprire i lavori** (FOSS v76, 20 novembre 2026): ogni lavoro si apre sulla
+- ~~**È il modo normale di aprire i lavori**~~ (tolto in FOSS v77: la scheda con tutte le
+  informazioni sta nello spazio di lavoro, non dentro al singolo lavoro; i lavori tornano ad aprirsi
+  sulle fasi). Il testo di prima: ogni lavoro si apriva sulla
   scheda. In «Modifica lo spazio», sotto «Scheda progetto», l'interruttore **«Apri i progetti sulla
   scheda»** (acceso di partenza, comando `sp-riep`) si può spegnere per uno spazio: allora quei lavori
   si aprono sulle fasi. Il campo salvato è il contrario, `sp.riepOff`, così il valore normale è «campo
@@ -334,6 +336,28 @@ Richiesta: i lavori pieni di note e riferimenti hanno bisogno di un posto solo d
   (prima «Riepilogo»). Il tasto
   «Torna alle fasi» resta sempre lì, e l'impostazione vale per spazio, non per persona: si salva nel
   nucleo dello spazio e si sincronizza con gli altri.
+
+### FOSS v77 — la scheda dello spazio di lavoro (20 novembre 2026)
+Richiesta: «entrando in uno spazio di lavoro devono vedersi i progetti in corso **e** tutte le
+informazioni», con la scheda **a fianco** della bacheca (riferimento visivo mandato in chat). La scheda
+delle informazioni non deve stare dentro al singolo episodio.
+
+Cosa c'è ora, nello spazio di lavoro:
+- `carteSpazio(sp)` disegna le stesse carte della scheda di un lavoro, ma sullo spazio: descrizione,
+  obiettivi (spuntabili), «a che punto siamo» (progetti da fare / in corso / completati + numeri),
+  informazioni (cliente, professione, inizio, consegna, responsabile, team), tag, colori, link utili,
+  soldi (somma dei preventivi, incassi e spese dei lavori dello spazio) e note.
+- `schedaSpazio(sp)` è la colonna a destra (`.sp2-info`, 420px, dai 1280px in su): copertina e membri
+  come prima, poi le carte, poi le attività recenti. Riaccesa in `renderHome` con
+  `conScheda = largo0 && !sp.schedaOff`.
+- Sul telefono le stesse carte compaiono **sotto** ai progetti (classe `.tel-rp`), così entrando si
+  vede tutto senza cambiare schermata.
+- Interruttore in «Modifica lo spazio» → **Scheda dello spazio** → «Mostra la scheda accanto ai
+  progetti» (acceso di partenza, comando `sp-scheda`, campo salvato `sp.schedaOff`).
+- I dati stanno nel nucleo dello spazio (`sp.descrizione`, `sp.obiettivi`, `sp.tags`, `sp.palette`,
+  `sp.rif`, `sp.nota`, `sp.cliente`, `sp.inizio`, `sp.consegna`, `sp.responsabile`) e si sincronizzano
+  come tutto il resto dello spazio. Comandi: `sps-edit`/`sps-campo-ok`, `sps-ob-*`, `sps-pal-via`,
+  `sps-rif-*`, più il colore scelto con `data-sp-col`. Scrive solo chi ha il permesso `spazi`.
 
 ### 2.9.9 e FOSS — cambiare la propria password (17 novembre 2026)
 Segnalazione: «non trovo il pannello per cambiare la password». Non esisteva: in FOSS non c'era nessun modo di
