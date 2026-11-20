@@ -347,7 +347,7 @@ Cosa c'è ora, nello spazio di lavoro:
   obiettivi (spuntabili), «a che punto siamo» (progetti da fare / in corso / completati + numeri),
   informazioni (cliente, professione, inizio, consegna, responsabile, team), tag, colori, link utili,
   soldi (somma dei preventivi, incassi e spese dei lavori dello spazio) e note.
-- `schedaSpazio(sp)` è la colonna a destra (`.sp2-info`, 420px, dai 1280px in su): copertina e membri
+- `schedaSpazio(sp)` è la colonna a sinistra dei progetti (`.sp2-info`, 420px, dai 1280px in su): copertina e membri
   come prima, poi le carte, poi le attività recenti. Riaccesa in `renderHome` con
   `conScheda = largo0 && !sp.schedaOff`.
 - Sul telefono le stesse carte compaiono **sotto** ai progetti (classe `.tel-rp`), così entrando si

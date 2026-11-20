@@ -2722,7 +2722,7 @@ button.all-apri:hover .nm{color:var(--amber-ink);text-decoration:underline}
 :root[data-theme="light"]{--t-giallo:#D99A0B;--t-grigio:#6F8098}
 
 /* la scheda dello spazio a destra */
-.sp2-info{width:420px;flex:none;overflow-y:auto;border-left:1px solid var(--line);background:var(--surface);padding:16px;display:none;flex-direction:column;gap:14px}
+.sp2-info{width:420px;flex:none;overflow-y:auto;border-right:1px solid var(--line);background:var(--surface);padding:16px;display:none;flex-direction:column;gap:14px}
 .sp2-lay.con-scheda .sp2-info{display:flex}
 .sp2-card{flex:none;border:1px solid var(--line);border-radius:16px;background:var(--bg);padding:16px}
 .sp2-card h3{font-size:15px;font-weight:700;letter-spacing:-.01em}
@@ -5882,7 +5882,7 @@ function renderHome(){
   const largo = !suTelefono() && !!sp;
   /* la scheda dello spazio sta accanto ai progetti: si spegne da Modifica spazio */
   const conScheda = largo0 && !sp.schedaOff;
-  if(largo) h += '<div class="hm sp2-lay'+(conScheda?' con-scheda':'')+'">'+barraSinistra(sp.id)+'<div class="sp2-main'+(bgSp?' con-sfondo':'')+'"'+(bgSp? ' style="--bg-img:url(\''+bgSp+'\');'+varsRit(ritDi(sp,'sfondo'))+'"':'')+'>';
+  if(largo) h += '<div class="hm sp2-lay'+(conScheda?' con-scheda':'')+'">'+barraSinistra(sp.id)+(conScheda? schedaSpazio(sp) : '')+'<div class="sp2-main'+(bgSp?' con-sfondo':'')+'"'+(bgSp? ' style="--bg-img:url(\''+bgSp+'\');'+varsRit(ritDi(sp,'sfondo'))+'"':'')+'>';
   if(tutto) h += '<div class="scroller tel-tutto">' + testataTelefono();
   h += intestazioneSpazio(lista);
   if(largo) h += schedeViste();
@@ -5914,7 +5914,7 @@ function renderHome(){
   if(sp && !largo && !state.ospite && (state.vista==='tessere' || state.vista==='lista') && !sp.schedaOff)
     h += '<div class="rp sp-rp tel-rp">'+carteSpazio(sp)+'</div>';
   if(tutto) h += '</div>';
-  if(largo) h += '</div>'+(conScheda? schedaSpazio(sp) : '')+'</div>';
+  if(largo) h += '</div></div>';
   h += '</div>';
   el('stage').innerHTML = h;
   const qi = el('q'); if(qi && qi.value!==state.filtro) qi.value = state.filtro;
@@ -10840,7 +10840,7 @@ function cartaModelli(){
    Come si fa tutto, capitolo per capitolo: dai primi passi alle cose per chi
    organizza un team. Si cerca per parola (anche senza accenti); in fondo c'e'
    il tasto per segnalare quello che manca o non funziona. */
-const VERSIONE = 'v77';
+const VERSIONE = 'v78';
 const LIVELLI_GUIDA = {base:'Per cominciare', medio:'Tutti i giorni', esperto:'Per chi organizza', aiuto:'Se qualcosa non va'};
 const GUIDA = [
 {id:'primi-passi', liv:'base', ic:'spark', t:'Primi passi', s:'Cos’è FOSS e come ci si muove', v:[
