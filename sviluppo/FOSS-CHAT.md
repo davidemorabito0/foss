@@ -295,6 +295,11 @@ Provato: FOSS (compresa la mappa, che è Leaflet da cdnjs) e FOSS.chat non segna
 Resta aperto il passo più stretto (togliere `'unsafe-inline'` con i nonce): tocca tutto il codice scritto dentro
 le pagine e va fatto con calma, verificando anche l'app per computer (Tauri) e quella Android.
 
+**Nota sulle prove automatiche.** La `prova22` («il pallino scorre in avanti mentre ascolti») ogni tanto
+fallisce sulla macchina di GitHub e passa al rilancio: il microfono finto di quel Chrome a volte consegna
+l'audio in ritardo e il pallino resta a zero per i primi secondi. Succedeva anche prima della CSP (provato:
+con la CSP attiva la stessa prova passa in locale). Se fallisce solo lei, rilanciare il controllo.
+
 **2. Oltre mille lavori.** Supabase restituisce al massimo 1000 righe per lettura: i lavori, i conti e i modelli
 venivano letti in un colpo solo, quindi oltre quella soglia sparivano senza dirlo. Ora passano tutti da
 `tutteLeRighe` (blocchi da 1000, con un ordinamento stabile), come già facevano gli `elementi`. Vale sia al
