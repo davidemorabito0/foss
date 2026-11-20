@@ -5890,7 +5890,7 @@ function renderProgetto(){
       '<h1 style="display:flex;align-items:center;gap:8px">'+esc(p.nome)+pen('proj','nome',null,null,1)+'</h1></div>'+
     (cloudAttivo() && !state.ospite ? tastoChatLavoro(p) : '')+
     '<div class="side">'+
-      '<button class="btn sm'+(state.riep?' primary':' ghost')+' no-tel" data-action="riep" title="Descrizione, obiettivi, colori, immagini, link: tutto il lavoro in un posto solo">'+svg('file')+'Riepilogo'+(riepPieno(p)?'':'<span class="chip" style="margin-left:6px;padding:1px 6px;font-size:10px">nuovo</span>')+'</button>'+
+      '<button class="btn sm'+(state.riep?' primary':' ghost')+' no-tel" data-action="riep" title="Scheda progetto: descrizione, obiettivi, colori, immagini, link: tutto il lavoro in un posto solo">'+svg('file')+'Scheda'+(riepPieno(p)?'':'<span class="chip" style="margin-left:6px;padding:1px 6px;font-size:10px">nuovo</span>')+'</button>'+
       '<button class="btn sm ghost solo-stretto no-tel" data-action="toggle-rail" title="Scheda progetto, team e blocco">'+svg('file')+'Scheda</button>'+
       '<button class="btn sm no-tel" data-action="condividi" data-pid="'+p.id+'">'+svg('share')+'Condividi</button>'+
       (!state.ospite ? '<button class="btn sm ghost no-tel" data-action="menu-progetto" data-pid="'+p.id+'" title="Altre azioni: copertina, blocco, preset, completa…" aria-label="Altre azioni">'+svg('altro',2)+'</button>' : '')+
@@ -9431,7 +9431,7 @@ function apriProgetto(id, conDissolvenza){
     state.progettoId = p.id; state.schermo='progetto'; state.showFeed=false; state.railOn=false; state.drawer=false;
     /* lo spazio può chiedere di aprire i suoi lavori sulla scheda invece che sulle fasi */
     const spz = state.spazi.find(x=>x.id===p.spazio);
-    state.riep = !!(spz && spz.riepAuto);
+    state.riep = !(spz && spz.riepOff);
     render(); introProgetto();
   };
   if(!conDissolvenza){ vai(); return; }
@@ -10709,15 +10709,15 @@ function cartaModelli(){
    Come si fa tutto, capitolo per capitolo: dai primi passi alle cose per chi
    organizza un team. Si cerca per parola (anche senza accenti); in fondo c'e'
    il tasto per segnalare quello che manca o non funziona. */
-const VERSIONE = 'v75';
+const VERSIONE = 'v76';
 const LIVELLI_GUIDA = {base:'Per cominciare', medio:'Tutti i giorni', esperto:'Per chi organizza', aiuto:'Se qualcosa non va'};
 const GUIDA = [
 {id:'primi-passi', liv:'base', ic:'spark', t:'Primi passi', s:'Cos’è FOSS e come ci si muove', v:[
   ['Che cos’è FOSS', 'È il posto dove tieni i tuoi lavori. Ogni progetto ha le sue fasi, le task da fare, le date, i soldi e le persone che ci lavorano. Funziona dal computer, dall’iPad e dal telefono: quello che cambi su uno compare anche sugli altri.'],
   ['Come è organizzato', 'Quattro livelli, uno dentro l’altro: gli <b>spazi di lavoro</b> (un ambito, per esempio «Video Milano»), i <b>progetti</b> (un lavoro per un cliente), le <b>task</b> divise per fase e, dentro ogni task, le <b>subtask</b> da spuntare. Una subtask può avere anche una sua piccola checklist.'],
   ['Entrare la prima volta', 'Apri FOSS e scegli <b>Registrati</b>: nome, il tuo <b>ruolo</b> (videomaker, montatrice, fotografo…), email e una password. Se qualcuno ti ha invitato, apri il link che ti ha mandato: trovi già scritte la tua email e, se li ha indicati, nome e ruolo. Entri direttamente nel suo archivio e vedi i lavori che ti apre. Dalla volta dopo il dispositivo si ricorda di te.'],
-  ['Aprire sempre sulla scheda', 'Se in uno spazio i lavori sono pieni di riferimenti, apri <b>Modifica spazio</b> e accendi <b>Apri i progetti sulla scheda</b>: entrando in un lavoro di quello spazio vedi subito il Riepilogo invece delle fasi. Vale per tutti i lavori di quello spazio e lo spegni quando vuoi; le fasi restano sempre a un tocco.'],
-  ['La scheda del progetto (Riepilogo)', 'Dentro un lavoro, in alto a destra, il tasto <b>Riepilogo</b> (sul telefono l’icona del foglio nella barra in basso) apre la scheda: <b>descrizione</b>, <b>obiettivi</b> da spuntare, a che punto siamo, <b>informazioni</b> (cliente, priorità, inizio, consegna, responsabile, team), <b>tag</b>, i <b>colori</b> del progetto, le <b>immagini e i file</b> allegati, i <b>link utili</b>, i soldi e le note. Si riempie un pezzo alla volta: quello che manca ha il suo tasto «+». La descrizione la puoi scrivere già quando crei il progetto. Serve per i lavori pieni di riferimenti, per averli sempre sott’occhio.'],
+  ['Aprire sulle fasi invece che sulla scheda', 'Di partenza ogni lavoro si apre sulla <b>Scheda progetto</b>. Se in uno spazio preferisci partire dalle fasi, apri <b>Modifica spazio</b> e spegni <b>Apri i progetti sulla scheda</b>: vale per tutti i lavori di quello spazio e lo riaccendi quando vuoi. La scheda resta sempre a un tocco.'],
+  ['La scheda del progetto', 'Entrando in un lavoro vedi prima la scheda. Dentro un lavoro, in alto a destra, il tasto <b>Scheda</b> (sul telefono l’icona del foglio nella barra in basso) apre la scheda: <b>descrizione</b>, <b>obiettivi</b> da spuntare, a che punto siamo, <b>informazioni</b> (cliente, priorità, inizio, consegna, responsabile, team), <b>tag</b>, i <b>colori</b> del progetto, le <b>immagini e i file</b> allegati, i <b>link utili</b>, i soldi e le note. Si riempie un pezzo alla volta: quello che manca ha il suo tasto «+». La descrizione la puoi scrivere già quando crei il progetto. Serve per i lavori pieni di riferimenti, per averli sempre sott’occhio.'],
   ['Cambiare la password', 'Apri il tuo <b>Profilo</b> (la tua foto in alto a destra) e cerca il riquadro <b>Accesso e password</b>: il tasto <b>Cambia password</b> ti chiede quella di adesso e poi quella nuova. È la stessa password di FOSS.chat. Se l’hai dimenticata, nella schermata di accesso c’è <b>Password dimenticata?</b>: ti arriva una mail con il link per farne una nuova.'],
   ['La Home', 'FOSS si apre sempre sulla <b>Home</b>. A sinistra il menu (Home, Le mie task, Calendario, Notifiche, <b>Team</b>) e l’elenco dei tuoi spazi. Al centro il saluto, quattro numeri (progetti attivi, task aperte, consegne entro 7 giorni, collaboratori: toccali per andarci), le schede degli spazi (sul computer le prime sei; <b>Mostra altro</b> apre le altre) e, in fondo, le task in scadenza da spuntare al volo, le attività recenti e gli impegni di oggi. Il tuo <b>profilo</b> si apre dalla tua foto in alto a destra.'],
   ['Il calendario di tutto', '<b>Calendario</b>, nel menu a sinistra della Home, mette insieme le date di tutti i lavori di tutti gli spazi, ognuno col suo colore; in alto puoi nascondere gli spazi che non ti servono. Dentro un singolo spazio il calendario mostra solo i suoi lavori.'],
@@ -11808,7 +11808,7 @@ function nlPaginaChi(){
   h += '<div class="field"><label>Descrizione del progetto</label>'+
       '<div class="rte-bar"><button class="rte-b b" data-action="rte" data-c="bold" title="Grassetto">B</button>'+
       '<button class="rte-b u" data-action="rte" data-c="underline" title="Sottolineato">U</button></div>'+
-      '<div class="rte" id="np_descr" contenteditable="true" data-ph="Di cosa parla, con che tono, per chi… La ritrovi nel Riepilogo del progetto.">'+sicuro(nl.descrizione||'')+'</div></div>'+
+      '<div class="rte" id="np_descr" contenteditable="true" data-ph="Di cosa parla, con che tono, per chi… La ritrovi nella scheda del progetto.">'+sicuro(nl.descrizione||'')+'</div></div>'+
     '<div class="field"><label>Note</label>'+
       '<div class="rte-bar"><button class="rte-b b" data-action="rte" data-c="bold" title="Grassetto">B</button>'+
       '<button class="rte-b u" data-action="rte" data-c="underline" title="Sottolineato">U</button></div>'+
@@ -12269,10 +12269,10 @@ document.addEventListener('click', function(e){
           '<option value="">Nessuno: parto dalla professione</option>'+
           state.modelli.map(m=>'<option value="'+esc(m.id)+'"'+(sp.preset===m.id?' selected':'')+'>'+esc(m.nome)+'</option>').join('')+
           '</select></div>' : '')+
-        '<div class="field"><label>Scheda del progetto</label>'+
+        '<div class="field"><label>Scheda progetto</label>'+
           '<div class="riga" style="border-bottom:0;padding:0"><div class="tx"><b>Apri i progetti sulla scheda</b>'+
-          '<span>Entrando in un lavoro di questo spazio vedi prima il <b>Riepilogo</b>: descrizione, obiettivi, colori, immagini, link. Le fasi restano a un tocco.</span></div>'+
-          '<button class="sw'+(sp.riepAuto?' on':'')+'" data-action="sp-riep" aria-pressed="'+(!!sp.riepAuto)+'" aria-label="Apri i progetti sulla scheda"></button></div>'+
+          '<span>Entrando in un lavoro di questo spazio vedi prima la scheda: descrizione, obiettivi, colori, immagini, link. Le fasi restano a un tocco. Se lo spegni, i lavori si aprono sulle fasi.</span></div>'+
+          '<button class="sw'+(sp.riepOff?'':' on')+'" data-action="sp-riep" aria-pressed="'+(!sp.riepOff)+'" aria-label="Apri i progetti sulla scheda"></button></div>'+
         '</div>'+
         '<div class="field"><label>Icona (facoltativa)</label><div class="icone">'+
           ICONE_PROG.map(i=>'<button class="ico-b'+(sp.icona===i?' on':'')+'" data-action="sp-icona" data-k="'+i+'">'+svg(i)+'</button>').join('')+
@@ -12303,7 +12303,7 @@ document.addEventListener('click', function(e){
     case 'sp-riep':{
       const sp = state.spazi.find(x=>x.id===spazioMod); if(!sp) break;
       leggiCampiSpazio(sp);
-      if(sp.riepAuto) delete sp.riepAuto; else sp.riepAuto = true;
+      if(sp.riepOff) delete sp.riepOff; else sp.riepOff = true;
       riapriModificaSpazio(); break; }
 
     case 'sp-icona':{

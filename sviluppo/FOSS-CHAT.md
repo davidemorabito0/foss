@@ -325,10 +325,13 @@ Richiesta: i lavori pieni di note e riferimenti hanno bisogno di un posto solo d
 - Chi guarda da fuori (ospite), i lavori bloccati e i lavori completati: la scheda si legge ma non si cambia.
   Gli obiettivi si spuntano anche con il solo permesso «spunta».
 - Nuovo capitolo della guida: «La scheda del progetto (Riepilogo)».
-- **Si può accendere per tutto uno spazio di lavoro** (20 novembre 2026): in «Modifica lo spazio», sotto
-  «Scheda del progetto», l'interruttore **«Apri i progetti sulla scheda»** (`sp.riepAuto`, comando
-  `sp-riep`). Acceso, ogni lavoro di quello spazio si apre sul Riepilogo invece che sulle fasi:
-  `apriProgetto` fa `state.riep = !!(spz && spz.riepAuto)` leggendo lo spazio del lavoro. Il tasto
+- **È il modo normale di aprire i lavori** (FOSS v76, 20 novembre 2026): ogni lavoro si apre sulla
+  scheda. In «Modifica lo spazio», sotto «Scheda progetto», l'interruttore **«Apri i progetti sulla
+  scheda»** (acceso di partenza, comando `sp-riep`) si può spegnere per uno spazio: allora quei lavori
+  si aprono sulle fasi. Il campo salvato è il contrario, `sp.riepOff`, così il valore normale è «campo
+  assente» e vale anche per gli spazi già esistenti e per i lavori senza spazio:
+  `apriProgetto` fa `state.riep = !(spz && spz.riepOff)`. Nell'interfaccia si chiama **Scheda**
+  (prima «Riepilogo»). Il tasto
   «Torna alle fasi» resta sempre lì, e l'impostazione vale per spazio, non per persona: si salva nel
   nucleo dello spazio e si sincronizza con gli altri.
 
