@@ -285,6 +285,26 @@ L'elenco completo è nel `README.md` del sito, sezioni «FOSS.chat» e «FOSS.ch
   e alta zero perche' la scheda (un `<button>`) allinea i figli a sinistra (`align-items:flex-start`). Ora ha
   `width:100%` e l'altezza dal padding (`padding-bottom: calc(100% / 3.6)`), che funziona ovunque.
 
+### FOSS — la scheda «Riepilogo» del progetto (20 novembre 2026)
+Richiesta: i lavori pieni di note e riferimenti hanno bisogno di un posto solo dove tenerli sott'occhio.
+- Dentro un lavoro, il tasto **Riepilogo** nell'intestazione (sul telefono un passo nella barra in basso)
+  sostituisce il centro della pagina con la scheda: `state.riep`, `riepilogoHTML(p)` in index.html.
+  «Torna alle fasi» rimette le task. Cambiando lavoro si riparte sempre dalle fasi.
+- Dieci carte, quelle vuote mostrano un invito e il tasto «+»: **Descrizione** (`p.descrizione`, testo
+  formattato), **Obiettivi** (`p.obiettivi` = [{t, done}], si spuntano), **A che punto siamo** (le fasi),
+  **Informazioni** (tipo, cliente, stato, priorità, `p.inizio`, consegna, scadenza, dove, responsabile, team),
+  **Tag**, **Colori del progetto** (`p.palette`, scelti col selettore del sistema, solo colori veri),
+  **Immagini e file** (gli allegati del lavoro: le immagini come miniature, l'indirizzo arriva dopo con
+  `idrataRiepilogo`), **Link utili** (`p.rif` = [{t, url}], solo `https://`, controllati con `urlSicura`),
+  **Soldi** (dai conti, solo a chi li può vedere), **Note** (`p.nota`).
+- I campi nuovi stanno nel nucleo del lavoro, quindi si salvano e si sincronizzano da soli. Nuovi campi
+  modificabili in `CAMPI`: `descrizione` (testo formattato) e `inizio` (data).
+- Alla creazione del progetto c'è il campo **Descrizione** (`np_descr` nel wizard), così la scheda nasce
+  già con qualcosa dentro.
+- Chi guarda da fuori (ospite), i lavori bloccati e i lavori completati: la scheda si legge ma non si cambia.
+  Gli obiettivi si spuntano anche con il solo permesso «spunta».
+- Nuovo capitolo della guida: «La scheda del progetto (Riepilogo)».
+
 ### 2.9.9 e FOSS — cambiare la propria password (17 novembre 2026)
 Segnalazione: «non trovo il pannello per cambiare la password». Non esisteva: in FOSS non c'era nessun modo di
 cambiarla, né un «password dimenticata» nella schermata di accesso.

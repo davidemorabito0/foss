@@ -1048,6 +1048,68 @@ input,textarea,select{font:inherit;color:inherit}
 .gate-legal{margin-top:16px;padding-top:12px;border-top:1px solid var(--line-soft);font-size:11.5px;line-height:1.5;color:var(--mute);text-align:center}
 .gate-legal a{color:var(--dim);text-decoration:underline;text-underline-offset:2px}
 .gate-legal a:hover{color:var(--amber-ink)}
+/* ---------- SCHEDA RIEPILOGO DEL PROGETTO ---------- */
+.rp{display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:14px;align-content:start;padding:2px 0 20px}
+.rp-c{border:1px solid var(--line);border-radius:16px;background:var(--surface);padding:15px 16px 14px;min-width:0}
+.rp-c.largo{grid-column:1/-1}
+.rp-t{display:flex;align-items:center;gap:9px;margin-bottom:11px}
+.rp-t .ic{width:28px;height:28px;border-radius:9px;display:grid;place-items:center;background:var(--surface-2);color:var(--amber-ink);flex:none}
+.rp-t .ic svg{width:15px;height:15px}
+.rp-t h3{font:700 14.5px Sora,sans-serif;letter-spacing:-.01em;flex:1;min-width:0}
+.rp-t .az{display:flex;gap:5px;flex:none}
+.rp-testo{font-size:14px;line-height:1.6;color:var(--text);white-space:pre-wrap;word-break:break-word}
+.rp-vuoto{font-size:12.5px;color:var(--mute);line-height:1.5}
+.rp-kv{display:flex;justify-content:space-between;gap:12px;padding:6px 0;border-bottom:1px solid var(--line-soft);font-size:13px;align-items:center}
+.rp-kv:last-child{border-bottom:0}
+.rp-kv>span{color:var(--dim);flex:none}
+.rp-kv>b{font-weight:600;text-align:right;min-width:0;overflow-wrap:anywhere}
+.rp-ob{display:flex;align-items:flex-start;gap:10px;padding:7px 0;border-bottom:1px solid var(--line-soft)}
+.rp-ob:last-of-type{border-bottom:0}
+.rp-ob .box{width:19px;height:19px;border-radius:6px;border:1.5px solid var(--line);display:grid;place-items:center;flex:none;margin-top:1px;cursor:pointer;background:var(--surface-2)}
+.rp-ob .box svg{width:11px;height:11px;opacity:0;color:#fff}
+.rp-ob.fatto .box{background:var(--ok);border-color:var(--ok)}
+.rp-ob.fatto .box svg{opacity:1}
+.rp-ob .tx{flex:1;min-width:0;font-size:13.5px;line-height:1.45;overflow-wrap:anywhere}
+.rp-ob.fatto .tx{color:var(--mute);text-decoration:line-through}
+.rp-ob .x{opacity:0;flex:none;color:var(--mute)}
+.rp-ob:hover .x{opacity:1}
+.rp-pal{display:flex;flex-wrap:wrap;gap:9px}
+.rp-col{position:relative;width:62px}
+.rp-col i{display:block;height:46px;border-radius:10px;box-shadow:inset 0 0 0 1px rgba(128,128,128,.3)}
+.rp-col span{display:block;margin-top:4px;font:500 10px ui-monospace,Menlo,monospace;color:var(--mute);text-align:center;letter-spacing:.02em}
+.rp-col .x{position:absolute;top:-6px;right:-6px;width:20px;height:20px;border-radius:50%;background:var(--surface-3);border:1px solid var(--line);display:grid;place-items:center;opacity:0;color:var(--text)}
+.rp-col:hover .x{opacity:1}
+.rp-col .x svg{width:10px;height:10px}
+.rp-foto{display:grid;grid-template-columns:repeat(auto-fill,minmax(104px,1fr));gap:9px;margin-bottom:10px}
+.rp-foto figure{margin:0;position:relative;border-radius:11px;overflow:hidden;background:var(--surface-2);aspect-ratio:4/3}
+.rp-foto img{width:100%;height:100%;object-fit:cover;display:block;cursor:zoom-in}
+.rp-foto figcaption{position:absolute;left:0;right:0;bottom:0;padding:14px 7px 5px;font-size:10.5px;color:#fff;
+  background:linear-gradient(transparent,rgba(0,0,0,.72));white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.rp-file{display:flex;align-items:center;gap:9px;padding:8px 10px;border:1px solid var(--line);border-radius:11px;margin-bottom:6px;background:var(--surface-2);min-width:0}
+.rp-file .ic{width:26px;height:26px;border-radius:8px;display:grid;place-items:center;background:var(--surface-3);color:var(--dim);flex:none}
+.rp-file .ic svg{width:13px;height:13px}
+.rp-file .nm{flex:1;min-width:0;font-size:12.5px;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;text-align:left}
+.rp-file .sz{font-size:11px;color:var(--mute);flex:none}
+.rp-rif{display:flex;align-items:center;gap:9px;padding:7px 0;border-bottom:1px solid var(--line-soft);min-width:0}
+.rp-rif:last-of-type{border-bottom:0}
+.rp-rif a{flex:1;min-width:0;display:flex;flex-direction:column;gap:1px;text-decoration:none;color:var(--text)}
+.rp-rif a b{font-size:13px;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.rp-rif a span{font-size:11px;color:var(--mute);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.rp-rif a:hover b{color:var(--amber-ink)}
+.rp-tags{display:flex;flex-wrap:wrap;gap:6px}
+.rp-piu{display:inline-flex;align-items:center;gap:6px;margin-top:10px;padding:7px 12px;border-radius:10px;border:1px dashed var(--line);
+  background:transparent;color:var(--dim);font-size:12.5px;font-weight:600;cursor:pointer}
+.rp-piu:hover{border-color:var(--amber);color:var(--text)}
+.rp-piu svg{width:13px;height:13px}
+.rp-barra{height:7px;border-radius:5px;background:var(--surface-3);overflow:hidden;margin:9px 0 7px}
+.rp-barra i{display:block;height:100%;border-radius:5px;background:var(--amber)}
+.rp-tl{display:flex;flex-direction:column;gap:0}
+.rp-tl .f{display:flex;align-items:center;gap:10px;padding:7px 0}
+.rp-tl .p{width:13px;height:13px;border-radius:50%;border:2px solid var(--line);flex:none;background:var(--surface)}
+.rp-tl .f.fatta .p{background:var(--ok);border-color:var(--ok)}
+.rp-tl .f.qui .p{background:var(--amber);border-color:var(--amber);box-shadow:0 0 0 4px var(--amber-soft)}
+.rp-tl .tx{flex:1;min-width:0;font-size:13px;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.rp-tl .st{font-size:11px;color:var(--mute);flex:none}
 .pf-legal{margin:14px 0 4px;text-align:center;font-size:12px;color:var(--mute)}
 .pf-legal a{color:var(--dim);text-decoration:underline;text-underline-offset:2px}
 .gate-card p{color:var(--dim);font-size:12.5px;margin:0 0 20px}
@@ -5825,6 +5887,7 @@ function renderProgetto(){
       '<h1 style="display:flex;align-items:center;gap:8px">'+esc(p.nome)+pen('proj','nome',null,null,1)+'</h1></div>'+
     (cloudAttivo() && !state.ospite ? tastoChatLavoro(p) : '')+
     '<div class="side">'+
+      '<button class="btn sm'+(state.riep?' primary':' ghost')+' no-tel" data-action="riep" title="Descrizione, obiettivi, colori, immagini, link: tutto il lavoro in un posto solo">'+svg('file')+'Riepilogo'+(riepPieno(p)?'':'<span class="chip" style="margin-left:6px;padding:1px 6px;font-size:10px">nuovo</span>')+'</button>'+
       '<button class="btn sm ghost solo-stretto no-tel" data-action="toggle-rail" title="Scheda progetto, team e blocco">'+svg('file')+'Scheda</button>'+
       '<button class="btn sm no-tel" data-action="condividi" data-pid="'+p.id+'">'+svg('share')+'Condividi</button>'+
       (!state.ospite ? '<button class="btn sm ghost no-tel" data-action="menu-progetto" data-pid="'+p.id+'" title="Altre azioni: copertina, blocco, preset, completa…" aria-label="Altre azioni">'+svg('altro',2)+'</button>' : '')+
@@ -5894,7 +5957,14 @@ function renderProgetto(){
 
   h += '</aside>';
 
-  /* centro */
+  /* centro: la scheda riepilogo, oppure la fase con le sue task */
+  if(state.riep){
+    h += '<section class="work"><div class="work-head"><div style="flex:1;min-width:0">'+
+      '<h2><span style="color:var(--amber-ink)">'+svg('file',2).replace('<svg','<svg style="width:17px;height:17px;vertical-align:-3px"')+'</span>Scheda del progetto</h2>'+
+      '<p class="no-tel">Tutto quello che serve sapere su questo lavoro, in un posto solo.</p></div>'+
+      '<button class="btn sm" data-action="riep">'+svg('undo')+'Torna alle fasi</button></div>'+
+      riepilogoHTML(p)+'</section>';
+  } else {
   h += '<section class="work"><div class="work-head"><div style="flex:1;min-width:0">'+
     '<h2><span style="color:var(--amber-ink)">'+svg(F.icon).replace('<svg','<svg style="width:17px;height:17px;vertical-align:-3px"')+'</span>'+esc(F.nome)+
     (p.revisione? ' <span class="chip ok">in modifica</span>':'')+'</h2>'+
@@ -5985,6 +6055,7 @@ function renderProgetto(){
   });
   if(!subs.length) h += '<div class="empty">Nessuna task in questa fase.</div>';
   h += '</div></section>';
+  }
 
   /* pannello a destra: la chat di tutto il lavoro (con le risposte del cliente) e l'attivita'.
      I commenti stanno dentro le task e le subtask, nel loro fumetto. */
@@ -6260,6 +6331,8 @@ function renderPhasebar(){
   /* Sul telefono la barra in basso e' l'unico posto sempre a portata di pollice:
      ci metto anche la chat, sennò dal telefono non si raggiunge. */
   if(suTelefono()){
+    h += '<button class="step'+(state.riep?' active':'')+'" data-action="riep" title="Scheda del progetto">'+
+      '<span class="ic">'+svg('file')+'</span></button>';
     const n = totaleNonLetti(p);
     h += '<button class="step chat-step'+(n?' ha-nuovi':'')+'" data-action="feed" title="Conversazione del lavoro">'+
       '<span class="ic">'+svg('chat')+'</span>'+
@@ -6317,7 +6390,10 @@ const PERM_AZIONE = {
   'cm-invia':'modifica', 'cm-letto':'spunta', 'all-togli':'modifica', 'all-togli-ok':'modifica',
   'pe-nuovo':'crea_lavori','pe-importa':'crea_lavori','pe-salva':'crea_lavori','pe-elimina':'crea_lavori','pe-usa':'crea_lavori',
   'conti':'soldi','conti-prev':'soldi-scrive','conti-add':'soldi-scrive','conti-togli':'soldi-scrive',
-  'data-nuova':'modifica','data-salva':'modifica', 'cestino-ripristina':'elimina','cestino-elimina':'elimina','cestino-elimina-ok':'elimina', 'consegna-cal':'modifica',
+  'data-nuova':'modifica','data-salva':'modifica',
+  'rp-ob-nuovo':'modifica','rp-ob-ok':'modifica','rp-ob-via':'modifica','rp-pal-via':'modifica',
+  'rp-rif-nuovo':'modifica','rp-rif-ok':'modifica','rp-rif-via':'modifica','rp-ob-tog':'spunta',
+  'cestino-ripristina':'elimina','cestino-elimina':'elimina','cestino-elimina-ok':'elimina', 'consegna-cal':'modifica',
   'edit':'modifica','personale-toggle':'modifica','cop-progetto':'modifica','rit-progetto':'modifica','togli-cop-progetto':'modifica','salva-campo':'modifica','nuova-task':'modifica','add-compito':'modifica',
   'tagga':'modifica','tagga-chi':'modifica','stagga':'modifica','assegna-sub':'modifica','assegna-sub-chi':'modifica','ass-tocca':'modifica','ass-salva':'modifica','ass-mail':'modifica',
   'fase':'modifica','indietro':'modifica','torna-a-fase':'modifica','riprendi':'modifica','completa':'modifica',
@@ -9350,6 +9426,7 @@ function apriProgetto(id, conDissolvenza){
   if(p.spazio && p.spazio!==state.spazioId) state.spazioId = p.spazio;   // segue il progetto nel suo spazio
   const vai = ()=>{
     state.progettoId = p.id; state.schermo='progetto'; state.showFeed=false; state.railOn=false; state.drawer=false;
+    state.riep = false;
     render(); introProgetto();
   };
   if(!conDissolvenza){ vai(); return; }
@@ -9583,6 +9660,7 @@ function render(){
   else if(state.schermo==='guida'){ renderGuida(); }
   else { renderProgetto(); }
   renderTop(); renderPhasebar(); renderTabbar(); renderDrawer();
+  if(state.schermo==='progetto' && state.riep) idrataRiepilogo();
   el('app').classList.toggle('home-tel', state.schermo==='spazi' && suTelefono());
   el('app').classList.toggle('con-nav', state.schermo==='home' || !el('tabbar').hidden);
   misuraNav();
@@ -9802,6 +9880,176 @@ function numeroDa(v){
   }
   const n = parseFloat(s);
   return isFinite(n) ? Math.round(n*100)/100 : null;
+}
+/* ---------- SCHEDA RIEPILOGO DEL PROGETTO (v2.10) ----------
+   Tutto quello che serve avere sotto gli occhi in un posto solo: descrizione, obiettivi, dove siamo,
+   colori, immagini e file, dati del lavoro, tag, link utili, soldi e note. Si riempie quando si vuole:
+   le parti vuote non si vedono, e in fondo c'e' il tasto per aggiungerle. */
+function riepModificabile(p){ return !!p && !state.ospite && !isLock(p) && puo('modifica'); }
+function riepPieno(p){
+  if(!p) return false;
+  return !!(testoVero(p.descrizione) || (p.obiettivi||[]).length || (p.palette||[]).length ||
+            (p.rif||[]).length || (p.allegati||[]).length || testoVero(p.nota));
+}
+function testoVero(h){ return String(h==null?'':h).replace(/<[^>]*>/g,'').replace(/&nbsp;/g,' ').trim() !== ''; }
+function rpCarta(ic, titolo, corpo, az, largo){
+  return '<section class="rp-c'+(largo?' largo':'')+'"><div class="rp-t"><span class="ic">'+svg(ic,2)+'</span>'+
+    '<h3>'+esc(titolo)+'</h3>'+(az ? '<span class="az">'+az+'</span>' : '')+'</div>'+corpo+'</section>';
+}
+const rpPiu = (azione, testo, extra) => '<button class="rp-piu" data-action="'+azione+'"'+(extra||'')+'>'+svg('plus',2.4)+esc(testo)+'</button>';
+
+function riepilogoHTML(p){
+  const mod = riepModificabile(p), F = FZ(p), dd = D({pid:p.id});
+  let h = '<div class="rp">';
+
+  /* descrizione */
+  {
+    const c = testoVero(p.descrizione)
+      ? '<div class="rp-testo">'+sicuro(p.descrizione)+'</div>'
+      : '<div class="rp-vuoto">Di cosa parla questo lavoro, con che tono, per chi. Resta qui, sempre a portata di mano.</div>'+
+        (mod ? rpPiu('edit','Scrivi la descrizione',' data-t="proj" data-k="descrizione" '+dd) : '');
+    h += rpCarta('file','Descrizione del progetto', c,
+      (mod && testoVero(p.descrizione) ? pen('proj','descrizione',null,null,1) : ''), true);
+  }
+
+  /* obiettivi */
+  {
+    const ob = p.obiettivi||[];
+    const fatti = ob.filter(x=>x.done).length;
+    let c = ob.map((x,i)=>'<div class="rp-ob'+(x.done?' fatto':'')+'">'+
+        '<span class="box" role="button" tabindex="0" data-action="rp-ob-tog" data-i="'+i+'" '+dd+' aria-label="Segna">'+svg('check',3.4)+'</span>'+
+        '<span class="tx">'+esc(x.t||'')+'</span>'+
+        (mod ? '<button class="iconbtn x" data-action="rp-ob-via" data-i="'+i+'" '+dd+' title="Togli" aria-label="Togli">'+svg('x',2.4)+'</button>' : '')+
+      '</div>').join('');
+    if(!ob.length) c = '<div class="rp-vuoto">Cosa deve portare a casa questo lavoro. Li spunti man mano.</div>';
+    if(mod) c += rpPiu('rp-ob-nuovo','Aggiungi un obiettivo', ' '+dd);
+    h += rpCarta('check','Obiettivi', c, (ob.length ? '<span class="chip">'+fatti+'/'+ob.length+'</span>' : ''));
+  }
+
+  /* dove siamo */
+  {
+    const c = '<div class="rp-tl">'+F.map((x,i)=>{
+      const cls = p.completato || i < p.fase ? 'fatta' : i === p.fase ? 'qui' : '';
+      const st = p.completato ? 'Fatta' : i < p.fase ? 'Chiusa' : i === p.fase ? 'In corso' : 'Prossima';
+      return '<div class="f '+cls+'"><span class="p"></span><span class="tx">'+esc(x.nome)+'</span><span class="st">'+st+'</span></div>';
+    }).join('')+'</div>';
+    const pc = p.completato ? 100 : Math.round(prog(p, p.fase));
+    h += rpCarta('check','A che punto siamo', c+'<div class="rp-barra"><i style="width:'+Math.max(2,pc)+'%"></i></div>', '<span class="chip">'+pc+'%</span>');
+  }
+
+  /* informazioni */
+  {
+    const sc = scadenza(p), capo = U(titolareDiProgetto(p) || adminId() || state.utente);
+    const riga = (k, v) => v ? '<div class="rp-kv"><span>'+esc(k)+'</span><b>'+esc(v)+'</b></div>' : '';
+    let c = riga('Tipo', nomeLavoro(p)) +
+      (p.personale ? riga('Per chi','Progetto personale') : riga(TIPO(p.tipo).chi||'Cliente', p.cliente)) +
+      '<div class="rp-kv"><span>Stato</span><b>'+(p.completato ? 'Completato' : 'Attivo')+'</b></div>'+
+      '<div class="rp-kv"><span>Priorità</span><b><span class="prio '+p.prio+'">'+PRIO[p.prio]+'</span></b></div>'+
+      riga('Inizio', p.inizio) + riga(etichettaData(p), p.consegna) +
+      (p.consegna ? '<div class="rp-kv"><span>Scadenza</span><b><span class="chip '+sc.c+'">'+esc(sc.t)+'</span></b></div>' : '')+
+      riga('Dove', p.indirizzo) +
+      '<div class="rp-kv"><span>Responsabile</span><b>'+esc(capo.nome)+'</b></div>'+
+      '<div class="rp-kv"><span>Team</span><b>'+[...new Set([capo.id].concat(p.team||[]))].length+' persone</b></div>';
+    if(mod && !p.inizio) c += rpPiu('edit','Aggiungi la data di inizio',' data-t="proj" data-k="inizio" '+dd);
+    h += rpCarta('file','Informazioni', c);
+  }
+
+  /* tag */
+  if((p.tags||[]).length || mod){
+    const c = (p.tags||[]).length
+      ? '<div class="rp-tags">'+p.tags.map(t=>'<span class="chip">'+esc(t)+'</span>').join('')+'</div>'
+      : '<div class="rp-vuoto">Parole per ritrovarlo e filtrarlo.</div>';
+    h += rpCarta('spark','Tag', c, (mod ? pen('proj','tags',null,null,1) : ''));
+  }
+
+  /* palette */
+  {
+    const pal = (p.palette||[]).filter(x=>coloreOk(x,null));
+    let c = pal.length
+      ? '<div class="rp-pal">'+pal.map((x,i)=>'<span class="rp-col"><i style="background:'+coloreOk(x,'#888888')+'"></i><span>'+esc(String(x).toUpperCase())+'</span>'+
+          (mod ? '<button class="x" data-action="rp-pal-via" data-i="'+i+'" '+dd+' title="Togli" aria-label="Togli">'+svg('x',2.6)+'</button>' : '')+'</span>').join('')+'</div>'
+      : '<div class="rp-vuoto">I colori del progetto, sempre uguali per tutti.</div>';
+    if(mod) c += '<label class="rp-piu" for="rp_col_'+esc(p.id)+'">'+svg('plus',2.4)+'Aggiungi un colore'+
+      '<input type="color" id="rp_col_'+esc(p.id)+'" data-rp-col="'+esc(p.id)+'" value="#FFAD01" style="width:0;height:0;opacity:0;position:absolute;pointer-events:none"></label>';
+    h += rpCarta('palette','Colori del progetto', c);
+  }
+
+  /* immagini e file */
+  {
+    const all = p.allegati||[];
+    const img = all.map((a,i)=>Object.assign({}, a, {i})).filter(a=>/^image\//.test(String(a.tipo||'')) && a.path && cloudAttivo());
+    const altri = all.map((a,i)=>Object.assign({}, a, {i})).filter(a=>!img.some(x=>x.i===a.i));
+    let c = '';
+    if(img.length) c += '<div class="rp-foto">'+img.map(a=>'<figure>'+
+      '<img alt="'+esc(a.nome||'')+'" data-rp-img="'+esc(a.path)+'" data-action="all-apri" data-path="'+esc(a.path)+'">'+
+      '<figcaption>'+esc(a.nome||'')+'</figcaption></figure>').join('')+'</div>';
+    c += altri.map(a=>{
+      const apri = a.path && cloudAttivo();
+      const via = a.path && puoAllegare(p) && (a.u === state.utente || adminQui(p) || !a.u);
+      return '<div class="rp-file">'+
+        (apri ? '<button class="all-apri rp-file-b" data-action="all-apri" data-path="'+esc(a.path)+'" style="display:contents" title="Apri">' : '<span style="display:contents">')+
+        '<span class="ic">'+svg(icFile(a.tipo))+'</span><span class="nm">'+esc(a.nome||'file')+'</span>'+
+        '<span class="sz">'+fmtSize(a.size || a.dim || 0)+'</span>'+
+        (apri ? '</button>' : '</span>')+
+        (via ? '<button class="iconbtn" data-action="all-togli" data-pid="'+esc(p.id)+'" data-i="'+a.i+'" title="Togli il file" aria-label="Togli il file">'+svg('x',2.4)+'</button>' : '')+
+      '</div>'; }).join('');
+    if(!all.length) c += '<div class="rp-vuoto">Moodboard, riferimenti, documenti: tutto quello che serve guardare mentre si lavora.</div>';
+    if(puoAllegare(p)) c += '<label class="rp-piu" for="all_file_'+esc(p.id)+'">'+svg('clip',2.2)+'Aggiungi immagini o file</label>'+
+      (document.getElementById('all_file_'+p.id) ? '' : '<input type="file" id="all_file_'+esc(p.id)+'" data-allega="'+esc(p.id)+'" hidden>');
+    const st = allegaStato[p.id];
+    if(st && st.carico) c += '<div class="rp-vuoto" style="margin-top:8px">Sto caricando «'+esc(st.carico)+'»… '+(st.pc||0)+'%</div>';
+    if(st && st.errore) c += '<div class="all-err">'+esc(st.errore)+'</div>';
+    h += rpCarta('foto','Immagini e file', c, '', img.length > 2);
+  }
+
+  /* link utili */
+  {
+    const rif = (p.rif||[]).filter(x=>x && urlSicura(x.url));
+    let c = rif.length
+      ? rif.map((x,i)=>'<div class="rp-rif"><span class="ic" style="color:var(--dim)">'+svg('link',2)+'</span>'+
+          '<a href="'+esc(x.url)+'" target="_blank" rel="noopener noreferrer"><b>'+esc(x.t||x.url)+'</b><span>'+esc(x.url)+'</span></a>'+
+          (mod ? '<button class="iconbtn" data-action="rp-rif-via" data-i="'+i+'" '+dd+' title="Togli" aria-label="Togli">'+svg('x',2.4)+'</button>' : '')+
+        '</div>').join('')
+      : '<div class="rp-vuoto">Cartelle condivise, moodboard, montaggi da rivedere.</div>';
+    if(mod) c += rpPiu('rp-rif-nuovo','Aggiungi un link', ' '+dd);
+    h += rpCarta('link','Link utili', c);
+  }
+
+  /* soldi */
+  if(vedeSoldi()){
+    const co = contiDi(p.id), rs = co ? riassuntoConti(co) : null;
+    let c;
+    if(rs && rs.prev != null){
+      const pc = rs.prev ? Math.min(100, Math.round(rs.inc / rs.prev * 100)) : 0;
+      c = '<div class="rp-kv"><span>Preventivo</span><b>'+esc(euro(rs.prev))+'</b></div>'+
+        '<div class="rp-kv"><span>Incassato</span><b>'+esc(euro(rs.inc))+'</b></div>'+
+        '<div class="rp-kv"><span>Spese</span><b>'+esc(euro(rs.sp))+'</b></div>'+
+        '<div class="rp-barra"><i style="width:'+Math.max(2,pc)+'%"></i></div>'+
+        '<div class="rp-vuoto">'+pc+'% incassato</div>';
+    } else c = '<div class="rp-vuoto">Preventivo, incassi e spese di questo lavoro.</div>';
+    h += rpCarta('euro','Soldi del lavoro', c,
+      (scriveSoldi() ? '<button class="pen fisso" data-action="conti" data-pid="'+esc(p.id)+'" title="Apri i conti">'+svg('pen',2.2)+'</button>' : ''));
+  }
+
+  /* note rapide */
+  {
+    const c = testoVero(p.nota)
+      ? '<div class="rp-testo">'+sicuro(p.nota)+'</div>'
+      : '<div class="rp-vuoto">Appunti veloci: contatti, indicazioni, cose da ricordare.</div>'+
+        (mod ? rpPiu('edit','Scrivi una nota',' data-t="proj" data-k="nota" '+dd) : '');
+    h += rpCarta('pen','Note', c, (mod && testoVero(p.nota) ? pen('proj','nota',null,null,1) : ''), true);
+  }
+
+  return h + '</div>';
+}
+/* le immagini stanno nell'archivio protetto: l'indirizzo lo chiedo dopo aver disegnato */
+function idrataRiepilogo(){
+  if(typeof linkAllegato !== 'function') return;
+  document.querySelectorAll('img[data-rp-img]:not([src])').forEach(async n=>{
+    const path = n.dataset.rpImg;
+    try{ const u = await linkAllegato(path); if(n.isConnected) n.src = u; }
+    catch(e){ if(n.isConnected){ const fg = n.closest('figure'); if(fg) fg.style.display = 'none'; } }
+  });
 }
 function riassuntoConti(c){
   const prev = (c && c.preventivo!=null && c.preventivo!=='') ? Number(c.preventivo) : null;
@@ -10463,6 +10711,7 @@ const GUIDA = [
   ['Che cos’è FOSS', 'È il posto dove tieni i tuoi lavori. Ogni progetto ha le sue fasi, le task da fare, le date, i soldi e le persone che ci lavorano. Funziona dal computer, dall’iPad e dal telefono: quello che cambi su uno compare anche sugli altri.'],
   ['Come è organizzato', 'Quattro livelli, uno dentro l’altro: gli <b>spazi di lavoro</b> (un ambito, per esempio «Video Milano»), i <b>progetti</b> (un lavoro per un cliente), le <b>task</b> divise per fase e, dentro ogni task, le <b>subtask</b> da spuntare. Una subtask può avere anche una sua piccola checklist.'],
   ['Entrare la prima volta', 'Apri FOSS e scegli <b>Registrati</b>: nome, il tuo <b>ruolo</b> (videomaker, montatrice, fotografo…), email e una password. Se qualcuno ti ha invitato, apri il link che ti ha mandato: trovi già scritte la tua email e, se li ha indicati, nome e ruolo. Entri direttamente nel suo archivio e vedi i lavori che ti apre. Dalla volta dopo il dispositivo si ricorda di te.'],
+  ['La scheda del progetto (Riepilogo)', 'Dentro un lavoro, in alto a destra, il tasto <b>Riepilogo</b> (sul telefono l’icona del foglio nella barra in basso) apre la scheda: <b>descrizione</b>, <b>obiettivi</b> da spuntare, a che punto siamo, <b>informazioni</b> (cliente, priorità, inizio, consegna, responsabile, team), <b>tag</b>, i <b>colori</b> del progetto, le <b>immagini e i file</b> allegati, i <b>link utili</b>, i soldi e le note. Si riempie un pezzo alla volta: quello che manca ha il suo tasto «+». La descrizione la puoi scrivere già quando crei il progetto. Serve per i lavori pieni di riferimenti, per averli sempre sott’occhio.'],
   ['Cambiare la password', 'Apri il tuo <b>Profilo</b> (la tua foto in alto a destra) e cerca il riquadro <b>Accesso e password</b>: il tasto <b>Cambia password</b> ti chiede quella di adesso e poi quella nuova. È la stessa password di FOSS.chat. Se l’hai dimenticata, nella schermata di accesso c’è <b>Password dimenticata?</b>: ti arriva una mail con il link per farne una nuova.'],
   ['La Home', 'FOSS si apre sempre sulla <b>Home</b>. A sinistra il menu (Home, Le mie task, Calendario, Notifiche, <b>Team</b>) e l’elenco dei tuoi spazi. Al centro il saluto, quattro numeri (progetti attivi, task aperte, consegne entro 7 giorni, collaboratori: toccali per andarci), le schede degli spazi (sul computer le prime sei; <b>Mostra altro</b> apre le altre) e, in fondo, le task in scadenza da spuntare al volo, le attività recenti e gli impegni di oggi. Il tuo <b>profilo</b> si apre dalla tua foto in alto a destra.'],
   ['Il calendario di tutto', '<b>Calendario</b>, nel menu a sinistra della Home, mette insieme le date di tutti i lavori di tutti gli spazi, ognuno col suo colore; in alto puoi nascondere gli spazi che non ti servono. Dentro un singolo spazio il calendario mostra solo i suoi lavori.'],
@@ -11362,6 +11611,7 @@ function nlLeggi(){
   if((x = v('nl_acc'))!=null) nl.acconto = x;
   if((x = v('nl_nomemod'))!=null) nl.nomeModello = x.trim();
   const nt = el('np_nota'); if(nt) nl.nota = nt.innerHTML;
+  const nd = el('np_descr'); if(nd) nl.descrizione = nd.innerHTML;
   const vis = el('np_vis');
   if(vis) nl.vis = [...vis.querySelectorAll('.vis-chip.on')].map(b=>b.dataset.id);
   /* una task scritta e non ancora aggiunta la aggiungo io */
@@ -11549,7 +11799,11 @@ function nlPaginaChi(){
         '<button type="button" class="sw'+(nl.mail?' on':'')+'" data-action="nl-mail" aria-pressed="'+(!!nl.mail)+'" aria-label="Avvisa anche via email"></button></div>' : '')+
       '</div>';
   }
-  h += '<div class="field"><label>Note</label>'+
+  h += '<div class="field"><label>Descrizione del progetto</label>'+
+      '<div class="rte-bar"><button class="rte-b b" data-action="rte" data-c="bold" title="Grassetto">B</button>'+
+      '<button class="rte-b u" data-action="rte" data-c="underline" title="Sottolineato">U</button></div>'+
+      '<div class="rte" id="np_descr" contenteditable="true" data-ph="Di cosa parla, con che tono, per chi… La ritrovi nel Riepilogo del progetto.">'+sicuro(nl.descrizione||'')+'</div></div>'+
+    '<div class="field"><label>Note</label>'+
       '<div class="rte-bar"><button class="rte-b b" data-action="rte" data-c="bold" title="Grassetto">B</button>'+
       '<button class="rte-b u" data-action="rte" data-c="underline" title="Sottolineato">U</button></div>'+
       '<div class="rte" id="np_nota" contenteditable="true" data-ph="Indicazioni, contatti, dettagli…">'+sicuro(nl.nota||'')+'</div></div>'+
@@ -11614,6 +11868,7 @@ function nlCrea(){
     col:PALETTE_PROG[state.progetti.length % PALETTE_PROG.length], fase:0,
     fasi, subs, faseAss, team, eventi,
     indirizzo:nl.luogo, nota:String(nl.nota||'').replace(/<(?!\/?(b|strong|u|i|em|br|div)\b)[^>]*>/gi,''),
+    descrizione:String(nl.descrizione||'').replace(/<(?!\/?(b|strong|u|i|em|br|div)\b)[^>]*>/gi,''),
     allegati:tmpAllegati.slice(), tags:((M && M.tags) || (L && L.tags) || []).slice(),
     consegna: q ? q[2]+'/'+q[1]+'/'+q[0] : '', fattura: nl.personale ? '' : 'Da emettere'
   }));
@@ -11661,7 +11916,9 @@ const CAMPI = {
   tags:{l:'Tag (separati da virgola)'},
   icona:{l:'Icona del progetto', tipo:'opt', opt:()=>ICONE_PROG.map(i=>[i,i])},
   prio:{l:'Priorità', tipo:'opt', opt:()=>Object.keys(PRIO).map(k=>[k,PRIO[k]])},
-  nota:{l:'Note del progetto', tipo:'rte'}
+  nota:{l:'Note del progetto', tipo:'rte'},
+  descrizione:{l:'Descrizione del progetto', tipo:'rte'},
+  inizio:{l:'Data di inizio', tipo:'data'}
 };
 /* i campi delle professioni che qui sopra non ci sono prendono l'etichetta dalla professione */
 ORDINE_TIPI.forEach(k=>{
@@ -11919,7 +12176,7 @@ function modaleFiltro(){
 }
 
 /* ============ AZIONI ============ */
-const PROTETTE = ['consegna-cal','check-lista','add-lista','togli-voce','nuova-lista','edit','salva-campo','check','fase','indietro','riprendi','add-user','assegna',
+const PROTETTE = ['rp-ob-nuovo','rp-ob-ok','rp-ob-via','rp-ob-tog','rp-pal-via','rp-rif-nuovo','rp-rif-ok','rp-rif-via','consegna-cal','check-lista','add-lista','togli-voce','nuova-lista','edit','salva-campo','check','fase','indietro','riprendi','add-user','assegna',
                   'elimina-progetto','conferma-elimina','sposta-ev','rinomina-ev','elimina-ev',
                   'add-compito','elimina-compito','elimina-task','tagga','tagga-chi','stagga',
                   'assegna-sub','assegna-sub-chi','ass-salva',
@@ -13681,6 +13938,61 @@ document.addEventListener('click', function(e){
       state.me.foto = null; U(state.utente).foto = null; render(); applicaProfilo();
       toast('Foto rimossa.','info'); break;
 
+    /* ---- scheda riepilogo del progetto ---- */
+    case 'riep': state.riep = !state.riep; render(); break;
+    case 'rp-ob-nuovo':{
+      const pr = state.progetti.find(x=>x.id===t.dataset.pid); if(!pr || !riepModificabile(pr)) break;
+      modale('<h3>Nuovo obiettivo</h3><div class="sub-t">'+esc(pr.nome)+'</div><div class="modal-b">'+
+        '<div class="field"><label>Cosa deve portare a casa questo lavoro</label><input id="rp_ob" maxlength="140" placeholder="Es. Produrre 6 episodi da 15–20 min"></div></div>'+
+        '<div class="modal-f"><button class="btn ghost" data-action="chiudi-modale">Annulla</button>'+
+        '<button class="btn primary" data-action="rp-ob-ok" '+D({pid:pr.id})+'>Aggiungi</button></div>');
+      setTimeout(()=>{ const n = el('rp_ob'); if(n) n.focus(); }, 40);
+      break; }
+    case 'rp-ob-ok':{
+      const pr = state.progetti.find(x=>x.id===t.dataset.pid); if(!pr || !riepModificabile(pr)) break;
+      const v = ((el('rp_ob')||{}).value || '').trim().slice(0,140);
+      if(!v){ toast('Scrivi l’obiettivo.','warn','Manca il testo'); break; }
+      snap('Obiettivo «'+v+'»');
+      pr.obiettivi = (pr.obiettivi||[]).concat([{t:v, done:false}]).slice(0,40);
+      logga(pr, 'Obiettivo aggiunto: <b>'+esc(v)+'</b>');
+      chiudiModale(); render(); break; }
+    case 'rp-ob-tog':{
+      const pr = state.progetti.find(x=>x.id===t.dataset.pid); if(!pr || state.ospite || isLock(pr) || !(puo('modifica')||puo('spunta'))) break;
+      const o = (pr.obiettivi||[])[Number(t.dataset.i)]; if(!o) break;
+      o.done = !o.done; render(); break; }
+    case 'rp-ob-via':{
+      const pr = state.progetti.find(x=>x.id===t.dataset.pid); if(!pr || !riepModificabile(pr)) break;
+      const i = Number(t.dataset.i), o = (pr.obiettivi||[])[i]; if(!o) break;
+      snap('Obiettivo tolto'); pr.obiettivi.splice(i,1); render(); break; }
+    case 'rp-pal-via':{
+      const pr = state.progetti.find(x=>x.id===t.dataset.pid); if(!pr || !riepModificabile(pr)) break;
+      const i = Number(t.dataset.i); if(!(pr.palette||[])[i]) break;
+      snap('Colore tolto'); pr.palette.splice(i,1); render(); break; }
+    case 'rp-rif-nuovo':{
+      const pr = state.progetti.find(x=>x.id===t.dataset.pid); if(!pr || !riepModificabile(pr)) break;
+      modale('<h3>Nuovo link</h3><div class="sub-t">'+esc(pr.nome)+'</div><div class="modal-b">'+
+        '<div class="field"><label>Come si chiama</label><input id="rp_rt" maxlength="80" placeholder="Es. Cartella su Drive"></div>'+
+        '<div class="field"><label>Indirizzo</label><input id="rp_ru" placeholder="https://" maxlength="500"></div>'+
+        '<div class="nota-box">Vanno bene solo gli indirizzi che cominciano con <b>https://</b>.</div></div>'+
+        '<div class="modal-f"><button class="btn ghost" data-action="chiudi-modale">Annulla</button>'+
+        '<button class="btn primary" data-action="rp-rif-ok" '+D({pid:pr.id})+'>Aggiungi</button></div>');
+      setTimeout(()=>{ const n = el('rp_rt'); if(n) n.focus(); }, 40);
+      break; }
+    case 'rp-rif-ok':{
+      const pr = state.progetti.find(x=>x.id===t.dataset.pid); if(!pr || !riepModificabile(pr)) break;
+      const nome = ((el('rp_rt')||{}).value || '').trim().slice(0,80);
+      let url = ((el('rp_ru')||{}).value || '').trim();
+      if(url && !/^https?:\/\//i.test(url)) url = 'https://' + url;
+      if(!urlSicura(url) || !/^https:\/\//i.test(url)){ toast('L’indirizzo deve cominciare con https://','warn','Link non valido'); break; }
+      snap('Link «'+(nome||url)+'»');
+      pr.rif = (pr.rif||[]).concat([{t:nome || url, url}]).slice(0,30);
+      logga(pr, 'Link aggiunto: <b>'+esc(nome||url)+'</b>');
+      chiudiModale(); render(); break; }
+    case 'rp-rif-via':{
+      const pr = state.progetti.find(x=>x.id===t.dataset.pid); if(!pr || !riepModificabile(pr)) break;
+      const i = Number(t.dataset.i); if(!(pr.rif||[])[i]) break;
+      snap('Link tolto'); pr.rif.splice(i,1); render(); break; }
+
     case 'cambia-pw': modaleCambiaPw(); break;
     case 'cambia-pw-ok': cambiaPassword(); break;
     case 'pw-dimenticata': modaleRecuperoPw(); break;
@@ -14480,6 +14792,16 @@ document.addEventListener('change', function(e){
       });
     }).catch(()=>toast('Immagine non leggibile.','warn','Errore'));
     e.target.value=''; return;
+  }
+  if(e.target.dataset && e.target.dataset.rpCol){
+    const pr = state.progetti.find(x=>x.id===e.target.dataset.rpCol);
+    const c = coloreOk(e.target.value, null);
+    if(pr && c && riepModificabile(pr)){
+      snap('Colore aggiunto');
+      pr.palette = (pr.palette||[]).concat([c.toLowerCase()]).slice(0,12);
+      render();
+    }
+    return;
   }
   if(e.target.id==='mie_prog'){ state.mieProg = e.target.value; if(e.target.value) (state.mieAperti || (state.mieAperti = new Set())).add(e.target.value); render(); return; }
   if(e.target.id==='mie_ord'){ state.mieOrd = e.target.value; render(); return; }
