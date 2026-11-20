@@ -2,6 +2,9 @@
 <html lang="it">
 <head>
 <meta charset="utf-8">
+<!-- Sicurezza: niente plugin, niente <base> cambiata, niente invio a siti terzi,
+     e gli script possono arrivare solo da qui e dalle due librerie che usiamo. -->
+<meta http-equiv="Content-Security-Policy" content="script-src 'self' 'unsafe-inline' https://cdn.jsdelivr.net https://cdnjs.cloudflare.com; object-src 'none'; base-uri 'self'; form-action 'none'">
 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover, interactive-widget=resizes-content">
 <script>try{if(navigator.standalone===true||matchMedia('(display-mode: standalone)').matches)document.documentElement.classList.add('da-icona')}catch(e){}</script>
 <meta name="description" content="FOSS.chat: la chat del tuo team su FOSS.">

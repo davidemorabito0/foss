@@ -2,6 +2,9 @@
 <html lang="it">
 <head>
 <meta charset="utf-8">
+<!-- Sicurezza: niente plugin, niente <base> cambiata, niente invio a siti terzi,
+     e gli script possono arrivare solo da qui e dalle due librerie che usiamo. -->
+<meta http-equiv="Content-Security-Policy" content="script-src 'self' 'unsafe-inline' https://cdn.jsdelivr.net https://cdnjs.cloudflare.com; object-src 'none'; base-uri 'self'; form-action 'none'">
 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover">
 <script>try{if(navigator.standalone===true||matchMedia('(display-mode: standalone)').matches)document.documentElement.classList.add('da-icona')}catch(e){}</script>
 <meta name="description" content="FOSS è il gestionale dei tuoi progetti, dal brief alla consegna: lavori, task, commenti, file e calendario del team in un unico posto.">
@@ -10706,7 +10709,7 @@ function cartaModelli(){
    Come si fa tutto, capitolo per capitolo: dai primi passi alle cose per chi
    organizza un team. Si cerca per parola (anche senza accenti); in fondo c'e'
    il tasto per segnalare quello che manca o non funziona. */
-const VERSIONE = 'v74';
+const VERSIONE = 'v75';
 const LIVELLI_GUIDA = {base:'Per cominciare', medio:'Tutti i giorni', esperto:'Per chi organizza', aiuto:'Se qualcosa non va'};
 const GUIDA = [
 {id:'primi-passi', liv:'base', ic:'spark', t:'Primi passi', s:'Cos’è FOSS e come ci si muove', v:[
@@ -15479,16 +15482,13 @@ async function caricaCloud(){
     /* spazi e lavori: arrivano gia' filtrati dal database */
     const {data:sps, error:e1} = await sb.from('spazi').select('org_id,id,dati,ordine').order('ordine');
     if(e1) throw e1;
-    let {data:prs, error:e2} = await sb.from('progetti').select('org_id,id,spazio_id,dati');
-    if(e2) throw e2;
+    let prs = await tutteLeRighe(()=>sb.from('progetti').select('org_id,id,spazio_id,dati').order('id'));
     /* i lavori ancora nel formato vecchio (un blocco unico) li divido in
        pezzi sul database, tutto o niente per ciascuno, poi li rileggo */
     if((prs||[]).some(r=>!r.dati || String(r.dati._formato)!=='2')){
       const m = await sb.rpc('migra_progetti');
       if(m.error) console.warn('migrazione:', m.error.message);
-      const rr = await sb.from('progetti').select('org_id,id,spazio_id,dati');
-      if(rr.error) throw rr.error;
-      prs = rr.data;
+      prs = await tutteLeRighe(()=>sb.from('progetti').select('org_id,id,spazio_id,dati').order('id'));
     }
     const righe = await tutteLeRighe(()=>sb.from('elementi').select(COLONNE_EL).order('progetto_id').order('id'));
     const perLavoro = {};
@@ -15512,13 +15512,13 @@ async function caricaCloud(){
     /* soldi: arrivano solo a chi li puo' vedere */
     state.conti = {};
     {
-      const {data:cs} = await sb.from('conti').select('progetto_id,dati');
+      let cs = []; try{ cs = await tutteLeRighe(()=>sb.from('conti').select('progetto_id,dati').order('progetto_id')); }catch(e){ cs = []; }
       (cs||[]).forEach(c=>{ state.conti[c.progetto_id] = c.dati || {}; ombraConti[c.progetto_id] = canon(c.dati||{}); });
     }
     /* i modelli salvati dell'archivio */
     state.modelli = [];
     if(orgMia){
-      const {data:md} = await sb.from('modelli').select('id,nome,tipo,dati,creato_da,creato_il').eq('org_id', orgMia).order('creato_il');
+      let md = []; try{ md = await tutteLeRighe(()=>sb.from('modelli').select('id,nome,tipo,dati,creato_da,creato_il').eq('org_id', orgMia).order('creato_il').order('id')); }catch(e){ md = []; }
       state.modelli = (md||[]).map(m=>Object.assign({id:m.id, nome:m.nome, tipo:m.tipo, creato_da:m.creato_da}, senzaId(m.dati)));
     }
 
@@ -16025,8 +16025,7 @@ async function aggiornaDaCloud(){
   if(!sb || !utenteCloud || !cloudPronto || rileggendo) return;
   rileggendo = true;
   try{
-    const {data:prs, error} = await sb.from('progetti').select('org_id,id,spazio_id,dati');
-    if(error) throw error;
+    const prs = await tutteLeRighe(()=>sb.from('progetti').select('org_id,id,spazio_id,dati').order('id'));
     const righe = await tutteLeRighe(()=>sb.from('elementi').select(COLONNE_EL).order('progetto_id').order('id'));
     const perLavoro = {};
     righe.forEach(r=>{ (perLavoro[r.progetto_id] = perLavoro[r.progetto_id]||[]).push(r); });
@@ -16051,7 +16050,7 @@ async function aggiornaDaCloud(){
       if(!remoti.has(p.id) && ombraNucleo[p.id]){ if(togliLavoroLocale(p.id)) tocca = true; }
     });
     {
-      const {data:cs} = await sb.from('conti').select('progetto_id,dati');
+      let cs = []; try{ cs = await tutteLeRighe(()=>sb.from('conti').select('progetto_id,dati').order('progetto_id')); }catch(e){ cs = []; }
       (cs||[]).forEach(c=>{
         const cc = canon(c.dati||{});
         if(ombraConti[c.progetto_id] === cc) return;
@@ -16065,7 +16064,9 @@ async function aggiornaDaCloud(){
     renderTop();
     /* i modelli salvati dagli altri */
     if(orgMia){
-      const {data:md, error:em} = await sb.from('modelli').select('id,nome,tipo,dati,creato_da,creato_il').eq('org_id', orgMia).order('creato_il');
+      let md = null, em = null;
+      try{ md = await tutteLeRighe(()=>sb.from('modelli').select('id,nome,tipo,dati,creato_da,creato_il').eq('org_id', orgMia).order('creato_il').order('id')); }
+      catch(e){ em = e; }
       if(!em){
         let nuovi = (md||[]).map(m=>Object.assign({id:m.id, nome:m.nome, tipo:m.tipo, creato_da:m.creato_da}, senzaId(m.dati)));
         /* uno appena salvato da me potrebbe non essere ancora arrivato */

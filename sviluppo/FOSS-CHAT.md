@@ -285,6 +285,22 @@ L'elenco completo è nel `README.md` del sito, sezioni «FOSS.chat» e «FOSS.ch
   e alta zero perche' la scheda (un `<button>`) allinea i figli a sinistra (`align-items:flex-start`). Ora ha
   `width:100%` e l'altezza dal padding (`padding-bottom: calc(100% / 3.6)`), che funziona ovunque.
 
+### FOSS v75 e chat 2.9.10 — due rinforzi (20 novembre 2026)
+**1. Niente script da fuori (Content-Security-Policy).** In testa a `index.html` e a `sviluppo/chat/head.html`
+(quindi in `chat.html`) c'è ora una riga di regole del browser:
+`script-src 'self' 'unsafe-inline' https://cdn.jsdelivr.net https://cdnjs.cloudflare.com; object-src 'none'; base-uri 'self'; form-action 'none'`.
+Anche se qualcuno riuscisse a infilare del codice in una pagina, il browser non caricherebbe uno script da un
+altro sito, non aprirebbe plugin, non potrebbe cambiare la base dei link né spedire un modulo altrove.
+Provato: FOSS (compresa la mappa, che è Leaflet da cdnjs) e FOSS.chat non segnalano nessuna violazione.
+Resta aperto il passo più stretto (togliere `'unsafe-inline'` con i nonce): tocca tutto il codice scritto dentro
+le pagine e va fatto con calma, verificando anche l'app per computer (Tauri) e quella Android.
+
+**2. Oltre mille lavori.** Supabase restituisce al massimo 1000 righe per lettura: i lavori, i conti e i modelli
+venivano letti in un colpo solo, quindi oltre quella soglia sparivano senza dirlo. Ora passano tutti da
+`tutteLeRighe` (blocchi da 1000, con un ordinamento stabile), come già facevano gli `elementi`. Vale sia al
+primo caricamento sia nelle riletture (`aggiornaDaCloud`). Conti e modelli, se il database li nega, restano
+vuoti come prima invece di far fallire tutto il caricamento.
+
 ### FOSS — la scheda «Riepilogo» del progetto (20 novembre 2026)
 Richiesta: i lavori pieni di note e riferimenti hanno bisogno di un posto solo dove tenerli sott'occhio.
 - Dentro un lavoro, il tasto **Riepilogo** nell'intestazione (sul telefono un passo nella barra in basso)
