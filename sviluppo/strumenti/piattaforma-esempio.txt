@@ -1,0 +1,39 @@
+# Impostazioni di una piattaforma gemella di FOSS.
+# Copia questo file, compilalo e passalo a:  perl sviluppo/strumenti/nuova-piattaforma.pl <questo file> <cartella nuova>
+# Una voce per riga: CHIAVE = valore. Le righe che iniziano con # sono commenti.
+# Qui vanno SOLO dati pubblici: nessuna password, nessuna chiave segreta.
+
+# --- obbligatori ---
+NOME = Atelier
+DOMINIO = atelier.example.com
+
+# --- facoltativi (se mancano: valori ricavati o lasciati vuoti) ---
+# nome della chat (di serie: NOME + ".chat")
+NOME_CHAT = Atelier.chat
+# server dei media (come il NAS di FOSS). Di serie «nessuno»: foto, video e file vanno su Supabase
+# (fino a 50 MB l'uno). Metti un indirizzo solo se il cliente ha un suo server (vedi la cartella nas/).
+DOMINIO_MEDIA = nessuno
+# colore principale (di serie quello di FOSS, #FFAD01)
+COLORE = #3B82F6
+# email di contatto mostrata nelle pagine legali e nell'app
+EMAIL = info@atelier.example.com
+
+# --- database (Supabase): dal progetto nuovo, Project Settings → API ---
+# Se li lasci vuoti la copia parte in modalità locale e NON tocca nessun database.
+# riferimento del progetto (la parte prima di .supabase.co)
+SUPABASE_PROGETTO =
+# chiave pubblica "publishable" (sb_publishable_...): è fatta per stare nel browser
+SUPABASE_CHIAVE =
+# chiave PUBBLICA VAPID degli avvisi (la privata va solo nel Vault di Supabase)
+VAPID_PUBBLICA =
+
+# --- dati legali (privacy.html e termini.html) ---
+TITOLARE = Ragione sociale del cliente
+INDIRIZZO = Via Esempio 1, 00100 Roma (RM)
+PIVA = 00000000000
+
+# --- app per computer e Android ---
+# identificativo unico (di serie: il dominio al contrario + .app)
+ID_APP = com.example.atelier.app
+# repository GitHub dove vivrà la copia (per gli aggiornamenti dell'app per computer)
+REPO = utente/atelier

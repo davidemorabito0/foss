@@ -337,6 +337,31 @@ Richiesta: i lavori pieni di note e riferimenti hanno bisogno di un posto solo d
   «Torna alle fasi» resta sempre lì, e l'impostazione vale per spazio, non per persona: si salva nel
   nucleo dello spazio e si sincronizza con gli altri.
 
+### Piattaforme gemelle per i clienti (25 novembre 2026)
+Richiesta: poter creare un sito nuovo con un altro nome, con la stessa base di FOSS, da personalizzare per
+un cliente — **solo la struttura, nessun dato** (utenti, progetti, messaggi restano in FOSS).
+- Guida: **`NUOVA-PIATTAFORMA.md`** (radice).
+- `sviluppo/strumenti/nuova-piattaforma.pl <impostazioni> <cartella>`: copia il progetto in una cartella
+  nuova e sostituisce nome, nome della chat, dominio, riferimento e chiave pubblica di Supabase, chiave
+  VAPID pubblica, colore (con le sfumature), email, dati legali, identificativo delle app, repository.
+  Senza Supabase indicato la copia resta in modalità locale (`SUPA_URL = ''`): non può toccare il database
+  di FOSS. Senza server dei media `MEDIA_NAS = ''` e i file vanno su Supabase. I nomi delle persone vere
+  nei dati dimostrativi e nelle prove diventano inventati con le stesse iniziali; non copia il diario
+  tecnico, `assetlinks.json` né gli strumenti per creare gemelle. Alla fine segnala resti di vecchio
+  nome/dominio/dati personali. Provato con «Atelier»: `prova-foss.py` 13/13 e le prove della chat
+  14, 15, 16, 17, 20, 26 passano sulla copia.
+- Modello delle impostazioni: `sviluppo/strumenti/piattaforma-esempio.txt`.
+- `sviluppo/strumenti/chiavi-avvisi.pl`: crea una coppia VAPID con openssl; la privata è stampata come
+  `select vault.create_secret('{"jwk":{...}}', 'foss_vapid');` (il formato che leggono i trigger e la
+  funzione `push`), da incollare solo nel Vault del progetto nuovo.
+- `.github/workflows/esporta-struttura.yml` (solo a mano): `supabase db dump` dello schema public + bucket,
+  regole dei file, realtime, cron, trigger `al_nuovo_utente` su `auth.users`, nomi dei segreti del Vault;
+  controlla che non ci siano dati e prova il file su un Supabase vuoto (`supabase start`). Richiede il
+  segreto GitHub `SUPABASE_DB_URL`, da inserire dal titolare. **Non ancora lanciato.**
+- Nota: la struttura **non** si è potuta esportare passando da una funzione edge temporanea (permesso
+  negato); 71 delle 73 migrazioni registrate coprono quasi tutto, ma `vede_spazio` e
+  `creatore_nel_lavoro` furono create fuori dalle migrazioni: per questo si usa il dump vero.
+
 ### FOSS v81 — correzioni dal controllo generale (25 novembre 2026)
 Dopo un controllo di FOSS e della chat (errori registrati in `errori_app`, segnalazioni, advisors di
 Supabase, peso delle pagine), il titolare ha approvato queste correzioni:

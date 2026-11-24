@@ -419,7 +419,13 @@ gh run list -R davidemorabito0/foss -L 5
 
 ---
 
-## 15. Problemi già visti e come si riconoscono
+## 15. Creare una piattaforma gemella per un cliente
+
+Tutto in [`NUOVA-PIATTAFORMA.md`](NUOVA-PIATTAFORMA.md): un comando copia il progetto con un altro nome,
+dominio, colore e database, senza nessun dato di FOSS; un'azione di GitHub esporta la struttura del
+database.
+
+## 16. Problemi già visti e come si riconoscono
 
 | Sintomo | Causa | Cosa fare |
 |---|---|---|

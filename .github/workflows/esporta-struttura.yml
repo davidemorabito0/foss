@@ -1,0 +1,93 @@
+# Esporta la STRUTTURA del database di FOSS (tabelle, regole di sicurezza, funzioni, trigger, bucket,
+# orologi, realtime) SENZA NESSUN DATO, e la prova su un Supabase vuoto creato al momento.
+# Serve per creare una piattaforma gemella (vedi NUOVA-PIATTAFORMA.md). Si lancia a mano:
+# GitHub → Actions → «Esporta struttura del database» → Run workflow.
+# Richiede il segreto SUPABASE_DB_URL (Settings → Secrets and variables → Actions), che inserisce il titolare:
+# Supabase → Connect → «Session pooler» → la stringa postgresql://... con la password del database.
+# Il risultato (struttura.sql) resta 7 giorni negli «Artifacts» del controllo.
+name: Esporta struttura del database
+
+on:
+  workflow_dispatch:
+
+jobs:
+  esporta:
+    runs-on: ubuntu-latest
+    env:
+      SUPABASE_DB_URL: ${{ secrets.SUPABASE_DB_URL }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: supabase/setup-cli@v1
+        with:
+          version: latest
+      - name: Strumenti
+        run: sudo apt-get update -qq && sudo apt-get install -y -qq postgresql-client > /dev/null
+      - name: Controllo del segreto
+        run: |
+          if [ -z "$SUPABASE_DB_URL" ]; then echo "::error::Manca il segreto SUPABASE_DB_URL"; exit 1; fi
+
+      - name: Struttura dello schema public (solo struttura, nessun dato)
+        run: supabase db dump --db-url "$SUPABASE_DB_URL" -f dump-public.sql
+
+      - name: Il resto (bucket, regole dei file, orologi, realtime, registrazione utenti, segreti da creare)
+        run: |
+          psql "$SUPABASE_DB_URL" -X -q -At -v ON_ERROR_STOP=1 > extra.sql <<'SQL'
+          select '-- ===== estensioni che servono =====';
+          select 'create extension if not exists pg_cron;';
+          select 'create extension if not exists pg_net;';
+          select '-- ===== nuovi utenti: crea il profilo e l''archivio =====';
+          select 'drop trigger if exists al_nuovo_utente on auth.users;';
+          select pg_get_triggerdef(t.oid) || ';' from pg_trigger t join pg_class c on c.oid = t.tgrelid
+            join pg_namespace n on n.oid = c.relnamespace where n.nspname = 'auth' and not t.tgisinternal;
+          select '-- ===== spazi per i file (bucket) =====';
+          select format('insert into storage.buckets (id, name, public, file_size_limit, allowed_mime_types) values (%L, %L, %s, %s, %L) on conflict (id) do nothing;',
+                        id, name, public, coalesce(file_size_limit::text, 'null'), allowed_mime_types) from storage.buckets order by id;
+          select '-- ===== regole di sicurezza sui file =====';
+          select format('drop policy if exists %I on %I.%I;', policyname, schemaname, tablename) || E'\n' ||
+                 format('create policy %I on %I.%I as %s for %s to %s', policyname, schemaname, tablename, permissive, cmd, array_to_string(roles, ', '))
+                 || coalesce(' using (' || qual || ')', '') || coalesce(' with check (' || with_check || ')', '') || ';'
+            from pg_policies where schemaname = 'storage' order by tablename, policyname;
+          select '-- ===== aggiornamenti in tempo reale =====';
+          select format('alter publication supabase_realtime add table %I.%I;', schemaname, tablename)
+            from pg_publication_tables where pubname = 'supabase_realtime' order by tablename;
+          select '-- ===== orologi (cron) =====';
+          select format('select cron.schedule(%L, %L, %L);', jobname, schedule, command) from cron.job order by jobname;
+          select '-- ===== segreti del Vault da creare a mano (i valori NON sono qui) =====';
+          select format('-- select vault.create_secret(''INSERISCI-QUI-IL-VALORE'', %L);', name) from vault.secrets order by name;
+          SQL
+
+      - name: Unisco in struttura.sql
+        run: |
+          {
+            echo "-- Struttura del database di FOSS: SOLO STRUTTURA, NESSUN DATO."
+            echo "-- Esportata il $(date -u +%Y-%m-%d) da GitHub Actions (esporta-struttura.yml)."
+            echo "-- Si applica su un progetto Supabase NUOVO e vuoto (vedi NUOVA-PIATTAFORMA.md)."
+            echo
+            cat dump-public.sql
+            echo
+            cat extra.sql
+          } > struttura.sql
+          # nessun dato: controllo che non ci siano righe copiate
+          if grep -qE '^(COPY|INSERT INTO) public\.' struttura.sql; then echo "::error::trovati dati nella struttura"; exit 1; fi
+          wc -c struttura.sql
+
+      - name: Prova su un Supabase vuoto
+        run: |
+          mkdir prova && cd prova && supabase init --force > /dev/null
+          supabase start -x studio,imgproxy,edge-runtime,logflare,vector,supavisor,mailpit,postgres-meta
+          psql "postgresql://postgres:postgres@127.0.0.1:54322/postgres" -X -q -v ON_ERROR_STOP=1 -f ../struttura.sql
+          psql "postgresql://postgres:postgres@127.0.0.1:54322/postgres" -X -At <<'SQL'
+          select 'tabelle: ' || count(*) from pg_tables where schemaname = 'public';
+          select 'funzioni: ' || count(*) from pg_proc p join pg_namespace n on n.oid = p.pronamespace where n.nspname = 'public';
+          select 'regole: ' || count(*) from pg_policies where schemaname in ('public', 'storage');
+          select 'trigger: ' || count(*) from pg_trigger t join pg_class c on c.oid = t.tgrelid join pg_namespace n on n.oid = c.relnamespace where n.nspname in ('public', 'auth') and not t.tgisinternal;
+          select 'bucket: ' || count(*) from storage.buckets;
+          select 'orologi: ' || count(*) from cron.job;
+          select 'righe di dati in public: ' || coalesce(sum(n_live_tup), 0) from pg_stat_user_tables where schemaname = 'public';
+          SQL
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: struttura-database
+          path: struttura.sql
+          retention-days: 7
