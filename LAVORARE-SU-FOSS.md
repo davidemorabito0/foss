@@ -3,8 +3,9 @@
 Guida completa per chi riprende in mano il progetto con un altro strumento (un editor, un'altra IA, uno
 sviluppatore). Si legge dall'inizio alla fine prima di toccare qualcosa.
 
-Aggiornata al **24 novembre 2026**: FOSS **v80**, FOSS.chat **2.9.10**, app per computer **1.0.6**,
-service worker `foss-guscio-v111`.
+Aggiornata al **25 novembre 2026**: FOSS **v81**, FOSS.chat **2.9.10**, app per computer **1.0.6**,
+service worker `foss-guscio-v112`. La versione che gira su un dispositivo si legge in fondo al **Profilo**
+(FOSS) e nelle impostazioni della chat.
 
 Il diario tecnico dettagliato, con la storia di ogni versione e i motivi delle scelte, è
 [`sviluppo/FOSS-CHAT.md`](sviluppo/FOSS-CHAT.md). Questo file è la mappa; quello è il registro.
@@ -81,10 +82,10 @@ sviluppo/
   sql/                  copia locale delle funzioni SQL (può essere indietro rispetto alla produzione)
   edge/                 funzioni edge: push, gif, supernotifica, trascrivi
   strumenti/            pubblica.pl (pubblica senza git), build.pl (costruisce chat.html)
-  test/app/             prove nel browser (Playwright) con Supabase finto: prova*.py, mock-supabase.js
+  test/app/             prove nel browser (Playwright): prova-foss.py (FOSS), prova*.py + mock-supabase.js (chat)
   test/db/              prove del database in memoria (PGlite): prova.mjs
   test/desktop/         prove dell'app per computer
-.github/workflows/      controllo-chat.yml, controllo-app.yml, app-desktop.yml, app-android.yml
+.github/workflows/      controllo-foss.yml, controllo-chat.yml, controllo-app.yml, app-desktop.yml, app-android.yml
 ```
 
 ---
@@ -198,6 +199,18 @@ con i dati dimostrativi (spazi «Video Milano», «Social & Food»…). Ricorda 
 risultato.
 
 Controlla sempre: console senza errori nuovi, schermo largo (1500 px e oltre) e telefono (375 px).
+
+### Controllo automatico di FOSS
+
+Con il server sulla porta 8123 attivo:
+
+```bash
+CHROME="/Applications/Google Chrome.app/Contents/MacOS/Google Chrome" python3 sviluppo/test/app/prova-foss.py
+```
+
+Apre FOSS senza database (dati dimostrativi), entra in uno spazio, apre un lavoro e il Profilo, prova il
+telefono, e si ferma su qualunque errore della pagina. Su GitHub lo lancia `controllo-foss.yml` a ogni
+modifica di `index.html` o `sw.js`. Quando aggiungi una funzione importante, aggiungi lì il suo controllo.
 
 ### Prove automatiche della chat
 
@@ -329,7 +342,7 @@ Per pubblicare su un ramo di prova (creato da `main`): `RAMO=prova-x perl svilup
 curl -s https://foss.team/ | grep -o "VERSIONE = 'v[0-9]*'"
 ```
 
-6. Se hai toccato la chat, guarda il controllo automatico su GitHub:
+6. Guarda i controlli automatici su GitHub («Controllo FOSS» e, se hai toccato la chat, «Controllo chat»):
 
 ```bash
 gh run list -R davidemorabito0/foss -L 5
@@ -380,6 +393,8 @@ gh run list -R davidemorabito0/foss -L 5
   vocali è pronta ma spenta finché manca.
 - Accendere **Leaked password protection** in Supabase → Authentication.
 - Provare sui dispositivi veri: avvisi su Android e iPhone (icona sulla Home), email di recupero password.
+- Gli avvisi accesi sono pochi (3 dispositivi su 9 persone a fine novembre 2026): dalla v81 FOSS invita
+  tutti ad accenderli; vale la pena ricordarlo anche a voce ai collaboratori.
 
 ### Miglioramenti noti, non ancora fatti
 
@@ -392,6 +407,9 @@ gh run list -R davidemorabito0/foss -L 5
 
 ### Ultime modifiche
 
+- **v81** — invito ad accendere gli avvisi per tutti (anche nel browser); scheda dello spazio
+  richiudibile e più stretta sugli schermi medi; versione nel Profilo; controllo automatico di FOSS;
+  indici e una regola del database ottimizzati.
 - **v80** — il fumetto per commentare task e subtask è sempre visibile (prima compariva solo passandoci
   sopra col mouse).
 - **v77–v79** — scheda dello spazio di lavoro accanto ai progetti (a destra, larga circa il 44% della

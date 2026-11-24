@@ -2719,7 +2719,7 @@ button.all-apri:hover .nm{color:var(--amber-ink);text-decoration:underline}
 :root[data-theme="light"]{--t-giallo:#D99A0B;--t-grigio:#6F8098}
 
 /* la scheda dello spazio a destra */
-.sp2-info{width:clamp(380px,44%,860px);flex:none;overflow-y:auto;border-left:1px solid var(--line);background:var(--surface);padding:16px;display:none;flex-direction:column;gap:14px}
+.sp2-info{width:clamp(340px,min(44vw,calc(100vw - 1180px)),860px);flex:none;overflow-y:auto;border-left:1px solid var(--line);background:var(--surface);padding:16px;display:none;flex-direction:column;gap:14px}
 .sp2-lay.con-scheda .sp2-info{display:flex}
 .sp2-card{flex:none;border:1px solid var(--line);border-radius:16px;background:var(--bg);padding:16px}
 .sp2-card h3{font-size:15px;font-weight:700;letter-spacing:-.01em}
@@ -2758,7 +2758,17 @@ button.all-apri:hover .nm{color:var(--amber-ink);text-decoration:underline}
 .sp2-info .hm-a{padding:9px 2px}
 .sp2-info .hm-a .w{white-space:normal;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical}
 
-@media (max-width:1279px){ .sp2-lay.con-scheda .sp2-info{display:none} }
+@media (max-width:1279px){ .sp2-lay.con-scheda .sp2-info{display:none} .sp2-ling{display:none} }
+/* v81: la scheda dello spazio si chiude e si riapre (ognuno sul suo dispositivo) */
+.sp2-testa{display:flex;align-items:center;gap:8px;margin:-4px 0 -2px}
+.sp2-testa b{flex:1;font-size:12px;letter-spacing:.06em;text-transform:uppercase;color:var(--mute)}
+.sp2-chiudi{display:inline-flex;align-items:center;gap:4px;height:28px;padding:0 10px;border-radius:8px;border:1px solid var(--line);background:var(--surface-2);color:var(--dim);font:600 12px Sora;cursor:pointer}
+.sp2-chiudi:hover{color:var(--text);background:var(--surface-3)}
+.sp2-chiudi svg{width:14px;height:14px}
+.sp2-ling{flex:none;width:34px;display:flex;flex-direction:column;align-items:center;gap:8px;padding:14px 0;border:0;border-left:1px solid var(--line);background:var(--surface);color:var(--dim);cursor:pointer;font:600 12px Sora}
+.sp2-ling span{writing-mode:vertical-rl;transform:rotate(180deg);letter-spacing:.04em}
+.sp2-ling svg{width:16px;height:16px}
+.sp2-ling:hover{color:var(--text);background:var(--surface-2)}
 /* le carte della scheda dello spazio: una colonna nella barra laterale, e sotto ai progetti sul telefono */
 .sp-rp{grid-template-columns:repeat(auto-fill,minmax(260px,1fr));gap:12px;padding:0}
 .sp-rp .rp-c.largo{grid-column:auto}
@@ -5623,6 +5633,7 @@ function schedaSpazio(sp){
   ps.forEach(p=>(p.log||[]).forEach(l=>{ if(l && l.t) att.push({p, l}); }));
   att.sort((a,b)=>b.l.t-a.l.t);
   let h = '<aside class="sp2-info" style="--acc:'+col+'">';
+  h += '<div class="sp2-testa"><b>Scheda dello spazio</b><button class="sp2-chiudi" data-action="scheda-chiudi" title="Chiudi la scheda: più spazio per i progetti">Chiudi'+svg('right',2.2)+'</button></div>';
   h += '<section class="sp2-card sp2-cop">'+
     '<div class="cop'+(bg?' con-foto':'')+'">'+(bg? imgRit(bg, ritDi(sp,'scheda')) : '')+
       (puoCop ? '<span class="cop-bb">'+(bg? '<button class="cop-b" data-action="rit-spazio" data-id="'+esc(sp.id)+'">'+svg('grid',2)+'<span>Ritaglia</span></button>' : '')+
@@ -5879,6 +5890,7 @@ function renderHome(){
   const largo = !suTelefono() && !!sp;
   /* la scheda dello spazio sta accanto ai progetti: si spegne da Modifica spazio */
   const conScheda = largo0 && !sp.schedaOff;
+  let schedaChiusa = false; try{ schedaChiusa = localStorage.getItem('foss_scheda_chiusa') === '1'; }catch(e){}
   if(largo) h += '<div class="hm sp2-lay'+(conScheda?' con-scheda':'')+'">'+barraSinistra(sp.id)+'<div class="sp2-main'+(bgSp?' con-sfondo':'')+'"'+(bgSp? ' style="--bg-img:url(\''+bgSp+'\');'+varsRit(ritDi(sp,'sfondo'))+'"':'')+'>';
   if(tutto) h += '<div class="scroller tel-tutto">' + testataTelefono();
   h += intestazioneSpazio(lista);
@@ -5911,7 +5923,9 @@ function renderHome(){
   if(sp && !largo && !state.ospite && (state.vista==='tessere' || state.vista==='lista') && !sp.schedaOff)
     h += '<div class="rp sp-rp tel-rp">'+carteSpazio(sp)+'</div>';
   if(tutto) h += '</div>';
-  if(largo) h += '</div>'+(conScheda? schedaSpazio(sp) : '')+'</div>';
+  if(largo) h += '</div>'+(conScheda? (schedaChiusa
+      ? '<button class="sp2-ling" data-action="scheda-apri" title="Apri la scheda dello spazio">'+svg('left',2.2)+'<span>Scheda dello spazio</span></button>'
+      : schedaSpazio(sp)) : '')+'</div>';
   h += '</div>';
   el('stage').innerHTML = h;
   const qi = el('q'); if(qi && qi.value!==state.filtro) qi.value = state.filtro;
@@ -8570,6 +8584,8 @@ function renderProfilo(){
 
   h += '<button class="btn esci-rosso" data-action="esci">'+svg('out')+'Esci da FOSS</button>';
   h += cartaCestino();
+  /* v81: la versione che gira davvero su questo dispositivo, per capire se e' aggiornato */
+  h += '<div class="pf-legal pf-ver" style="margin-bottom:0;opacity:.7">FOSS '+esc(VERSIONE)+(window.fossDesktop ? ' · app per computer' : '')+'</div>';
   h += '<div class="pf-legal"><a href="privacy.html" target="_blank" rel="noopener">Privacy</a> \u00b7 <a href="termini.html" target="_blank" rel="noopener">Termini</a> \u00b7 <a href="mailto:info@davidemorabito.com">info@davidemorabito.com</a></div>';
   h += '</div></div></div></div></div>';
   el('stage').innerHTML = h;
@@ -10837,7 +10853,7 @@ function cartaModelli(){
    Come si fa tutto, capitolo per capitolo: dai primi passi alle cose per chi
    organizza un team. Si cerca per parola (anche senza accenti); in fondo c'e'
    il tasto per segnalare quello che manca o non funziona. */
-const VERSIONE = 'v80';
+const VERSIONE = 'v81';
 const LIVELLI_GUIDA = {base:'Per cominciare', medio:'Tutti i giorni', esperto:'Per chi organizza', aiuto:'Se qualcosa non va'};
 const GUIDA = [
 {id:'primi-passi', liv:'base', ic:'spark', t:'Primi passi', s:'Cos’è FOSS e come ci si muove', v:[
@@ -12428,6 +12444,8 @@ document.addEventListener('click', function(e){
         '<button class="btn primary" data-action="salva-spazio" data-id="'+sp.id+'">'+svg('check')+'Salva</button></div>');
       break; }
 
+    case 'scheda-chiudi': try{ localStorage.setItem('foss_scheda_chiusa','1'); }catch(e){} render(); break;
+    case 'scheda-apri': try{ localStorage.removeItem('foss_scheda_chiusa'); }catch(e){} render(); break;
     case 'sp-scheda':{
       const sp = state.spazi.find(x=>x.id===spazioMod); if(!sp) break;
       leggiCampiSpazio(sp);
@@ -16436,17 +16454,28 @@ function attivaPush(){
    viene invitato a farlo appena entra: senza, il telefono non suona. Il permesso parte dal tocco sul tasto.
    «Non ora»: lo richiedo dopo 3 giorni. */
 let invitoAvvisiFatto = false;
+/* v81: l'invito arriva a tutti, anche nel browser (prima solo nell'app): senza avvisi chi non ha FOSS
+   aperto non sa di un messaggio o di una task. Sull'iPhone nel browser gli avvisi non esistono:
+   lì spiego come mettere l'icona sulla Home. */
 async function invitaAvvisi(){
-  if(invitoAvvisiFatto || window.fossDesktop || state.ospite || !aTuttoSchermo()) return;
+  if(invitoAvvisiFatto || window.fossDesktop || state.ospite) return;
   invitoAvvisiFatto = true;
   try{
     const ultimo = +(localStorage.getItem('foss_avvisi_invito') || 0);
     if(Date.now() - ultimo < 3*86400000) return;
-    if(await statoPush() !== 'no') return;
+    const sp = await statoPush();
+    if(sp !== 'no' && sp !== 'ios-home') return;
     if(el('modalSlot').children.length || state.schermo==='gate') { invitoAvvisiFatto = false; return; }
     localStorage.setItem('foss_avvisi_invito', String(Date.now()));
+    if(sp === 'ios-home'){
+      modale('<h3>Vuoi gli avvisi sull’iPhone?</h3><div class="sub-t">Serve l’icona di FOSS sulla Home</div>'+
+        '<div class="modal-b"><div class="nota-box">Su iPhone gli avvisi arrivano solo aprendo FOSS dall’icona: tocca <b>Condividi</b> in basso, poi <b>Aggiungi alla schermata Home</b>. Apri FOSS da lì e accendi gli avvisi.</div></div>'+
+        '<div class="modal-f"><button class="btn primary" data-action="chiudi-modale">Ho capito</button></div>');
+      return;
+    }
+    const dove = suTelefono() ? 'Il telefono suona' : 'Il computer ti avvisa';
     modale('<h3>Accendi gli avvisi</h3><div class="sub-t">Come in un’app di messaggi</div>'+
-      '<div class="modal-b"><div class="nota-box">Il telefono suona quando ti scrivono in chat, ti assegnano una task o si avvicina una consegna, anche con l’app chiusa. Si spengono quando vuoi dal Profilo.</div></div>'+
+      '<div class="modal-b"><div class="nota-box">'+dove+' quando ti scrivono in chat, ti assegnano una task o si avvicina una consegna, anche con FOSS chiuso. Si spengono quando vuoi dal Profilo.</div></div>'+
       '<div class="modal-f"><button class="btn ghost" data-action="chiudi-modale">Non ora</button>'+
       '<button class="btn primary" data-action="push-attiva-invito">'+svg('bell')+'Attiva gli avvisi</button></div>');
   }catch(e){}

@@ -1,0 +1,35 @@
+# Controllo di base di FOSS (index.html) nel browser, senza database: a ogni modifica di FOSS e a mano
+# (Actions → «Controllo FOSS» → Run workflow). Apre la Home, uno spazio, un lavoro, il Profilo, e il
+# telefono; si ferma se la pagina dà errori. Non pubblica niente.
+name: Controllo FOSS
+
+on:
+  workflow_dispatch:
+  push:
+    branches: [main, 'prova-*']
+    paths: ['index.html', 'sw.js', 'sviluppo/test/app/prova-foss.py', '.github/workflows/controllo-foss.yml']
+
+jobs:
+  prove:
+    runs-on: ubuntu-latest
+    env:
+      CHROME: /usr/bin/google-chrome
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Playwright
+        run: pip install playwright
+      - name: Prove
+        shell: bash
+        run: |
+          python3 -m http.server 8123 --bind 127.0.0.1 > /dev/null 2>&1 &
+          sleep 1
+          timeout 600 python3 sviluppo/test/app/prova-foss.py
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: schermate-foss
+          path: sviluppo/test/app/shot/foss-*
+          retention-days: 7

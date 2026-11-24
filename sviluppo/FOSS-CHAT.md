@@ -337,6 +337,30 @@ Richiesta: i lavori pieni di note e riferimenti hanno bisogno di un posto solo d
   «Torna alle fasi» resta sempre lì, e l'impostazione vale per spazio, non per persona: si salva nel
   nucleo dello spazio e si sincronizza con gli altri.
 
+### FOSS v81 — correzioni dal controllo generale (25 novembre 2026)
+Dopo un controllo di FOSS e della chat (errori registrati in `errori_app`, segnalazioni, advisors di
+Supabase, peso delle pagine), il titolare ha approvato queste correzioni:
+- **Invito ad accendere gli avvisi per tutti** (`invitaAvvisi`): prima compariva solo nell'app (APK /
+  icona sulla Home), ora anche nel browser del computer e del telefono. Su iPhone nel browser, dove gli
+  avvisi non esistono (`statoPush() === 'ios-home'`), spiega come aggiungere FOSS alla Home. Sempre una
+  volta ogni 3 giorni al massimo (`localStorage.foss_avvisi_invito`). Motivo: su 9 persone solo 3
+  dispositivi avevano gli avvisi accesi.
+- **Scheda dello spazio richiudibile**: in cima alla scheda «Chiudi ›»; al suo posto resta una linguetta
+  verticale «Scheda dello spazio» per riaprirla (`scheda-chiudi`/`scheda-apri`, ricordato per dispositivo in
+  `localStorage.foss_scheda_chiusa`). Larghezza `clamp(340px, min(44vw, 100vw - 1180px), 860px)`: grande
+  sugli schermi grandi, sugli schermi medi lascia ai progetti il posto per le tre colonne.
+- **Versione nel Profilo** (`.pf-ver`, sotto il cestino): «FOSS v81», più «app per computer» dentro l'app.
+  La chat la mostrava già nelle impostazioni.
+- **Controllo automatico di FOSS**: `sviluppo/test/app/prova-foss.py` (senza database: blocca supabase-js e
+  usa i dati dimostrativi; Home, spazio, scheda che si chiude e riapre, lavoro, fumetto dei commenti
+  visibile, versione nel Profilo, telefono, nessun errore nella pagina: 13 controlli) e il workflow
+  `.github/workflows/controllo-foss.yml`, che lo lancia a ogni modifica di `index.html` o `sw.js`.
+- **Database** (migrazione `foss_pulizie_indici_regole`): indici sulle chiavi esterne `inviti.org_id`,
+  `notifiche.org_id`, `organizzazioni.titolare`, `progetti.aggiornato_da`; nella regola DELETE di
+  `modelli` `auth.uid()` diventa `(select auth.uid())`. **`migra_progetti` resta**: oggi nessun lavoro è
+  nel formato vecchio, ma `aggiornaDaCloud` la chiama se ne compare uno, quindi è una rete di sicurezza.
+  Gli indici «mai usati» restano (servono alle chiavi esterne e alle cancellazioni).
+
 ### FOSS v80 — il fumetto dei commenti sempre visibile (24 novembre 2026)
 Segnalazione: «l'icona per commentare task e subtask è invisibile, il tasto funziona ma non si vede».
 Dalla v48 sul computer (`@media (hover:hover)`) il tasto `.cm-btn` di una task o subtask **senza commenti**
