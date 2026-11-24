@@ -146,7 +146,7 @@ da capo (`arrivaImportato`).
 ## 5. Avvisi e notifiche
 
 - **Service worker** `sw.js`, cache `foss-guscio-vNN`. A ogni pubblicazione che tocca la chat o FOSS
-  si **alza il numero** (oggi v81).
+  si **alza il numero** (il numero attuale è in cima a `sw.js`).
 - Il SW non mostra l'avviso se la chat è già aperta e in primo piano (`chatDavanti()`; su
   Safari non è affidabile, quindi lì l'avviso arriva sempre).
 - **Nel browser:** numero nel titolo della scheda e avvisi a comparsa in basso (stile WhatsApp
@@ -336,6 +336,16 @@ Richiesta: i lavori pieni di note e riferimenti hanno bisogno di un posto solo d
   (prima «Riepilogo»). Il tasto
   «Torna alle fasi» resta sempre lì, e l'impostazione vale per spazio, non per persona: si salva nel
   nucleo dello spazio e si sincronizza con gli altri.
+
+### FOSS v80 — il fumetto dei commenti sempre visibile (24 novembre 2026)
+Segnalazione: «l'icona per commentare task e subtask è invisibile, il tasto funziona ma non si vede».
+Dalla v48 sul computer (`@media (hover:hover)`) il tasto `.cm-btn` di una task o subtask **senza commenti**
+aveva `opacity:0` e compariva solo passando sopra la riga. Tolte quelle due regole: il fumetto con la
+graffetta resta sempre visibile (colore `--dim`, sulle subtask `opacity:.7`), pieno passandoci sopra.
+
+Nella radice c'è ora **`LAVORARE-SU-FOSS.md`**: la guida completa per lavorare al progetto fuori da
+Claude Code (mappa del repository, regole, prove, pubblicazione, segreti, app, cose aperte). Va tenuta
+aggiornata insieme a questo file.
 
 ### FOSS v77 — la scheda dello spazio di lavoro (20 novembre 2026)
 Richiesta: «entrando in uno spazio di lavoro devono vedersi i progetti in corso **e** tutte le
