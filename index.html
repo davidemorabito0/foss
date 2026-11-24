@@ -2189,10 +2189,10 @@ a.btn.primary{color:var(--on-amber)}
 .pe-az .iconbtn:disabled{opacity:.3;pointer-events:none}
 /* ---------- COMMENTI DENTRO TASK E SUBTASK ---------- */
 .cm-btn{position:relative;display:inline-flex;align-items:center;gap:3px;height:24px;min-width:26px;padding:0 6px;border-radius:7px;flex:none;
-  color:var(--mute);background:transparent;border:1px solid transparent;font-size:11px;font-weight:700;font-family:Sora;transition:background .14s,color .14s,border-color .14s}
+  color:var(--dim);background:transparent;border:1px solid transparent;font-size:11px;font-weight:700;font-family:Sora;transition:background .14s,color .14s,border-color .14s}
 .cm-btn svg{width:14px;height:14px}
 .cm-btn:hover{background:var(--surface-3);color:var(--text)}
-.cm-btn.su-voce:not(.ha){opacity:.45}
+.cm-btn.su-voce:not(.ha){opacity:.7}
 .cm-btn.su-voce:not(.ha):hover{opacity:1}
 .cm-btn.ha{color:var(--dim);border-color:var(--line);background:var(--surface-2)}
 .cm-btn.nuovi{color:#fff;border-color:var(--alert);background:var(--alert);box-shadow:0 0 0 3px color-mix(in srgb,var(--alert) 25%,transparent)}
@@ -2641,11 +2641,8 @@ a.btn.primary{color:var(--on-amber)}
 .v-st.muto{background:transparent!important}
 @media (hover:hover){
   .chk.v2 .v-data.vuota{opacity:0}
-  .chk.v2 .cm-btn:not(.ha):not(.nuovi){opacity:0}
   .chk.v2 .v-menu{opacity:0}
   .chk.v2:hover .v-data.vuota,.chk.v2:hover .cm-btn,.chk.v2:hover .v-menu,.chk.v2 :focus-visible{opacity:1}
-  .sub-h .cm-btn:not(.ha):not(.nuovi){opacity:0}
-  .sub-h:hover .cm-btn{opacity:1}
 }
 .all-az{display:flex;flex-wrap:wrap;gap:8px}
 .all-az .agg-dato{margin-top:4px}
@@ -10840,7 +10837,7 @@ function cartaModelli(){
    Come si fa tutto, capitolo per capitolo: dai primi passi alle cose per chi
    organizza un team. Si cerca per parola (anche senza accenti); in fondo c'e'
    il tasto per segnalare quello che manca o non funziona. */
-const VERSIONE = 'v79';
+const VERSIONE = 'v80';
 const LIVELLI_GUIDA = {base:'Per cominciare', medio:'Tutti i giorni', esperto:'Per chi organizza', aiuto:'Se qualcosa non va'};
 const GUIDA = [
 {id:'primi-passi', liv:'base', ic:'spark', t:'Primi passi', s:'Cos’è FOSS e come ci si muove', v:[
