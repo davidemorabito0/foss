@@ -849,6 +849,7 @@ svg{display:block}
   .vocale .tempo{font-size:13px;bottom:-12px}
   /* barra per scrivere */
   .scrivi{background:var(--testa);padding-bottom:max(8px, env(safe-area-inset-bottom))}
+  :root.tastiera .scrivi{padding-bottom:6px}
   :root[data-tema="scuro"] .scrivi{background:#161618}
   .barra-scrivi{padding:8px 10px 4px;gap:8px;min-height:60px;align-items:center}
   #emojiB{display:none}
@@ -1554,7 +1555,7 @@ const SUPA_KEY = 'sb_publishable_f5Kjp6NHT9yTxr1bhWJjhg_4y72V-Kj';
 const VAPID_PUBBLICA = 'BNlGbW4nZrXmx8DioKxnl7ubULVOr5_6CAKvpuQYoiXeObmxYAzGU6UrkExx2zu1hACmtRNDcpoMh_ARQ0GSmlw';
 /* il server dei file sul NAS (es. 'https://media.foss.team'). Vuoto = si usa Supabase. */
 const MEDIA_NAS = 'https://media.foss.team';
-const VERSIONE = 'chat-2.9.10';
+const VERSIONE = 'chat-2.9.11';
 /* i temi colore: gli stessi di FOSS. Il predefinito per tutti è Brand (blu e giallo). */
 const TEMI_COLORE = [
   {id:'brand',   nome:'Brand',    ds:'Navy e ambra, il predefinito', c:['#0D1926','#1A3149','#FFAD01']},
@@ -4925,7 +4926,8 @@ function nuovaChat(){
   if(!tocco()) setTimeout(() => { const i = el('ncCerca'); if(i) i.focus(); }, 200);
 }
 async function scriviA(id){
-  chiudiPannelloSinistra(); chiudiVelo();
+  /* anche dalle informazioni del gruppo: chiudo il pannello e porto dritto nella chat privata */
+  chiudiPannelloSinistra(); chiudiVelo(); chiudiInfo();
   let conv = null;
   S.convs.forEach(c => { if(c.tipo !== 'privata') return;
     const solo = (c.membri || []).every(m => m.id === S.io);
@@ -6038,8 +6040,11 @@ if('serviceWorker' in navigator){
   const adatta = () => {
     const R = document.documentElement, h = Math.round(vv.height);
     const pieno = Math.max(window.innerHeight || 0, R.clientHeight || 0);
-    if(pieno - h > 150) R.style.setProperty('--alto', h + 'px');
+    const tastiera = pieno - h > 150;
+    if(tastiera) R.style.setProperty('--alto', h + 'px');
     else R.style.removeProperty('--alto');
+    /* con la tastiera aperta il bordo in basso del telefono e' coperto: niente spazio vuoto sotto la barra */
+    R.classList.toggle('tastiera', tastiera);
     if(Math.abs(window.scrollY) > 0 || vv.offsetTop > 0) window.scrollTo(0, 0);
     const app = el('app'); if(app) app.style.transform = vv.offsetTop ? 'translateY(' + vv.offsetTop + 'px)' : '';
     const M = el('msgs');
