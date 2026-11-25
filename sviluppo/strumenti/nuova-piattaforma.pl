@@ -101,7 +101,7 @@ my @VIA = (qr{^\.git(/|$)}, qr{^desktop/src-tauri/target/}, qr{^desktop/src-taur
            qr{(^|/)__pycache__/}, qr{(^|/)\.DS_Store$}, qr{^sviluppo/test/app/shot/}, qr{^android/\.gradle/},
            qr{^android/(app/)?build/}, qr{^\.well-known/assetlinks\.json$},
            # il diario tecnico di FOSS ha dettagli personali (casa, NAS, chiavi): non va nella copia
-           qr{^sviluppo/FOSS-CHAT\.md$}, qr{^sviluppo/strumenti/piattaforma-esempio\.txt$}, qr{^BRIEF-NUOVA-CHAT\.md$},
+           qr{^sviluppo/FOSS-CHAT\.md$}, qr{^sviluppo/strumenti/piattaforma-esempio\.txt$}, qr{^BRIEF-NUOVA-CHAT\.md$}, qr{^CONTESTO-CHAT-CLAUDE\.md$},
            # gli strumenti per creare piattaforme gemelle restano solo in FOSS
            qr{^sviluppo/strumenti/nuova-piattaforma\.pl$}, qr{^NUOVA-PIATTAFORMA\.md$});
 my $TESTO = qr{\.(html|js|mjs|ts|css|json|md|txt|yml|yaml|rs|toml|xml|gradle|properties|py|sql|sh|plist|svg|java|pl|conf)$|(^|/)(_headers|robots\.txt|Dockerfile)$};
