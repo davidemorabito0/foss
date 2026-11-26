@@ -822,3 +822,9 @@ Sul Mac di Davide git e python non ci sono più: `pubblica.pl` carica le modific
 - Misure dal telefono vero (iPhone, app dalla Home, 26 nov 2026): all'invio `disegnaScrivi` ricreava la casella; la casella nuova prendeva il fuoco (focusin al fotogramma 5) e iOS spostava la pagina per mostrarla: `visualViewport.offsetTop` 0→204→0, `#app` traslato di 204 px per due fotogrammi (ultima bolla da 394 a 636 px e ritorno). In più `#msgs.scrollTop` scendeva di ~60 px prima di risalire.
 - Correzione: `ripulisciScrivi()` in `05-scrivi.js` svuota la barra IN POSTO (toglie solo «rispondi a», segno effetti, aggiorna i tasti) e tiene la stessa textarea con il fuoco; `focus({preventScroll:true})` dove serve ancora ridisegnare.
 - La misura (`30-misura.js`) resta attiva per una seconda verifica sul telefono.
+
+## FOSS.chat 2.9.16 — rimbalzo risolto, misura tolta
+
+- Seconda misura sull'iPhone con la 2.9.15 (26 nov 2026): nessun focusin, `visualViewport.offsetTop` fermo a 0, `#app` mai traslato, `#msgs.scrollTop` sale in modo continuo (299→349 in ~17 fotogrammi). Davide conferma: «ora è perfetto».
+- Tolto `js/30-misura.js` e cancellate le righe `misura-rimbalzo` da `errori_app`. Service worker `foss-guscio-v119`.
+- Regola per il futuro: all'invio NON ricreare la textarea e non darle il fuoco con scorrimento; su iOS ogni fuoco nuovo sposta la pagina.
