@@ -835,3 +835,8 @@ Sul Mac di Davide git e python non ci sono più: `pubblica.pl` carica le modific
 - `js/30-misura.js`: solo account del titolare, solo schermi senza tocco. Dal clic sulla freccia annota per 1,6 s a ogni fotogramma scrollTop/altezze di #msgs, posizione dell'ultima bolla (anche «assoluta», per vedere se il contenuto si sposta da solo), animazione in corso, tasto, separatore non letti, fuoco, eventi wheel/scroll. Manda con `segnala_errore` (dove = `misura-fondo`).
 - Già visto in Chromium: il clic sulla freccia toglie il fuoco alla casella (va sul tasto, poi sul BODY quando il tasto sparisce).
 - Da togliere appena trovata la causa, e cancellare le righe `misura-fondo` da `errori_app`.
+
+## FOSS.chat 2.9.18 — misura del tasto «vai in fondo» tolta
+
+- Davide: «al momento mi funziona». Nessuna misura arrivata; tolto `js/30-misura.js` (copia in archivio di lavoro, non pubblicata). Service worker `foss-guscio-v121`.
+- Se il rimbalzo torna: ripristinare la misura 2.9.17 (registra dal clic sulla freccia, dove = `misura-fondo`). Notato in Chromium: il clic sulla freccia toglie il fuoco alla casella.
