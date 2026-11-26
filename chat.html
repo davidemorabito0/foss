@@ -236,10 +236,6 @@ svg{display:block}
 .msg{display:flex;padding:0 63px;margin-bottom:2px;position:relative}
 .msg.primo{margin-top:10px}
 .msg.mio{justify-content:flex-end}
-.msg.entra{animation:msgEntra .26s cubic-bezier(.2,.8,.25,1) both;transform-origin:0 100%}
-.msg.mio.entra{transform-origin:100% 100%}
-@keyframes msgEntra{from{opacity:0;transform:translateY(14px) scale(.96)}}
-@media (prefers-reduced-motion:reduce){ .msg.entra{animation:none} }
 .msg .av-g{width:28px;height:28px;margin-right:6px;flex:none;font-size:12px;align-self:flex-start}
 .msg.suo.gr .vuoto-av{width:28px;margin-right:6px;flex:none}
 .bolla{position:relative;max-width:min(65%,560px);border-radius:7.5px;padding:6px 7px 8px 9px;box-shadow:0 1px .5px rgba(11,20,26,.13);
@@ -556,8 +552,6 @@ svg{display:block}
 .ai-manda{width:60px;height:60px;border-radius:50%;background:var(--pieno);color:var(--su-pieno);display:grid;place-items:center;flex:none;box-shadow:0 2px 8px rgba(0,0,0,.25)}
 .ai-manda svg{width:28px;height:28px}
 .ai-strumenti{display:flex;gap:4px}
-.ai-gif{align-self:center;height:30px;padding:0 11px;border-radius:9px;border:1.5px solid rgba(255,255,255,.55);background:none;color:#fff;font:800 13px/1 var(--font);letter-spacing:.06em;cursor:pointer;margin-right:4px}
-.ai-gif.on{background:var(--pieno,#FFAD01);border-color:var(--pieno,#FFAD01);color:var(--su-pieno,#0D1926)}
 
 /* ---------- editor disegno e sticker ---------- */
 .editor{position:fixed;inset:0;z-index:75;background:#111;display:flex;flex-direction:column;color:#fff;touch-action:none;user-select:none;-webkit-user-select:none}
@@ -855,7 +849,6 @@ svg{display:block}
   .vocale .tempo{font-size:13px;bottom:-12px}
   /* barra per scrivere */
   .scrivi{background:var(--testa);padding-bottom:max(8px, env(safe-area-inset-bottom))}
-  :root.tastiera .scrivi{padding-bottom:6px}
   :root[data-tema="scuro"] .scrivi{background:#161618}
   .barra-scrivi{padding:8px 10px 4px;gap:8px;min-height:60px;align-items:center}
   #emojiB{display:none}
@@ -1561,7 +1554,7 @@ const SUPA_KEY = 'sb_publishable_f5Kjp6NHT9yTxr1bhWJjhg_4y72V-Kj';
 const VAPID_PUBBLICA = 'BNlGbW4nZrXmx8DioKxnl7ubULVOr5_6CAKvpuQYoiXeObmxYAzGU6UrkExx2zu1hACmtRNDcpoMh_ARQ0GSmlw';
 /* il server dei file sul NAS (es. 'https://media.foss.team'). Vuoto = si usa Supabase. */
 const MEDIA_NAS = 'https://media.foss.team';
-const VERSIONE = 'chat-2.9.12';
+const VERSIONE = 'chat-2.9.10';
 /* i temi colore: gli stessi di FOSS. Il predefinito per tutti è Brand (blu e giallo). */
 const TEMI_COLORE = [
   {id:'brand',   nome:'Brand',    ds:'Navy e ambra, il predefinito', c:['#0D1926','#1A3149','#FFAD01']},
@@ -3123,41 +3116,13 @@ function mediaNonArriva(mid){
   if(v && nas){ const t = v.querySelector('.tempo'); if(t) t.textContent = 'Il server dei media sembra offline'; }
 }
 
-/* 2.9.12: aggiorno il messaggio "in posto", toccando solo quello che cambia (spunte, ora, coda della bolla):
-   foto e video gia' caricati restano li', senza ricaricarsi e senza lampi */
-const MEDIA_FISSI = /^(IMG|VIDEO|AUDIO|CANVAS|IFRAME)$/;
-function chiaveMedia(n){ return n.getAttribute('data-mid') || n.getAttribute('data-mini-di') || n.getAttribute('data-polvere') || n.getAttribute('src') || ''; }
-function morfa(a, b){
-  if(a.nodeType !== b.nodeType || a.nodeName !== b.nodeName){ a.replaceWith(b); return; }
-  if(a.nodeType === 3 || a.nodeType === 8){ if(a.data !== b.data) a.data = b.data; return; }
-  if(a.nodeType !== 1){ a.replaceWith(b); return; }
-  if(MEDIA_FISSI.test(a.nodeName)){
-    const k = chiaveMedia(a);
-    if(k && k === chiaveMedia(b)){
-      Array.from(b.attributes).forEach(x => { if(x.name !== 'src' && a.getAttribute(x.name) !== x.value) a.setAttribute(x.name, x.value); });
-      return;
-    }
-    a.replaceWith(b); return;
-  }
-  Array.from(a.attributes).forEach(x => { if(!b.hasAttribute(x.name)) a.removeAttribute(x.name); });
-  Array.from(b.attributes).forEach(x => { if(a.getAttribute(x.name) !== x.value) a.setAttribute(x.name, x.value); });
-  const ca = Array.from(a.childNodes), cb = Array.from(b.childNodes);
-  for(let i = 0; i < cb.length; i++){ if(i < ca.length) morfa(ca[i], cb[i]); else a.appendChild(cb[i]); }
-  for(let i = cb.length; i < ca.length; i++) ca[i].remove();
-}
 function ridisegnaMessaggio(id){
   const c = S.convs.get(S.aperta); if(!c) return;
   const n = $('.msg[data-id="'+id+'"]', el('msgs')); if(!n) return;
   const lista = msgVisibili(c.id), i = lista.findIndex(x => x.id === id); if(i < 0){ n.remove(); return; }
   const d = document.createElement('div'); d.innerHTML = msgHTML(lista[i], lista[i - 1], lista[i + 1], c);
   const nuovo = d.firstChild;
-  if(!nuovo || nuovo.nodeType !== 1 || !nuovo.classList.contains('msg')){ if(nuovo) n.replaceWith(nuovo); else n.remove(); if(nuovo) idrataMedia(nuovo); return; }
-  /* la sfocatura d'attesa non torna se la foto e' gia' arrivata */
-  if(!n.querySelector('.mini')) nuovo.querySelectorAll('.mini').forEach(x => x.remove());
-  /* l'animazione d'entrata continua fino in fondo */
-  if(n.classList.contains('entra')) nuovo.classList.add('entra');
-  morfa(n, nuovo);
-  idrataMedia(n.isConnected ? n : nuovo);
+  n.replaceWith(nuovo); idrataMedia(nuovo);
 }
 function aggiornaSpunte(){
   const c = S.convs.get(S.aperta); if(!c) return;
@@ -3174,31 +3139,17 @@ function aggiungiMessaggioAlFondo(m, altrui){
   const giu = vicinoAlFondo();
   const lista = msgVisibili(c.id), i = lista.findIndex(x => x.id === m.id);
   if(i < 0) return;
+  if(i < lista.length - 1){ disegnaMessaggi(true); return; }
   const prev = lista[i - 1];
-  if(i < lista.length - 1){
-    /* arrivato "in mezzo" (orologi diversi): lo infilo al suo posto invece di ridisegnare tutta la chat */
-    const succ = lista[i + 1], nSucc = $('.msg[data-id="'+succ.id+'"]', M);
-    const stessoG = !prev || stessoGiorno(new Date(prev.creato_il), new Date(m.creato_il));
-    if(!nSucc || !stessoG || !stessoGiorno(new Date(succ.creato_il), new Date(m.creato_il))){ disegnaMessaggi(true); return; }
-    const d = document.createElement('div'); d.innerHTML = msgHTML(m, prev, succ, c);
-    const nodo = d.firstChild; nodo.classList && nodo.classList.add('entra');
-    M.insertBefore(nodo, nSucc); idrataMedia(nodo); togliEntra(nodo);
-    if(prev) ridisegnaMessaggio(prev.id);
-    ridisegnaMessaggio(succ.id);
-    if(giu || !altrui) vaiInFondo(false);
-    return;
-  }
   if(prev && !stessoGiorno(new Date(prev.creato_il), new Date(m.creato_il))) M.insertAdjacentHTML('beforeend', '<div class="giorno"><span>'+dataGiorno(m.creato_il)+'</span></div>');
   if(prev && stessoGruppo(prev, m)) ridisegnaMessaggio(prev.id);
   const d = document.createElement('div'); d.innerHTML = msgHTML(m, prev, null, c);
   const nodo = d.firstChild;
-  /* entra morbido, come su WhatsApp */
-  if(nodo.classList) nodo.classList.add('entra');
   M.appendChild(nodo);
-  idrataMedia(nodo); togliEntra(nodo);
+  idrataMedia(nodo);
   const md = m.media || {};
   if(md.bolla === 'slam' && !S.visti.has(m.id)){ const cv = el('conv'); cv.classList.remove('scossa'); void cv.offsetWidth; cv.classList.add('scossa'); }
-  if(giu || !altrui) vaiInFondo(false);
+  if(giu || !altrui) vaiInFondo(!altrui ? false : true);
   else { nuoviSotto++; mostraGiu(); if(menzionaMe(m)){ menzDaVedere.push(m.id); mostraMenz(); } }
   if(md.bolla || md.anim) setTimeout(() => segnaVisto(m.id), 2600);
 }
@@ -3206,40 +3157,14 @@ function segnaVisto(id){ S.visti.add(id); const a = Array.from(S.visti).slice(-4
 
 /* ---------- scorrere ---------- */
 function vicinoAlFondo(){ const M = el('msgs'); return !M || M.scrollHeight - M.scrollTop - M.clientHeight < 160; }
-function togliEntra(n){
-  if(!n || !n.classList) return;
-  const via = () => { n.classList.remove('entra'); };
-  n.addEventListener('animationend', e => { if(e.target === n) via(); }, {once: true});
-  setTimeout(via, 600);
-}
-/* 2.9.12: uno scorrimento solo, morbido, che segue il fondo anche se cresce (foto che arrivano):
-   prima ne partivano tre di fila e si vedeva lo scatto */
-let scorrendo = null;
-function scorriAlFondo(M){
-  const fondo = () => Math.max(0, M.scrollHeight - M.clientHeight);
-  if(matchMedia('(prefers-reduced-motion: reduce)').matches){ M.scrollTop = fondo(); return; }
-  if(scorrendo && scorrendo.M === M){ scorrendo.t0 = performance.now(); scorrendo.da = M.scrollTop; return; }
-  const st = scorrendo = {M, da: M.scrollTop, t0: performance.now()};
-  const dur = 280;
-  const passo = t => {
-    if(scorrendo !== st) return;
-    const k = Math.min(1, (t - st.t0) / dur), e = 1 - Math.pow(1 - k, 3);
-    M.scrollTop = st.da + (fondo() - st.da) * e;
-    if(k < 1) requestAnimationFrame(passo); else { M.scrollTop = fondo(); scorrendo = null; }
-  };
-  requestAnimationFrame(passo);
-}
 function vaiInFondo(subito){
   const M = el('msgs'); if(!M) return;
-  if(subito){
-    const sep = primaNonLetta && el('sepNonLette');
-    const fai = () => { if(sep){ M.scrollTop = Math.max(0, sep.offsetTop - 80); } else M.scrollTop = M.scrollHeight; };
-    fai(); requestAnimationFrame(fai); setTimeout(fai, 120);
-  } else {
-    scorriAlFondo(M);
-    /* se nel frattempo una foto ha allungato la chat, la raggiungo con calma */
-    setTimeout(() => { if(M.isConnected && vicinoAlFondo() && M.scrollHeight - M.scrollTop - M.clientHeight > 2) scorriAlFondo(M); }, 450);
-  }
+  const sep = subito && primaNonLetta && el('sepNonLette');
+  const fai = () => {
+    if(sep){ M.scrollTop = Math.max(0, sep.offsetTop - 80); }
+    else M.scrollTo({top: M.scrollHeight, behavior: subito ? 'auto' : 'smooth'});
+  };
+  fai(); requestAnimationFrame(fai); setTimeout(fai, 120);
   nuoviSotto = 0; mostraGiu();
 }
 function mostraGiu(){
@@ -3899,8 +3824,6 @@ function incolla(e){
   if(f.length){ e.preventDefault(); anteprimaInvio(f); }
 }
 function attivaTrascina(zona){
-  /* 2.9.12: la zona resta la stessa cambiando chat: si attiva una volta sola (prima ogni file arrivava doppio) */
-  if(zona._trascina) return; zona._trascina = true;
   let n = 0, velo = null;
   zona.addEventListener('dragenter', e => { if(!Array.from(e.dataTransfer.types || []).includes('Files')) return; e.preventDefault(); n++;
     if(!velo){ velo = document.createElement('div'); velo.className = 'trascina'; velo.innerHTML = '<span>Lascia qui per inviare</span>'; zona.appendChild(velo); } });
@@ -4044,13 +3967,11 @@ function disegnaAnteprima(){
   const v = ai.voci[ai.i]; if(!v){ chiudiAnteprima(); return; }
   const img = /^image\//.test(v.file.type) && v.modo !== 'file', vid = /^video\//.test(v.file.type) && v.modo !== 'file';
   const ext = estensione(v.file.name);
-  const vista = img && v.url ? '<img src="'+v.url+'" alt="">' : vid && v.url ? '<video src="'+v.url+'" playsinline'+(v.modo === 'gif' ? ' autoplay loop muted' : ' controls')+'></video>'
+  const vista = img && v.url ? '<img src="'+v.url+'" alt="">' : vid && v.url ? '<video src="'+v.url+'" controls playsinline'+(v.modo === 'gif' ? ' autoplay loop muted' : '')+'></video>'
     : '<div class="doc-grande"><span class="ic">'+esc((ext || 'file').toUpperCase().slice(0, 4))+'</span><b style="color:var(--testo)">'+esc(v.file.name)+'</b><span>'+fmtDim(v.file.size)+'</span></div>';
   const puoDisegnare = img && !/gif/.test(v.file.type);
-  /* 2.9.12: un video breve (fino a 15 secondi) si puo' mandare come GIF: parte da solo, senza audio, in loop */
-  const puoGif = vid && v.dur != null && v.dur > 0 && v.dur <= 15;
   n.innerHTML = '<div class="ai-testa"><button class="ib" data-a="ai-chiudi" aria-label="Chiudi">'+svg('chiudi')+'</button><b>'+esc(nomeConv(S.convs.get(S.aperta)))+'</b>'+
-      '<span class="ai-strumenti">'+(puoGif ? '<button class="ai-gif'+(v.modo === 'gif' ? ' on' : '')+'" data-a="ai-gif" aria-pressed="'+(v.modo === 'gif')+'" title="'+(v.modo === 'gif' ? 'Manda come video' : 'Manda come GIF')+'">GIF</button>' : '')+(puoDisegnare ? '<button class="ib" data-a="ai-disegna" title="Disegna sopra">'+svg('disegno', 1.8)+'</button>'+
+      '<span class="ai-strumenti">'+(puoDisegnare ? '<button class="ib" data-a="ai-disegna" title="Disegna sopra">'+svg('disegno', 1.8)+'</button>'+
         '<button class="ib" data-a="ai-sticker" title="Fai uno sticker">'+svg('sticker', 1.8)+'</button>' : '')+
       (ai.voci.length > 1 ? '<button class="ib" data-a="ai-togli" title="Togli">'+svg('cestino', 1.8)+'</button>' : '')+'</span></div>'+
     '<div class="ai-c">'+vista+'</div>'+
@@ -4058,11 +3979,6 @@ function disegnaAnteprima(){
     '<div class="ai-miniature">'+ai.voci.map((x, i) => '<button class="'+(i === ai.i ? 'on' : '')+'" data-a="ai-vai" data-i="'+i+'">'+
       (x.url && /^image/.test(x.file.type) ? '<img src="'+x.url+'" alt="">' : x.url ? '<video src="'+x.url+'" muted></video>' : svg('doc', 1.6))+'</button>').join('')+
       '<button class="agg" data-a="ai-aggiungi" title="Aggiungi">'+svg('piu')+'</button></div>';
-  /* durata del video, per sapere se puo' diventare una GIF */
-  if(vid && v.dur == null){
-    const vv = n.querySelector('.ai-c video');
-    if(vv) vv.addEventListener('loadedmetadata', () => { v.dur = isFinite(vv.duration) ? vv.duration : 0; if(ai && ai.voci[ai.i] === v && v.dur > 0 && v.dur <= 15) disegnaAnteprima(); }, {once: true});
-  }
   const d = el('aiDid');
   d.addEventListener('input', () => { v.did = d.value; });
   d.addEventListener('keydown', e => { if(e.key === 'Enter'){ e.preventDefault(); mandaAnteprima(); } if(e.key === 'Escape') chiudiAnteprima(); });
@@ -5009,8 +4925,7 @@ function nuovaChat(){
   if(!tocco()) setTimeout(() => { const i = el('ncCerca'); if(i) i.focus(); }, 200);
 }
 async function scriviA(id){
-  /* anche dalle informazioni del gruppo: chiudo il pannello e porto dritto nella chat privata */
-  chiudiPannelloSinistra(); chiudiVelo(); chiudiInfo();
+  chiudiPannelloSinistra(); chiudiVelo();
   let conv = null;
   S.convs.forEach(c => { if(c.tipo !== 'privata') return;
     const solo = (c.membri || []).every(m => m.id === S.io);
@@ -5903,7 +5818,6 @@ document.addEventListener('click', async e => {
     case 'ai-chiudi': chiudiAnteprima(); break;
     case 'ai-vai': ai.i = +t.dataset.i; disegnaAnteprima(); break;
     case 'ai-aggiungi': scegliFile('image/*,video/*', true, f => anteprimaInvio(f)); break;
-    case 'ai-gif': { const v = ai && ai.voci[ai.i]; if(!v) break; if(!('modoPrima' in v)) v.modoPrima = v.modo === 'gif' ? undefined : v.modo; v.modo = v.modo === 'gif' ? v.modoPrima : 'gif'; disegnaAnteprima(); break; }
     case 'ai-togli': ai.voci.splice(ai.i, 1); ai.i = Math.max(0, ai.i - 1); disegnaAnteprima(); break;
     case 'ai-manda': mandaAnteprima(); break;
     case 'ai-disegna': { const v = ai.voci[ai.i]; apriDisegno(v.file, b => { const f = new File([b], 'foto.jpg', {type: b.type}); if(v.url) URL.revokeObjectURL(v.url); v.file = f; v.url = URL.createObjectURL(f); disegnaAnteprima(); }, {titolo: 'Disegna sulla foto', tastoOk: 'ok'}); break; }
@@ -6124,19 +6038,13 @@ if('serviceWorker' in navigator){
   const adatta = () => {
     const R = document.documentElement, h = Math.round(vv.height);
     const pieno = Math.max(window.innerHeight || 0, R.clientHeight || 0);
-    const tastiera = pieno - h > 150;
-    if(tastiera) R.style.setProperty('--alto', h + 'px');
+    if(pieno - h > 150) R.style.setProperty('--alto', h + 'px');
     else R.style.removeProperty('--alto');
-    /* con la tastiera aperta il bordo in basso del telefono e' coperto: niente spazio vuoto sotto la barra */
-    R.classList.toggle('tastiera', tastiera);
     if(Math.abs(window.scrollY) > 0 || vv.offsetTop > 0) window.scrollTo(0, 0);
     const app = el('app'); if(app) app.style.transform = vv.offsetTop ? 'translateY(' + vv.offsetTop + 'px)' : '';
-    /* 2.9.12: tengo il fondo solo quando la tastiera cambia davvero altezza (prima anche a ogni messaggio
-       mandato: lo scorrimento morbido veniva interrotto da un salto) */
-    const M = el('msgs'), cambiata = h !== ultimaH; ultimaH = h;
-    if(M && M._eraInFondo !== false && cambiata && !scorrendo) M.scrollTop = M.scrollHeight;
+    const M = el('msgs');
+    if(M && M._eraInFondo !== false) M.scrollTop = M.scrollHeight;
   };
-  let ultimaH = null;
   vv.addEventListener('resize', adatta); vv.addEventListener('scroll', adatta);
   window.addEventListener('resize', adatta); window.addEventListener('orientationchange', () => setTimeout(adatta, 300));
   document.addEventListener('focusin', e => { if(e.target.id === 'testoIn'){ const M = el('msgs'); if(M) M._eraInFondo = vicinoAlFondo(); setTimeout(adatta, 60); setTimeout(adatta, 350); } });

@@ -801,3 +801,7 @@ niente scorciatoie: Davide le ha escluse).
 ### Strumenti per pubblicare senza git (`sviluppo/strumenti/`)
 Sul Mac di Davide git e python non ci sono più: `pubblica.pl` carica le modifiche su GitHub con `gh`
 (anche su un ramo di prova: `RAMO=prova-x`), `build.pl` ricostruisce `chat.html` come `build.py`.
+
+## FOSS v82
+
+- Home del computer: tolti i quattro riquadri numerici sotto il saluto (blocco «quattro numeri» in `renderSpazi`). Lo stile `.hm-stat*` resta nel CSS, inutilizzato.

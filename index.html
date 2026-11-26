@@ -7213,19 +7213,6 @@ function renderSpazi(){
       '<b id="hmOraT">'+o.ora+'</b>'+
     '</div></section>';
 
-  /* quattro numeri */
-  const perSpazio = elenco.map(s=>progettiDi(s.id).filter(p=>!p.completato).length);
-  const perLavoro = attivi.map(p=>(p.subs||[]).filter(s=>(s.items||[]).some(i=>!i.done)).length).sort((a,b)=>b-a);
-  const perGiorno = [0,1,2,3,4,5,6].map(g=>attivi.filter(p=>giorniA(p.consegna)===g).length);
-  const perPersona = persone.map(u=>attivi.filter(p=>(p.team||[]).indexOf(u.id)>=0).length);
-  const carta = (cls, ic, n, l, a, extra, bar) => '<button class="hm-stat '+cls+'" data-action="'+a+'"'+(extra||'')+'>'+
-    '<span class="ic">'+svg(ic,2.2)+'</span><span class="tx"><b>'+n+'</b><span>'+l+'</span></span>'+barre(bar)+'</button>';
-  h += '<div class="hm-stats">'+
-    carta('blu', 'grid', attivi.length, attivi.length===1?'Progetto attivo':'Progetti attivi', 'hm-giu', ' data-a="hmSpazi"', perSpazio)+
-    carta('verde', 'check', taskAperte, taskAperte===1?'Task aperta':'Task aperte', 'hm-mie', '', perLavoro)+
-    carta('rosso', 'clock', scad.length, 'Consegne entro 7 giorni', 'hm-giu', ' data-a="hmTre"', perGiorno)+
-    carta('viola', 'users', persone.length, persone.length===1?'Collaboratore':'Collaboratori', 'team', '', perPersona)+
-  '</div>';
 
   /* spazi di lavoro */
   const lista = state.hmVista === 'lista';
@@ -10853,7 +10840,7 @@ function cartaModelli(){
    Come si fa tutto, capitolo per capitolo: dai primi passi alle cose per chi
    organizza un team. Si cerca per parola (anche senza accenti); in fondo c'e'
    il tasto per segnalare quello che manca o non funziona. */
-const VERSIONE = 'v81';
+const VERSIONE = 'v82';
 const LIVELLI_GUIDA = {base:'Per cominciare', medio:'Tutti i giorni', esperto:'Per chi organizza', aiuto:'Se qualcosa non va'};
 const GUIDA = [
 {id:'primi-passi', liv:'base', ic:'spark', t:'Primi passi', s:'Cos’è FOSS e come ci si muove', v:[
