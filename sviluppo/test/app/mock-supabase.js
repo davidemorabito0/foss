@@ -336,7 +336,7 @@
       onAuthStateChange: () => ({data: {subscription: {unsubscribe(){}}}}),
     },
     from: t => new Q(t),
-    rpc: async (n, a) => { window.__rpcConta = window.__rpcConta || {}; window.__rpcConta[n] = (window.__rpcConta[n] || 0) + 1; await new Promise(r => setTimeout(r, 20)); if(!RPC[n]) return {data: null, error: {message: 'rpc ' + n}}; try{ return {data: RPC[n](a || {}), error: null}; }catch(e){ return {data: null, error: {message: String(e)}}; } },
+    rpc: async (n, a) => { window.__rpcConta = window.__rpcConta || {}; window.__rpcConta[n] = (window.__rpcConta[n] || 0) + 1; (window.__rpcArgs = window.__rpcArgs || []).push([n, a]); await new Promise(r => setTimeout(r, 20)); if(!RPC[n]) return {data: null, error: {message: 'rpc ' + n}}; try{ return {data: RPC[n](a || {}), error: null}; }catch(e){ return {data: null, error: {message: String(e)}}; } },
     storage: {from: () => ({
       createSignedUrl: async p => { const b = storage.get(p); if(!b) return {data: null, error: {message: 'Object not found'}}; return {data: {signedUrl: URL.createObjectURL(b)}, error: null}; },
       copy: async (a, b) => { if(!storage.has(a)) return {error: {message: 'not found'}}; storage.set(b, storage.get(a)); return {error: null}; },

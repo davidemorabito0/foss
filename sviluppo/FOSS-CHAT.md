@@ -828,3 +828,10 @@ Sul Mac di Davide git e python non ci sono più: `pubblica.pl` carica le modific
 - Seconda misura sull'iPhone con la 2.9.15 (26 nov 2026): nessun focusin, `visualViewport.offsetTop` fermo a 0, `#app` mai traslato, `#msgs.scrollTop` sale in modo continuo (299→349 in ~17 fotogrammi). Davide conferma: «ora è perfetto».
 - Tolto `js/30-misura.js` e cancellate le righe `misura-rimbalzo` da `errori_app`. Service worker `foss-guscio-v119`.
 - Regola per il futuro: all'invio NON ricreare la textarea e non darle il fuoco con scorrimento; su iOS ogni fuoco nuovo sposta la pagina.
+
+## FOSS.chat 2.9.17 — misura del rimbalzo del tasto «vai in fondo» sul computer (TEMPORANEA)
+
+- Davide segnala sul computer (app per computer = Tauri, cioè il motore di Safari) un rimbalzo premendo la freccia «vai in fondo». In Chromium non si riproduce: lo scorrimento sale sempre.
+- `js/30-misura.js`: solo account del titolare, solo schermi senza tocco. Dal clic sulla freccia annota per 1,6 s a ogni fotogramma scrollTop/altezze di #msgs, posizione dell'ultima bolla (anche «assoluta», per vedere se il contenuto si sposta da solo), animazione in corso, tasto, separatore non letti, fuoco, eventi wheel/scroll. Manda con `segnala_errore` (dove = `misura-fondo`).
+- Già visto in Chromium: il clic sulla freccia toglie il fuoco alla casella (va sul tasto, poi sul BODY quando il tasto sparisce).
+- Da togliere appena trovata la causa, e cancellare le righe `misura-fondo` da `errori_app`.
