@@ -84,11 +84,13 @@ function disegnaAnteprima(){
   const v = ai.voci[ai.i]; if(!v){ chiudiAnteprima(); return; }
   const img = /^image\//.test(v.file.type) && v.modo !== 'file', vid = /^video\//.test(v.file.type) && v.modo !== 'file';
   const ext = estensione(v.file.name);
-  const vista = img && v.url ? '<img src="'+v.url+'" alt="">' : vid && v.url ? '<video src="'+v.url+'" controls playsinline'+(v.modo === 'gif' ? ' autoplay loop muted' : '')+'></video>'
+  const vista = img && v.url ? '<img src="'+v.url+'" alt="">' : vid && v.url ? '<video src="'+v.url+'" playsinline'+(v.modo === 'gif' ? ' autoplay loop muted' : ' controls')+'></video>'
     : '<div class="doc-grande"><span class="ic">'+esc((ext || 'file').toUpperCase().slice(0, 4))+'</span><b style="color:var(--testo)">'+esc(v.file.name)+'</b><span>'+fmtDim(v.file.size)+'</span></div>';
   const puoDisegnare = img && !/gif/.test(v.file.type);
+  /* 2.9.12: un video breve (fino a 15 secondi) si puo' mandare come GIF: parte da solo, senza audio, in loop */
+  const puoGif = vid && v.dur != null && v.dur > 0 && v.dur <= 15;
   n.innerHTML = '<div class="ai-testa"><button class="ib" data-a="ai-chiudi" aria-label="Chiudi">'+svg('chiudi')+'</button><b>'+esc(nomeConv(S.convs.get(S.aperta)))+'</b>'+
-      '<span class="ai-strumenti">'+(puoDisegnare ? '<button class="ib" data-a="ai-disegna" title="Disegna sopra">'+svg('disegno', 1.8)+'</button>'+
+      '<span class="ai-strumenti">'+(puoGif ? '<button class="ai-gif'+(v.modo === 'gif' ? ' on' : '')+'" data-a="ai-gif" aria-pressed="'+(v.modo === 'gif')+'" title="'+(v.modo === 'gif' ? 'Manda come video' : 'Manda come GIF')+'">GIF</button>' : '')+(puoDisegnare ? '<button class="ib" data-a="ai-disegna" title="Disegna sopra">'+svg('disegno', 1.8)+'</button>'+
         '<button class="ib" data-a="ai-sticker" title="Fai uno sticker">'+svg('sticker', 1.8)+'</button>' : '')+
       (ai.voci.length > 1 ? '<button class="ib" data-a="ai-togli" title="Togli">'+svg('cestino', 1.8)+'</button>' : '')+'</span></div>'+
     '<div class="ai-c">'+vista+'</div>'+
@@ -96,6 +98,11 @@ function disegnaAnteprima(){
     '<div class="ai-miniature">'+ai.voci.map((x, i) => '<button class="'+(i === ai.i ? 'on' : '')+'" data-a="ai-vai" data-i="'+i+'">'+
       (x.url && /^image/.test(x.file.type) ? '<img src="'+x.url+'" alt="">' : x.url ? '<video src="'+x.url+'" muted></video>' : svg('doc', 1.6))+'</button>').join('')+
       '<button class="agg" data-a="ai-aggiungi" title="Aggiungi">'+svg('piu')+'</button></div>';
+  /* durata del video, per sapere se puo' diventare una GIF */
+  if(vid && v.dur == null){
+    const vv = n.querySelector('.ai-c video');
+    if(vv) vv.addEventListener('loadedmetadata', () => { v.dur = isFinite(vv.duration) ? vv.duration : 0; if(ai && ai.voci[ai.i] === v && v.dur > 0 && v.dur <= 15) disegnaAnteprima(); }, {once: true});
+  }
   const d = el('aiDid');
   d.addEventListener('input', () => { v.did = d.value; });
   d.addEventListener('keydown', e => { if(e.key === 'Enter'){ e.preventDefault(); mandaAnteprima(); } if(e.key === 'Escape') chiudiAnteprima(); });

@@ -487,6 +487,8 @@ function incolla(e){
   if(f.length){ e.preventDefault(); anteprimaInvio(f); }
 }
 function attivaTrascina(zona){
+  /* 2.9.12: la zona resta la stessa cambiando chat: si attiva una volta sola (prima ogni file arrivava doppio) */
+  if(zona._trascina) return; zona._trascina = true;
   let n = 0, velo = null;
   zona.addEventListener('dragenter', e => { if(!Array.from(e.dataTransfer.types || []).includes('Files')) return; e.preventDefault(); n++;
     if(!velo){ velo = document.createElement('div'); velo.className = 'trascina'; velo.innerHTML = '<span>Lascia qui per inviare</span>'; zona.appendChild(velo); } });

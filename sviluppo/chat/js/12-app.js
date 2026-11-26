@@ -180,6 +180,7 @@ document.addEventListener('click', async e => {
     case 'ai-chiudi': chiudiAnteprima(); break;
     case 'ai-vai': ai.i = +t.dataset.i; disegnaAnteprima(); break;
     case 'ai-aggiungi': scegliFile('image/*,video/*', true, f => anteprimaInvio(f)); break;
+    case 'ai-gif': { const v = ai && ai.voci[ai.i]; if(!v) break; if(!('modoPrima' in v)) v.modoPrima = v.modo === 'gif' ? undefined : v.modo; v.modo = v.modo === 'gif' ? v.modoPrima : 'gif'; disegnaAnteprima(); break; }
     case 'ai-togli': ai.voci.splice(ai.i, 1); ai.i = Math.max(0, ai.i - 1); disegnaAnteprima(); break;
     case 'ai-manda': mandaAnteprima(); break;
     case 'ai-disegna': { const v = ai.voci[ai.i]; apriDisegno(v.file, b => { const f = new File([b], 'foto.jpg', {type: b.type}); if(v.url) URL.revokeObjectURL(v.url); v.file = f; v.url = URL.createObjectURL(f); disegnaAnteprima(); }, {titolo: 'Disegna sulla foto', tastoOk: 'ok'}); break; }
@@ -400,13 +401,19 @@ if('serviceWorker' in navigator){
   const adatta = () => {
     const R = document.documentElement, h = Math.round(vv.height);
     const pieno = Math.max(window.innerHeight || 0, R.clientHeight || 0);
-    if(pieno - h > 150) R.style.setProperty('--alto', h + 'px');
+    const tastiera = pieno - h > 150;
+    if(tastiera) R.style.setProperty('--alto', h + 'px');
     else R.style.removeProperty('--alto');
+    /* con la tastiera aperta il bordo in basso del telefono e' coperto: niente spazio vuoto sotto la barra */
+    R.classList.toggle('tastiera', tastiera);
     if(Math.abs(window.scrollY) > 0 || vv.offsetTop > 0) window.scrollTo(0, 0);
     const app = el('app'); if(app) app.style.transform = vv.offsetTop ? 'translateY(' + vv.offsetTop + 'px)' : '';
-    const M = el('msgs');
-    if(M && M._eraInFondo !== false) M.scrollTop = M.scrollHeight;
+    /* 2.9.12: tengo il fondo solo quando la tastiera cambia davvero altezza (prima anche a ogni messaggio
+       mandato: lo scorrimento morbido veniva interrotto da un salto) */
+    const M = el('msgs'), cambiata = h !== ultimaH; ultimaH = h;
+    if(M && M._eraInFondo !== false && cambiata && !scorrendo) M.scrollTop = M.scrollHeight;
   };
+  let ultimaH = null;
   vv.addEventListener('resize', adatta); vv.addEventListener('scroll', adatta);
   window.addEventListener('resize', adatta); window.addEventListener('orientationchange', () => setTimeout(adatta, 300));
   document.addEventListener('focusin', e => { if(e.target.id === 'testoIn'){ const M = el('msgs'); if(M) M._eraInFondo = vicinoAlFondo(); setTimeout(adatta, 60); setTimeout(adatta, 350); } });

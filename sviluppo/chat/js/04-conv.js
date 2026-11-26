@@ -394,13 +394,41 @@ function mediaNonArriva(mid){
   if(v && nas){ const t = v.querySelector('.tempo'); if(t) t.textContent = 'Il server dei media sembra offline'; }
 }
 
+/* 2.9.12: aggiorno il messaggio "in posto", toccando solo quello che cambia (spunte, ora, coda della bolla):
+   foto e video gia' caricati restano li', senza ricaricarsi e senza lampi */
+const MEDIA_FISSI = /^(IMG|VIDEO|AUDIO|CANVAS|IFRAME)$/;
+function chiaveMedia(n){ return n.getAttribute('data-mid') || n.getAttribute('data-mini-di') || n.getAttribute('data-polvere') || n.getAttribute('src') || ''; }
+function morfa(a, b){
+  if(a.nodeType !== b.nodeType || a.nodeName !== b.nodeName){ a.replaceWith(b); return; }
+  if(a.nodeType === 3 || a.nodeType === 8){ if(a.data !== b.data) a.data = b.data; return; }
+  if(a.nodeType !== 1){ a.replaceWith(b); return; }
+  if(MEDIA_FISSI.test(a.nodeName)){
+    const k = chiaveMedia(a);
+    if(k && k === chiaveMedia(b)){
+      Array.from(b.attributes).forEach(x => { if(x.name !== 'src' && a.getAttribute(x.name) !== x.value) a.setAttribute(x.name, x.value); });
+      return;
+    }
+    a.replaceWith(b); return;
+  }
+  Array.from(a.attributes).forEach(x => { if(!b.hasAttribute(x.name)) a.removeAttribute(x.name); });
+  Array.from(b.attributes).forEach(x => { if(a.getAttribute(x.name) !== x.value) a.setAttribute(x.name, x.value); });
+  const ca = Array.from(a.childNodes), cb = Array.from(b.childNodes);
+  for(let i = 0; i < cb.length; i++){ if(i < ca.length) morfa(ca[i], cb[i]); else a.appendChild(cb[i]); }
+  for(let i = cb.length; i < ca.length; i++) ca[i].remove();
+}
 function ridisegnaMessaggio(id){
   const c = S.convs.get(S.aperta); if(!c) return;
   const n = $('.msg[data-id="'+id+'"]', el('msgs')); if(!n) return;
   const lista = msgVisibili(c.id), i = lista.findIndex(x => x.id === id); if(i < 0){ n.remove(); return; }
   const d = document.createElement('div'); d.innerHTML = msgHTML(lista[i], lista[i - 1], lista[i + 1], c);
   const nuovo = d.firstChild;
-  n.replaceWith(nuovo); idrataMedia(nuovo);
+  if(!nuovo || nuovo.nodeType !== 1 || !nuovo.classList.contains('msg')){ if(nuovo) n.replaceWith(nuovo); else n.remove(); if(nuovo) idrataMedia(nuovo); return; }
+  /* la sfocatura d'attesa non torna se la foto e' gia' arrivata */
+  if(!n.querySelector('.mini')) nuovo.querySelectorAll('.mini').forEach(x => x.remove());
+  /* l'animazione d'entrata continua fino in fondo */
+  if(n.classList.contains('entra')) nuovo.classList.add('entra');
+  morfa(n, nuovo);
+  idrataMedia(n.isConnected ? n : nuovo);
 }
 function aggiornaSpunte(){
   const c = S.convs.get(S.aperta); if(!c) return;
@@ -417,17 +445,31 @@ function aggiungiMessaggioAlFondo(m, altrui){
   const giu = vicinoAlFondo();
   const lista = msgVisibili(c.id), i = lista.findIndex(x => x.id === m.id);
   if(i < 0) return;
-  if(i < lista.length - 1){ disegnaMessaggi(true); return; }
   const prev = lista[i - 1];
+  if(i < lista.length - 1){
+    /* arrivato "in mezzo" (orologi diversi): lo infilo al suo posto invece di ridisegnare tutta la chat */
+    const succ = lista[i + 1], nSucc = $('.msg[data-id="'+succ.id+'"]', M);
+    const stessoG = !prev || stessoGiorno(new Date(prev.creato_il), new Date(m.creato_il));
+    if(!nSucc || !stessoG || !stessoGiorno(new Date(succ.creato_il), new Date(m.creato_il))){ disegnaMessaggi(true); return; }
+    const d = document.createElement('div'); d.innerHTML = msgHTML(m, prev, succ, c);
+    const nodo = d.firstChild; nodo.classList && nodo.classList.add('entra');
+    M.insertBefore(nodo, nSucc); idrataMedia(nodo); togliEntra(nodo);
+    if(prev) ridisegnaMessaggio(prev.id);
+    ridisegnaMessaggio(succ.id);
+    if(giu || !altrui) vaiInFondo(false);
+    return;
+  }
   if(prev && !stessoGiorno(new Date(prev.creato_il), new Date(m.creato_il))) M.insertAdjacentHTML('beforeend', '<div class="giorno"><span>'+dataGiorno(m.creato_il)+'</span></div>');
   if(prev && stessoGruppo(prev, m)) ridisegnaMessaggio(prev.id);
   const d = document.createElement('div'); d.innerHTML = msgHTML(m, prev, null, c);
   const nodo = d.firstChild;
+  /* entra morbido, come su WhatsApp */
+  if(nodo.classList) nodo.classList.add('entra');
   M.appendChild(nodo);
-  idrataMedia(nodo);
+  idrataMedia(nodo); togliEntra(nodo);
   const md = m.media || {};
   if(md.bolla === 'slam' && !S.visti.has(m.id)){ const cv = el('conv'); cv.classList.remove('scossa'); void cv.offsetWidth; cv.classList.add('scossa'); }
-  if(giu || !altrui) vaiInFondo(!altrui ? false : true);
+  if(giu || !altrui) vaiInFondo(false);
   else { nuoviSotto++; mostraGiu(); if(menzionaMe(m)){ menzDaVedere.push(m.id); mostraMenz(); } }
   if(md.bolla || md.anim) setTimeout(() => segnaVisto(m.id), 2600);
 }
@@ -435,14 +477,40 @@ function segnaVisto(id){ S.visti.add(id); const a = Array.from(S.visti).slice(-4
 
 /* ---------- scorrere ---------- */
 function vicinoAlFondo(){ const M = el('msgs'); return !M || M.scrollHeight - M.scrollTop - M.clientHeight < 160; }
+function togliEntra(n){
+  if(!n || !n.classList) return;
+  const via = () => { n.classList.remove('entra'); };
+  n.addEventListener('animationend', e => { if(e.target === n) via(); }, {once: true});
+  setTimeout(via, 600);
+}
+/* 2.9.12: uno scorrimento solo, morbido, che segue il fondo anche se cresce (foto che arrivano):
+   prima ne partivano tre di fila e si vedeva lo scatto */
+let scorrendo = null;
+function scorriAlFondo(M){
+  const fondo = () => Math.max(0, M.scrollHeight - M.clientHeight);
+  if(matchMedia('(prefers-reduced-motion: reduce)').matches){ M.scrollTop = fondo(); return; }
+  if(scorrendo && scorrendo.M === M){ scorrendo.t0 = performance.now(); scorrendo.da = M.scrollTop; return; }
+  const st = scorrendo = {M, da: M.scrollTop, t0: performance.now()};
+  const dur = 280;
+  const passo = t => {
+    if(scorrendo !== st) return;
+    const k = Math.min(1, (t - st.t0) / dur), e = 1 - Math.pow(1 - k, 3);
+    M.scrollTop = st.da + (fondo() - st.da) * e;
+    if(k < 1) requestAnimationFrame(passo); else { M.scrollTop = fondo(); scorrendo = null; }
+  };
+  requestAnimationFrame(passo);
+}
 function vaiInFondo(subito){
   const M = el('msgs'); if(!M) return;
-  const sep = subito && primaNonLetta && el('sepNonLette');
-  const fai = () => {
-    if(sep){ M.scrollTop = Math.max(0, sep.offsetTop - 80); }
-    else M.scrollTo({top: M.scrollHeight, behavior: subito ? 'auto' : 'smooth'});
-  };
-  fai(); requestAnimationFrame(fai); setTimeout(fai, 120);
+  if(subito){
+    const sep = primaNonLetta && el('sepNonLette');
+    const fai = () => { if(sep){ M.scrollTop = Math.max(0, sep.offsetTop - 80); } else M.scrollTop = M.scrollHeight; };
+    fai(); requestAnimationFrame(fai); setTimeout(fai, 120);
+  } else {
+    scorriAlFondo(M);
+    /* se nel frattempo una foto ha allungato la chat, la raggiungo con calma */
+    setTimeout(() => { if(M.isConnected && vicinoAlFondo() && M.scrollHeight - M.scrollTop - M.clientHeight > 2) scorriAlFondo(M); }, 450);
+  }
   nuoviSotto = 0; mostraGiu();
 }
 function mostraGiu(){

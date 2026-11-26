@@ -805,3 +805,8 @@ Sul Mac di Davide git e python non ci sono più: `pubblica.pl` carica le modific
 ## FOSS v82
 
 - Home del computer: tolti i quattro riquadri numerici sotto il saluto (blocco «quattro numeri» in `renderSpazi`). Lo stile `.hm-stat*` resta nel CSS, inutilizzato.
+
+## Pubblicazione protetta (26 nov 2026)
+
+- Un caricamento a mano su GitHub (chat.html 2.9.12 e sw.js) era stato sovrascritto da una pubblicazione da questo Mac: ripristinato subito, e le modifiche sono state riportate nei sorgenti `sviluppo/chat/` (la ricostruzione dà lo stesso file caricato).
+- `pubblica.pl` ora ricorda l'ultima pubblicazione (`sviluppo/strumenti/.ultima-pubblicazione-main`, mai pubblicato) e si FERMA se un file che cambierebbe è stato modificato su GitHub nel frattempo. `FORZA=1` lo scavalca.

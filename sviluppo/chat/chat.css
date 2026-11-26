@@ -191,6 +191,10 @@ svg{display:block}
 .msg{display:flex;padding:0 63px;margin-bottom:2px;position:relative}
 .msg.primo{margin-top:10px}
 .msg.mio{justify-content:flex-end}
+.msg.entra{animation:msgEntra .26s cubic-bezier(.2,.8,.25,1) both;transform-origin:0 100%}
+.msg.mio.entra{transform-origin:100% 100%}
+@keyframes msgEntra{from{opacity:0;transform:translateY(14px) scale(.96)}}
+@media (prefers-reduced-motion:reduce){ .msg.entra{animation:none} }
 .msg .av-g{width:28px;height:28px;margin-right:6px;flex:none;font-size:12px;align-self:flex-start}
 .msg.suo.gr .vuoto-av{width:28px;margin-right:6px;flex:none}
 .bolla{position:relative;max-width:min(65%,560px);border-radius:7.5px;padding:6px 7px 8px 9px;box-shadow:0 1px .5px rgba(11,20,26,.13);
@@ -507,6 +511,8 @@ svg{display:block}
 .ai-manda{width:60px;height:60px;border-radius:50%;background:var(--pieno);color:var(--su-pieno);display:grid;place-items:center;flex:none;box-shadow:0 2px 8px rgba(0,0,0,.25)}
 .ai-manda svg{width:28px;height:28px}
 .ai-strumenti{display:flex;gap:4px}
+.ai-gif{align-self:center;height:30px;padding:0 11px;border-radius:9px;border:1.5px solid rgba(255,255,255,.55);background:none;color:#fff;font:800 13px/1 var(--font);letter-spacing:.06em;cursor:pointer;margin-right:4px}
+.ai-gif.on{background:var(--pieno,#FFAD01);border-color:var(--pieno,#FFAD01);color:var(--su-pieno,#0D1926)}
 
 /* ---------- editor disegno e sticker ---------- */
 .editor{position:fixed;inset:0;z-index:75;background:#111;display:flex;flex-direction:column;color:#fff;touch-action:none;user-select:none;-webkit-user-select:none}
@@ -804,6 +810,7 @@ svg{display:block}
   .vocale .tempo{font-size:13px;bottom:-12px}
   /* barra per scrivere */
   .scrivi{background:var(--testa);padding-bottom:max(8px, env(safe-area-inset-bottom))}
+  :root.tastiera .scrivi{padding-bottom:6px}
   :root[data-tema="scuro"] .scrivi{background:#161618}
   .barra-scrivi{padding:8px 10px 4px;gap:8px;min-height:60px;align-items:center}
   #emojiB{display:none}
