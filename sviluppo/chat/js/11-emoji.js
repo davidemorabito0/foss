@@ -171,7 +171,7 @@ async function mandaGiphy(x){
   /* l'indirizzo pulito di GIPHY (senza «?...»): e' quello che il database accetta */
   const url = /^[A-Za-z0-9]{1,40}$/.test(x.id || '') ? 'https://media.giphy.com/media/' + x.id + '/giphy.mp4' : String(x.mp4 || '').split('?')[0];
   const m = nuovoLocale('video', {media: {gif: true, url, w: x.w || 200, h: x.h || 200, giphy: x.id}});
-  if(S.risposta){ S.risposta = null; disegnaScrivi(); } mettiInLista(m); suono('invio');
+  cambiaInFondo(() => { if(S.risposta){ S.risposta = null; disegnaScrivi(); } mettiInLista(m); }, true); suono('invio');
   if(tocco()) chiudiPannelloEmoji();
   try{ await salvaMessaggio(m); }catch(e){ m._stato = 'errore'; ridisegnaMessaggio(m.id); errore(e, 'GIF non inviata'); }
 }

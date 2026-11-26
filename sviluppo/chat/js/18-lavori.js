@@ -148,7 +148,7 @@ function vediLavoro(ref){
 async function mandaLavoro(ref, testo){
   const c = S.convs.get(S.aperta); if(!c || !ref || !ref.id) return;
   const m = nuovoLocale('lavoro', {testo: testo || null, media: {lavoro: {id: ref.id, org: ref.org, n: String(ref.n || ref.nome || 'Lavoro').slice(0, 120)}}});
-  S.risposta = null; disegnaScrivi(); mettiInLista(m); suono('invio');
+  cambiaInFondo(() => { S.risposta = null; disegnaScrivi(); mettiInLista(m); }, true); suono('invio');
   try{ await salvaMessaggio(m); }catch(e){ m._stato = 'errore'; ridisegnaMessaggio(m.id); errore(e, 'Lavoro non condiviso'); }
 }
 

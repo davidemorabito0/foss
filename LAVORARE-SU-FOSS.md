@@ -3,8 +3,8 @@
 Guida completa per chi riprende in mano il progetto con un altro strumento (un editor, un'altra IA, uno
 sviluppatore). Si legge dall'inizio alla fine prima di toccare qualcosa.
 
-Aggiornata al **25 novembre 2026**: FOSS **v81**, FOSS.chat **2.9.10**, app per computer **1.0.6**,
-service worker `foss-guscio-v112`. La versione che gira su un dispositivo si legge in fondo al **Profilo**
+Aggiornata al **26 novembre 2026**: FOSS **v81**, FOSS.chat **2.9.14**, app per computer **1.0.6**,
+service worker `foss-guscio-v116`. La versione che gira su un dispositivo si legge in fondo al **Profilo**
 (FOSS) e nelle impostazioni della chat.
 
 Il diario tecnico dettagliato, con la storia di ogni versione e i motivi delle scelte, è
@@ -163,6 +163,10 @@ perl sviluppo/strumenti/build.pl sviluppo/chat chat.html
   utilità, `VERSIONE`, `MEDIA_NAS`), `02-dati.js` (Supabase, realtime, caricamento file), `04-conv.js`
   (messaggi), `05-scrivi.js` (scrittura, vocali), `12-app.js` (avvio e clic). Elenco completo in
   `sviluppo/FOSS-CHAT.md`, sezione 1.
+- **La lista dei messaggi parte dal fondo** (dalla 2.9.14): `#msgs` è una colonna rovesciata con dentro
+  `#msgsIn`. Lo scorrimento si legge e si scrive solo con `giuDalFondo`, `suDallaCima`, `mettiGiuDalFondo`
+  (`04-conv.js`), e i cambi vicino al fondo passano da `cambiaInFondo`. Non usare `M.scrollTop` «dall'alto»
+  né `offsetTop` dei messaggi.
 - I file vanno sul NAS (fino a 2 GB); se il NAS non risponde ripiegano sul bucket Supabase `chat` (50 MB).
 
 ---
@@ -220,7 +224,7 @@ Con il server sulla porta 8123 attivo:
 CHROME="/Applications/Google Chrome.app/Contents/MacOS/Google Chrome" python3 sviluppo/test/app/prova7.py
 ```
 
-Ci sono `prova7.py` … `prova27.py`; `mock-supabase.js` finge Supabase (se servono RPC nuove vanno
+Ci sono `prova7.py` … `prova28.py`; `mock-supabase.js` finge Supabase (se servono RPC nuove vanno
 aggiunte lì). Le stesse prove girano da sole su GitHub (`controllo-chat.yml`) a ogni modifica della chat.
 **`prova22` a volte fallisce solo sulla macchina di GitHub** (microfono finto): se fallisce solo lei,
 si rilancia il controllo.

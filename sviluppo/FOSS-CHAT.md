@@ -337,6 +337,40 @@ Richiesta: i lavori pieni di note e riferimenti hanno bisogno di un posto solo d
   «Torna alle fasi» resta sempre lì, e l'impostazione vale per spazio, non per persona: si salva nel
   nucleo dello spazio e si sincronizza con gli altri.
 
+### Chat 2.9.12 e 2.9.14 — niente «rimbalzo» mandando un messaggio dall'iPhone (26 novembre 2026)
+**Il problema.** Nell'app aggiunta alla Home dell'iPhone, a ogni messaggio mandato la lista faceva su e giù.
+
+**2.9.12** (pubblicata solo come `chat.html`, ora riportata anche nei sorgenti): animazione d'entrata della
+bolla, `scorriAlFondo` (uno scorrimento solo), `ridisegnaMessaggio` in posto (`morfa`), video da mandare come
+GIF, file trascinati non più doppi. Non bastava. La 2.9.13 (casella non ricreata) non era mai stata pubblicata.
+
+**2.9.14 — la correzione strutturale.**
+- **La lista parte dal fondo.** `#msgs` è una colonna rovesciata (`flex-direction:column-reverse`) con dentro
+  `#msgsIn`, che tiene i messaggi nell'ordine normale (e, se sono pochi, in alto come prima: `margin-bottom:auto`).
+  Il fondo è il punto fermo: tastiera che cambia altezza (anche per la barra dei suggerimenti), casella che si
+  abbassa, barra di risposta che sparisce non spostano più i messaggi in basso. `adatta()` in `12-app.js` non
+  tocca più lo scorrimento (resta solo per i browser vecchi).
+- **Le misure** passano da `giuDalFondo(M)`, `suDallaCima(M)`, `mettiGiuDalFondo(M, d)` in `04-conv.js`:
+  funzionano con lo `scrollTop` negativo (Safari e Chrome di oggi: 0 = in fondo) e con quello vecchio
+  (`versoNegativo()` lo scopre una volta). Mai più `M.scrollTop` letto «dall'alto» a mano.
+- **Un movimento solo.** `cambiaInFondo(fai, segui)` misura dove sta il primo elemento della lista, fa il
+  cambio e: se eri in fondo, fa salire la lista dalla posizione di prima a quella nuova in 260 ms (Web
+  Animations, `composite:'add'` così due messaggi di fila si sommano); se leggevi più in alto e il messaggio è
+  di un altro, corregge lo scorrimento e quello che leggi resta fermo. Le chiamate annidate contano come una:
+  `mandaTesto` ci mette dentro «svuoto la casella + tolgo la risposta + aggiungo il messaggio», così il
+  messaggio su più righe non fa più giù (casella che si abbassa) e poi su. Lo stesso per foto, sticker,
+  sondaggi e lavori. La bolla nuova ha solo la dissolvenza (`.msg.entra`), niente `translateY`/`scale`.
+- **La casella non si ricrea.** `disegnaScrivi` la aggiorna in posto quando c'è già (`#scriviSopra` per la
+  barra di risposta/modifica, `tastoMandaHTML` per il tasto): resta lo stesso elemento con il fuoco, quindi
+  sull'iPhone la tastiera non si chiude e riapre e iOS non sposta la pagina.
+- Data che galleggia, separatore dei non letti e «vai in fondo» misurano con `getBoundingClientRect`
+  (con la colonna rovesciata `offsetTop` non vale più). Toccare la lista ferma lo scorrimento automatico.
+- Prova nuova: `sviluppo/test/app/prova28.py` (a ogni fotogramma il messaggio di prima non scende mai, sale
+  in più fotogrammi; la casella è la stessa e ha il fuoco; tastiera più bassa = fondo fermo; leggendo sopra,
+  un messaggio che arriva non sposta niente e «vai in fondo» conta 1).
+- Non provato su un iPhone vero né sul Simulatore (in questa sessione non c'era un Mac): la conferma la dà
+  Davide chiudendo del tutto la chat e riaprendola dall'icona.
+
 ### Piattaforme gemelle per i clienti (25 novembre 2026)
 Richiesta: poter creare un sito nuovo con un altro nome, con la stessa base di FOSS, da personalizzare per
 un cliente — **solo la struttura, nessun dato** (utenti, progetti, messaggi restano in FOSS).

@@ -356,7 +356,7 @@ async function mandaDaRaccolta(x){
     const m = nuovoLocale(ext === 'mp4' ? 'video' : 'foto', {media: {gif: true, locale: loc, w: 300, h: 300}});
     try{ const dims = await new Promise(ok => { if(ext === 'mp4') return ok([320, 240]); const i = new Image(); i.onload = () => ok([i.naturalWidth, i.naturalHeight]); i.onerror = () => ok([300, 300]); i.src = loc; });
       m.media.w = dims[0]; m.media.h = dims[1]; }catch(e){}
-    m._avanza = .5; S.risposta = null; disegnaScrivi(); mettiInLista(m);
+    m._avanza = .5; cambiaInFondo(() => { S.risposta = null; disegnaScrivi(); mettiInLista(m); }, true);
     try{
       const {error} = await sb.storage.from('chat').copy(x.path, dest); if(error) throw error;
       m.media.path = dest; firme.set(dest, {url: loc, scade: Date.now() + 864e5}); delete m._avanza;
@@ -365,12 +365,12 @@ async function mandaDaRaccolta(x){
     return;
   }
   const m = nuovoLocale('sticker', {media: {path: x.path, w: 512, h: 512}});
-  S.risposta = null; disegnaScrivi(); mettiInLista(m); suono('invio');
+  cambiaInFondo(() => { S.risposta = null; disegnaScrivi(); mettiInLista(m); }, true); suono('invio');
   try{ await salvaMessaggio(m); }catch(e){ m._stato = 'errore'; ridisegnaMessaggio(m.id); errore(e, 'Sticker non inviato'); }
 }
 async function mandaStickerFoss(nome){
   if(!S.aperta) return;
   const m = nuovoLocale('sticker', {media: {path: 'foss:' + nome, w: 512, h: 512}});
-  S.risposta = null; disegnaScrivi(); mettiInLista(m); suono('invio');
+  cambiaInFondo(() => { S.risposta = null; disegnaScrivi(); mettiInLista(m); }, true); suono('invio');
   try{ await salvaMessaggio(m); }catch(e){ m._stato = 'errore'; ridisegnaMessaggio(m.id); errore(e, 'Sticker non inviato'); }
 }

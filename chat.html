@@ -217,6 +217,11 @@ svg{display:block}
 .messaggi{flex:1;overflow-y:auto;overflow-x:hidden;position:relative;padding:12px 0 8px;overscroll-behavior:contain;
   background-color:var(--sfondo-chat);background-image:var(--doodle-img);background-size:420px;background-attachment:local}
 .messaggi.niente-doodle{background-image:none}
+/* 2.9.14: la lista parte dal fondo. #msgs e' una colonna rovesciata: il fondo e' il punto fermo, cosi' tastiera,
+   casella e messaggi nuovi non fanno saltare la lista. Dentro, #msgsIn tiene i messaggi nell'ordine normale
+   e, se sono pochi, in alto come prima (margin-bottom:auto) */
+.messaggi{display:flex;flex-direction:column-reverse;overflow-anchor:none}
+.msgs-in{flex:none;margin-bottom:auto;min-width:0}
 .carica-prima{display:flex;justify-content:center;padding:6px}
 .carica-prima span{font-size:12.5px;color:var(--testo-2);background:var(--sistema);padding:5px 12px;border-radius:8px;box-shadow:0 1px .5px rgba(11,20,26,.13)}
 .giorno{display:flex;justify-content:center;margin:10px 0 8px;position:sticky;top:6px;z-index:2}
@@ -236,9 +241,9 @@ svg{display:block}
 .msg{display:flex;padding:0 63px;margin-bottom:2px;position:relative}
 .msg.primo{margin-top:10px}
 .msg.mio{justify-content:flex-end}
-.msg.entra{animation:msgEntra .26s cubic-bezier(.2,.8,.25,1) both;transform-origin:0 100%}
-.msg.mio.entra{transform-origin:100% 100%}
-@keyframes msgEntra{from{opacity:0;transform:translateY(14px) scale(.96)}}
+/* 2.9.14: la bolla nuova sale insieme alla lista (vedi cambiaInFondo): qui solo la dissolvenza, niente movimento in piu' */
+.msg.entra{animation:msgEntra .22s ease-out both}
+@keyframes msgEntra{from{opacity:0}}
 @media (prefers-reduced-motion:reduce){ .msg.entra{animation:none} }
 .msg .av-g{width:28px;height:28px;margin-right:6px;flex:none;font-size:12px;align-self:flex-start}
 .msg.suo.gr .vuoto-av{width:28px;margin-right:6px;flex:none}
@@ -357,6 +362,7 @@ svg{display:block}
 
 /* ---------- barra per scrivere ---------- */
 .scrivi{flex:none;background:var(--testa);display:flex;flex-direction:column;z-index:3;padding-bottom:env(safe-area-inset-bottom)}
+.scrivi-sopra{display:contents}
 .rispondi-a{display:flex;align-items:center;gap:8px;padding:6px 10px 0 16px}
 .rispondi-a .citazione{flex:1;margin:0;background:var(--campo)}
 :root[data-tema="scuro"] .rispondi-a .citazione{background:#1d282f}
@@ -1561,7 +1567,7 @@ const SUPA_KEY = 'sb_publishable_f5Kjp6NHT9yTxr1bhWJjhg_4y72V-Kj';
 const VAPID_PUBBLICA = 'BNlGbW4nZrXmx8DioKxnl7ubULVOr5_6CAKvpuQYoiXeObmxYAzGU6UrkExx2zu1hACmtRNDcpoMh_ARQ0GSmlw';
 /* il server dei file sul NAS (es. 'https://media.foss.team'). Vuoto = si usa Supabase. */
 const MEDIA_NAS = 'https://media.foss.team';
-const VERSIONE = 'chat-2.9.12';
+const VERSIONE = 'chat-2.9.14';
 /* i temi colore: gli stessi di FOSS. Il predefinito per tutti è Brand (blu e giallo). */
 const TEMI_COLORE = [
   {id:'brand',   nome:'Brand',    ds:'Navy e ambra, il predefinito', c:['#0D1926','#1A3149','#FFAD01']},
@@ -2757,7 +2763,7 @@ async function apriConv(id, opz){
   disegnaConv();
   const s = statoMsgs(id);
   if(!s.caricato){
-    el('msgs').innerHTML = '<div class="carica-prima"><span>Carico i messaggi…</span></div>';
+    el('msgsIn').innerHTML = '<div class="carica-prima"><span>Carico i messaggi…</span></div>';
     try{ await caricaMessaggi(id); }catch(e){ errore(e, 'Messaggi non caricati'); }
     if(S.aperta !== id) return;
   }
@@ -2801,7 +2807,7 @@ function disegnaConv(){
   el('conv').innerHTML =
     '<header class="conv-testa" id="convTesta"></header>'+
     '<div class="fissati-barra nascosto" id="fissatiB"></div>'+
-    '<div class="msgs-wrap"><div class="messaggi'+(S.cfg.doodle === false ? ' niente-doodle' : '')+'" id="msgs"></div>'+
+    '<div class="msgs-wrap"><div class="messaggi'+(S.cfg.doodle === false ? ' niente-doodle' : '')+'" id="msgs"><div class="msgs-in" id="msgsIn"></div></div>'+
     '<div class="data-fluttua" id="dataFluttua" aria-hidden="true"><span></span></div>'+
     '<button class="menz-b nascosto" id="menzB" data-a="vai-menzione" aria-label="Vai alla menzione">'+svg('chiocciola', 2.2)+'</button>'+
     '<button class="giu-b nascosto" id="giuB" data-a="in-fondo" aria-label="Vai in fondo">'+svg('giu')+'</button></div>'+
@@ -2814,6 +2820,8 @@ function disegnaConv(){
   M.addEventListener('error', e => { const t = e.target; if(t && (t.tagName === 'IMG' || t.tagName === 'VIDEO' || t.tagName === 'AUDIO') && t.dataset.mid) mediaNonArriva(t.dataset.mid); }, true);
   attivaTrascina(el('conv'));
   attivaScorriPerRispondere(M);
+  M.addEventListener('touchstart', fermaScorrendo, {passive: true});
+  M.addEventListener('wheel', fermaScorrendo, {passive: true});
 }
 function aggiornaTestaConv(){
   const T = el('convTesta'); const c = S.convs.get(S.aperta); if(!T || !c) return;
@@ -2847,9 +2855,9 @@ function msgVisibili(id){
 }
 function disegnaMessaggi(mantieni){
   ultimoDisegno = Date.now();
-  const M = el('msgs'); const c = S.convs.get(S.aperta); if(!M || !c) return;
+  const M = el('msgs'), I = el('msgsIn'); const c = S.convs.get(S.aperta); if(!M || !I || !c) return;
   const lista = msgVisibili(c.id), s = statoMsgs(c.id);
-  const daFondo = M.scrollHeight - M.scrollTop;
+  const daFondo = giuDalFondo(M);
   let h = s.tutti ? '<div class="avviso-cifrato"><span>'+svg('lucchetto').replace('<svg','<svg style="width:11px;height:11px;display:inline;vertical-align:-1px;margin-right:4px"')+
       'Questa chat è visibile solo a chi ne fa parte. Il tuo account è quello di FOSS.</span></div>'
     : '<div class="carica-prima"><span>Scorri in su per i messaggi precedenti</span></div>';
@@ -2864,9 +2872,9 @@ function disegnaMessaggi(mantieni){
     }
     h += msgHTML(m, lista[i - 1], lista[i + 1], c);
   });
-  M.innerHTML = h;
+  I.innerHTML = h;
   idrataMedia(M);
-  if(mantieni) M.scrollTop = M.scrollHeight - daFondo;
+  if(mantieni) mettiGiuDalFondo(M, daFondo);
   /* gli effetti si vedono una volta: poi restano fermi (si rivedono toccandoli) */
   const conEff = lista.filter(m => m.media && (m.media.bolla || m.media.anim) && !S.visti.has(m.id));
   if(conEff.length) setTimeout(() => conEff.forEach(m => segnaVisto(m.id)), 2600);
@@ -3169,9 +3177,9 @@ function aggiornaSpunte(){
   });
 }
 function aggiungiMessaggioAlFondo(m, altrui){
-  const M = el('msgs'); const c = S.convs.get(S.aperta); if(!M || !c) return;
+  const M = el('msgs'), I = el('msgsIn'); const c = S.convs.get(S.aperta); if(!M || !I || !c) return;
   if(S.nascosti.has(m.id)) return;
-  const giu = vicinoAlFondo();
+  const giu = vicinoAlFondo(), segui = giu || !altrui;
   const lista = msgVisibili(c.id), i = lista.findIndex(x => x.id === m.id);
   if(i < 0) return;
   const prev = lista[i - 1];
@@ -3182,64 +3190,106 @@ function aggiungiMessaggioAlFondo(m, altrui){
     if(!nSucc || !stessoG || !stessoGiorno(new Date(succ.creato_il), new Date(m.creato_il))){ disegnaMessaggi(true); return; }
     const d = document.createElement('div'); d.innerHTML = msgHTML(m, prev, succ, c);
     const nodo = d.firstChild; nodo.classList && nodo.classList.add('entra');
-    M.insertBefore(nodo, nSucc); idrataMedia(nodo); togliEntra(nodo);
-    if(prev) ridisegnaMessaggio(prev.id);
-    ridisegnaMessaggio(succ.id);
-    if(giu || !altrui) vaiInFondo(false);
+    cambiaInFondo(() => {
+      nSucc.parentNode.insertBefore(nodo, nSucc); idrataMedia(nodo); togliEntra(nodo);
+      if(prev) ridisegnaMessaggio(prev.id);
+      ridisegnaMessaggio(succ.id);
+    }, segui);
+    if(segui) vaiInFondo(false);
     return;
   }
-  if(prev && !stessoGiorno(new Date(prev.creato_il), new Date(m.creato_il))) M.insertAdjacentHTML('beforeend', '<div class="giorno"><span>'+dataGiorno(m.creato_il)+'</span></div>');
-  if(prev && stessoGruppo(prev, m)) ridisegnaMessaggio(prev.id);
   const d = document.createElement('div'); d.innerHTML = msgHTML(m, prev, null, c);
   const nodo = d.firstChild;
   /* entra morbido, come su WhatsApp */
   if(nodo.classList) nodo.classList.add('entra');
-  M.appendChild(nodo);
-  idrataMedia(nodo); togliEntra(nodo);
+  cambiaInFondo(() => {
+    if(prev && !stessoGiorno(new Date(prev.creato_il), new Date(m.creato_il))) I.insertAdjacentHTML('beforeend', '<div class="giorno"><span>'+dataGiorno(m.creato_il)+'</span></div>');
+    if(prev && stessoGruppo(prev, m)) ridisegnaMessaggio(prev.id);
+    I.appendChild(nodo);
+    idrataMedia(nodo); togliEntra(nodo);
+  }, segui);
   const md = m.media || {};
   if(md.bolla === 'slam' && !S.visti.has(m.id)){ const cv = el('conv'); cv.classList.remove('scossa'); void cv.offsetWidth; cv.classList.add('scossa'); }
-  if(giu || !altrui) vaiInFondo(false);
+  if(segui) vaiInFondo(false);
   else { nuoviSotto++; mostraGiu(); if(menzionaMe(m)){ menzDaVedere.push(m.id); mostraMenz(); } }
   if(md.bolla || md.anim) setTimeout(() => segnaVisto(m.id), 2600);
 }
 function segnaVisto(id){ S.visti.add(id); const a = Array.from(S.visti).slice(-400); memoria('effetti_visti', a); }
 
 /* ---------- scorrere ---------- */
-function vicinoAlFondo(){ const M = el('msgs'); return !M || M.scrollHeight - M.scrollTop - M.clientHeight < 160; }
+/* 2.9.14: la lista dei messaggi parte dal FONDO (#msgs e' una colonna rovesciata con dentro #msgsIn).
+   Il punto fermo e' il fondo: se cambia l'altezza della tastiera, della casella o della barra di risposta,
+   i messaggi in basso restano dove sono senza nessuno "scrollTop = scrollHeight" a mano (era il rimbalzo
+   dell'iPhone a ogni invio). Le misure qui sotto valgono sia con lo scrollTop negativo (Safari e Chrome
+   di oggi: 0 = in fondo) sia con quello vecchio (0 = in cima). */
+let scorriNeg = null;
+function versoNegativo(){
+  if(scorriNeg !== null) return scorriNeg;
+  const a = document.createElement('div');
+  a.style.cssText = 'position:absolute;left:-9999px;top:0;width:20px;height:20px;overflow:auto;display:flex;flex-direction:column-reverse;visibility:hidden';
+  a.innerHTML = '<div style="flex:none;height:80px"></div>';
+  document.body.appendChild(a); a.scrollTop = -10; scorriNeg = a.scrollTop < 0; a.remove();
+  return scorriNeg;
+}
+function giuDalFondo(M){ return Math.max(0, versoNegativo() ? -M.scrollTop : M.scrollHeight - M.clientHeight - M.scrollTop); }
+function suDallaCima(M){ return Math.max(0, M.scrollHeight - M.clientHeight - giuDalFondo(M)); }
+function mettiGiuDalFondo(M, d){ d = Math.max(0, d || 0); M.scrollTop = versoNegativo() ? -d : M.scrollHeight - M.clientHeight - d; }
+function vicinoAlFondo(){ const M = el('msgs'); return !M || giuDalFondo(M) < 160; }
+/* cambio la lista vicino al fondo: se seguivo il fondo i messaggi sopra salgono UNA volta, in modo continuo
+   (la bolla nuova entra da sotto); se stavo leggendo piu' in alto, quello che vedo resta fermo */
+const PIANO = 'cubic-bezier(.2,.8,.25,1)';
+let dentroCambio = 0;
+function cambiaInFondo(fai, segui){
+  const M = el('msgs'), I = el('msgsIn');
+  /* dentro un cambio gia' aperto (per esempio: svuoto la casella E aggiungo il messaggio) conta come uno solo */
+  if(!M || !I || dentroCambio){ fai(); return; }
+  const ref = I.firstElementChild, y0 = ref ? ref.getBoundingClientRect().top : 0;
+  const eraInFondo = giuDalFondo(M) < 2;
+  dentroCambio++;
+  try{ fai(); } finally{ dentroCambio--; }
+  if(!ref || !ref.isConnected) return;
+  const salito = y0 - ref.getBoundingClientRect().top;
+  if(Math.abs(salito) < .5) return;
+  if(!segui){ M.scrollTop -= salito; return; }
+  if(eraInFondo && I.animate && !matchMedia('(prefers-reduced-motion: reduce)').matches){
+    try{ I.animate([{transform: 'translateY(' + salito + 'px)'}, {transform: 'translateY(0)'}], {duration: 260, easing: PIANO, composite: 'add'}); }
+    catch(_){ I.animate([{transform: 'translateY(' + salito + 'px)'}, {transform: 'translateY(0)'}], {duration: 260, easing: PIANO}); }
+  }
+}
 function togliEntra(n){
   if(!n || !n.classList) return;
   const via = () => { n.classList.remove('entra'); };
   n.addEventListener('animationend', e => { if(e.target === n) via(); }, {once: true});
   setTimeout(via, 600);
 }
-/* 2.9.12: uno scorrimento solo, morbido, che segue il fondo anche se cresce (foto che arrivano):
-   prima ne partivano tre di fila e si vedeva lo scatto */
+/* uno scorrimento solo, morbido, fino al fondo (serve solo se ero piu' in alto) */
 let scorrendo = null;
 function scorriAlFondo(M){
-  const fondo = () => Math.max(0, M.scrollHeight - M.clientHeight);
-  if(matchMedia('(prefers-reduced-motion: reduce)').matches){ M.scrollTop = fondo(); return; }
-  if(scorrendo && scorrendo.M === M){ scorrendo.t0 = performance.now(); scorrendo.da = M.scrollTop; return; }
-  const st = scorrendo = {M, da: M.scrollTop, t0: performance.now()};
+  if(matchMedia('(prefers-reduced-motion: reduce)').matches){ mettiGiuDalFondo(M, 0); return; }
+  if(giuDalFondo(M) < 1) return;
+  if(scorrendo && scorrendo.M === M){ scorrendo.t0 = performance.now(); scorrendo.da = giuDalFondo(M); return; }
+  const st = scorrendo = {M, da: giuDalFondo(M), t0: performance.now()};
   const dur = 280;
   const passo = t => {
     if(scorrendo !== st) return;
-    const k = Math.min(1, (t - st.t0) / dur), e = 1 - Math.pow(1 - k, 3);
-    M.scrollTop = st.da + (fondo() - st.da) * e;
-    if(k < 1) requestAnimationFrame(passo); else { M.scrollTop = fondo(); scorrendo = null; }
+    const k = Math.min(1, Math.max(0, (t - st.t0) / dur)), e = 1 - Math.pow(1 - k, 3);
+    mettiGiuDalFondo(M, st.da * (1 - e));
+    if(k < 1) requestAnimationFrame(passo); else { mettiGiuDalFondo(M, 0); scorrendo = null; }
   };
   requestAnimationFrame(passo);
 }
+/* l'utente che tocca la lista ferma lo scorrimento automatico */
+function fermaScorrendo(){ scorrendo = null; }
 function vaiInFondo(subito){
   const M = el('msgs'); if(!M) return;
   if(subito){
     const sep = primaNonLetta && el('sepNonLette');
-    const fai = () => { if(sep){ M.scrollTop = Math.max(0, sep.offsetTop - 80); } else M.scrollTop = M.scrollHeight; };
+    const fai = () => {
+      if(sep && sep.isConnected) M.scrollTop += sep.getBoundingClientRect().top - M.getBoundingClientRect().top - 80;
+      else mettiGiuDalFondo(M, 0);
+    };
     fai(); requestAnimationFrame(fai); setTimeout(fai, 120);
-  } else {
-    scorriAlFondo(M);
-    /* se nel frattempo una foto ha allungato la chat, la raggiungo con calma */
-    setTimeout(() => { if(M.isConnected && vicinoAlFondo() && M.scrollHeight - M.scrollTop - M.clientHeight > 2) scorriAlFondo(M); }, 450);
-  }
+  } else scorriAlFondo(M);
   nuoviSotto = 0; mostraGiu();
 }
 function mostraGiu(){
@@ -3255,7 +3305,7 @@ async function alloScorrere(){
   mostraDataFluttua();
   if(menzDaVedere.length) mostraMenz();
   if(vicinoAlFondo()){ nuoviSotto = 0; const c = S.convs.get(S.aperta); if(c && c.non_lette) segnaLetto(c.id); }
-  if(M.scrollTop < 300 && !caricandoSu){
+  if(suDallaCima(M) < 300 && !caricandoSu){
     const s = S.msgs.get(S.aperta); if(!s || s.tutti) return;
     caricandoSu = true;
     try{ const n = await caricaMessaggi(S.aperta, true); if(n.length) disegnaMessaggi(true); else if(s.tutti) disegnaMessaggi(true); }
@@ -3400,9 +3450,9 @@ let ultimoDisegno = 0, tDataFluttua = null;
 function mostraDataFluttua(){
   const M = el('msgs'), D = el('dataFluttua'); if(!M || !D) return;
   if(Date.now() - ultimoDisegno < 700) return;          // e' il ridisegno, non sei tu che scorri
-  const alto = M.scrollTop + (parseFloat(getComputedStyle(M).paddingTop) || 0) + 4;
+  const alto = M.getBoundingClientRect().top + (parseFloat(getComputedStyle(M).paddingTop) || 0) + 4;
   let testo = '';
-  for(const g of M.querySelectorAll('.giorno')){ if(g.offsetTop <= alto) testo = g.textContent; else break; }
+  for(const g of M.querySelectorAll('.giorno')){ if(g.getBoundingClientRect().top <= alto) testo = g.textContent; else break; }
   clearTimeout(tDataFluttua);
   if(!testo){ D.classList.remove('su'); return; }
   D.firstChild.textContent = testo;
@@ -3411,6 +3461,9 @@ function mostraDataFluttua(){
 }
 
 /* ======================= SCRIVERE E MANDARE ======================= */
+function tastoMandaHTML(md, pieno, e){
+  return svg(md ? 'ok' : pieno ? (suTelefono() ? 'freccia' : 'manda') : 'mic', md ? 2.6 : suTelefono() && pieno ? 2.6 : 1.8)+(e && !md ? '<span class="effetto-segno">'+svg('effetti', 2.4)+'</span>' : '');
+}
 function disegnaScrivi(){
   const F = el('scrivi'); const c = S.convs.get(S.aperta); if(!F || !c) return;
   if(S.selezione){ disegnaSelezione(); return; }
@@ -3419,27 +3472,51 @@ function disegnaScrivi(){
   const e = S.effettoScelto;
   const md = S.modifica && S.modifica.conv_id === c.id ? S.modifica : null;
   if(S.modifica && !md){ S.modifica = null; S.extraModifica = null; }
-  const pieno = !!testo.trim() || !!md;
+  const pieno = !!testo.trim() || !!md, scritto = !!testo.trim();
+  const sopra = md ? '<div class="rispondi-a modifica-a"><div class="citazione" style="--col:var(--verde)"><span class="barra"></span><span class="cc"><b>'+svg('matita', 2.2)+'Modifica '+(md.tipo === 'testo' ? 'messaggio' : 'didascalia')+'</b>'+
+        '<span>'+esc(testoAnteprima(md))+'</span></span></div><button class="ib" data-a="annulla-modifica" aria-label="Annulla la modifica">'+svg('chiudi')+'</button></div>'
+      : r ? '<div class="rispondi-a">'+citazioneHTML(r.id, c).replace('data-a="vai-msg"', '')+'<button class="ib" data-a="annulla-risposta" aria-label="Annulla">'+svg('chiudi')+'</button></div>' : '';
+  const segnaposto = md ? 'Modifica il messaggio' : suTelefono() ? '' : 'Scrivi un messaggio';
+  const invio = S.cfg.invio && !tocco() ? 'send' : 'enter';
+  const etichetta = md ? 'Salva la modifica' : scritto ? 'Invia' : 'Registra un vocale';
+  /* 2.9.14: se la barra c'e' gia' la aggiorno in posto. La casella resta la stessa (non perde il fuoco):
+     sull'iPhone ricrearla chiudeva e riapriva la tastiera a ogni invio, e la chat rimbalzava */
+  const S0 = el('scriviSopra'), B0 = el('barraScrivi'), mb0 = el('mandaB');
+  if(vecchio && S0 && B0 && mb0 && F.contains(vecchio)){
+    if(S0.innerHTML !== sopra) S0.innerHTML = sopra;
+    B0.classList.toggle('in-modifica', !!md);
+    if(vecchio.placeholder !== segnaposto) vecchio.placeholder = segnaposto;
+    if(vecchio.getAttribute('enterkeyhint') !== invio) vecchio.setAttribute('enterkeyhint', invio);
+    const eb = el('effettiB'), sk = el('stkB'), cb = el('camB');
+    if(eb){ eb.classList.toggle('on', !!e); eb.style.display = !md && (scritto || e) ? '' : 'none'; }
+    if(sk) sk.style.display = scritto || md ? 'none' : '';
+    if(cb) cb.style.display = scritto || md ? 'none' : '';
+    mb0.classList.toggle('pieno', pieno);
+    const dentro = tastoMandaHTML(md, scritto, e);
+    if(mb0._dentro !== dentro){ mb0.innerHTML = dentro; mb0._dentro = dentro; }
+    mb0.setAttribute('aria-label', etichetta);
+    adatta(vecchio);
+    disegnaBarraProgrammati();
+    return;
+  }
   F.innerHTML =
     '<div class="prog-barra nascosto" id="progBarra"></div>'+
     '<div class="picker nascosto" id="picker"></div>'+
-    (md ? '<div class="rispondi-a modifica-a"><div class="citazione" style="--col:var(--verde)"><span class="barra"></span><span class="cc"><b>'+svg('matita', 2.2)+'Modifica '+(md.tipo === 'testo' ? 'messaggio' : 'didascalia')+'</b>'+
-        '<span>'+esc(testoAnteprima(md))+'</span></span></div><button class="ib" data-a="annulla-modifica" aria-label="Annulla la modifica">'+svg('chiudi')+'</button></div>'
-      : r ? '<div class="rispondi-a">'+citazioneHTML(r.id, c).replace('data-a="vai-msg"', '')+'<button class="ib" data-a="annulla-risposta" aria-label="Annulla">'+svg('chiudi')+'</button></div>' : '')+
+    '<div class="scrivi-sopra" id="scriviSopra">'+sopra+'</div>'+
     '<div id="pannelloEmoji"></div>'+
     '<div class="barra-scrivi'+(md ? ' in-modifica' : '')+'" id="barraScrivi">'+
       '<button class="ib" data-a="emoji" id="emojiB" title="Emoji, GIF e sticker">'+svg('emoji', 1.8)+'</button>'+
       '<span class="allega-wrap"><button class="ib" data-a="allega" id="allegaB" title="Allega">'+svg('piu', 2)+'</button></span>'+
       '<div class="campo">'+
-        '<textarea class="testo-in" id="testoIn" rows="1" placeholder="'+(md ? 'Modifica il messaggio' : suTelefono() ? '' : 'Scrivi un messaggio')+'" enterkeyhint="'+(S.cfg.invio && !tocco() ? 'send' : 'enter')+'" '+
+        '<textarea class="testo-in" id="testoIn" rows="1" placeholder="'+segnaposto+'" enterkeyhint="'+invio+'" '+
           'autocomplete="off" autocapitalize="sentences" spellcheck="true"></textarea>'+
-        '<button class="ib effetti-b'+(e ? ' on' : '')+'" data-a="effetti" id="effettiB" title="Effetti" style="'+(!md && (testo.trim() || e) ? '' : 'display:none')+'">'+svg('effetti', 1.8)+'</button>'+
-        '<button class="ib stk-b" data-a="emoji-sticker" id="stkB" title="Sticker" style="'+(testo.trim() || md ? 'display:none' : '')+'">'+svg('sticker', 1.8)+'</button>'+
+        '<button class="ib effetti-b'+(e ? ' on' : '')+'" data-a="effetti" id="effettiB" title="Effetti" style="'+(!md && (scritto || e) ? '' : 'display:none')+'">'+svg('effetti', 1.8)+'</button>'+
+        '<button class="ib stk-b" data-a="emoji-sticker" id="stkB" title="Sticker" style="'+(scritto || md ? 'display:none' : '')+'">'+svg('sticker', 1.8)+'</button>'+
       '</div>'+
-      '<button class="ib cam-b" data-a="fotocamera" id="camB" title="Fotocamera" style="'+(testo.trim() || md ? 'display:none' : '')+'">'+svg('camera', 1.8)+'</button>'+
-      '<button class="manda'+(pieno ? ' pieno' : '')+'" id="mandaB" aria-label="'+(md ? 'Salva la modifica' : testo.trim() ? 'Invia' : 'Registra un vocale')+'">'+
-        svg(md ? 'ok' : testo.trim() ? (suTelefono() ? 'freccia' : 'manda') : 'mic', md ? 2.6 : suTelefono() && testo.trim() ? 2.6 : 1.8)+(e && !md ? '<span class="effetto-segno">'+svg('effetti', 2.4)+'</span>' : '')+'</button>'+
+      '<button class="ib cam-b" data-a="fotocamera" id="camB" title="Fotocamera" style="'+(scritto || md ? 'display:none' : '')+'">'+svg('camera', 1.8)+'</button>'+
+      '<button class="manda'+(pieno ? ' pieno' : '')+'" id="mandaB" aria-label="'+etichetta+'">'+tastoMandaHTML(md, scritto, e)+'</button>'+
     '</div>';
+  el('mandaB')._dentro = tastoMandaHTML(md, scritto, e);
   const t = el('testoIn');
   t.value = testo; adatta(t);
   t.addEventListener('input', () => { adatta(t); aggiornaTastoManda(); if(!S.modifica){ dicoCheScrivo(); salvaBozzaPresto(); } controllaPicker(); });
@@ -3463,7 +3540,7 @@ function aggiornaTastoManda(){
   const pieno = !!t.value.trim();
   if(b.classList.contains('pieno') !== pieno){
     b.classList.toggle('pieno', pieno);
-    b.innerHTML = svg(pieno ? (suTelefono() ? 'freccia' : 'manda') : 'mic', suTelefono() && pieno ? 2.6 : 1.8) + (S.effettoScelto ? '<span class="effetto-segno">'+svg('effetti', 2.4)+'</span>' : '');
+    b.innerHTML = b._dentro = tastoMandaHTML(null, pieno, S.effettoScelto);
     b.setAttribute('aria-label', pieno ? 'Invia' : 'Registra un vocale');
   }
   const eb = el('effettiB'), cb = el('camB'), sk = el('stkB');
@@ -3545,10 +3622,13 @@ async function mandaTesto(opz){
   const c = S.convs.get(S.aperta);
   const eff = Object.assign({}, S.effettoScelto || {}, raccogliExtra(testo, c), opz && opz.muto ? {silenzioso: true} : {});
   const m = nuovoLocale('testo', {testo, media: Object.keys(eff).length ? eff : null});
-  t.value = ''; adatta(t); S.effettoScelto = null; S.risposta = null;
-  delete S.bozze[S.aperta]; memoria('bozze', S.bozze); pulisciBozzaExtra(S.aperta); chiudiPicker();
-  disegnaScrivi(); el('testoIn').focus();
-  mettiInLista(m);
+  /* 2.9.14: la casella che si svuota (e si abbassa) e il messaggio che entra sono UN movimento solo */
+  cambiaInFondo(() => {
+    t.value = ''; adatta(t); S.effettoScelto = null; S.risposta = null;
+    delete S.bozze[S.aperta]; memoria('bozze', S.bozze); pulisciBozzaExtra(S.aperta); chiudiPicker();
+    disegnaScrivi(); { const t2 = el('testoIn'); if(t2 && document.activeElement !== t2) t2.focus(); }
+    mettiInLista(m);
+  }, true);
   suono('invio');
   if(eff.schermo) setTimeout(() => eseguiEffettoSchermo(m), 250);
   if(opz && opz.muto) toast('Inviato senza suono: arriva senza far suonare il telefono.');
@@ -4762,7 +4842,7 @@ async function mandaDaRaccolta(x){
     const m = nuovoLocale(ext === 'mp4' ? 'video' : 'foto', {media: {gif: true, locale: loc, w: 300, h: 300}});
     try{ const dims = await new Promise(ok => { if(ext === 'mp4') return ok([320, 240]); const i = new Image(); i.onload = () => ok([i.naturalWidth, i.naturalHeight]); i.onerror = () => ok([300, 300]); i.src = loc; });
       m.media.w = dims[0]; m.media.h = dims[1]; }catch(e){}
-    m._avanza = .5; S.risposta = null; disegnaScrivi(); mettiInLista(m);
+    m._avanza = .5; cambiaInFondo(() => { S.risposta = null; disegnaScrivi(); mettiInLista(m); }, true);
     try{
       const {error} = await sb.storage.from('chat').copy(x.path, dest); if(error) throw error;
       m.media.path = dest; firme.set(dest, {url: loc, scade: Date.now() + 864e5}); delete m._avanza;
@@ -4771,13 +4851,13 @@ async function mandaDaRaccolta(x){
     return;
   }
   const m = nuovoLocale('sticker', {media: {path: x.path, w: 512, h: 512}});
-  S.risposta = null; disegnaScrivi(); mettiInLista(m); suono('invio');
+  cambiaInFondo(() => { S.risposta = null; disegnaScrivi(); mettiInLista(m); }, true); suono('invio');
   try{ await salvaMessaggio(m); }catch(e){ m._stato = 'errore'; ridisegnaMessaggio(m.id); errore(e, 'Sticker non inviato'); }
 }
 async function mandaStickerFoss(nome){
   if(!S.aperta) return;
   const m = nuovoLocale('sticker', {media: {path: 'foss:' + nome, w: 512, h: 512}});
-  S.risposta = null; disegnaScrivi(); mettiInLista(m); suono('invio');
+  cambiaInFondo(() => { S.risposta = null; disegnaScrivi(); mettiInLista(m); }, true); suono('invio');
   try{ await salvaMessaggio(m); }catch(e){ m._stato = 'errore'; ridisegnaMessaggio(m.id); errore(e, 'Sticker non inviato'); }
 }
 
@@ -5612,7 +5692,7 @@ async function mandaGiphy(x){
   /* l'indirizzo pulito di GIPHY (senza «?...»): e' quello che il database accetta */
   const url = /^[A-Za-z0-9]{1,40}$/.test(x.id || '') ? 'https://media.giphy.com/media/' + x.id + '/giphy.mp4' : String(x.mp4 || '').split('?')[0];
   const m = nuovoLocale('video', {media: {gif: true, url, w: x.w || 200, h: x.h || 200, giphy: x.id}});
-  if(S.risposta){ S.risposta = null; disegnaScrivi(); } mettiInLista(m); suono('invio');
+  cambiaInFondo(() => { if(S.risposta){ S.risposta = null; disegnaScrivi(); } mettiInLista(m); }, true); suono('invio');
   if(tocco()) chiudiPannelloEmoji();
   try{ await salvaMessaggio(m); }catch(e){ m._stato = 'errore'; ridisegnaMessaggio(m.id); errore(e, 'GIF non inviata'); }
 }
@@ -6131,10 +6211,10 @@ if('serviceWorker' in navigator){
     R.classList.toggle('tastiera', tastiera);
     if(Math.abs(window.scrollY) > 0 || vv.offsetTop > 0) window.scrollTo(0, 0);
     const app = el('app'); if(app) app.style.transform = vv.offsetTop ? 'translateY(' + vv.offsetTop + 'px)' : '';
-    /* 2.9.12: tengo il fondo solo quando la tastiera cambia davvero altezza (prima anche a ogni messaggio
-       mandato: lo scorrimento morbido veniva interrotto da un salto) */
+    /* 2.9.14: la lista dei messaggi parte dal fondo e ci resta da sola: qui non si tocca piu' lo scorrimento.
+       Solo sui browser vecchi (scrollTop non rovesciato) tengo il fondo quando la tastiera cambia altezza */
     const M = el('msgs'), cambiata = h !== ultimaH; ultimaH = h;
-    if(M && M._eraInFondo !== false && cambiata && !scorrendo) M.scrollTop = M.scrollHeight;
+    if(M && !versoNegativo() && M._eraInFondo !== false && cambiata && !scorrendo) mettiGiuDalFondo(M, 0);
   };
   let ultimaH = null;
   vv.addEventListener('resize', adatta); vv.addEventListener('scroll', adatta);
@@ -6894,7 +6974,7 @@ function nuovoSondaggio(){
       const media = {opzioni: vv.slice(0, 12).map((t, i) => ({id: lettere[i], t})), multi};
       chiudi();
       const m = nuovoLocale('sondaggio', {testo: dom, media});
-      S.risposta = null; disegnaScrivi(); mettiInLista(m); suono('invio');
+      cambiaInFondo(() => { S.risposta = null; disegnaScrivi(); mettiInLista(m); }, true); suono('invio');
       try{ await salvaMessaggio(m); }catch(err){ m._stato = 'errore'; ridisegnaMessaggio(m.id); errore(err, 'Sondaggio non inviato'); }
     }
   });
@@ -7113,7 +7193,7 @@ function vediLavoro(ref){
 async function mandaLavoro(ref, testo){
   const c = S.convs.get(S.aperta); if(!c || !ref || !ref.id) return;
   const m = nuovoLocale('lavoro', {testo: testo || null, media: {lavoro: {id: ref.id, org: ref.org, n: String(ref.n || ref.nome || 'Lavoro').slice(0, 120)}}});
-  S.risposta = null; disegnaScrivi(); mettiInLista(m); suono('invio');
+  cambiaInFondo(() => { S.risposta = null; disegnaScrivi(); mettiInLista(m); }, true); suono('invio');
   try{ await salvaMessaggio(m); }catch(e){ m._stato = 'errore'; ridisegnaMessaggio(m.id); errore(e, 'Lavoro non condiviso'); }
 }
 

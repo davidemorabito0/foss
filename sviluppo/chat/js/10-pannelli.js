@@ -28,7 +28,8 @@ function nuovaChat(){
   if(!tocco()) setTimeout(() => { const i = el('ncCerca'); if(i) i.focus(); }, 200);
 }
 async function scriviA(id){
-  chiudiPannelloSinistra(); chiudiVelo();
+  /* anche dalle informazioni del gruppo: chiudo il pannello e porto dritto nella chat privata */
+  chiudiPannelloSinistra(); chiudiVelo(); chiudiInfo();
   let conv = null;
   S.convs.forEach(c => { if(c.tipo !== 'privata') return;
     const solo = (c.membri || []).every(m => m.id === S.io);

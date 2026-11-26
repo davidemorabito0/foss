@@ -59,7 +59,7 @@ function nuovoSondaggio(){
       const media = {opzioni: vv.slice(0, 12).map((t, i) => ({id: lettere[i], t})), multi};
       chiudi();
       const m = nuovoLocale('sondaggio', {testo: dom, media});
-      S.risposta = null; disegnaScrivi(); mettiInLista(m); suono('invio');
+      cambiaInFondo(() => { S.risposta = null; disegnaScrivi(); mettiInLista(m); }, true); suono('invio');
       try{ await salvaMessaggio(m); }catch(err){ m._stato = 'errore'; ridisegnaMessaggio(m.id); errore(err, 'Sondaggio non inviato'); }
     }
   });

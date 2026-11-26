@@ -1,4 +1,7 @@
 /* ======================= SCRIVERE E MANDARE ======================= */
+function tastoMandaHTML(md, pieno, e){
+  return svg(md ? 'ok' : pieno ? (suTelefono() ? 'freccia' : 'manda') : 'mic', md ? 2.6 : suTelefono() && pieno ? 2.6 : 1.8)+(e && !md ? '<span class="effetto-segno">'+svg('effetti', 2.4)+'</span>' : '');
+}
 function disegnaScrivi(){
   const F = el('scrivi'); const c = S.convs.get(S.aperta); if(!F || !c) return;
   if(S.selezione){ disegnaSelezione(); return; }
@@ -7,27 +10,51 @@ function disegnaScrivi(){
   const e = S.effettoScelto;
   const md = S.modifica && S.modifica.conv_id === c.id ? S.modifica : null;
   if(S.modifica && !md){ S.modifica = null; S.extraModifica = null; }
-  const pieno = !!testo.trim() || !!md;
+  const pieno = !!testo.trim() || !!md, scritto = !!testo.trim();
+  const sopra = md ? '<div class="rispondi-a modifica-a"><div class="citazione" style="--col:var(--verde)"><span class="barra"></span><span class="cc"><b>'+svg('matita', 2.2)+'Modifica '+(md.tipo === 'testo' ? 'messaggio' : 'didascalia')+'</b>'+
+        '<span>'+esc(testoAnteprima(md))+'</span></span></div><button class="ib" data-a="annulla-modifica" aria-label="Annulla la modifica">'+svg('chiudi')+'</button></div>'
+      : r ? '<div class="rispondi-a">'+citazioneHTML(r.id, c).replace('data-a="vai-msg"', '')+'<button class="ib" data-a="annulla-risposta" aria-label="Annulla">'+svg('chiudi')+'</button></div>' : '';
+  const segnaposto = md ? 'Modifica il messaggio' : suTelefono() ? '' : 'Scrivi un messaggio';
+  const invio = S.cfg.invio && !tocco() ? 'send' : 'enter';
+  const etichetta = md ? 'Salva la modifica' : scritto ? 'Invia' : 'Registra un vocale';
+  /* 2.9.14: se la barra c'e' gia' la aggiorno in posto. La casella resta la stessa (non perde il fuoco):
+     sull'iPhone ricrearla chiudeva e riapriva la tastiera a ogni invio, e la chat rimbalzava */
+  const S0 = el('scriviSopra'), B0 = el('barraScrivi'), mb0 = el('mandaB');
+  if(vecchio && S0 && B0 && mb0 && F.contains(vecchio)){
+    if(S0.innerHTML !== sopra) S0.innerHTML = sopra;
+    B0.classList.toggle('in-modifica', !!md);
+    if(vecchio.placeholder !== segnaposto) vecchio.placeholder = segnaposto;
+    if(vecchio.getAttribute('enterkeyhint') !== invio) vecchio.setAttribute('enterkeyhint', invio);
+    const eb = el('effettiB'), sk = el('stkB'), cb = el('camB');
+    if(eb){ eb.classList.toggle('on', !!e); eb.style.display = !md && (scritto || e) ? '' : 'none'; }
+    if(sk) sk.style.display = scritto || md ? 'none' : '';
+    if(cb) cb.style.display = scritto || md ? 'none' : '';
+    mb0.classList.toggle('pieno', pieno);
+    const dentro = tastoMandaHTML(md, scritto, e);
+    if(mb0._dentro !== dentro){ mb0.innerHTML = dentro; mb0._dentro = dentro; }
+    mb0.setAttribute('aria-label', etichetta);
+    adatta(vecchio);
+    disegnaBarraProgrammati();
+    return;
+  }
   F.innerHTML =
     '<div class="prog-barra nascosto" id="progBarra"></div>'+
     '<div class="picker nascosto" id="picker"></div>'+
-    (md ? '<div class="rispondi-a modifica-a"><div class="citazione" style="--col:var(--verde)"><span class="barra"></span><span class="cc"><b>'+svg('matita', 2.2)+'Modifica '+(md.tipo === 'testo' ? 'messaggio' : 'didascalia')+'</b>'+
-        '<span>'+esc(testoAnteprima(md))+'</span></span></div><button class="ib" data-a="annulla-modifica" aria-label="Annulla la modifica">'+svg('chiudi')+'</button></div>'
-      : r ? '<div class="rispondi-a">'+citazioneHTML(r.id, c).replace('data-a="vai-msg"', '')+'<button class="ib" data-a="annulla-risposta" aria-label="Annulla">'+svg('chiudi')+'</button></div>' : '')+
+    '<div class="scrivi-sopra" id="scriviSopra">'+sopra+'</div>'+
     '<div id="pannelloEmoji"></div>'+
     '<div class="barra-scrivi'+(md ? ' in-modifica' : '')+'" id="barraScrivi">'+
       '<button class="ib" data-a="emoji" id="emojiB" title="Emoji, GIF e sticker">'+svg('emoji', 1.8)+'</button>'+
       '<span class="allega-wrap"><button class="ib" data-a="allega" id="allegaB" title="Allega">'+svg('piu', 2)+'</button></span>'+
       '<div class="campo">'+
-        '<textarea class="testo-in" id="testoIn" rows="1" placeholder="'+(md ? 'Modifica il messaggio' : suTelefono() ? '' : 'Scrivi un messaggio')+'" enterkeyhint="'+(S.cfg.invio && !tocco() ? 'send' : 'enter')+'" '+
+        '<textarea class="testo-in" id="testoIn" rows="1" placeholder="'+segnaposto+'" enterkeyhint="'+invio+'" '+
           'autocomplete="off" autocapitalize="sentences" spellcheck="true"></textarea>'+
-        '<button class="ib effetti-b'+(e ? ' on' : '')+'" data-a="effetti" id="effettiB" title="Effetti" style="'+(!md && (testo.trim() || e) ? '' : 'display:none')+'">'+svg('effetti', 1.8)+'</button>'+
-        '<button class="ib stk-b" data-a="emoji-sticker" id="stkB" title="Sticker" style="'+(testo.trim() || md ? 'display:none' : '')+'">'+svg('sticker', 1.8)+'</button>'+
+        '<button class="ib effetti-b'+(e ? ' on' : '')+'" data-a="effetti" id="effettiB" title="Effetti" style="'+(!md && (scritto || e) ? '' : 'display:none')+'">'+svg('effetti', 1.8)+'</button>'+
+        '<button class="ib stk-b" data-a="emoji-sticker" id="stkB" title="Sticker" style="'+(scritto || md ? 'display:none' : '')+'">'+svg('sticker', 1.8)+'</button>'+
       '</div>'+
-      '<button class="ib cam-b" data-a="fotocamera" id="camB" title="Fotocamera" style="'+(testo.trim() || md ? 'display:none' : '')+'">'+svg('camera', 1.8)+'</button>'+
-      '<button class="manda'+(pieno ? ' pieno' : '')+'" id="mandaB" aria-label="'+(md ? 'Salva la modifica' : testo.trim() ? 'Invia' : 'Registra un vocale')+'">'+
-        svg(md ? 'ok' : testo.trim() ? (suTelefono() ? 'freccia' : 'manda') : 'mic', md ? 2.6 : suTelefono() && testo.trim() ? 2.6 : 1.8)+(e && !md ? '<span class="effetto-segno">'+svg('effetti', 2.4)+'</span>' : '')+'</button>'+
+      '<button class="ib cam-b" data-a="fotocamera" id="camB" title="Fotocamera" style="'+(scritto || md ? 'display:none' : '')+'">'+svg('camera', 1.8)+'</button>'+
+      '<button class="manda'+(pieno ? ' pieno' : '')+'" id="mandaB" aria-label="'+etichetta+'">'+tastoMandaHTML(md, scritto, e)+'</button>'+
     '</div>';
+  el('mandaB')._dentro = tastoMandaHTML(md, scritto, e);
   const t = el('testoIn');
   t.value = testo; adatta(t);
   t.addEventListener('input', () => { adatta(t); aggiornaTastoManda(); if(!S.modifica){ dicoCheScrivo(); salvaBozzaPresto(); } controllaPicker(); });
@@ -51,7 +78,7 @@ function aggiornaTastoManda(){
   const pieno = !!t.value.trim();
   if(b.classList.contains('pieno') !== pieno){
     b.classList.toggle('pieno', pieno);
-    b.innerHTML = svg(pieno ? (suTelefono() ? 'freccia' : 'manda') : 'mic', suTelefono() && pieno ? 2.6 : 1.8) + (S.effettoScelto ? '<span class="effetto-segno">'+svg('effetti', 2.4)+'</span>' : '');
+    b.innerHTML = b._dentro = tastoMandaHTML(null, pieno, S.effettoScelto);
     b.setAttribute('aria-label', pieno ? 'Invia' : 'Registra un vocale');
   }
   const eb = el('effettiB'), cb = el('camB'), sk = el('stkB');
@@ -133,10 +160,13 @@ async function mandaTesto(opz){
   const c = S.convs.get(S.aperta);
   const eff = Object.assign({}, S.effettoScelto || {}, raccogliExtra(testo, c), opz && opz.muto ? {silenzioso: true} : {});
   const m = nuovoLocale('testo', {testo, media: Object.keys(eff).length ? eff : null});
-  t.value = ''; adatta(t); S.effettoScelto = null; S.risposta = null;
-  delete S.bozze[S.aperta]; memoria('bozze', S.bozze); pulisciBozzaExtra(S.aperta); chiudiPicker();
-  disegnaScrivi(); el('testoIn').focus();
-  mettiInLista(m);
+  /* 2.9.14: la casella che si svuota (e si abbassa) e il messaggio che entra sono UN movimento solo */
+  cambiaInFondo(() => {
+    t.value = ''; adatta(t); S.effettoScelto = null; S.risposta = null;
+    delete S.bozze[S.aperta]; memoria('bozze', S.bozze); pulisciBozzaExtra(S.aperta); chiudiPicker();
+    disegnaScrivi(); { const t2 = el('testoIn'); if(t2 && document.activeElement !== t2) t2.focus(); }
+    mettiInLista(m);
+  }, true);
   suono('invio');
   if(eff.schermo) setTimeout(() => eseguiEffettoSchermo(m), 250);
   if(opz && opz.muto) toast('Inviato senza suono: arriva senza far suonare il telefono.');
@@ -487,6 +517,8 @@ function incolla(e){
   if(f.length){ e.preventDefault(); anteprimaInvio(f); }
 }
 function attivaTrascina(zona){
+  /* 2.9.12: la zona resta la stessa cambiando chat: si attiva una volta sola (prima ogni file arrivava doppio) */
+  if(zona._trascina) return; zona._trascina = true;
   let n = 0, velo = null;
   zona.addEventListener('dragenter', e => { if(!Array.from(e.dataTransfer.types || []).includes('Files')) return; e.preventDefault(); n++;
     if(!velo){ velo = document.createElement('div'); velo.className = 'trascina'; velo.innerHTML = '<span>Lascia qui per inviare</span>'; zona.appendChild(velo); } });
