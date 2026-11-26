@@ -78,6 +78,19 @@ function salvaBozza(){
   memoria('bozze', S.bozze);
 }
 
+/* 2.9.15: dopo l'invio la barra si ripulisce IN POSTO. Prima veniva ridisegnata: la casella nuova prendeva il fuoco e
+   l'iPhone spostava tutta la pagina di ~200 px per due fotogrammi (il «rimbalzo», misurato sul telefono vero). */
+function ripulisciScrivi(){
+  const F = el('scrivi'), t = el('testoIn');
+  if(!F || !t || S.selezione || S.modifica || !el('barraScrivi')){
+    disegnaScrivi(); const n = el('testoIn'); if(n) n.focus({preventScroll: true}); return;
+  }
+  const ra = F.querySelector('.rispondi-a'); if(ra) ra.remove();
+  const eb = el('effettiB'); if(eb) eb.classList.remove('on');
+  const b = el('mandaB'), segno = b && b.querySelector('.effetto-segno'); if(segno) segno.remove();
+  aggiornaTastoManda();
+  if(document.activeElement !== t) t.focus({preventScroll: true});
+}
 /* il tasto in basso a destra: tocco = invia (o registra), pressione lunga sul testo = effetti */
 let tPress = null;
 function premiManda(e){
@@ -135,7 +148,7 @@ async function mandaTesto(opz){
   const m = nuovoLocale('testo', {testo, media: Object.keys(eff).length ? eff : null});
   t.value = ''; adatta(t); S.effettoScelto = null; S.risposta = null;
   delete S.bozze[S.aperta]; memoria('bozze', S.bozze); pulisciBozzaExtra(S.aperta); chiudiPicker();
-  disegnaScrivi(); el('testoIn').focus();
+  ripulisciScrivi();
   mettiInLista(m);
   suono('invio');
   if(eff.schermo) setTimeout(() => eseguiEffettoSchermo(m), 250);

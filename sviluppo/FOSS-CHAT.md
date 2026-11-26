@@ -816,3 +816,9 @@ Sul Mac di Davide git e python non ci sono più: `pubblica.pl` carica le modific
 - `js/30-misura.js`: solo per l'account del titolare, a tutto schermo e su touch. Dal tocco su invio annota per 1,8 s a ogni fotogramma le misure (visualViewport, --alto, scrollTop/altezze di #msgs, posizione dell'ultima bolla, fuoco) e le manda con `segnala_errore` (dove = `misura-rimbalzo`). Solo numeri, nessun testo.
 - Già visto in Chromium: a ogni invio la casella perde e riprende il fuoco (`disegnaScrivi` ricrea la textarea) → probabile chiusura/riapertura della tastiera su iOS.
 - Da togliere appena trovata la causa, e cancellare le righe `misura-rimbalzo` da `errori_app`.
+
+## FOSS.chat 2.9.15 — causa del rimbalzo trovata e corretta
+
+- Misure dal telefono vero (iPhone, app dalla Home, 26 nov 2026): all'invio `disegnaScrivi` ricreava la casella; la casella nuova prendeva il fuoco (focusin al fotogramma 5) e iOS spostava la pagina per mostrarla: `visualViewport.offsetTop` 0→204→0, `#app` traslato di 204 px per due fotogrammi (ultima bolla da 394 a 636 px e ritorno). In più `#msgs.scrollTop` scendeva di ~60 px prima di risalire.
+- Correzione: `ripulisciScrivi()` in `05-scrivi.js` svuota la barra IN POSTO (toglie solo «rispondi a», segno effetti, aggiorna i tasti) e tiene la stessa textarea con il fuoco; `focus({preventScroll:true})` dove serve ancora ridisegnare.
+- La misura (`30-misura.js`) resta attiva per una seconda verifica sul telefono.
