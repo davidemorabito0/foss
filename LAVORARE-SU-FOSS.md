@@ -3,8 +3,8 @@
 Guida completa per chi riprende in mano il progetto con un altro strumento (un editor, un'altra IA, uno
 sviluppatore). Si legge dall'inizio alla fine prima di toccare qualcosa.
 
-Aggiornata al **25 novembre 2026**: FOSS **v82**, FOSS.chat **2.9.10**, app per computer **1.0.6**,
-service worker `foss-guscio-v113`. La versione che gira su un dispositivo si legge in fondo al **Profilo**
+Aggiornata al **25 novembre 2026**: FOSS **v82**, FOSS.chat **2.9.14**, app per computer **1.0.6**,
+service worker `foss-guscio-v117`. La versione che gira su un dispositivo si legge in fondo al **Profilo**
 (FOSS) e nelle impostazioni della chat.
 
 Il diario tecnico dettagliato, con la storia di ogni versione e i motivi delle scelte, è

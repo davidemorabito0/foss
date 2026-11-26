@@ -810,3 +810,9 @@ Sul Mac di Davide git e python non ci sono più: `pubblica.pl` carica le modific
 
 - Un caricamento a mano su GitHub (chat.html 2.9.12 e sw.js) era stato sovrascritto da una pubblicazione da questo Mac: ripristinato subito, e le modifiche sono state riportate nei sorgenti `sviluppo/chat/` (la ricostruzione dà lo stesso file caricato).
 - `pubblica.pl` ora ricorda l'ultima pubblicazione (`sviluppo/strumenti/.ultima-pubblicazione-main`, mai pubblicato) e si FERMA se un file che cambierebbe è stato modificato su GitHub nel frattempo. `FORZA=1` lo scavalca.
+
+## FOSS.chat 2.9.14 — misura del rimbalzo sull'iPhone (TEMPORANEA)
+
+- `js/30-misura.js`: solo per l'account del titolare, a tutto schermo e su touch. Dal tocco su invio annota per 1,8 s a ogni fotogramma le misure (visualViewport, --alto, scrollTop/altezze di #msgs, posizione dell'ultima bolla, fuoco) e le manda con `segnala_errore` (dove = `misura-rimbalzo`). Solo numeri, nessun testo.
+- Già visto in Chromium: a ogni invio la casella perde e riprende il fuoco (`disegnaScrivi` ricrea la textarea) → probabile chiusura/riapertura della tastiera su iOS.
+- Da togliere appena trovata la causa, e cancellare le righe `misura-rimbalzo` da `errori_app`.
