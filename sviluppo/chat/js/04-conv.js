@@ -156,7 +156,7 @@ function msgHTML(m, prev, next, c){
     return '<div class="sistema" data-id="'+m.id+'"><span>'+esc(m.testo || '')+'</span></div>';
   }
   if(m.tipo === 'colpetto') return colpettoHTML(m);
-  const mio = m.autore === S.io, gr = c.tipo === 'gruppo';
+  const mio = m.autore === S.io, gr = c.tipo === 'gruppo' && !c.solo_avvisi;   /* 2.9.19: negli avvisi niente nome e foto di chi scrive */
   const primo = !stessoGruppo(prev, m), ultimo = !stessoGruppo(m, next);
   const r = S.reazioni.get(m.id), haR = r && r.size;
   let cls = 'msg ' + (mio ? 'mio' : 'suo') + (primo ? ' primo' : '') + (ultimo ? ' ultimo' : '') + (gr ? ' gr' : '') + (haR ? ' con-reazioni' : '') +
@@ -269,6 +269,8 @@ function formatta(t, md){
   s = s.replace(/```([\s\S]+?)```/g, (_, x) => metti('<pre>' + x + '</pre>'));
   s = s.replace(/`([^`\n]+)`/g, (_, x) => metti('<code>' + x + '</code>'));
   s = s.replace(/(https?:\/\/[^\s<]+[^\s<.,;:!?)\]'"])/g, u => metti('<a href="' + u + '" target="_blank" rel="noopener noreferrer">' + u + '</a>'));
+  /* 2.9.19: un indirizzo email si tocca e apre la mail (es. nelle richieste dal sito) */
+  s = s.replace(/(^|[\s(:])([A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,})(?=$|[\s).,;!?])/g, (_, p, e) => p + metti('<a href="mailto:' + e + '">' + e + '</a>'));
   s = decoraTesto(s, md, metti);
   s = s.replace(/(^|[\s(])\*\*(\S(?:[^*\n]*\S)?)\*\*(?=$|[\s).,!?:;])/g, '$1<b>$2</b>');   /* anche **cosi'** */
   s = s.replace(/(^|[\s(])\*(\S(?:[^*\n]*\S)?)\*(?=$|[\s).,!?:;])/g, '$1<b>$2</b>')
@@ -579,6 +581,7 @@ function chiReagisce(id){
   foglio('Reazioni · ' + r.size, '<div style="margin:0 -24px">'+righe+'</div>', [['Chiudi']]);
 }
 function impostaRisposta(m){
+  const cv = S.convs.get(m.conv_id); if(cv && cv.solo_avvisi) return;   /* 2.9.19: negli avvisi non si risponde */
   S.risposta = m;
   disegnaScrivi();
   const t = el('testoIn'); if(t) t.focus();

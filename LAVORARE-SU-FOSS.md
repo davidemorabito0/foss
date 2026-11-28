@@ -3,8 +3,8 @@
 Guida completa per chi riprende in mano il progetto con un altro strumento (un editor, un'altra IA, uno
 sviluppatore). Si legge dall'inizio alla fine prima di toccare qualcosa.
 
-Aggiornata al **26 novembre 2026**: FOSS **v82**, FOSS.chat **2.9.18**, app per computer **1.0.6**,
-service worker `foss-guscio-v121`. La versione che gira su un dispositivo si legge in fondo al **Profilo**
+Aggiornata al **28 novembre 2026**: FOSS **v82**, FOSS.chat **2.9.19**, app per computer **1.0.6**,
+service worker `foss-guscio-v122`. La versione che gira su un dispositivo si legge in fondo al **Profilo**
 (FOSS) e nelle impostazioni della chat.
 
 Il diario tecnico dettagliato, con la storia di ogni versione e i motivi delle scelte, è
@@ -407,6 +407,7 @@ gh run list -R davidemorabito0/foss -L 5
 
 ### Ultime modifiche
 
+- **FOSS.chat 2.9.19** — le richieste dal modulo di contatto di davidemorabito.com arrivano anche nella chat «Richieste dal sito» (solo avvisi, non si risponde), con la notifica; le email nei messaggi si toccano.
 - **FOSS.chat 2.9.16** — niente più «rimbalzo» quando si manda un messaggio dall'iPhone: la casella dove si scrive non viene più ricreata a ogni invio (dettagli in `sviluppo/FOSS-CHAT.md`).
 - **v82** — tolti dalla Home i quattro riquadri numerici (progetti attivi, task aperte, consegne, collaboratori).
 - **v81** — invito ad accendere gli avvisi per tutti (anche nel browser); scheda dello spazio

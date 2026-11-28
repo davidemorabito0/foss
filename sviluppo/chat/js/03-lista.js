@@ -151,7 +151,7 @@ function rigaHTML(c){
     else if(u.tipo === 'colpetto') ant = anteprimaTipo(u);
     else {
       if(u.autore === S.io){ const st = statoSpunte(u, c); ant += spunteHTML(st, true); }
-      else if(c.tipo === 'gruppo') ant += '<span class="chi">'+esc(nomeMsg(u))+':&nbsp;</span>';
+      else if(c.tipo === 'gruppo' && !c.solo_avvisi && u.autore) ant += '<span class="chi">'+esc(nomeMsg(u))+':&nbsp;</span>';
       ant += anteprimaTipo(u);
     }
   } else if(c.tipo === 'gruppo') ant = '<span class="tx">Gruppo creato</span>';

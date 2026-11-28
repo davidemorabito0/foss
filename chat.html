@@ -1542,6 +1542,9 @@ input,textarea,[contenteditable="true"]{-webkit-user-select:text;user-select:tex
 .mio-colori label b{font-size:14px;font-weight:600;color:var(--testo)}
 .mio-colori label span span{font-size:12px;color:var(--testo-2)}
 .mio-colori p{grid-column:1/-1;margin:2px 2px 0;font-size:12.5px;color:var(--testo-2)}
+/* 2.9.19: chat di soli avvisi (es. «Richieste dal sito»): al posto della casella per scrivere */
+.solo-avvisi{display:flex;align-items:center;justify-content:center;gap:8px;min-height:62px;padding:10px 18px;color:var(--testo-2);font-size:13.5px;line-height:1.35;text-align:center}
+.solo-avvisi svg{width:18px;height:18px;flex:none}
 </style>
 </head>
 <body>
@@ -1561,7 +1564,7 @@ const SUPA_KEY = 'sb_publishable_f5Kjp6NHT9yTxr1bhWJjhg_4y72V-Kj';
 const VAPID_PUBBLICA = 'BNlGbW4nZrXmx8DioKxnl7ubULVOr5_6CAKvpuQYoiXeObmxYAzGU6UrkExx2zu1hACmtRNDcpoMh_ARQ0GSmlw';
 /* il server dei file sul NAS (es. 'https://media.foss.team'). Vuoto = si usa Supabase. */
 const MEDIA_NAS = 'https://media.foss.team';
-const VERSIONE = 'chat-2.9.18';
+const VERSIONE = 'chat-2.9.19';
 /* i temi colore: gli stessi di FOSS. Il predefinito per tutti è Brand (blu e giallo). */
 const TEMI_COLORE = [
   {id:'brand',   nome:'Brand',    ds:'Navy e ambra, il predefinito', c:['#0D1926','#1A3149','#FFAD01']},
@@ -2666,7 +2669,7 @@ function rigaHTML(c){
     else if(u.tipo === 'colpetto') ant = anteprimaTipo(u);
     else {
       if(u.autore === S.io){ const st = statoSpunte(u, c); ant += spunteHTML(st, true); }
-      else if(c.tipo === 'gruppo') ant += '<span class="chi">'+esc(nomeMsg(u))+':&nbsp;</span>';
+      else if(c.tipo === 'gruppo' && !c.solo_avvisi && u.autore) ant += '<span class="chi">'+esc(nomeMsg(u))+':&nbsp;</span>';
       ant += anteprimaTipo(u);
     }
   } else if(c.tipo === 'gruppo') ant = '<span class="tx">Gruppo creato</span>';
@@ -2885,7 +2888,7 @@ function msgHTML(m, prev, next, c){
     return '<div class="sistema" data-id="'+m.id+'"><span>'+esc(m.testo || '')+'</span></div>';
   }
   if(m.tipo === 'colpetto') return colpettoHTML(m);
-  const mio = m.autore === S.io, gr = c.tipo === 'gruppo';
+  const mio = m.autore === S.io, gr = c.tipo === 'gruppo' && !c.solo_avvisi;   /* 2.9.19: negli avvisi niente nome e foto di chi scrive */
   const primo = !stessoGruppo(prev, m), ultimo = !stessoGruppo(m, next);
   const r = S.reazioni.get(m.id), haR = r && r.size;
   let cls = 'msg ' + (mio ? 'mio' : 'suo') + (primo ? ' primo' : '') + (ultimo ? ' ultimo' : '') + (gr ? ' gr' : '') + (haR ? ' con-reazioni' : '') +
@@ -2998,6 +3001,8 @@ function formatta(t, md){
   s = s.replace(/```([\s\S]+?)```/g, (_, x) => metti('<pre>' + x + '</pre>'));
   s = s.replace(/`([^`\n]+)`/g, (_, x) => metti('<code>' + x + '</code>'));
   s = s.replace(/(https?:\/\/[^\s<]+[^\s<.,;:!?)\]'"])/g, u => metti('<a href="' + u + '" target="_blank" rel="noopener noreferrer">' + u + '</a>'));
+  /* 2.9.19: un indirizzo email si tocca e apre la mail (es. nelle richieste dal sito) */
+  s = s.replace(/(^|[\s(:])([A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,})(?=$|[\s).,;!?])/g, (_, p, e) => p + metti('<a href="mailto:' + e + '">' + e + '</a>'));
   s = decoraTesto(s, md, metti);
   s = s.replace(/(^|[\s(])\*\*(\S(?:[^*\n]*\S)?)\*\*(?=$|[\s).,!?:;])/g, '$1<b>$2</b>');   /* anche **cosi'** */
   s = s.replace(/(^|[\s(])\*(\S(?:[^*\n]*\S)?)\*(?=$|[\s).,!?:;])/g, '$1<b>$2</b>')
@@ -3308,6 +3313,7 @@ function chiReagisce(id){
   foglio('Reazioni · ' + r.size, '<div style="margin:0 -24px">'+righe+'</div>', [['Chiudi']]);
 }
 function impostaRisposta(m){
+  const cv = S.convs.get(m.conv_id); if(cv && cv.solo_avvisi) return;   /* 2.9.19: negli avvisi non si risponde */
   S.risposta = m;
   disegnaScrivi();
   const t = el('testoIn'); if(t) t.focus();
@@ -3413,6 +3419,8 @@ function mostraDataFluttua(){
 /* ======================= SCRIVERE E MANDARE ======================= */
 function disegnaScrivi(){
   const F = el('scrivi'); const c = S.convs.get(S.aperta); if(!F || !c) return;
+  /* 2.9.19: chat di soli avvisi (es. «Richieste dal sito»): al posto della casella, una riga che lo spiega */
+  if(c.solo_avvisi){ F.innerHTML = '<div class="solo-avvisi" id="soloAvvisi">'+svg('info', 1.8)+'<span>Qui arrivano solo avvisi: non si può rispondere. Per rispondere usa l\'email.</span></div>'; return; }
   if(S.selezione){ disegnaSelezione(); return; }
   const vecchio = el('testoIn'), testo = vecchio ? vecchio.value : (S.bozze[c.id] || '');
   const r = S.risposta && S.risposta.conv_id === c.id ? S.risposta : null;
@@ -6185,7 +6193,7 @@ function vociMessaggio(m, c){
     return {p, a};
   }
   const colp = m.tipo === 'colpetto';
-  if(!colp) p.push(['Rispondi', 'rispondi', () => impostaRisposta(m)]);
+  if(!colp && !c.solo_avvisi) p.push(['Rispondi', 'rispondi', () => impostaRisposta(m)]);
   if(m.tipo === 'lavoro' && md.lavoro) p.push(['Apri in FOSS', 'apri', () => apriLavoroInFoss(md.lavoro)]);
   if(testoDi(m) && m.tipo !== 'lavoro') p.push(['Copia', 'copia', () => copia(testoDi(m))]);
   if(m.tipo === 'vocale') p.push(['Trascrivi', 'testo', () => apriTrascrizione(m.id)]);

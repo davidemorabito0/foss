@@ -1,6 +1,8 @@
 /* ======================= SCRIVERE E MANDARE ======================= */
 function disegnaScrivi(){
   const F = el('scrivi'); const c = S.convs.get(S.aperta); if(!F || !c) return;
+  /* 2.9.19: chat di soli avvisi (es. «Richieste dal sito»): al posto della casella, una riga che lo spiega */
+  if(c.solo_avvisi){ F.innerHTML = '<div class="solo-avvisi" id="soloAvvisi">'+svg('info', 1.8)+'<span>Qui arrivano solo avvisi: non si può rispondere. Per rispondere usa l\'email.</span></div>'; return; }
   if(S.selezione){ disegnaSelezione(); return; }
   const vecchio = el('testoIn'), testo = vecchio ? vecchio.value : (S.bozze[c.id] || '');
   const r = S.risposta && S.risposta.conv_id === c.id ? S.risposta : null;

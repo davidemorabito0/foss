@@ -840,3 +840,12 @@ Sul Mac di Davide git e python non ci sono più: `pubblica.pl` carica le modific
 
 - Davide: «al momento mi funziona». Nessuna misura arrivata; tolto `js/30-misura.js` (copia in archivio di lavoro, non pubblicata). Service worker `foss-guscio-v121`.
 - Se il rimbalzo torna: ripristinare la misura 2.9.17 (registra dal clic sulla freccia, dove = `misura-fondo`). Notato in Chromium: il clic sulla freccia toglie il fuoco alla casella.
+
+## FOSS.chat 2.9.19 — le richieste dal sito arrivano in chat («Richieste dal sito»)
+
+- Il modulo di contatto di davidemorabito.com (repo `davidemorabito-sito`, `index.html`, oggetto `FOSS_INBOX`) oltre alla mail (web3forms) scrive una copia in `richieste_sito` con la chiave pubblica: solo inserimento, nessuno la legge da fuori (la vede solo l'amministratore di FOSS).
+- Prima di salvare (`richieste_sito_prima`): pulisce e accorcia i campi; senza nome/email/messaggio non salva; robot (casella nascosta `botcheck` o modulo compilato in meno di 3 s) → salvata come `spam`, niente messaggio; più di 3 richieste in 10 minuti dalla stessa email o più di 30 in un'ora → non salva. Il sito non riceve mai un errore.
+- Dopo (`richieste_sito_in_chat`): mette il messaggio, SENZA autore, nella chat `solo_avvisi` chiamata «Richieste dal sito» (gruppo con dentro solo il titolare). La notifica parte come per gli altri messaggi, con il nome della chat come mittente (`chat_dopo_il_messaggio` ora avvisa anche per i messaggi senza autore).
+- `chat_conversazioni.solo_avvisi`: nessuno ci scrive (`chat_prima_del_messaggio` blocca chiunque sia collegato); `chat_elenco` lo restituisce.
+- Nella chat: al posto della casella una riga «Qui arrivano solo avvisi…», niente nome/foto del mittente, niente «Rispondi» (si può inoltrare, fissare, ecc.). In tutte le chat un indirizzo email nel testo ora si tocca e apre la mail.
+- SQL in `sviluppo/sql/richieste_sito.sql`. Prova automatica: `prova28.py` (il finto Supabase crea la chat di avvisi con `window.__AVVISI = true`).

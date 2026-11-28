@@ -22,7 +22,7 @@ function vociMessaggio(m, c){
     return {p, a};
   }
   const colp = m.tipo === 'colpetto';
-  if(!colp) p.push(['Rispondi', 'rispondi', () => impostaRisposta(m)]);
+  if(!colp && !c.solo_avvisi) p.push(['Rispondi', 'rispondi', () => impostaRisposta(m)]);
   if(m.tipo === 'lavoro' && md.lavoro) p.push(['Apri in FOSS', 'apri', () => apriLavoroInFoss(md.lavoro)]);
   if(testoDi(m) && m.tipo !== 'lavoro') p.push(['Copia', 'copia', () => copia(testoDi(m))]);
   if(m.tipo === 'vocale') p.push(['Trascrivi', 'testo', () => apriTrascrizione(m.id)]);

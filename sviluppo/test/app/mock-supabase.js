@@ -37,6 +37,14 @@
   msg(G1, AN, 'Vocale per te', 150, {tipo: 'vocale', testo: null, media: {path: G1 + '/v.m4a', dur: 14.2, onda: 'BDHLPTXbfjnrvzzvrnjfbXTPLHDBDHLPTXbfjnrvz'}});
   msg(G1, MO, 'Questa sta sul NAS', 100, {tipo: 'foto', testo: null, media: {url: 'https://nas-spento.invalid/media/x.jpg', w: 800, h: 600}});
   msg(G1, MO, 'Ok ragazzi a domani!', 2, {media: {schermo: 'coriandoli'}});
+  /* 2.9.19: chat di soli avvisi (richieste dal sito), solo se la prova la chiede */
+  let A1 = null;
+  if(window.__AVVISI){
+    A1 = uid();
+    db.chat_conversazioni.push({id: A1, tipo: 'gruppo', nome: 'Richieste dal sito', descrizione: '', foto: null, creata_da: D, creata_il: fa(500), ultimo_il: fa(3), solo_avvisi: true});
+    mem(A1, D, 'admin', fa(100));
+    msg(A1, null, '📩 *Nuova richiesta dal sito*\n*Prova Rossi* · Matrimonio\n\nEmail: prova@example.com\nTelefono: 333\n\nCiao, vorrei un video', 3);
+  }
 
   /* ---- lavori di FOSS finti ---- */
   const O1 = '9ee833a0-d3bc-47ca-b838-0bbf8c1d113b';
@@ -363,7 +371,7 @@
     realtime: {isConnected: () => !staccato.v, setAuth(){}},
   };
   /* aiutanti per le prove */
-  window.__mock = {db, storage, MO, AN, D, C1, G1,
+  window.__mock = {db, storage, MO, AN, D, C1, G1, A1,
     /* il collegamento cade in silenzio (telefono in tasca) e poi torna */
     cade(){ staccato.v = true; canali.forEach(ch => { ch.state = 'errored'; }); },
     cadeRumoroso(){ staccato.v = true; canali.slice().forEach(ch => { ch.state = 'errored'; ch.cb && ch.cb('CHANNEL_ERROR'); }); },
